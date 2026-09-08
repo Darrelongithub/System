@@ -1,0 +1,95 @@
+{
+  "analyzedRows": 9738,
+  "invalidRows": 0,
+  "tradePassCount": 2384,
+  "contextPassCount": 3184,
+  "perStrategy": {
+    "dual-thrust": {
+      "triggers": 170,
+      "tp": 60,
+      "sl": 109,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 38.10916783884909
+    },
+    "macd-cross": {
+      "triggers": 395,
+      "tp": 136,
+      "sl": 258,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 76.0054182969676
+    },
+    "pdh-retest": {
+      "triggers": 127,
+      "tp": 43,
+      "sl": 84,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 20.62069754675213
+    },
+    "williams-r-fade": {
+      "triggers": 390,
+      "tp": 128,
+      "sl": 262,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 114.91045104513023
+    },
+    "three-soldiers": {
+      "triggers": 402,
+      "tp": 136,
+      "sl": 265,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 69.46647390872525
+    },
+    "morning-star": {
+      "triggers": 373,
+      "tp": 115,
+      "sl": 258,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 77.62416867618006
+    },
+    "classic-pivot": {
+      "triggers": 141,
+      "tp": 44,
+      "sl": 97,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 31.117822395746977
+    },
+    "ichimoku-tk": {
+      "triggers": 202,
+      "tp": 59,
+      "sl": 142,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 32.60584879176691
+    },
+    "donchian-55": {
+      "triggers": 184,
+      "tp": 47,
+      "sl": 137,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 47.37046884498458
+    }
+  },
+  "totals": {
+    "triggers": 2384,
+    "tp": 768,
+    "sl": 1612,
+    "open": 4,
+    "noFill": 0,
+    "rSum": 507.83051734510207
+  },
+  "generatedAt": "2026-08-28T19:02:16.192Z",
+  "runAnalysisMs": 1842.2413699999997,
+  "options": {
+    "seriesEndsComplete": true,
+    "enableHtfDirectionFilter": true
+  },
+  "note": "Regenerated after removal of absolute 10xATR TP-distance gate. Production strategy math unchanged."
+}

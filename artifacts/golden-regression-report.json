@@ -1,0 +1,35 @@
+{
+  "registration": {
+    "missing": [],
+    "extra": [],
+    "legacyInDefault": []
+  },
+  "aggregates": {
+    "golden": {
+      "triggers": 2384,
+      "tp": 768,
+      "sl": 1612,
+      "open": 4,
+      "noFill": 0,
+      "rSum": 507.83051734510207
+    },
+    "current": {
+      "triggers": 2384,
+      "tp": 768,
+      "sl": 1612,
+      "open": 4,
+      "noFill": 0,
+      "rSum": 507.83051734510207
+    }
+  },
+  "rowDiff": {
+    "onlyGolden": 0,
+    "onlyCurrent": 0,
+    "fieldMismatches": 0
+  },
+  "onlyGoldenSample": [],
+  "onlyCurrentSample": [],
+  "fieldMismatchSample": [],
+  "contextInTrades": 0,
+  "marketSameBarResolve": 0
+}

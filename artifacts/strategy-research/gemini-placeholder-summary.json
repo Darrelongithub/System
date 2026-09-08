@@ -1,0 +1,13 @@
+{
+  "note": "Placeholder is a deterministic regime rejector, NOT a trained LLM. Interface matches Gemini contract.",
+  "sampleSize": 312,
+  "takeN": 184,
+  "rejectN": 128,
+  "takeR": 41.42409690907584,
+  "rejectR": -35.43442649825466,
+  "rIfRejectsDropped": 41.42409690907584,
+  "rGainedByRejects": 35.43442649825466,
+  "rejectWins": 25,
+  "rejectLosses": 103,
+  "resultsPath": "artifacts/strategy-research/gemini-placeholder-results.jsonl"
+}
