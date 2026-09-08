@@ -53,65 +53,14 @@ export function dailyAggregates(candles: Candle[]): DayAggregate[] {
   return out;
 }
 
-/** Prior EAT day's aggregate relative to the day containing bar `i`. */
-export function priorDay(daily: DayAggregate[], candle: Candle): DayAggregate | undefined {
-  const day = eatDay(candle.datetime);
-  let previous: DayAggregate | undefined;
-  for (const agg of daily) {
-    if (agg.day === day) return previous;
-    previous = agg;
-  }
-  return undefined;
-}
-
-export interface ClassicPivots {
-  pp: number;
-  r1: number;
-  r2: number;
-  s1: number;
-  s2: number;
-}
-
-/** Classic pivots (the one method used everywhere in this analyzer). */
-export function classicPivots(d: DayAggregate): ClassicPivots {
-  const pp = (d.high + d.low + d.close) / 3;
-  const range = d.high - d.low;
-  return {
-    pp,
-    r1: 2 * pp - d.low,
-    s1: 2 * pp - d.high,
-    r2: pp + range,
-    s2: pp - range,
-  };
-}
-
-/** Asian-session range (EAT window) keyed by EAT day. */
-export function asianRanges(candles: Candle[]): Map<string, RangeWindow> {
-  const map = new Map<string, RangeWindow>();
-  for (const c of candles) {
-    if (!usable(c)) continue;
-    if ((c.session ?? sessionOf(c.datetime)) !== "asian") continue;
-    const day = eatDay(c.datetime);
-    const existing = map.get(day);
-    if (!existing) {
-      map.set(day, { high: c.high!, low: c.low!, start: c.index, end: c.index });
-    } else {
-      existing.high = Math.max(existing.high, c.high!);
-      existing.low = Math.min(existing.low, c.low!);
-      existing.end = c.index;
-    }
-  }
-  return map;
-}
-
 /**
  * The source-of-truth reference is explicit that Crabel's book does not pin
  * an opening-range window length — it's an implementer's choice (15/30/60
  * minutes are all cited as plausible). This project chooses 30 minutes as
  * its documented convention (see FIXES_APPLIED.md), not a value drawn from
  * any primary source. Only the london and ny sessions get an opening range
- * here — asian is intentionally excluded (see asianRanges, which computes a
- * full-session range, a different construct entirely).
+ * here — asian is intentionally excluded (an opening range is a different
+ * construct from a full-session range).
  */
 export const OPENING_WINDOW_MINUTES = CRABEL_ORB_WINDOW_MINUTES;
 

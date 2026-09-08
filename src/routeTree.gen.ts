@@ -14,7 +14,6 @@ import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as BacktestRouteImport } from './routes/backtest'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as AnalysisIndexRouteImport } from './routes/analysis.index'
-import { Route as AnalysisV2RouteImport } from './routes/analysis.v2'
 import { Route as ApiMarketDataRouteImport } from './routes/api/market-data'
 
 const IndexRoute = IndexRouteImport.update({
@@ -42,11 +41,6 @@ const AnalysisIndexRoute = AnalysisIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AnalysisRoute,
 } as any)
-const AnalysisV2Route = AnalysisV2RouteImport.update({
-  id: '/v2',
-  path: '/v2',
-  getParentRoute: () => AnalysisRoute,
-} as any)
 const ApiMarketDataRoute = ApiMarketDataRouteImport.update({
   id: '/api/market-data',
   path: '/api/market-data',
@@ -58,7 +52,6 @@ export interface FileRoutesByFullPath {
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v2': typeof AnalysisV2Route
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis/': typeof AnalysisIndexRoute
 }
@@ -66,7 +59,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v2': typeof AnalysisV2Route
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis': typeof AnalysisIndexRoute
 }
@@ -76,7 +68,6 @@ export interface FileRoutesById {
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v2': typeof AnalysisV2Route
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis/': typeof AnalysisIndexRoute
 }
@@ -87,24 +78,16 @@ export interface FileRouteTypes {
     | '/analysis'
     | '/backtest'
     | '/generator'
-    | '/analysis/v2'
     | '/api/market-data'
     | '/analysis/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/backtest'
-    | '/generator'
-    | '/analysis/v2'
-    | '/api/market-data'
-    | '/analysis'
+  to: '/' | '/backtest' | '/generator' | '/api/market-data' | '/analysis'
   id:
     | '__root__'
     | '/'
     | '/analysis'
     | '/backtest'
     | '/generator'
-    | '/analysis/v2'
     | '/api/market-data'
     | '/analysis/'
   fileRoutesById: FileRoutesById
@@ -154,13 +137,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalysisIndexRouteImport
       parentRoute: typeof AnalysisRoute
     }
-    '/analysis/v2': {
-      id: '/analysis/v2'
-      path: '/v2'
-      fullPath: '/analysis/v2'
-      preLoaderRoute: typeof AnalysisV2RouteImport
-      parentRoute: typeof AnalysisRoute
-    }
     '/api/market-data': {
       id: '/api/market-data'
       path: '/api/market-data'
@@ -172,12 +148,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface AnalysisRouteChildren {
-  AnalysisV2Route: typeof AnalysisV2Route
   AnalysisIndexRoute: typeof AnalysisIndexRoute
 }
 
 const AnalysisRouteChildren: AnalysisRouteChildren = {
-  AnalysisV2Route: AnalysisV2Route,
   AnalysisIndexRoute: AnalysisIndexRoute,
 }
 

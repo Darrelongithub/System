@@ -83,9 +83,6 @@ export interface AnalysisContext {
   candles: Candle[];
   byDatetime: Map<string, Candle>;
   ema20: (number | undefined)[];
-  ema50: (number | undefined)[];
-  ema200: (number | undefined)[];
-  blocks: import("./indicators").SessionBlock[];
   spread: number;
   /** ATR(14) per bar — every threshold in the specs is ATR-relative. */
   atr: (number | undefined)[];
@@ -94,12 +91,8 @@ export interface AnalysisContext {
   pivotLows: import("./pivots").Pivot[];
   /** Daily (EAT) aggregates used for pivot levels. */
   daily: import("./daily").DayAggregate[];
-  /** Asian-session range per EAT day. */
-  asian: Map<string, import("./daily").RangeWindow>;
   /** Opening range per `${day}|${session}`. */
   openingRanges: Map<string, import("./daily").OpeningRange>;
-  htfTrendAt: (index: number) => HtfTrendContext;
-  enableHtfDirectionFilter: boolean;
   /**
    * Levels already used up by a strategy (swept swing, mitigated order block,
    * filled FVG...). Keyed `${strategyId}` -> set of level keys, so the same

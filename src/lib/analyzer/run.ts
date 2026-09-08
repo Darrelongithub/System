@@ -1,5 +1,5 @@
-import { asianRanges, dailyAggregates, openingRanges } from "./daily";
-import { ema, sessionBlocks } from "./indicators";
+import { dailyAggregates, openingRanges } from "./daily";
+import { ema } from "./indicators";
 import { applySpreadAndRR, RR_FAIL_REASON, RR_THRESHOLD } from "./math";
 import { parseCsv, parseSpread } from "./parse";
 import { atrSeries, findPivots } from "./pivots";
@@ -31,10 +31,11 @@ export type RunOutcome = RunSuccess | RunFailure;
 
 export interface RunOptions {
   /**
-   * Stored on AnalysisContext for tooling/comparison helpers.
+   * Accepted for call-site compatibility (UI, tests, golden generator).
    * CURRENTLY INERT for trade generation: runAnalysis does not reject PASS rows
-   * via htfAllowsDirection. Activating it would change strategy definition (A1)
-   * and requires an explicit experiment + new golden — do not treat as live filter.
+   * via htfAllowsDirection and the flag is not stored on AnalysisContext.
+   * Activating it would change strategy definition (A1) and requires an
+   * explicit experiment + new golden — do not treat as live filter.
    */
   enableHtfDirectionFilter?: boolean;
   /**
@@ -105,18 +106,12 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
     candles,
     byDatetime,
     ema20: ema(candles, 20),
-    ema50: ema(candles, 50),
-    ema200: ema(candles, 200),
-    blocks: sessionBlocks(candles),
     spread,
     atr,
     pivotHighs: pivots.highs,
     pivotLows: pivots.lows,
     daily: dailyAggregates(candles),
-    asian: asianRanges(candles),
     openingRanges: openingRanges(candles),
-    htfTrendAt: (index) => htfTrends[index] ?? { h1: "ranging", h4: "ranging", d1: "ranging" },
-    enableHtfDirectionFilter: options.enableHtfDirectionFilter ?? true,
     consumed: new Map(),
     state: new Map(),
   };
