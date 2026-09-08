@@ -19,10 +19,9 @@ const RequestSchema = z.object({
 });
 
 /**
- * Twelve Data keys are the ONLY candle providers (Finnhub is reserved for
- * news). Supports all layouts: TWELVE_DATA_API_KEYS (CSV list),
- * TWELVE_DATA_API_KEY, and suffixed singles TWELVE_DATA_API_KEY_1..N.
- * Order is stable and deductions are deduped.
+ * Twelve Data keys are the ONLY candle providers. Supports all layouts:
+ * TWELVE_DATA_API_KEYS (CSV list), TWELVE_DATA_API_KEY, and suffixed singles
+ * TWELVE_DATA_API_KEY_1..N. Order is stable and deductions are deduped.
  */
 export function collectTwelveDataKeys(env: NodeJS.ProcessEnv = process.env): string[] {
   const seen = new Set<string>();
@@ -111,7 +110,7 @@ async function proxyInner(request: Request): Promise<Response> {
       JSON.stringify({
         status: "error",
         message:
-          "No candle provider is configured on the server (set TWELVE_DATA_API_KEYS, TWELVE_DATA_API_KEY, or TWELVE_DATA_API_KEY_1..N). Finnhub is reserved for news and is never used for candles.",
+          "No candle provider is configured on the server (set TWELVE_DATA_API_KEYS, TWELVE_DATA_API_KEY, or TWELVE_DATA_API_KEY_1..N).",
       }),
       {
         status: 500,

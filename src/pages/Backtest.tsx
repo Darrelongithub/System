@@ -2,7 +2,7 @@ import { useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import JSZip from "jszip";
-import { ArrowLeft, Bot, Download, History, Loader2, Play, Square } from "lucide-react";
+import { ArrowLeft, Download, History, Loader2, Play, Square } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,7 @@ import { getDiagnosticsReportLines, resetDiagnostics } from "@/lib/analyzer/stra
 import { AVAILABLE_SYMBOLS } from "@/lib/market-data";
 import { buildOhlcCsv } from "@/lib/ohlc-generator";
 import { verifySetup } from "@/lib/verifier.functions";
-import { appendAiSections, runDebate, type AiStage } from "@/lib/backtest/ai";
+import { appendAiSections, type AiStage } from "@/lib/backtest/ai";
 import {
   applyTriggers,
   buildDayReport,
@@ -41,8 +41,6 @@ import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 
 const AI_STAGE_LABELS: Record<AiStage, string> = {
   verifier: "Verifier / picker (default)",
-  debate: "Gemini ↔ GPT debate",
-  both: "Verifier + debate",
   off: "Local engine only",
 };
 
@@ -340,7 +338,7 @@ export default function Backtest() {
         addLog(`${day}: AI stage skipped — no trade triggers this day.`);
       }
 
-      if (canRunAi && (aiStage === "verifier" || aiStage === "both")) {
+      if (canRunAi && aiStage === "verifier") {
         try {
           addLog(`${day}: running V2 verifier / picker…`);
           const outcome = await runVerifier({ data: { scoutData: report, ohlcCsv: continuousCsv } });
@@ -357,30 +355,6 @@ export default function Backtest() {
           const message = error instanceof Error ? error.message : String(error);
           aiSections.push({ title: "V2 VERIFIER VERDICT", body: `FAILED: ${message}` });
           addLog(`${day}: verifier failed — ${message}`);
-        }
-      }
-
-      if (canRunAi && (aiStage === "debate" || aiStage === "both")) {
-        try {
-          addLog(`${day}: running Gemini ↔ GPT debate…`);
-          const debate = await runDebate({
-            symbol,
-            range: `${windowStart} → ${day}`,
-            ohlcCsv: continuousCsv,
-            summaryFields: report,
-            onLog: (message) => addLog(`${day}: ${message}`),
-          });
-          if (!isCurrent()) return;
-          aiSections.push({
-            title: `GEMINI ↔ GPT DEBATE (${debate.status}${debate.agreed ? " · agreed" : ""})`,
-            body: `${debate.summary}\n\n--- FULL TRANSCRIPT ---\n${debate.transcript}`,
-          });
-          addLog(`${day}: debate finished — ${debate.status}`);
-        } catch (error) {
-          if (!isCurrent()) return;
-          const message = error instanceof Error ? error.message : String(error);
-          aiSections.push({ title: "GEMINI ↔ GPT DEBATE", body: `FAILED: ${message}` });
-          addLog(`${day}: debate failed — ${message}`);
         }
       }
 
@@ -439,9 +413,6 @@ export default function Backtest() {
           <div className="flex flex-wrap items-center gap-2">
             <Link to="/" className="flex w-fit items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-bold text-muted-foreground transition-colors hover:text-foreground">
               <ArrowLeft size={12} /> Main menu
-            </Link>
-            <Link to="/gemini-console" className="flex w-fit items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-bold text-muted-foreground transition-colors hover:text-foreground">
-              <Bot size={12} /> Gemini console
             </Link>
           </div>
           <div className="flex flex-wrap items-end justify-between gap-3">
@@ -548,7 +519,7 @@ export default function Backtest() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(["verifier", "debate", "both", "off"] as AiStage[]).map((stage) => (
+                  {(["verifier", "off"] as AiStage[]).map((stage) => (
                     <SelectItem key={stage} value={stage}>
                       {AI_STAGE_LABELS[stage]}
                     </SelectItem>
@@ -557,8 +528,7 @@ export default function Backtest() {
               </Select>
               <p className="text-[11px] text-muted-foreground">
                 The verifier runs on every day that produced PASS setups and its verdict is written
-                into that day&apos;s report. The debate is much slower — it streams a full Gemini ↔
-                GPT round per day.
+                into that day&apos;s report.
               </p>
             </div>
           </div>

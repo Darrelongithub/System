@@ -62,7 +62,7 @@ const NVIDIA_MODELS = ["deepseek-ai/deepseek-r1-0528", "deepseek-ai/deepseek-r1"
 
 export interface VerifyResult {
   verdict: string;
-  provider: "gemini" | "lovable" | "openrouter" | "nvidia";
+  provider: "lovable" | "openrouter" | "nvidia";
   model: string;
   warnings: string[];
 }

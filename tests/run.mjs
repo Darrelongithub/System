@@ -15,10 +15,6 @@ await import("./determinism.test.mjs");
 await import("./causality.test.mjs");
 await import("./weekend-tail-accounting.test.mjs");
 await import("./backtest-analyzer-parity.test.mjs");
-await import("./gemini-research.test.mjs");
-await import("./gemini-phase2.test.mjs");
-await import("./gemini-select.test.mjs");
-await import("./gemini-console.test.mjs");
 await import("./server-env.test.mjs");
 
 const filter = process.argv[2];

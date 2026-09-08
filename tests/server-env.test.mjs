@@ -12,16 +12,16 @@ test("server-env: parser handles comments/quotes/blanks and rejects junk keys", 
   const parsed = parseEnvText(
     [
       "# comment",
-      "FINNHUB_API_KEY=abc123",
-      'GEMINI_API_KEY="quoted value"',
+      "TWELVE_DATA_API_KEY=abc123",
+      'OPENROUTER_API_KEY="quoted value"',
       "SPACED = around-eq ",
       "1BAD=value",
       "",
       "NOEQUALS",
     ].join("\n"),
   );
-  assertEqual(parsed["FINNHUB_API_KEY"], "abc123");
-  assertEqual(parsed["GEMINI_API_KEY"], "quoted value");
+  assertEqual(parsed["TWELVE_DATA_API_KEY"], "abc123");
+  assertEqual(parsed["OPENROUTER_API_KEY"], "quoted value");
   assertEqual(parsed["SPACED"], "around-eq");
   assert(!("1BAD" in parsed) && !("NOEQUALS" in parsed), "junk lines ignored");
 });
@@ -117,7 +117,6 @@ test("edge-safe: no static node:* imports may re-enter the env loader or its rou
   for (const f of [
     "src/lib/server-env.ts",
     "src/routes/api/market-data.ts",
-    "src/routes/api/economic-calendar.ts",
     "src/lib/verifier.server.ts",
   ]) {
     const src = readFileSync(f, "utf8");

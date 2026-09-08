@@ -12,14 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as BacktestRouteImport } from './routes/backtest'
-import { Route as GeminiConsoleRouteImport } from './routes/gemini-console'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as AnalysisIndexRouteImport } from './routes/analysis.index'
-import { Route as AnalysisV1RouteImport } from './routes/analysis.v1'
 import { Route as AnalysisV2RouteImport } from './routes/analysis.v2'
-import { Route as ApiAnalysisRouteImport } from './routes/api/analysis'
-import { Route as ApiEconomicCalendarRouteImport } from './routes/api/economic-calendar'
-import { Route as ApiGeminiConsoleRouteImport } from './routes/api/gemini-console'
 import { Route as ApiMarketDataRouteImport } from './routes/api/market-data'
 
 const IndexRoute = IndexRouteImport.update({
@@ -37,11 +32,6 @@ const BacktestRoute = BacktestRouteImport.update({
   path: '/backtest',
   getParentRoute: () => rootRouteImport,
 } as any)
-const GeminiConsoleRoute = GeminiConsoleRouteImport.update({
-  id: '/gemini-console',
-  path: '/gemini-console',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const GeneratorRoute = GeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
@@ -52,30 +42,10 @@ const AnalysisIndexRoute = AnalysisIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AnalysisRoute,
 } as any)
-const AnalysisV1Route = AnalysisV1RouteImport.update({
-  id: '/v1',
-  path: '/v1',
-  getParentRoute: () => AnalysisRoute,
-} as any)
 const AnalysisV2Route = AnalysisV2RouteImport.update({
   id: '/v2',
   path: '/v2',
   getParentRoute: () => AnalysisRoute,
-} as any)
-const ApiAnalysisRoute = ApiAnalysisRouteImport.update({
-  id: '/api/analysis',
-  path: '/api/analysis',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiEconomicCalendarRoute = ApiEconomicCalendarRouteImport.update({
-  id: '/api/economic-calendar',
-  path: '/api/economic-calendar',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiGeminiConsoleRoute = ApiGeminiConsoleRouteImport.update({
-  id: '/api/gemini-console',
-  path: '/api/gemini-console',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiMarketDataRoute = ApiMarketDataRouteImport.update({
   id: '/api/market-data',
@@ -87,26 +57,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
-  '/gemini-console': typeof GeminiConsoleRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v1': typeof AnalysisV1Route
   '/analysis/v2': typeof AnalysisV2Route
-  '/api/analysis': typeof ApiAnalysisRoute
-  '/api/economic-calendar': typeof ApiEconomicCalendarRoute
-  '/api/gemini-console': typeof ApiGeminiConsoleRoute
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis/': typeof AnalysisIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtest': typeof BacktestRoute
-  '/gemini-console': typeof GeminiConsoleRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v1': typeof AnalysisV1Route
   '/analysis/v2': typeof AnalysisV2Route
-  '/api/analysis': typeof ApiAnalysisRoute
-  '/api/economic-calendar': typeof ApiEconomicCalendarRoute
-  '/api/gemini-console': typeof ApiGeminiConsoleRoute
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis': typeof AnalysisIndexRoute
 }
@@ -115,13 +75,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
-  '/gemini-console': typeof GeminiConsoleRoute
   '/generator': typeof GeneratorRoute
-  '/analysis/v1': typeof AnalysisV1Route
   '/analysis/v2': typeof AnalysisV2Route
-  '/api/analysis': typeof ApiAnalysisRoute
-  '/api/economic-calendar': typeof ApiEconomicCalendarRoute
-  '/api/gemini-console': typeof ApiGeminiConsoleRoute
   '/api/market-data': typeof ApiMarketDataRoute
   '/analysis/': typeof AnalysisIndexRoute
 }
@@ -131,26 +86,16 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/backtest'
-    | '/gemini-console'
     | '/generator'
-    | '/analysis/v1'
     | '/analysis/v2'
-    | '/api/analysis'
-    | '/api/economic-calendar'
-    | '/api/gemini-console'
     | '/api/market-data'
     | '/analysis/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/backtest'
-    | '/gemini-console'
     | '/generator'
-    | '/analysis/v1'
     | '/analysis/v2'
-    | '/api/analysis'
-    | '/api/economic-calendar'
-    | '/api/gemini-console'
     | '/api/market-data'
     | '/analysis'
   id:
@@ -158,13 +103,8 @@ export interface FileRouteTypes {
     | '/'
     | '/analysis'
     | '/backtest'
-    | '/gemini-console'
     | '/generator'
-    | '/analysis/v1'
     | '/analysis/v2'
-    | '/api/analysis'
-    | '/api/economic-calendar'
-    | '/api/gemini-console'
     | '/api/market-data'
     | '/analysis/'
   fileRoutesById: FileRoutesById
@@ -173,11 +113,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnalysisRoute: typeof AnalysisRouteWithChildren
   BacktestRoute: typeof BacktestRoute
-  GeminiConsoleRoute: typeof GeminiConsoleRoute
   GeneratorRoute: typeof GeneratorRoute
-  ApiAnalysisRoute: typeof ApiAnalysisRoute
-  ApiEconomicCalendarRoute: typeof ApiEconomicCalendarRoute
-  ApiGeminiConsoleRoute: typeof ApiGeminiConsoleRoute
   ApiMarketDataRoute: typeof ApiMarketDataRoute
 }
 
@@ -204,13 +140,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BacktestRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/gemini-console': {
-      id: '/gemini-console'
-      path: '/gemini-console'
-      fullPath: '/gemini-console'
-      preLoaderRoute: typeof GeminiConsoleRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/generator': {
       id: '/generator'
       path: '/generator'
@@ -225,40 +154,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnalysisIndexRouteImport
       parentRoute: typeof AnalysisRoute
     }
-    '/analysis/v1': {
-      id: '/analysis/v1'
-      path: '/v1'
-      fullPath: '/analysis/v1'
-      preLoaderRoute: typeof AnalysisV1RouteImport
-      parentRoute: typeof AnalysisRoute
-    }
     '/analysis/v2': {
       id: '/analysis/v2'
       path: '/v2'
       fullPath: '/analysis/v2'
       preLoaderRoute: typeof AnalysisV2RouteImport
       parentRoute: typeof AnalysisRoute
-    }
-    '/api/analysis': {
-      id: '/api/analysis'
-      path: '/api/analysis'
-      fullPath: '/api/analysis'
-      preLoaderRoute: typeof ApiAnalysisRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/economic-calendar': {
-      id: '/api/economic-calendar'
-      path: '/api/economic-calendar'
-      fullPath: '/api/economic-calendar'
-      preLoaderRoute: typeof ApiEconomicCalendarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/gemini-console': {
-      id: '/api/gemini-console'
-      path: '/api/gemini-console'
-      fullPath: '/api/gemini-console'
-      preLoaderRoute: typeof ApiGeminiConsoleRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/api/market-data': {
       id: '/api/market-data'
@@ -271,13 +172,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface AnalysisRouteChildren {
-  AnalysisV1Route: typeof AnalysisV1Route
   AnalysisV2Route: typeof AnalysisV2Route
   AnalysisIndexRoute: typeof AnalysisIndexRoute
 }
 
 const AnalysisRouteChildren: AnalysisRouteChildren = {
-  AnalysisV1Route: AnalysisV1Route,
   AnalysisV2Route: AnalysisV2Route,
   AnalysisIndexRoute: AnalysisIndexRoute,
 }
@@ -290,11 +189,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalysisRoute: AnalysisRouteWithChildren,
   BacktestRoute: BacktestRoute,
-  GeminiConsoleRoute: GeminiConsoleRoute,
   GeneratorRoute: GeneratorRoute,
-  ApiAnalysisRoute: ApiAnalysisRoute,
-  ApiEconomicCalendarRoute: ApiEconomicCalendarRoute,
-  ApiGeminiConsoleRoute: ApiGeminiConsoleRoute,
   ApiMarketDataRoute: ApiMarketDataRoute,
 }
 export const routeTree = rootRouteImport
