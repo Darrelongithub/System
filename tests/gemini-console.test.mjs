@@ -24,26 +24,29 @@ test("console: audit tail guard rejects traversal/unknown names (fail closed, no
   }
 });
 
-test("economic-calendar route ↔ console contract cannot drift again", async () => {
+test("gemini console is removed from production — removal stubs cannot drift", async () => {
+  // v1.2 removed the Gemini Console from production. The page renders null,
+  // and both the page route and the API route return a 410 removal stub. The
+  // prior contract test (console consuming the economic-calendar events/byDay
+  // shape) was invalidated by that removal and is replaced by these pins: if
+  // the console is ever reinstated, its economic-calendar contract must be
+  // re-added deliberately.
   const { readFileSync } = await import("node:fs");
-  const route = readFileSync("src/routes/api/economic-calendar.ts", "utf8");
-  for (const method of ["GET:", "POST:"])
-    assert(route.includes(method), `route registers ${method} handler (console POSTs JSON)`);
-  assert(route.includes("handleCalendar"), "shared param logic (identical semantics for GET/POST)");
   const page = readFileSync("src/pages/GeminiConsole.tsx", "utf8");
-  assert(
-    page.includes('data["events"]'),
-    "console consumes the route's events/byDay shape (not a phantom {upcoming,recent} field)",
-  );
+  assert(page.includes("return null"), "page UI removed (renders null)");
+  const route = readFileSync("src/routes/gemini-console.tsx", "utf8");
+  assert(route.includes("Gemini Console removed"), "page route is a removal stub");
+  const api = readFileSync("src/routes/api/gemini-console.ts", "utf8");
+  assert(api.includes("410"), "API route returns 410 Gone");
 });
 
-test("console: baseline context loads the locked artifacts (2384 trades / 9738 candles)", () => {
+test("console: baseline context loads the locked artifacts (2323 trades / 9738 candles)", () => {
   const c = consoleContext();
-  assertEqual(c.truth.length, 2384, "golden trades");
+  assertEqual(c.truth.length, 2323, "golden trades");
   assertEqual(c.candles.length, 9738, "baseline candles");
   assert(c.candles[0].datetime < c.candles[c.candles.length - 1].datetime, "chronological");
   const status = aiConsoleStatus();
-  assertEqual(status.baseline.trades, 2384);
+  assertEqual(status.baseline.trades, 2323);
   assertEqual(status.promptVersion, "ts-v2-final-1", "final prompt asset detected");
   assertEqual(
     status.geminiConfigured,

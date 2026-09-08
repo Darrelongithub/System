@@ -81,7 +81,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
   const g = aggregatesOf(golden),
     r = aggregatesOf(ref.analysis.tradePasses);
   assertEqual(ref.analysis.tradePasses.length, golden.length, "row count");
-  assertEqual(summary.totals.triggers, 2384, "locked trigger count");
+  assertEqual(summary.totals.triggers, 2323, "locked trigger count");
   assert(
     Math.abs(g.r - summary.totals.rSum) / Math.max(1, Math.abs(summary.totals.rSum)) < 1e-12,
     "golden R internal precision",
@@ -94,7 +94,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
     for (const f of TRADE_FIELDS) assert(nearly(t[f], norm(g0[f])), `${keyOf(t)} field ${f}`);
     exact += 1;
   }
-  assertEqual(exact, 2384, "all fields row-for-row");
+  assertEqual(exact, 2323, "all fields row-for-row");
   assert(Math.abs(r.r - g.r) / Math.max(1, Math.abs(g.r)) < 1e-12, "aggregate R");
 });
 
@@ -140,9 +140,9 @@ test("parity: Backtest day-supplied accounting equals golden and per-strategy re
     totals.open += s.open;
     totals.noFill += s.noFill;
   }
-  assertEqual(totals.triggers, 2384, "bt triggers");
-  assertEqual(totals.tp, 768, "bt tp");
-  assertEqual(totals.sl, 1612, "bt sl");
+  assertEqual(totals.triggers, 2323, "bt triggers");
+  assertEqual(totals.tp, 756, "bt tp");
+  assertEqual(totals.sl, 1563, "bt sl");
   assertEqual(totals.open, 4, "bt open");
   assertEqual(totals.noFill, 0, "bt noFill");
   assert(skippedDays > 0, "genuinely empty days still skipped");

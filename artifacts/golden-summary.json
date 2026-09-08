@@ -1,95 +1,95 @@
 {
   "analyzedRows": 9738,
   "invalidRows": 0,
-  "tradePassCount": 2384,
+  "tradePassCount": 2323,
   "contextPassCount": 3184,
   "perStrategy": {
     "dual-thrust": {
-      "triggers": 170,
-      "tp": 60,
-      "sl": 109,
+      "triggers": 165,
+      "tp": 59,
+      "sl": 105,
       "open": 1,
       "noFill": 0,
-      "rSum": 38.10916783884909
+      "rSum": 39.507928508056196
     },
     "macd-cross": {
-      "triggers": 395,
-      "tp": 136,
-      "sl": 258,
+      "triggers": 389,
+      "tp": 134,
+      "sl": 254,
       "open": 1,
       "noFill": 0,
-      "rSum": 76.0054182969676
+      "rSum": 75.09939547758665
     },
     "pdh-retest": {
-      "triggers": 127,
-      "tp": 43,
-      "sl": 84,
+      "triggers": 120,
+      "tp": 41,
+      "sl": 79,
       "open": 0,
       "noFill": 0,
-      "rSum": 20.62069754675213
+      "rSum": 20.701644248975164
     },
     "williams-r-fade": {
-      "triggers": 390,
+      "triggers": 386,
       "tp": 128,
-      "sl": 262,
-      "open": 0,
-      "noFill": 0,
-      "rSum": 114.91045104513023
-    },
-    "three-soldiers": {
-      "triggers": 402,
-      "tp": 136,
-      "sl": 265,
-      "open": 1,
-      "noFill": 0,
-      "rSum": 69.46647390872525
-    },
-    "morning-star": {
-      "triggers": 373,
-      "tp": 115,
       "sl": 258,
       "open": 0,
       "noFill": 0,
-      "rSum": 77.62416867618006
+      "rSum": 118.91045104513022
     },
-    "classic-pivot": {
-      "triggers": 141,
-      "tp": 44,
-      "sl": 97,
-      "open": 0,
-      "noFill": 0,
-      "rSum": 31.117822395746977
-    },
-    "ichimoku-tk": {
-      "triggers": 202,
-      "tp": 59,
-      "sl": 142,
+    "three-soldiers": {
+      "triggers": 396,
+      "tp": 134,
+      "sl": 261,
       "open": 1,
       "noFill": 0,
-      "rSum": 32.60584879176691
+      "rSum": 68.52284948294876
     },
-    "donchian-55": {
-      "triggers": 184,
-      "tp": 47,
-      "sl": 137,
+    "morning-star": {
+      "triggers": 364,
+      "tp": 112,
+      "sl": 252,
       "open": 0,
       "noFill": 0,
-      "rSum": 47.37046884498458
+      "rSum": 74.78949297397797
+    },
+    "classic-pivot": {
+      "triggers": 136,
+      "tp": 44,
+      "sl": 92,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 36.11782239574696
+    },
+    "ichimoku-tk": {
+      "triggers": 190,
+      "tp": 58,
+      "sl": 131,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 40.63673974303377
+    },
+    "donchian-55": {
+      "triggers": 177,
+      "tp": 46,
+      "sl": 131,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 49.395026520863595
     }
   },
   "totals": {
-    "triggers": 2384,
-    "tp": 768,
-    "sl": 1612,
+    "triggers": 2323,
+    "tp": 756,
+    "sl": 1563,
     "open": 4,
     "noFill": 0,
-    "rSum": 507.83051734510207
+    "rSum": 523.6813503963194
   },
-  "generatedAt": "2026-08-28T19:02:16.192Z",
-  "runAnalysisMs": 1842.2413699999997,
+  "generatedAt": "2026-09-08T13:46:40.795Z",
+  "runAnalysisMs": 1265,
   "options": {
     "seriesEndsComplete": true,
     "enableHtfDirectionFilter": true
   },
-  "note": "Regenerated after removal of absolute 10xATR TP-distance gate. Production strategy math unchanged."
+  "note": "v1.4 re-baseline: production default (A2 consume-after-RR + Filter C enabled). Prior golden (2384) predated both the v1.2 A2 fix (+3) and the v1.3 Filter C default (-64)."
 }

@@ -1,5 +1,8 @@
 # Signal Finder Pro — Independent Audit (2026-09-08)
 
+> **Resolution:** findings §1–§4 (golden lock, .gitignore, Gemini contract test, README)
+> were fixed in v1.4 — see `logs/v1.4-changes.md`. The suite is now 94/94 green.
+
 **Scope:** whole repo, post-extraction. **Method:** execution-first — every claim below was
 reproduced by actually running the project (Node v22, `npm install` clean, `npx tsc`,
 `npm run build`, `npm test`, and direct `runAnalysis(...)` probes against the locked baseline).

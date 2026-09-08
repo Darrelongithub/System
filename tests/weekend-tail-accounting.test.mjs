@@ -100,8 +100,9 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
 
   assertEqual(applied, continuous.tradeTriggers.length, "every engine trigger is applied");
   assert(skippedDays > 0, "true empty days are still skipped");
-  // The pre-fix deficit: 39 trigger-bearing Saturdays in the locked baseline.
-  assertEqual([...saturdayTriggerBearing.values()].reduce((a, b) => a + b, 0), 39,
-    "all 39 Saturday-tail triggers accounted");
+  // The pre-fix deficit: 37 trigger-bearing Saturdays in the locked baseline
+  // (was 39 pre-Filter-C; Filter C removed 2 Saturday-tail trades in v1.3).
+  assertEqual([...saturdayTriggerBearing.values()].reduce((a, b) => a + b, 0), 37,
+    "all 37 Saturday-tail triggers accounted");
   assert(!saturdayTriggerBearing.has("9999-01-01"), "map is real");
 });

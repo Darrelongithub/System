@@ -6,20 +6,20 @@
   },
   "aggregates": {
     "golden": {
-      "triggers": 2384,
-      "tp": 768,
-      "sl": 1612,
+      "triggers": 2323,
+      "tp": 756,
+      "sl": 1563,
       "open": 4,
       "noFill": 0,
-      "rSum": 507.83051734510207
+      "rSum": 523.6813503963194
     },
     "current": {
-      "triggers": 2384,
-      "tp": 768,
-      "sl": 1612,
+      "triggers": 2323,
+      "tp": 756,
+      "sl": 1563,
       "open": 4,
       "noFill": 0,
-      "rSum": 507.83051734510207
+      "rSum": 523.6813503963194
     }
   },
   "rowDiff": {
