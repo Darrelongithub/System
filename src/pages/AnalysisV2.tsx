@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Bot } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
 import { VerifierPanel } from "@/components/verifier-panel";
 

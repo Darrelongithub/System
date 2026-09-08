@@ -457,15 +457,13 @@ export function batchBacktestReports(
 
 /**
  * Keyed by the live `StrategyCheck.id` values from `analyzer/strategies` (see
- * `spec-strategies.ts` and `fvg-fill.ts`). This previously listed ids from an
- * older, now-orphaned strategy set (underscored names like `opening_range`,
- * `order_block`, `liquidity_sweep`...) that no longer exist in `STRATEGIES`,
- * so every lookup silently missed and fell back to the generic placeholder
- * for every strategy except FVG. Updated to match the current hyphenated ids
- * and the actual coded rules from Strategy_Codeability_Specs.md.
+ * `spec-strategies.ts`). This previously listed ids from an older, now-orphaned
+ * strategy set (underscored names like `opening_range`, `order_block`,
+ * `liquidity_sweep`...) that no longer exist in `STRATEGIES`, so every lookup
+ * silently missed and fell back to the generic placeholder. Updated to match
+ * the current hyphenated ids and the actual coded rules.
  */
 const REQUIREMENTS: Record<string, string[]> = {
-  fvg_fill: ["fair-value gap condition", "source-defined fill mechanics where applicable"],
   "opening-range-breakout": ["opening range built for the candle's own session", "past the opening window", "Stretch-adjusted stop entry above/below the range", "opposite-side Stretch-adjusted protective stop", "no canonical fixed TP"],
   turtle: ["Wilder-smoothed N(20) from completed daily history", "System 1: prior 20-day extreme plus one instrument tick; System 2: prior 55-day extreme", "System 1 skip rule based on prior same-direction breakout outcome", "0.5N pyramiding from actual fills, maximum 4 units per market", "2N stop re-anchored to most recent fill", "System 1 10-day / System 2 20-day trailing exit"],
   "raschke-keltner": ["EMA(20) centerline", "ATR band convention", "condition only; no canonical TP"],

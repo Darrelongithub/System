@@ -4,6 +4,7 @@ import JSZip from "jszip";
 import { AVAILABLE_SYMBOLS, requestMarketData } from "@/lib/market-data";
 import {
   buildOhlcCsv,
+  MAX_RATE_LIMIT_RETRIES,
   removeRepeatedFlatlineArtifacts as removeRepeatedFlatlineArtifactsShared,
 } from "@/lib/ohlc-generator";
 import { Link } from "@tanstack/react-router";
@@ -11,16 +12,11 @@ import { setAnalysisSnapshot, type AnalysisChart } from "@/lib/analysis-store";
 import html2canvas from "html2canvas";
 import {
   LineChart,
-  Settings,
-  Play,
   Download,
   Image as ImageIcon,
   CheckCircle2,
   Loader2,
-  Calendar,
-  Key,
   Activity,
-  AlertCircle,
   Search,
   Brain,
   History,
@@ -386,8 +382,14 @@ export default function Home() {
         );
       }
 
-      // Convert to base64 data URI which is the most reliable way to load SVGs into Image objects
-      const base64Svg = btoa(unescape(encodeURIComponent(finalSvgString)));
+      // Convert to a base64 data URI (most reliable way to load SVGs into Image
+      // objects). TextEncoder-based so non-ASCII glyphs survive; replaces the
+      // deprecated unescape(encodeURIComponent()) trick, which corrupts lone
+      // surrogates and is flagged by linters.
+      const bytes = new TextEncoder().encode(finalSvgString);
+      let binary = "";
+      for (const b of bytes) binary += String.fromCharCode(b);
+      const base64Svg = btoa(binary);
       const url = `data:image/svg+xml;base64,${base64Svg}`;
 
       // Prevent hanging forever
@@ -601,7 +603,13 @@ export default function Home() {
     toDate: string,
     endDateStrParam?: string,
   ): Promise<any[]> => {
-    while (true) {
+    // Bounded rate-limit retry: the chart fetch path previously retried a
+    // Twelve Data 429 forever (while(true)), so a persistently rate-limited
+    // account hung the UI with isGenerating stuck true and no way to stop it.
+    // The OHLC path (ohlc-generator.ts) already aborts after MAX_RATE_LIMIT_RETRIES;
+    // mirror that contract here. Non-rate-limit failures still return [] immediately.
+    let rateLimitAttempts = 0;
+    while (rateLimitAttempts <= MAX_RATE_LIMIT_RETRIES) {
       try {
         // Add delay to respect rate limits (8 credits per minute max)
         await new Promise((resolve) => setTimeout(resolve, 150));
@@ -629,7 +637,17 @@ export default function Home() {
           data.code === 429;
 
         if (isRateLimit) {
-          addLog(`🛑 Twelve Data rate limit reached. Waiting 60 seconds before retrying...`);
+          rateLimitAttempts += 1;
+          if (rateLimitAttempts > MAX_RATE_LIMIT_RETRIES) {
+            addLog(
+              `❌ Twelve Data rate limit persisted through ${MAX_RATE_LIMIT_RETRIES} retry windows; aborting this fetch instead of retrying forever. Try a smaller window or later.`,
+            );
+            setResumeTimer(null);
+            return [];
+          }
+          addLog(
+            `🛑 Twelve Data rate limit reached. Waiting 60 seconds before retrying (${rateLimitAttempts}/${MAX_RATE_LIMIT_RETRIES})...`,
+          );
           setResumeTimer(60);
           await new Promise((resolve) => setTimeout(resolve, 60000));
           setResumeTimer(null);
@@ -688,6 +706,7 @@ export default function Home() {
         return [];
       }
     }
+    return [];
   };
 
   const executeGeneration = async (
@@ -857,6 +876,13 @@ export default function Home() {
   const handleGenerate = async () => {
     if (!symbol || !chartStartDate || !chartEndDate) {
       toast.error("Please fill in all fields");
+      return;
+    }
+
+    // Guard against an inverted date range, which would compute a negative
+    // daysSpan and silently generate nothing (with a misleading success toast).
+    if (parseLocalDate(chartEndDate) < parseLocalDate(chartStartDate)) {
+      toast.error("End date must be on or after the start date");
       return;
     }
 
