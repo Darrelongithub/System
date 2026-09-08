@@ -1,0 +1,95 @@
+{
+  "analyzedRows": 9738,
+  "invalidRows": 0,
+  "tradePassCount": 2323,
+  "contextPassCount": 3184,
+  "perStrategy": {
+    "dual-thrust": {
+      "triggers": 165,
+      "tp": 59,
+      "sl": 105,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 39.507928508056196
+    },
+    "macd-cross": {
+      "triggers": 389,
+      "tp": 134,
+      "sl": 254,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 75.09939547758665
+    },
+    "pdh-retest": {
+      "triggers": 120,
+      "tp": 41,
+      "sl": 79,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 20.701644248975164
+    },
+    "williams-r-fade": {
+      "triggers": 386,
+      "tp": 128,
+      "sl": 258,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 118.91045104513022
+    },
+    "three-soldiers": {
+      "triggers": 396,
+      "tp": 134,
+      "sl": 261,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 68.52284948294876
+    },
+    "morning-star": {
+      "triggers": 364,
+      "tp": 112,
+      "sl": 252,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 74.78949297397797
+    },
+    "classic-pivot": {
+      "triggers": 136,
+      "tp": 44,
+      "sl": 92,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 36.11782239574696
+    },
+    "ichimoku-tk": {
+      "triggers": 190,
+      "tp": 58,
+      "sl": 131,
+      "open": 1,
+      "noFill": 0,
+      "rSum": 40.63673974303377
+    },
+    "donchian-55": {
+      "triggers": 177,
+      "tp": 46,
+      "sl": 131,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 49.395026520863595
+    }
+  },
+  "totals": {
+    "triggers": 2323,
+    "tp": 756,
+    "sl": 1563,
+    "open": 4,
+    "noFill": 0,
+    "rSum": 523.6813503963194
+  },
+  "generatedAt": "2026-09-08T13:46:40.795Z",
+  "runAnalysisMs": 1265,
+  "options": {
+    "seriesEndsComplete": true,
+    "enableHtfDirectionFilter": true
+  },
+  "note": "v1.4 re-baseline: production default (A2 consume-after-RR + Filter C enabled). Prior golden (2384) predated both the v1.2 A2 fix (+3) and the v1.3 Filter C default (-64)."
+}

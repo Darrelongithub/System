@@ -1,0 +1,15 @@
+{
+  "label": "A2-only control",
+  "triggers": 2387,
+  "resolved": 2383,
+  "tp": 769,
+  "sl": 1614,
+  "open": 4,
+  "totalR": 508.16431891659414,
+  "winRate": 0.3227024758707511,
+  "expectancy": 0.21324562270943942,
+  "enableFilterC": false,
+  "filterB": false,
+  "a1": false,
+  "a2": true
+}
