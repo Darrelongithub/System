@@ -15,7 +15,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { STRATEGIES } from "@/lib/analyzer/strategies";
-import { getDiagnosticsReportLines, resetDiagnostics } from "@/lib/analyzer/strategies/diagnostics";
 import { AVAILABLE_SYMBOLS } from "@/lib/market-data";
 import { buildOhlcCsv } from "@/lib/ohlc-generator";
 import { verifySetup } from "@/lib/verifier.functions";
@@ -154,7 +153,6 @@ export default function Backtest() {
     revokeZipUrl();
     setZip(null);
     setProgress({ done: 0, total: days.length });
-    resetDiagnostics();
 
     // Every run is self-contained: the selected range is always processed in full.
     // Clear prior results immediately so a failed re-run cannot leave stale success stats.
@@ -362,7 +360,6 @@ export default function Backtest() {
       collected.push({ day, content: report, triggers });
     }
 
-    for (const line of getDiagnosticsReportLines()) addLog(line);
 
     if (collected.length === 0) {
       toast.error("Nothing was analysed.");

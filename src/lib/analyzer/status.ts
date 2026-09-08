@@ -24,8 +24,15 @@ function touched(candle: Candle, level: number): boolean {
   );
 }
 
+/**
+ * Parse a candle timestamp to epoch ms. Source timestamps are EAT (+03:00)
+ * when no explicit offset is supplied — regardless of whether the date/time
+ * separator is a space or a `T`. Mirrors `structure.ts#parseDatetimeMs`.
+ */
 function parseTime(value: string): number | undefined {
-  const ms = Date.parse(value.includes("T") ? value : value.replace(" ", "T") + "+03:00");
+  const normalized = value.trim().replace(" ", "T");
+  const hasOffset = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized);
+  const ms = Date.parse(hasOffset ? normalized : `${normalized}+03:00`);
   return Number.isFinite(ms) ? ms : undefined;
 }
 

@@ -1,47 +1,9 @@
 import type { Candle } from "./types";
 
 /**
- * ATR(n) per bar. The generator already ships `atr_30m`; we trust it when
- * present and fall back to a locally computed Wilder ATR so every strategy can
- * use ATR-relative thresholds instead of fixed pip/dollar buffers.
- */
-/**
- * Pure OHLC Wilder ATR(period) — never reads CSV atr_30m.
- * Used by the TP-plausibility gate so strategy-produced RR targets cannot be
- * rejected solely because a stale/mismatched atr_30m column understates range.
- */
-export function atrSeriesFromOhlc(candles: Candle[], period = 14): (number | undefined)[] {
-  const out: (number | undefined)[] = new Array(candles.length).fill(undefined);
-  const tr: number[] = [];
-  let prevClose: number | undefined;
-  let smoothed: number | undefined;
-  for (let i = 0; i < candles.length; i++) {
-    const c = candles[i]!;
-    if (c.invalid || c.high === undefined || c.low === undefined || c.close === undefined) {
-      out[i] = smoothed;
-      continue;
-    }
-    const range = c.high - c.low;
-    const trueRange =
-      prevClose === undefined
-        ? range
-        : Math.max(range, Math.abs(c.high - prevClose), Math.abs(c.low - prevClose));
-    prevClose = c.close;
-    tr.push(trueRange);
-    if (smoothed === undefined) {
-      if (tr.length === period) smoothed = tr.reduce((a, b) => a + b, 0) / period;
-    } else {
-      smoothed = (smoothed * (period - 1) + trueRange) / period;
-    }
-    out[i] = smoothed;
-  }
-  return out;
-}
-
-/**
- * ATR(n) per bar. Prefers generator-supplied atr_30m when present (legacy path
- * for strategies that read ctx.atr). Prefer atrSeriesFromOhlc for any gate that
- * must stay consistent with OHLC-derived stops/targets.
+ * ATR(n) per bar. Prefers generator-supplied atr_30m when present and falls
+ * back to a locally computed Wilder ATR so every strategy can use ATR-relative
+ * thresholds instead of fixed pip/dollar buffers.
  */
 export function atrSeries(candles: Candle[], period = 14): (number | undefined)[] {
   const out: (number | undefined)[] = new Array(candles.length).fill(undefined);
@@ -116,27 +78,4 @@ export function findPivots(candles: Candle[], k = 2): { highs: Pivot[]; lows: Pi
       lows.push({ index: i, datetime: c.datetime, price: c.low, kind: "low", confirmedAt: i + k });
   }
   return { highs, lows };
-}
-
-/** Pivots already confirmed at (strictly before) bar `i`. */
-export function confirmedBefore(pivots: Pivot[], i: number): Pivot[] {
-  return pivots.filter((p) => p.confirmedAt < i);
-}
-
-export function lastConfirmed(pivots: Pivot[], i: number): Pivot | undefined {
-  const list = confirmedBefore(pivots, i);
-  return list[list.length - 1];
-}
-
-/** Nearest confirmed pivot level strictly above `price`. */
-export function nearestAbove(pivots: Pivot[], i: number, price: number): Pivot | undefined {
-  return confirmedBefore(pivots, i)
-    .filter((p) => p.price > price)
-    .sort((a, b) => a.price - b.price)[0];
-}
-
-export function nearestBelow(pivots: Pivot[], i: number, price: number): Pivot | undefined {
-  return confirmedBefore(pivots, i)
-    .filter((p) => p.price < price)
-    .sort((a, b) => b.price - a.price)[0];
 }

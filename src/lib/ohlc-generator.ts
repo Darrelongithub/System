@@ -323,7 +323,7 @@ export const enrichOhlcRows = (rows: any[]) => {
     previousReliableClose = row.close;
   });
 
-  // A swing point is a reliable local high/low with 10 candles on each side.
+  // A swing point is a reliable local high/low with SWING_LOOKBACK (= 3) candles on each side.
   // Its magnitude is measured from the nearest prior opposite swing. Its
   // observed retrace is the largest counter-move during the next 20 candles,
   // capped at 100% of that swing's measured magnitude.
