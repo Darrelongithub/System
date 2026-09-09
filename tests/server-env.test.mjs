@@ -63,7 +63,10 @@ test("server-env: ensureServerEnv loads a project .env once, non-clobbering, fro
     [
       "--experimental-strip-types",
       "--import",
-      fileURLToPath(new URL("./register.mjs", import.meta.url)),
+      // --import is resolved by the ESM loader, which only accepts URLs with a
+      // file:/data:/node: scheme. A bare POSIX path works, but a Windows absolute
+      // path ("C:\\...\\register.mjs") parses as the "c:" protocol → pass a file:// URL.
+      new URL("./register.mjs", import.meta.url).href,
       "probe.mjs",
     ],
     { cwd: dir, env: { ...process.env, ENSURE_PRESET_MARK: "env-value" }, encoding: "utf8" },
