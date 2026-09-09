@@ -3,7 +3,7 @@ import { test, assert, assertEqual } from "./tiny.mjs";
 import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { pathToFileURL } from "node:url";
+import { pathToFileURL, fileURLToPath } from "node:url";
 
 const mod = await import("../src/lib/server-env.ts");
 const { parseEnvText, applyEnvDefaults, ensureServerEnv } = mod;
@@ -46,7 +46,7 @@ test("server-env: ensureServerEnv loads a project .env once, non-clobbering, fro
   const src = await import("node:fs/promises");
   await src.mkdir(join(dir, "lib"), { recursive: true });
   await src.copyFile(
-    new URL("../src/lib/server-env.ts", import.meta.url).pathname,
+    fileURLToPath(new URL("../src/lib/server-env.ts", import.meta.url)),
     join(dir, "lib", "server-env.ts"),
   );
   writeFileSync(
@@ -63,7 +63,7 @@ test("server-env: ensureServerEnv loads a project .env once, non-clobbering, fro
     [
       "--experimental-strip-types",
       "--import",
-      new URL("./register.mjs", import.meta.url).pathname,
+      fileURLToPath(new URL("./register.mjs", import.meta.url)),
       "probe.mjs",
     ],
     { cwd: dir, env: { ...process.env, ENSURE_PRESET_MARK: "env-value" }, encoding: "utf8" },
