@@ -15,6 +15,7 @@ import { Route as BacktestRouteImport } from './routes/backtest'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as AnalysisIndexRouteImport } from './routes/analysis.index'
 import { Route as ApiMarketDataRouteImport } from './routes/api/market-data'
+import { Route as ApiMarketDataHealthRouteImport } from './routes/api/market-data.health'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,21 +47,28 @@ const ApiMarketDataRoute = ApiMarketDataRouteImport.update({
   path: '/api/market-data',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMarketDataHealthRoute = ApiMarketDataHealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => ApiMarketDataRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/api/market-data': typeof ApiMarketDataRoute
+  '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
+  '/api/market-data/health': typeof ApiMarketDataHealthRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/api/market-data': typeof ApiMarketDataRoute
+  '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/analysis': typeof AnalysisIndexRoute
+  '/api/market-data/health': typeof ApiMarketDataHealthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -68,8 +76,9 @@ export interface FileRoutesById {
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
-  '/api/market-data': typeof ApiMarketDataRoute
+  '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
+  '/api/market-data/health': typeof ApiMarketDataHealthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -80,8 +89,15 @@ export interface FileRouteTypes {
     | '/generator'
     | '/api/market-data'
     | '/analysis/'
+    | '/api/market-data/health'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/backtest' | '/generator' | '/api/market-data' | '/analysis'
+  to:
+    | '/'
+    | '/backtest'
+    | '/generator'
+    | '/api/market-data'
+    | '/analysis'
+    | '/api/market-data/health'
   id:
     | '__root__'
     | '/'
@@ -90,6 +106,7 @@ export interface FileRouteTypes {
     | '/generator'
     | '/api/market-data'
     | '/analysis/'
+    | '/api/market-data/health'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,7 +114,7 @@ export interface RootRouteChildren {
   AnalysisRoute: typeof AnalysisRouteWithChildren
   BacktestRoute: typeof BacktestRoute
   GeneratorRoute: typeof GeneratorRoute
-  ApiMarketDataRoute: typeof ApiMarketDataRoute
+  ApiMarketDataRoute: typeof ApiMarketDataRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -144,6 +161,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMarketDataRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/market-data/health': {
+      id: '/api/market-data/health'
+      path: '/health'
+      fullPath: '/api/market-data/health'
+      preLoaderRoute: typeof ApiMarketDataHealthRouteImport
+      parentRoute: typeof ApiMarketDataRoute
+    }
   }
 }
 
@@ -159,12 +183,24 @@ const AnalysisRouteWithChildren = AnalysisRoute._addFileChildren(
   AnalysisRouteChildren,
 )
 
+interface ApiMarketDataRouteChildren {
+  ApiMarketDataHealthRoute: typeof ApiMarketDataHealthRoute
+}
+
+const ApiMarketDataRouteChildren: ApiMarketDataRouteChildren = {
+  ApiMarketDataHealthRoute: ApiMarketDataHealthRoute,
+}
+
+const ApiMarketDataRouteWithChildren = ApiMarketDataRoute._addFileChildren(
+  ApiMarketDataRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalysisRoute: AnalysisRouteWithChildren,
   BacktestRoute: BacktestRoute,
   GeneratorRoute: GeneratorRoute,
-  ApiMarketDataRoute: ApiMarketDataRoute,
+  ApiMarketDataRoute: ApiMarketDataRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
