@@ -134,3 +134,30 @@ test("edge-safe: no static node:* imports may re-enter the env loader or its rou
 test("server-env: no key material in loader surfaces", () => {
   assert(!JSON.stringify(Object.keys(mod)).toLowerCase().includes("key"), "only helpers exported");
 });
+
+test("market-data health endpoint: reports count + masked fingerprints, never full keys", async () => {
+  const health = await import("../src/routes/api/market-data.health.ts");
+  const getHandler = health.Route?.options?.server?.handlers?.GET;
+  assert(typeof getHandler === "function", "health GET handler is defined");
+
+  const fullKey = "super-secret-twelvedata-key-9Z";
+  const prev = process.env["TWELVE_DATA_API_KEYS"];
+  process.env["TWELVE_DATA_API_KEYS"] = fullKey;
+  try {
+    const res = await getHandler();
+    const text = await res.text();
+    assert(!text.includes(fullKey), "response never contains the full key string");
+    const body = JSON.parse(text);
+    assertEqual(body.ok, true, "ok true when a key is configured");
+    assertEqual(body.keysConfigured, 1, "reports exactly the configured count");
+    assertEqual(
+      body.fingerprints[0],
+      `${fullKey.slice(0, 4)}…${fullKey.slice(-2)}`,
+      "masked fingerprint only",
+    );
+    assert(body.hint === undefined, "no hint when keys are present");
+  } finally {
+    if (prev === undefined) delete process.env["TWELVE_DATA_API_KEYS"];
+    else process.env["TWELVE_DATA_API_KEYS"] = prev;
+  }
+});
