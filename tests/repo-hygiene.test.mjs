@@ -1,0 +1,124 @@
+/**
+ * Repo hygiene — the invariants that keep `git pull` working on Windows.
+ *
+ * Symptom this guards against (reproduced in a scratch clone, not guessed):
+ * `src/routeTree.gen.ts` is regenerated with LF by @tanstack/router-plugin on
+ * every dev/build, but a Windows checkout with `core.autocrlf=true` stores it
+ * with CRLF. Git then reports the file as modified *with an empty diff*, and any
+ * incoming commit that touches it aborts the pull with
+ * "Your local changes to the following files would be overwritten by merge".
+ * `.gitattributes` pins the generated file to `eol=lf` so what Git checks out
+ * and what the generator writes agree. These tests fail if that pin — or the
+ * prettier ignore that keeps `npm run format` from fighting the generator — is
+ * ever dropped.
+ */
+import { readFileSync, existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { test, assert, assertEqual } from "./tiny.mjs";
+
+const repoRoot = fileURLToPath(new URL("..", import.meta.url));
+const read = (rel) => readFileSync(new URL(`../${rel}`, import.meta.url), "utf8");
+
+const GENERATED = "src/routeTree.gen.ts";
+
+// Optional: only used to inspect the committed (index-form) blob. A zip/tarball
+// checkout has no .git, and a runtime without child_process must still load.
+let execFileSync = null;
+try {
+  ({ execFileSync } = await import("node:child_process"));
+} catch {
+  execFileSync = null;
+}
+
+/**
+ * Effective .gitattributes values for one path. Deliberately tiny: this repo
+ * only uses `*`, literal paths and `*.ext`, and Git's rule is "last match wins"
+ * per attribute. Returns e.g. { text: "auto", eol: "lf" } or { text: false }.
+ */
+function effectiveAttrs(path, attributesText) {
+  const out = {};
+  for (const rawLine of attributesText.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+    const [pattern, ...attrs] = line.split(/\s+/);
+    const ext = pattern.startsWith("*.") ? pattern.slice(1).toLowerCase() : null;
+    const matches =
+      pattern === path || pattern === "*" || (ext !== null && path.toLowerCase().endsWith(ext));
+    if (!matches) continue;
+    for (const attr of attrs) {
+      if (attr.startsWith("-")) out[attr.slice(1)] = false;
+      else if (attr.startsWith("!")) delete out[attr.slice(1)];
+      else {
+        const eq = attr.indexOf("=");
+        out[eq === -1 ? attr : attr.slice(0, eq)] = eq === -1 ? true : attr.slice(eq + 1);
+      }
+    }
+  }
+  return out;
+}
+
+test("repo hygiene: .gitattributes normalises text files to LF in the index", () => {
+  assert(
+    existsSync(new URL("../.gitattributes", import.meta.url)),
+    ".gitattributes must exist at the repo root",
+  );
+  const attrs = effectiveAttrs("src/lib/server-env.ts", read(".gitattributes"));
+  assert(
+    attrs.text === "auto" || attrs.text === true,
+    `* text=auto must apply to ordinary source files (got text=${JSON.stringify(attrs.text)})`,
+  );
+  assertEqual(
+    effectiveAttrs("System-v1.3.zip", read(".gitattributes")).text,
+    false,
+    "archives stay binary — never line-ending converted",
+  );
+});
+
+test(`repo hygiene: ${GENERATED} is pinned to text eol=lf`, () => {
+  const attrs = effectiveAttrs(GENERATED, read(".gitattributes"));
+  assert(
+    attrs.text === true || attrs.text === "auto",
+    `${GENERATED} must be marked text (got ${JSON.stringify(attrs.text)})`,
+  );
+  assertEqual(
+    attrs.eol,
+    "lf",
+    `${GENERATED} must be pinned to eol=lf: with core.autocrlf=true the checkout is CRLF while ` +
+      `@tanstack/router-plugin rewrites it as LF, which makes the file permanently "modified" ` +
+      `(empty diff) and aborts every pull that touches it`,
+  );
+});
+
+test("repo hygiene: generated route tree is prettier-ignored and LF in the repository", () => {
+  const ignored = read(".prettierignore")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith("#"));
+  assert(
+    ignored.some((entry) => GENERATED.endsWith(entry)),
+    `.prettierignore must exclude routeTree.gen.ts so "npm run format" cannot reformat what ` +
+      `the router generator writes (entries: ${ignored.join(", ")})`,
+  );
+
+  // Prefer the committed blob (index form) over the working copy: on a Windows
+  // checkout the working copy can legitimately be CRLF for other files, and the
+  // invariant we own is what is stored in git.
+  let committed = null;
+  if (execFileSync) {
+    try {
+      committed = execFileSync("git", ["show", `HEAD:${GENERATED}`], {
+        cwd: repoRoot,
+        encoding: "utf8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+    } catch {
+      committed = null; // not a git checkout — fall back to the working copy
+    }
+  }
+  const bytes = committed ?? read(GENERATED);
+  assert(!bytes.includes("\r"), `${GENERATED} must be stored LF-only (no CR bytes)`);
+  assert(
+    bytes.includes("This file was automatically generated by TanStack Router"),
+    `${GENERATED} still looks like generator output — do not hand-edit it`,
+  );
+});
