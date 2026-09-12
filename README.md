@@ -2,17 +2,17 @@
 
 ## Active production strategies (9)
 
-| ID | Origin |
-|----|--------|
-| dual-thrust | Locked survivor |
-| macd-cross | Locked survivor |
-| pdh-retest | Locked survivor |
+| ID              | Origin           |
+| --------------- | ---------------- |
+| dual-thrust     | Locked survivor  |
+| macd-cross      | Locked survivor  |
+| pdh-retest      | Locked survivor  |
 | williams-r-fade | Batch-2 survivor |
-| three-soldiers | Batch-2 survivor |
-| morning-star | Batch-2 survivor |
-| classic-pivot | Batch-2 survivor |
-| ichimoku-tk | Batch-2 survivor |
-| donchian-55 | Batch-2 survivor |
+| three-soldiers  | Batch-2 survivor |
+| morning-star    | Batch-2 survivor |
+| classic-pivot   | Batch-2 survivor |
+| ichimoku-tk     | Batch-2 survivor |
+| donchian-55     | Batch-2 survivor |
 
 Implementation: `src/lib/analyzer/strategies/final-survivors.ts`
 
@@ -66,4 +66,3 @@ npm run dev   # or project-standard start
 
 Regenerate the golden only on a deliberate, documented product change:
 `node --experimental-strip-types --import ./tests/register.mjs scripts/generate-golden.mjs`
-

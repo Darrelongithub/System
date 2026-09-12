@@ -41,7 +41,11 @@ test("F2: live mode never resolves a trade on the untrusted final bar", () => {
   const live = runAnalysis(makeCsv(rows), { seriesEndsComplete: false });
   assert(live.ok, "parse ok");
   const leaks = live.analysis.tradePasses.filter((t) => t.exitDatetime === finalDt);
-  assertEqual(leaks.length, 0, `resolutions on final bar: ${leaks.map((t) => `${t.strategyId}@${t.index}`).join(",")}`);
+  assertEqual(
+    leaks.length,
+    0,
+    `resolutions on final bar: ${leaks.map((t) => `${t.strategyId}@${t.index}`).join(",")}`,
+  );
 });
 
 test("F2: pre-final-bar resolutions are identical between complete and live modes", () => {
@@ -72,7 +76,11 @@ test("F2: a trigger whose only resolution is the untrusted bar reports live, not
   for (const t of live.analysis.tradePasses) {
     if (t.setupStatus === "FILLED" || t.setupStatus === "PENDING") {
       const oldStyle = evaluateSetupStatus(t, all);
-      if (oldStyle.setupStatus === "RESOLVED" && oldStyle.resolutionCandle && oldStyle.resolutionCandle.datetime === finalDt) {
+      if (
+        oldStyle.setupStatus === "RESOLVED" &&
+        oldStyle.resolutionCandle &&
+        oldStyle.resolutionCandle.datetime === finalDt
+      ) {
         sawOldLeak++;
       }
       sawLive++;

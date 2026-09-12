@@ -87,7 +87,6 @@
   }
 }
 
-
 :root {
   --radius: 0.625rem;
 
@@ -116,7 +115,6 @@
   --success-foreground: hsl(0 0% 100%);
   --warning: hsl(43 74% 52%);
   --warning-foreground: hsl(0 0% 8%);
-
 
   --border: hsl(348 10% 14%);
   --input: hsl(0 0% 9%);
@@ -188,28 +186,80 @@
     line-height: 1.5;
   }
 
-  button, input, textarea, select { font: inherit; }
-  button { touch-action: manipulation; }
-  ::selection { background: color-mix(in srgb, var(--primary) 55%, transparent); color: white; }
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+  button {
+    touch-action: manipulation;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--primary) 55%, transparent);
+    color: white;
+  }
 }
 
 @layer components {
-  .app-shell { min-height: 100svh; }
-  .page-frame { width: min(100%, 1280px); margin-inline: auto; }
-  .panel, .glass-card, .glass-panel { position: relative; overflow: hidden; }
-  .panel::before, .glass-card::before { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(135deg, rgba(255,255,255,.035), transparent 28%); }
-  .data-table { width: 100%; border-collapse: separate; border-spacing: 0; }
-  .data-table th { position: sticky; top: 0; z-index: 1; background: color-mix(in srgb, var(--card) 94%, black); }
+  .app-shell {
+    min-height: 100svh;
+  }
+  .page-frame {
+    width: min(100%, 1280px);
+    margin-inline: auto;
+  }
+  .panel,
+  .glass-card,
+  .glass-panel {
+    position: relative;
+    overflow: hidden;
+  }
+  .panel::before,
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 28%);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .data-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: color-mix(in srgb, var(--card) 94%, black);
+  }
 }
 
 @media (max-width: 640px) {
-  .panel, .glass-card { border-radius: 12px; }
-  .num { font-size: max(11px, .72rem); }
-  input, textarea, select { font-size: 16px !important; }
+  .panel,
+  .glass-card {
+    border-radius: 12px;
+  }
+  .num {
+    font-size: max(11px, 0.72rem);
+  }
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Glass card – dark with very subtle red border */
@@ -254,7 +304,6 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-
 @utility panel {
   background: linear-gradient(160deg, rgba(18, 8, 10, 0.95) 0%, rgba(8, 4, 5, 0.98) 100%);
   border: 1px solid rgba(139, 0, 32, 0.15);
@@ -269,16 +318,46 @@
   font-variant-numeric: tabular-nums;
 }
 
-
 /* Second-generation command-center polish */
-:root { --surface-2: rgba(255,255,255,.018); }
-.panel, .glass-card {
-  border-color: rgba(153, 48, 72, .24);
-  box-shadow: 0 12px 40px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.035);
+:root {
+  --surface-2: rgba(255, 255, 255, 0.018);
 }
-.panel:hover, .glass-card:hover { border-color: rgba(188, 62, 93, .34); }
-button, [role="button"], a { transition: transform .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease, color .16s ease; }
-button:not(:disabled):active, [role="button"]:active { transform: translateY(1px); }
-button:focus-visible, a:focus-visible, input:focus-visible, textarea:focus-visible, [role="combobox"]:focus-visible { outline: 2px solid color-mix(in srgb, var(--primary) 82%, white); outline-offset: 2px; }
-pre { max-width: 100%; }
-table { min-width: max-content; }
+.panel,
+.glass-card {
+  border-color: rgba(153, 48, 72, 0.24);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+.panel:hover,
+.glass-card:hover {
+  border-color: rgba(188, 62, 93, 0.34);
+}
+button,
+[role="button"],
+a {
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    box-shadow 0.16s ease,
+    color 0.16s ease;
+}
+button:not(:disabled):active,
+[role="button"]:active {
+  transform: translateY(1px);
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[role="combobox"]:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 82%, white);
+  outline-offset: 2px;
+}
+pre {
+  max-width: 100%;
+}
+table {
+  min-width: max-content;
+}

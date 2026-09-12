@@ -9,12 +9,7 @@
  * total over the full baseline series.
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
-import {
-  dayReportSkipReason,
-  isSunday,
-  isWeekend,
-  rangeDays,
-} from "../src/lib/backtest/engine.ts";
+import { dayReportSkipReason, isSunday, isWeekend, rangeDays } from "../src/lib/backtest/engine.ts";
 import { analyseContinuous } from "../src/lib/pipeline/continuous.ts";
 import { loadBaselineCsv } from "./fixtures.mjs";
 
@@ -42,7 +37,11 @@ test("G1: dayReportSkipReason predicate — every day class is classified correc
   );
   // THE FIX: a weekend day carrying trade triggers is processed, never skipped.
   assertEqual(dayReportSkipReason("2025-11-08", true, 2, 0), null, "saturday with triggers");
-  assertEqual(dayReportSkipReason("2025-11-08", true, 2, 3), null, "saturday with triggers+context");
+  assertEqual(
+    dayReportSkipReason("2025-11-08", true, 2, 3),
+    null,
+    "saturday with triggers+context",
+  );
   // Context-only weekend (candles implied absent) stays skipped.
   assertEqual(
     dayReportSkipReason("2025-11-08", false, 0, 1),
@@ -75,21 +74,13 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
   let applied = 0;
   let skippedDays = 0;
   let saturdayTriggerBearing = new Map(); // day -> trigger count (must all be processed)
-  for (const day of rangeDays(
-    firstRow.datetime.slice(0, 10),
-    lastRow.datetime.slice(0, 10),
-  )) {
+  for (const day of rangeDays(firstRow.datetime.slice(0, 10), lastRow.datetime.slice(0, 10))) {
     const triggers = continuous.tradesOnDay(day);
     const ctx = continuous.contextOnDay(day);
     if (isWeekend(day) && triggers.length > 0) {
       saturdayTriggerBearing.set(day, triggers.length);
     }
-    const reason = dayReportSkipReason(
-      day,
-      daysWithCandles.has(day),
-      triggers.length,
-      ctx.length,
-    );
+    const reason = dayReportSkipReason(day, daysWithCandles.has(day), triggers.length, ctx.length);
     if (reason !== null) {
       skippedDays += 1;
       assert(triggers.length === 0, `skipped day ${day} carried no triggers`);
@@ -102,7 +93,10 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
   assert(skippedDays > 0, "true empty days are still skipped");
   // The pre-fix deficit: 37 trigger-bearing Saturdays in the locked baseline
   // (was 39 pre-Filter-C; Filter C removed 2 Saturday-tail trades in v1.3).
-  assertEqual([...saturdayTriggerBearing.values()].reduce((a, b) => a + b, 0), 37,
-    "all 37 Saturday-tail triggers accounted");
+  assertEqual(
+    [...saturdayTriggerBearing.values()].reduce((a, b) => a + b, 0),
+    37,
+    "all 37 Saturday-tail triggers accounted",
+  );
   assert(!saturdayTriggerBearing.has("9999-01-01"), "map is real");
 });

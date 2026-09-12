@@ -19,7 +19,12 @@ function stubRateLimitedFetch() {
         JSON.stringify({ status: "error", code: 429, message: "You have run out of API credits" }),
     };
   };
-  return { restore: () => { globalThis.fetch = original; }, calls: () => calls };
+  return {
+    restore: () => {
+      globalThis.fetch = original;
+    },
+    calls: () => calls,
+  };
 }
 
 function baseOptions(logs, retries) {
@@ -42,7 +47,9 @@ test("F5: terminal rate-limit path aborts cleanly without waiting or looping", a
   try {
     const result = await Promise.race([
       buildOhlcCsv(baseOptions(logs, 0)),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("hung >10s — unbounded retry loop")), 10000)),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("hung >10s — unbounded retry loop")), 10000),
+      ),
     ]);
     assertEqual(result, null, "terminal rate-limit must return null");
     assertEqual(stub.calls(), 1, "exactly one upstream attempt when no retries remain");
@@ -68,8 +75,11 @@ test("F5: retry counter decrements strictly and terminates at the cap", async ()
       new Promise((_, reject) => setTimeout(() => reject(new Error("hung")), 10000)),
     ]);
     assertEqual(result, null, "must terminate");
-    assertEqual(logs.filter((m) => m.includes("rate limit reached. Waiting")).length, 0,
-      "no further wait may be scheduled past the budget");
+    assertEqual(
+      logs.filter((m) => m.includes("rate limit reached. Waiting")).length,
+      0,
+      "no further wait may be scheduled past the budget",
+    );
   } finally {
     stub.restore();
   }

@@ -7,7 +7,11 @@ import { VerifierPanel } from "@/components/verifier-panel";
 import { buildReport } from "@/lib/analyzer/export";
 import { downloadBundle, type BundleOutcome } from "@/lib/analyzer/bundle";
 
-import { compareHtfDirectionFilter, runAnalysis, type HtfFilterComparison } from "@/lib/analyzer/run";
+import {
+  compareHtfDirectionFilter,
+  runAnalysis,
+  type HtfFilterComparison,
+} from "@/lib/analyzer/run";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
 import type { VerifyResult } from "@/lib/verifier.functions";
@@ -75,15 +79,35 @@ export default function AnalysisV2() {
       return;
     }
     setAnalysis(outcome.analysis);
-    try {
-      setHtfComparison(compareHtfDirectionFilter(csv));
-    } catch {
-      setHtfComparison([]);
-    }
+    // Cleared here, filled by the deferred effect below — never left showing
+    // the previous CSV's numbers.
+    setHtfComparison([]);
     setStrategyFilter("all");
     setResultFilter("all");
     setStatus("ready");
   }, [csv]);
+
+  // The HTF alignment table is secondary. It used to be computed synchronously
+  // inside the callback above, which blocked the main thread for a full extra
+  // engine pass (~1.1s on the locked 9.7k-row baseline) before ANY result could
+  // paint. Deferred to an effect + macrotask so the results table renders first
+  // and this fills in a frame later; cancelled if the CSV changes meanwhile.
+  useEffect(() => {
+    if (!csv || !analysis) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      try {
+        const comparison = compareHtfDirectionFilter(csv);
+        if (!cancelled) setHtfComparison(comparison);
+      } catch {
+        if (!cancelled) setHtfComparison([]);
+      }
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [csv, analysis]);
 
   const handleVerdict = useCallback(
     (result: VerifyResult) => {
@@ -123,13 +147,10 @@ export default function AnalysisV2() {
               <ArrowLeft size={12} /> Main menu
             </Link>
           </div>
-          <p className="num text-xs uppercase tracking-[0.35em] text-primary">
-            Live Analyser
-          </p>
+          <p className="num text-xs uppercase tracking-[0.35em] text-primary">Live Analyser</p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
             Trading strategy analyzer
           </h1>
-
         </header>
 
         <section className="panel flex flex-col gap-4 p-6">
@@ -182,23 +203,21 @@ export default function AnalysisV2() {
           ) : null}
         </section>
 
-
         {analysis ? (
           <>
-            
-              <section className="flex flex-col gap-3">
-                <h2 className="text-sm font-semibold text-foreground">
-                  Context channel (not trades)
-                </h2>
-                <p className="text-xs text-muted-foreground">
-                  Diagnostic observations only. Never counted in trade stats, win rate, or R.
-                </p>
-                <pre className="overflow-x-auto rounded-lg border border-border bg-muted/30 p-3 text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
-                  {analysis.contextLog || "[CONTEXT]\n(none)"}
-                </pre>
-              </section>
+            <section className="flex flex-col gap-3">
+              <h2 className="text-sm font-semibold text-foreground">
+                Context channel (not trades)
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Diagnostic observations only. Never counted in trade stats, win rate, or R.
+              </p>
+              <pre className="overflow-x-auto rounded-lg border border-border bg-muted/30 p-3 text-[11px] leading-relaxed text-muted-foreground whitespace-pre-wrap">
+                {analysis.contextLog || "[CONTEXT]\n(none)"}
+              </pre>
+            </section>
 
-<section className="panel flex flex-col gap-6 p-6">
+            <section className="panel flex flex-col gap-6 p-6">
               <div className="flex flex-col gap-2 border-b border-border pb-5">
                 <span className="text-xs uppercase tracking-widest text-muted-foreground">
                   data_age
@@ -266,16 +285,29 @@ export default function AnalysisV2() {
 
               {htfComparison.length > 0 ? (
                 <div className="flex flex-col gap-3">
-                  <h3 className="text-sm font-medium text-foreground">HTF direction filter: before vs after</h3>
+                  <h3 className="text-sm font-medium text-foreground">
+                    HTF direction filter: before vs after
+                  </h3>
                   <p className="text-xs text-muted-foreground">
-                    Baseline and filtered runs use the same CSV, structure, RR rules, and no-lookahead HTF context.
+                    Baseline and filtered runs use the same CSV, structure, RR rules, and
+                    no-lookahead HTF context. The HTF direction filter is currently{" "}
+                    <strong className="font-medium text-foreground">inert</strong> for trade
+                    generation (see <code className="num">RunOptions.enableHtfDirectionFilter</code>
+                    ), so Before and After are identical by construction and Δ win rate is always
+                    +0.0 pp — read the trend-fighting count as an alignment mix, not as a filter
+                    effect.
                   </p>
                   <div className="overflow-x-auto rounded-md border border-border">
                     <table className="data-table w-full text-xs">
                       <thead>
                         <tr className="text-muted-foreground">
                           {["Strategy", "Before", "After", "Δ win rate"].map((head) => (
-                            <th key={head} className="border-b border-border px-3 py-2 text-left font-medium">{head}</th>
+                            <th
+                              key={head}
+                              className="border-b border-border px-3 py-2 text-left font-medium"
+                            >
+                              {head}
+                            </th>
                           ))}
                         </tr>
                       </thead>
@@ -283,16 +315,27 @@ export default function AnalysisV2() {
                         {htfComparison.map((item) => {
                           const beforeRate = item.before.winRate;
                           const afterRate = item.after.winRate;
-                          const delta = beforeRate !== null && afterRate !== null ? afterRate - beforeRate : null;
+                          const delta =
+                            beforeRate !== null && afterRate !== null
+                              ? afterRate - beforeRate
+                              : null;
                           const fmt = (v: typeof item.before) =>
                             `${v.triggers} trades · ${v.longs}L/${v.shorts}S · ${v.trendFighting} trend-fighting · ${v.wins}W/${v.losses}L · ${v.winRate === null ? "n/a" : `${v.winRate.toFixed(1)}%`}`;
                           return (
                             <tr key={item.strategyId}>
-                              <td className="border-b border-border/60 px-3 py-2">{item.strategy}</td>
-                              <td className="num border-b border-border/60 px-3 py-2">{fmt(item.before)}</td>
-                              <td className="num border-b border-border/60 px-3 py-2">{fmt(item.after)}</td>
+                              <td className="border-b border-border/60 px-3 py-2">
+                                {item.strategy}
+                              </td>
                               <td className="num border-b border-border/60 px-3 py-2">
-                                {delta === null ? "n/a" : `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} pp`}
+                                {fmt(item.before)}
+                              </td>
+                              <td className="num border-b border-border/60 px-3 py-2">
+                                {fmt(item.after)}
+                              </td>
+                              <td className="num border-b border-border/60 px-3 py-2">
+                                {delta === null
+                                  ? "n/a"
+                                  : `${delta >= 0 ? "+" : ""}${delta.toFixed(1)} pp`}
                               </td>
                             </tr>
                           );
@@ -399,7 +442,6 @@ export default function AnalysisV2() {
               onVerdict={handleVerdict}
             />
 
-
             <section className="panel flex flex-col gap-4 p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h2 className="text-base font-medium text-foreground">Results</h2>
@@ -440,13 +482,22 @@ export default function AnalysisV2() {
                 <table className="data-table w-full min-w-[880px] border-collapse text-left text-xs">
                   <thead>
                     <tr className="text-muted-foreground">
-                      {["Datetime", "Strategy", "Result", "Trend", "HTF", "Entry", "SL", "TP", "RR", "Reason"].map(
-                        (head) => (
-                          <th key={head} className="border-b border-border px-3 py-2 font-medium">
-                            {head}
-                          </th>
-                        ),
-                      )}
+                      {[
+                        "Datetime",
+                        "Strategy",
+                        "Result",
+                        "Trend",
+                        "HTF",
+                        "Entry",
+                        "SL",
+                        "TP",
+                        "RR",
+                        "Reason",
+                      ].map((head) => (
+                        <th key={head} className="border-b border-border px-3 py-2 font-medium">
+                          {head}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
@@ -466,8 +517,12 @@ export default function AnalysisV2() {
                           </span>
                         </td>
                         <td className="border-b border-border/60 px-3 py-2">{row.trend}</td>
-                        <td className="border-b border-border/60 px-3 py-2 whitespace-nowrap">H1 {row.htfTrend.h1} · H4 {row.htfTrend.h4} · D1 {row.htfTrend.d1}</td>
-                        <td className="num border-b border-border/60 px-3 py-2">{price(row.entry)}</td>
+                        <td className="border-b border-border/60 px-3 py-2 whitespace-nowrap">
+                          H1 {row.htfTrend.h1} · H4 {row.htfTrend.h4} · D1 {row.htfTrend.d1}
+                        </td>
+                        <td className="num border-b border-border/60 px-3 py-2">
+                          {price(row.entry)}
+                        </td>
                         <td className="num border-b border-border/60 px-3 py-2">{price(row.sl)}</td>
                         <td className="num border-b border-border/60 px-3 py-2">{price(row.tp)}</td>
                         <td className="num border-b border-border/60 px-3 py-2">

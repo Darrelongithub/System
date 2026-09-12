@@ -134,18 +134,36 @@ function unitsInMarket(state: TurtleState): number {
   return units;
 }
 
-function eventKey(event: Pick<TurtleEvent, "index" | "system" | "side">): string { return `${event.index}:${event.system}:${event.side}`; }
+function eventKey(event: Pick<TurtleEvent, "index" | "system" | "side">): string {
+  return `${event.index}:${event.system}:${event.side}`;
+}
 
-function markEventOpen(state: TurtleState, index: number, system: TurtleSystem, side: TurtleSide, stop: number, units: number) {
+function markEventOpen(
+  state: TurtleState,
+  index: number,
+  system: TurtleSystem,
+  side: TurtleSide,
+  stop: number,
+  units: number,
+) {
   const event = state.events.get(eventKey({ index, system, side }));
   if (!event) return;
   event.finalStop = stop;
   event.unitsAtExit = units;
 }
 
-function resolvePosition(state: TurtleState, position: ActivePosition, result: TurtleResult, index: number, price: number, reason: string) {
+function resolvePosition(
+  state: TurtleState,
+  position: ActivePosition,
+  result: TurtleResult,
+  index: number,
+  price: number,
+  reason: string,
+) {
   for (const eventIndex of position.eventIndexes) {
-    const event = state.events.get(eventKey({ index: eventIndex, system: position.system, side: position.side }));
+    const event = state.events.get(
+      eventKey({ index: eventIndex, system: position.system, side: position.side }),
+    );
     if (!event) continue;
     event.finalStop = position.stop;
     event.unitsAtExit = position.units;
@@ -175,23 +193,36 @@ function resolveHypotheticals(ctx: AnalysisContext, state: TurtleState, candle: 
       const exitShort = signal.exitLookback === 10 ? dHigh(ctx, day, 10) : dHigh(ctx, day, 20);
       if (side === "long") {
         if (candle.low !== undefined && candle.low <= signal.stop) signal.resolved = "LOSS";
-        else if (exit !== undefined && candle.low !== undefined && candle.low <= exit) signal.resolved = "WIN";
+        else if (exit !== undefined && candle.low !== undefined && candle.low <= exit)
+          signal.resolved = "WIN";
       } else {
         if (candle.high !== undefined && candle.high >= signal.stop) signal.resolved = "LOSS";
-        else if (exitShort !== undefined && candle.high !== undefined && candle.high >= exitShort) signal.resolved = "WIN";
+        else if (exitShort !== undefined && candle.high !== undefined && candle.high >= exitShort)
+          signal.resolved = "WIN";
       }
       if (signal.resolved) state.lastS1Outcome[side] = signal.resolved;
     }
   }
 }
 
-function fillPrice(candle: Candle, trigger: number, side: TurtleSide): { price: number; reason: string } | undefined {
-  if (candle.open === undefined || candle.high === undefined || candle.low === undefined) return undefined;
+function fillPrice(
+  candle: Candle,
+  trigger: number,
+  side: TurtleSide,
+): { price: number; reason: string } | undefined {
+  if (candle.open === undefined || candle.high === undefined || candle.low === undefined)
+    return undefined;
   if (side === "long" && candle.high >= trigger) {
-    return { price: candle.open >= trigger ? candle.open : trigger, reason: candle.open >= trigger ? "gap/market fill above stop level" : "stop level filled" };
+    return {
+      price: candle.open >= trigger ? candle.open : trigger,
+      reason: candle.open >= trigger ? "gap/market fill above stop level" : "stop level filled",
+    };
   }
   if (side === "short" && candle.low <= trigger) {
-    return { price: candle.open <= trigger ? candle.open : trigger, reason: candle.open <= trigger ? "gap/market fill below stop level" : "stop level filled" };
+    return {
+      price: candle.open <= trigger ? candle.open : trigger,
+      reason: candle.open <= trigger ? "gap/market fill below stop level" : "stop level filled",
+    };
   }
   return undefined;
 }
@@ -200,27 +231,61 @@ function positionKey(system: TurtleSystem, side: TurtleSide): string {
   return `${system}:${side}`;
 }
 
-function processPosition(ctx: AnalysisContext, state: TurtleState, candle: Candle, position: ActivePosition, N: number): boolean {
+function processPosition(
+  ctx: AnalysisContext,
+  state: TurtleState,
+  candle: Candle,
+  position: ActivePosition,
+  N: number,
+): boolean {
   const day = eatDay(candle.datetime);
   const trailing = position.exitLookback === 10 ? dLow(ctx, day, 10) : dLow(ctx, day, 20);
   const trailingShort = position.exitLookback === 10 ? dHigh(ctx, day, 10) : dHigh(ctx, day, 20);
 
   if (position.side === "long") {
     if (candle.low !== undefined && candle.low <= position.stop) {
-      resolvePosition(state, position, "LOSS", candle.index, position.stop, `2N unified stop hit; stop was re-anchored to most recent fill at ${position.stop}`);
+      resolvePosition(
+        state,
+        position,
+        "LOSS",
+        candle.index,
+        position.stop,
+        `2N unified stop hit; stop was re-anchored to most recent fill at ${position.stop}`,
+      );
       return true;
     }
     if (trailing !== undefined && candle.low !== undefined && candle.low <= trailing) {
-      resolvePosition(state, position, "WIN", candle.index, trailing, `${position.exitLookback}-day trailing exit hit`);
+      resolvePosition(
+        state,
+        position,
+        "WIN",
+        candle.index,
+        trailing,
+        `${position.exitLookback}-day trailing exit hit`,
+      );
       return true;
     }
   } else {
     if (candle.high !== undefined && candle.high >= position.stop) {
-      resolvePosition(state, position, "LOSS", candle.index, position.stop, `2N unified stop hit; stop was re-anchored to most recent fill at ${position.stop}`);
+      resolvePosition(
+        state,
+        position,
+        "LOSS",
+        candle.index,
+        position.stop,
+        `2N unified stop hit; stop was re-anchored to most recent fill at ${position.stop}`,
+      );
       return true;
     }
     if (trailingShort !== undefined && candle.high !== undefined && candle.high >= trailingShort) {
-      resolvePosition(state, position, "WIN", candle.index, trailingShort, `${position.exitLookback}-day trailing exit hit`);
+      resolvePosition(
+        state,
+        position,
+        "WIN",
+        candle.index,
+        trailingShort,
+        `${position.exitLookback}-day trailing exit hit`,
+      );
       return true;
     }
   }
@@ -241,26 +306,42 @@ function processPosition(ctx: AnalysisContext, state: TurtleState, candle: Candl
       position.nextAddN = N;
       position.nextAdd = position.side === "long" ? actual + 0.5 * N : actual - 0.5 * N;
       position.stop = position.side === "long" ? actual - 2 * N : actual + 2 * N;
-      state.events.set(eventKey({ index: candle.index, system: position.system, side: position.side }), {
-        index: candle.index,
-        system: position.system,
-        side: position.side,
-        unit: position.units,
-        entry: actual,
-        initialStop: position.stop,
-        finalStop: position.stop,
-        exitLevel: position.exitLookback === 10 ? trailing : trailingShort,
-        outcome: "OPEN",
-        fillReason: `pyramid unit ${position.units}: +0.5N from actual prior fill (${actual.toFixed(5)})`,
-        unitsAtExit: position.units,
-      });
-      for (const eventIndex of position.eventIndexes) markEventOpen(state, eventIndex, position.system, position.side, position.stop, position.units);
+      state.events.set(
+        eventKey({ index: candle.index, system: position.system, side: position.side }),
+        {
+          index: candle.index,
+          system: position.system,
+          side: position.side,
+          unit: position.units,
+          entry: actual,
+          initialStop: position.stop,
+          finalStop: position.stop,
+          exitLevel: position.exitLookback === 10 ? trailing : trailingShort,
+          outcome: "OPEN",
+          fillReason: `pyramid unit ${position.units}: +0.5N from actual prior fill (${actual.toFixed(5)})`,
+          unitsAtExit: position.units,
+        },
+      );
+      for (const eventIndex of position.eventIndexes)
+        markEventOpen(
+          state,
+          eventIndex,
+          position.system,
+          position.side,
+          position.stop,
+          position.units,
+        );
     }
   }
   return false;
 }
 
-function breakoutCandidates(ctx: AnalysisContext, candle: Candle, system: TurtleSystem, day: string): Array<{ side: TurtleSide; trigger: number; filled: { price: number; reason: string } }> {
+function breakoutCandidates(
+  ctx: AnalysisContext,
+  candle: Candle,
+  system: TurtleSystem,
+  day: string,
+): Array<{ side: TurtleSide; trigger: number; filled: { price: number; reason: string } }> {
   if (candle.high === undefined || candle.low === undefined) return [];
   const lookback = system === "S1" ? 20 : 55;
   const high = dHigh(ctx, day, lookback);
@@ -269,7 +350,11 @@ function breakoutCandidates(ctx: AnalysisContext, candle: Candle, system: Turtle
   const longTrigger = system === "S1" ? (high === undefined ? undefined : high + tick) : high;
   const shortTrigger = system === "S1" ? (low === undefined ? undefined : low - tick) : low;
   if (longTrigger === undefined || shortTrigger === undefined) return [];
-  const candidates: Array<{ side: TurtleSide; trigger: number; filled: { price: number; reason: string } }> = [];
+  const candidates: Array<{
+    side: TurtleSide;
+    trigger: number;
+    filled: { price: number; reason: string };
+  }> = [];
   const longFill = fillPrice(candle, longTrigger, "long");
   if (longFill) candidates.push({ side: "long", trigger: longTrigger, filled: longFill });
   const shortFill = fillPrice(candle, shortTrigger, "short");
@@ -277,7 +362,14 @@ function breakoutCandidates(ctx: AnalysisContext, candle: Candle, system: Turtle
   return candidates;
 }
 
-function runBreakout(ctx: AnalysisContext, state: TurtleState, candle: Candle, system: TurtleSystem, N: number, day: string) {
+function runBreakout(
+  ctx: AnalysisContext,
+  state: TurtleState,
+  candle: Candle,
+  system: TurtleSystem,
+  N: number,
+  day: string,
+) {
   const candidates = breakoutCandidates(ctx, candle, system, day);
   // With OHLC data we cannot know which stop was hit first. Never manufacture
   // an ordering when both sides trigger on the same candle.
@@ -294,7 +386,13 @@ function runBreakout(ctx: AnalysisContext, state: TurtleState, candle: Candle, s
 
     if (system === "S1" && state.lastS1Outcome[side] === "WIN") {
       const stop = side === "long" ? filled.price - 2 * N : filled.price + 2 * N;
-      state.hypothetical[side].push({ side, entry: filled.price, stop, exitLookback: 10, startedAt: candle.index });
+      state.hypothetical[side].push({
+        side,
+        entry: filled.price,
+        stop,
+        exitLookback: 10,
+        startedAt: candle.index,
+      });
       continue;
     }
 
@@ -315,7 +413,10 @@ function runBreakout(ctx: AnalysisContext, state: TurtleState, candle: Candle, s
       entryDay: day,
     };
     state.positions.set(key, position);
-    const exitLevel = side === "long" ? dLow(ctx, day, position.exitLookback) : dHigh(ctx, day, position.exitLookback);
+    const exitLevel =
+      side === "long"
+        ? dLow(ctx, day, position.exitLookback)
+        : dHigh(ctx, day, position.exitLookback);
     state.events.set(eventKey({ index: candle.index, system, side }), {
       index: candle.index,
       system,
@@ -338,14 +439,17 @@ function runBreakout(ctx: AnalysisContext, state: TurtleState, candle: Candle, s
 
 export function turtleRun(ctx: AnalysisContext, i: number): Outcome {
   const candle = ctx.candles[i]!;
-  if (candle.high === undefined || candle.low === undefined) return { result: "FAIL", reason: "needs complete OHLC" };
+  if (candle.high === undefined || candle.low === undefined)
+    return { result: "FAIL", reason: "needs complete OHLC" };
   const day = eatDay(candle.datetime);
   const N = atrN(ctx, day);
-  if (N === undefined) return { result: "FAIL", reason: "needs completed daily history for Wilder N(20)" };
+  if (N === undefined)
+    return { result: "FAIL", reason: "needs completed daily history for Wilder N(20)" };
   const state = getState(ctx);
 
   resolveHypotheticals(ctx, state, candle);
-  for (const position of [...state.positions.values()]) processPosition(ctx, state, candle, position, N);
+  for (const position of [...state.positions.values()])
+    processPosition(ctx, state, candle, position, N);
   const s1Candidates = breakoutCandidates(ctx, candle, "S1", day);
   const s2Candidates = breakoutCandidates(ctx, candle, "S2", day);
 
@@ -356,7 +460,10 @@ export function turtleRun(ctx: AnalysisContext, i: number): Outcome {
   // spec's combined caps, not an ordering ambiguity — collapsing the whole
   // candle across systems silently discarded legitimate independent signals.
   let ambiguous = false;
-  for (const [, candidates] of [["S1", s1Candidates], ["S2", s2Candidates]] as const) {
+  for (const [, candidates] of [
+    ["S1", s1Candidates],
+    ["S2", s2Candidates],
+  ] as const) {
     const hasLong = candidates.some((candidate) => candidate.side === "long");
     const hasShort = candidates.some((candidate) => candidate.side === "short");
     if (hasLong && hasShort) {
@@ -368,11 +475,18 @@ export function turtleRun(ctx: AnalysisContext, i: number): Outcome {
     const allCandidates = [...s1Candidates, ...s2Candidates];
     return {
       result: "FAIL",
-      reason: "Turtle breakout is intrabar ambiguous: a single system's own long and short stop levels were both crossed on the same OHLC candle; no entry was manufactured for that system. Higher-resolution data is required to determine which stop traded first.",
+      reason:
+        "Turtle breakout is intrabar ambiguous: a single system's own long and short stop levels were both crossed on the same OHLC candle; no entry was manufactured for that system. Higher-resolution data is required to determine which stop traded first.",
       detail: [
         `Ambiguous candle: ${candle.datetime}`,
-        `Long trigger(s): ${allCandidates.filter((candidate) => candidate.side === "long").map((candidate) => candidate.trigger.toFixed(5)).join(", ")}`,
-        `Short trigger(s): ${allCandidates.filter((candidate) => candidate.side === "short").map((candidate) => candidate.trigger.toFixed(5)).join(", ")}`,
+        `Long trigger(s): ${allCandidates
+          .filter((candidate) => candidate.side === "long")
+          .map((candidate) => candidate.trigger.toFixed(5))
+          .join(", ")}`,
+        `Short trigger(s): ${allCandidates
+          .filter((candidate) => candidate.side === "short")
+          .map((candidate) => candidate.trigger.toFixed(5))
+          .join(", ")}`,
       ],
     };
   }
@@ -380,11 +494,16 @@ export function turtleRun(ctx: AnalysisContext, i: number): Outcome {
   runBreakout(ctx, state, candle, "S2", N, day);
 
   // S1 and S2 can fire on the same candle in the same direction; include system+side in the key.
-  const event = state.events.get(eventKey({ index: i, system: "S1", side: "long" }))
-    ?? state.events.get(eventKey({ index: i, system: "S1", side: "short" }))
-    ?? state.events.get(eventKey({ index: i, system: "S2", side: "long" }))
-    ?? state.events.get(eventKey({ index: i, system: "S2", side: "short" }));
-  if (!event) return { result: "FAIL", reason: "no canonical Turtle breakout, pyramid, or eligible unit-cap event" };
+  const event =
+    state.events.get(eventKey({ index: i, system: "S1", side: "long" })) ??
+    state.events.get(eventKey({ index: i, system: "S1", side: "short" })) ??
+    state.events.get(eventKey({ index: i, system: "S2", side: "long" })) ??
+    state.events.get(eventKey({ index: i, system: "S2", side: "short" }));
+  if (!event)
+    return {
+      result: "FAIL",
+      reason: "no canonical Turtle breakout, pyramid, or eligible unit-cap event",
+    };
   if (event.unit > 1) {
     return {
       result: "FAIL",
@@ -405,5 +524,5 @@ export function turtleRun(ctx: AnalysisContext, i: number): Outcome {
 }
 
 export function turtleEvents(ctx: AnalysisContext): Map<string, TurtleEvent> {
-  return ((ctx.state.get(STATE_KEY) as TurtleState | undefined)?.events ?? new Map());
+  return (ctx.state.get(STATE_KEY) as TurtleState | undefined)?.events ?? new Map();
 }

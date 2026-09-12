@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AVAILABLE_SYMBOLS } from "@/lib/market-data";
+import { AVAILABLE_SYMBOLS, type MarketDataJson } from "@/lib/market-data";
 import { ensureServerEnv } from "@/lib/server-env";
 
 const RequestSchema = z.object({
@@ -54,7 +54,12 @@ function configuredKeys(): string[] {
  */
 const UPSTREAM_TIMEOUT_MS = 20_000;
 
-function isRateLimited(response: Response, data: any): boolean {
+/**
+ * Twelve Data signals a rate limit in three different shapes (HTTP 429, a
+ * numeric `code` inside a 200 body, or an error envelope mentioning credits),
+ * so all three are checked. `data` is the parsed upstream body — untrusted.
+ */
+function isRateLimited(response: Response, data: MarketDataJson | undefined): boolean {
   const message = String(data?.message ?? "").toLowerCase();
   return (
     response.status === 429 ||
@@ -119,7 +124,8 @@ async function proxyInner(request: Request): Promise<Response> {
     );
   }
 
-  let lastData: any = undefined;
+  // Last upstream body (or our own error envelope) — used only when every key fails.
+  let lastData: MarketDataJson | undefined = undefined;
   let lastWasRateLimit = false;
   for (const key of keys) {
     const params = new URLSearchParams({
@@ -148,7 +154,7 @@ async function proxyInner(request: Request): Promise<Response> {
       lastWasRateLimit = false;
       continue; // try the next configured key, same as a rate-limit fallthrough
     }
-    const data = await response.json().catch(() => ({}));
+    const data: MarketDataJson = await response.json().catch(() => ({}));
     lastData = data;
     const rateLimited = isRateLimited(response, data);
     lastWasRateLimit = rateLimited;

@@ -46,4 +46,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 Button.displayName = "Button";
 
-export { Button, buttonVariants };
+// `buttonVariants` stays module-local on purpose: exporting a non-component from
+// a component file breaks React Fast Refresh (eslint react-refresh/only-export-components),
+// and nothing outside this file imports it. Re-export it (and accept a full
+// reload on edit) only when a real consumer appears.
+export { Button };

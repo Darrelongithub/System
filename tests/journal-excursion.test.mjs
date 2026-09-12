@@ -8,8 +8,16 @@ import { test, assert, assertEqual } from "./tiny.mjs";
 import { walkTradePath } from "../src/lib/journal/path-walker.ts";
 
 const mk = (index, dt, o, h, l, c) => ({
-  index, datetime: dt, open: o, high: h, low: l, close: c,
-  similarSwingRefs: [], unresolvedRefs: [], trend: "ranging", raw: {},
+  index,
+  datetime: dt,
+  open: o,
+  high: h,
+  low: l,
+  close: c,
+  similarSwingRefs: [],
+  unresolvedRefs: [],
+  trend: "ranging",
+  raw: {},
 });
 
 test("F7: market-order excursion excludes the pre-close body of the fill bar", () => {
@@ -19,7 +27,18 @@ test("F7: market-order excursion excludes the pre-close body of the fill bar", (
     mk(2, "2025-01-01 01:00:00", 100, 101, 94, 95), // SL 95
   ];
   const rec = walkTradePath(
-    { strategyId: "x", strategy: "X", datetime: "2025-01-01 00:00:00", index: 0, side: "long", entry: 100, sl: 95, tp: 120, orderType: "market", rMultiple: -1 },
+    {
+      strategyId: "x",
+      strategy: "X",
+      datetime: "2025-01-01 00:00:00",
+      index: 0,
+      side: "long",
+      entry: 100,
+      sl: 95,
+      tp: 120,
+      orderType: "market",
+      rMultiple: -1,
+    },
     candles,
   );
   assert(rec, "journal record");
@@ -37,7 +56,18 @@ test("F7: stop/limit excursion excludes pre-fill bars, includes the fill bar", (
     mk(3, "2025-01-01 01:30:00", 99, 105.5, 98, 105), // SL 105
   ];
   const rec = walkTradePath(
-    { strategyId: "x", strategy: "X", datetime: "2025-01-01 00:00:00", index: 0, side: "short", entry: 100, sl: 105, tp: 85, orderType: "limit", rMultiple: -1 },
+    {
+      strategyId: "x",
+      strategy: "X",
+      datetime: "2025-01-01 00:00:00",
+      index: 0,
+      side: "short",
+      entry: 100,
+      sl: 105,
+      tp: 85,
+      orderType: "limit",
+      rMultiple: -1,
+    },
     candles,
   );
   assert(rec, "journal record");
@@ -56,10 +86,22 @@ test("F7: never-filled trades carry no excursion", () => {
     const slot = i % 48;
     const hh = String(Math.floor(slot / 2)).padStart(2, "0");
     const mm = slot % 2 === 0 ? "00" : "30";
-    candles.push(mk(i, `2025-01-${String(day).padStart(2, "0")} ${hh}:${mm}:00`, 100, 101, 99, 100));
+    candles.push(
+      mk(i, `2025-01-${String(day).padStart(2, "0")} ${hh}:${mm}:00`, 100, 101, 99, 100),
+    );
   }
   const rec = walkTradePath(
-    { strategyId: "x", strategy: "X", datetime: "2025-01-01 00:00:00", index: 0, side: "long", entry: 110, sl: 95, tp: 120, orderType: "limit" },
+    {
+      strategyId: "x",
+      strategy: "X",
+      datetime: "2025-01-01 00:00:00",
+      index: 0,
+      side: "long",
+      entry: 110,
+      sl: 95,
+      tp: 120,
+      orderType: "limit",
+    },
     candles,
   );
   assert(rec, "journal record");

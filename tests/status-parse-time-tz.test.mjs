@@ -105,9 +105,21 @@ test("parseTime: explicit offsets are respected, not double-applied", () => {
       candle(2, plus30, 100.5, 101, 99, 100.2),
       candle(3, plus60, 100.2, 101, 99, 100.1),
     ];
-    const row = { strategyId: "opening-range-breakout", index: 0, side: "long", orderType: "stop", entry: 100, sl: 90, tp: 120 };
+    const row = {
+      strategyId: "opening-range-breakout",
+      index: 0,
+      side: "long",
+      orderType: "stop",
+      entry: 100,
+      sl: 90,
+      tp: 120,
+    };
     const result = evaluateSetupStatus(row, candles);
     assertEqual(result.setupStatus, "RESOLVED", "offset variants resolve");
-    assertEqual(result.resolutionCandle?.index, 3, `offset variants: breakeven on +60 candle (got ${result.resolutionCandle?.index})`);
+    assertEqual(
+      result.resolutionCandle?.index,
+      3,
+      `offset variants: breakeven on +60 candle (got ${result.resolutionCandle?.index})`,
+    );
   }
 });

@@ -25,7 +25,19 @@ function splitDataLines(csv) {
 
 function fingerprint(analysis) {
   return analysis.results.map((r) =>
-    [r.strategyId, r.index, r.result, r.side, r.entry, r.sl, r.tp, r.rr, r.outcome, r.exitDatetime, r.exitPrice].join("|"),
+    [
+      r.strategyId,
+      r.index,
+      r.result,
+      r.side,
+      r.entry,
+      r.sl,
+      r.tp,
+      r.rr,
+      r.outcome,
+      r.exitDatetime,
+      r.exitPrice,
+    ].join("|"),
   );
 }
 
@@ -55,7 +67,10 @@ test("causality: future mutations never alter signals or pre-cutoff resolutions"
     for (let i = cutoffLine + 1; i < lines.length; i++) {
       if (lines[i].startsWith("===") || lines[i].trim() === "") continue;
       const c = lines[i].split(",");
-      c[1] = "1000000"; c[2] = "1000010"; c[3] = "999990"; c[4] = "1000005";
+      c[1] = "1000000";
+      c[2] = "1000010";
+      c[3] = "999990";
+      c[4] = "1000005";
       c[14] = "true";
       a[i] = c.join(",");
     }
@@ -64,13 +79,18 @@ test("causality: future mutations never alter signals or pre-cutoff resolutions"
     for (let i = cutoffLine + 1; i < lines.length; i++) {
       if (lines[i].startsWith("===") || lines[i].trim() === "") continue;
       const c = lines[i].split(",");
-      c[2] = "1"; c[3] = "2";
+      c[2] = "1";
+      c[3] = "2";
       b[i] = c.join(",");
     }
     // C: hard truncation after the cutoff.
     const c = lines.slice(0, cutoffLine + 1);
 
-    for (const [label, variant] of [["extreme-future", a], ["invalid-future", b], ["truncate", c]]) {
+    for (const [label, variant] of [
+      ["extreme-future", a],
+      ["invalid-future", b],
+      ["truncate", c],
+    ]) {
       const got = runText(variant.join("\n"));
       assert(!got.error, `${label} must still parse (K=${k})`);
       const gotPrefix = got.filter((row) => idxOf(row) <= k);
@@ -90,11 +110,15 @@ test("causality: future mutations never alter signals or pre-cutoff resolutions"
         // Resolution fields are only locked when the resolution completed at
         // or before the cutoff — later outcomes legitimately change when the
         // future itself changes (or vanishes).
-        const refExitIdx = rf[9] ? dtIndex.get(rf[9]) ?? -Infinity : undefined;
+        const refExitIdx = rf[9] ? (dtIndex.get(rf[9]) ?? -Infinity) : undefined;
         if (refExitIdx === undefined || refExitIdx <= k) {
           const refOut = rf.slice(8).join("|");
           const gotOut = gf.slice(8).join("|");
-          assertEqual(gotOut, refOut, `${label} diverged on pre-cutoff resolution at row ${i} (K=${k})`);
+          assertEqual(
+            gotOut,
+            refOut,
+            `${label} diverged on pre-cutoff resolution at row ${i} (K=${k})`,
+          );
         }
       }
     }

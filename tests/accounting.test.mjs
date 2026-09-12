@@ -24,7 +24,11 @@ test("accounting: triggers partition exactly into TP + SL + OPEN + NO_FILL", asy
   const g = { triggers: 0, tp: 0, sl: 0, open: 0, noFill: 0, rSum: 0 };
   for (const [id, e] of per) {
     assertEqual(e.tp + e.sl + e.open + e.noFill, e.triggers, `${id} outcome partition`);
-    g.triggers += e.triggers; g.tp += e.tp; g.sl += e.sl; g.open += e.open; g.noFill += e.noFill;
+    g.triggers += e.triggers;
+    g.tp += e.tp;
+    g.sl += e.sl;
+    g.open += e.open;
+    g.noFill += e.noFill;
     g.rSum += e.rSum;
   }
   assertEqual(g.tp + g.sl + g.open + g.noFill, g.triggers, "global outcome partition");
@@ -44,11 +48,13 @@ test("accounting: every trade's R recomputes independently from row-level fields
       Math.abs((t.rMultiple ?? Number.NaN) - expected) < 1e-9,
       `rMultiple recompute on ${t.strategyId}@${t.index}: expected ${expected}, got ${t.rMultiple}`,
     );
-    if (t.outcome === "TP") assertEqual(t.exitPrice, t.tp, `TP exit at level ${t.strategyId}@${t.index}`);
+    if (t.outcome === "TP")
+      assertEqual(t.exitPrice, t.tp, `TP exit at level ${t.strategyId}@${t.index}`);
     else assertEqual(t.exitPrice, t.sl, `SL exit at level ${t.strategyId}@${t.index}`);
     assert(t.exitDatetime > t.datetime, `exit strictly after trigger ${t.strategyId}@${t.index}`);
     // SL must sit on the losing side of the entry.
-    if (t.side === "short") assert(t.sl > t.entry, `short SL above entry ${t.strategyId}@${t.index}`);
+    if (t.side === "short")
+      assert(t.sl > t.entry, `short SL above entry ${t.strategyId}@${t.index}`);
     else assert(t.sl < t.entry, `long SL below entry ${t.strategyId}@${t.index}`);
   }
   assert(checked > 2000, `fixture sanity: expected >2000 resolved trades, got ${checked}`);

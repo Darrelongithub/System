@@ -5,15 +5,20 @@
  * opens 15+ hours in their future, so the last NY hour could never trade.
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
-import {
-  openingRanges,
-  openingRangeFor,
-  openingSessionDay,
-} from "../src/lib/analyzer/daily.ts";
+import { openingRanges, openingRangeFor, openingSessionDay } from "../src/lib/analyzer/daily.ts";
 
 const mk = (index, datetime, o, h, l, c, session) => ({
-  index, datetime, open: o, high: h, low: l, close: c,
-  session, similarSwingRefs: [], unresolvedRefs: [], trend: "ranging", raw: {},
+  index,
+  datetime,
+  open: o,
+  high: h,
+  low: l,
+  close: c,
+  session,
+  similarSwingRefs: [],
+  unresolvedRefs: [],
+  trend: "ranging",
+  raw: {},
 });
 
 test("F6: NY tail hour keys to the session's opening day", () => {

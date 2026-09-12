@@ -7,14 +7,12 @@ export const Route = createFileRoute("/")({
       { title: "Signal Finder Pro" },
       {
         name: "description",
-        content:
-          "Trading data generation, backtesting and live strategy analysis.",
+        content: "Trading data generation, backtesting and live strategy analysis.",
       },
       { property: "og:title", content: "Signal Finder Pro" },
       {
         property: "og:description",
-        content:
-          "Trading data generation, backtesting and live strategy analysis.",
+        content: "Trading data generation, backtesting and live strategy analysis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

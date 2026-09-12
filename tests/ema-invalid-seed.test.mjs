@@ -40,11 +40,7 @@ test("F3: invalid candle-0 value cannot contaminate later EMA/MACD signals", () 
   const r1 = runAnalysis(makeCsv(v1), { seriesEndsComplete: true });
   if (!r1.ok) throw new Error("fixture parse failed");
   assertEqual(r1.analysis.invalidRows, 1, "exactly one invalid row (candle 0)");
-  assertEqual(
-    s1,
-    s2,
-    "MACD trade set must not depend on an invalid candle's close value",
-  );
+  assertEqual(s1, s2, "MACD trade set must not depend on an invalid candle's close value");
 });
 
 test("F3: seed change is inert on all-valid files (production path safety)", () => {

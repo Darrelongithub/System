@@ -81,20 +81,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "Signal Finder Pro" },
       {
         name: "description",
-        content:
-          "Technical trading research and signal analysis workspace",
+        content: "Technical trading research and signal analysis workspace",
       },
       { property: "og:title", content: "Signal Finder Pro" },
       {
         property: "og:description",
-        content:
-          "Technical trading research and signal analysis workspace",
+        content: "Technical trading research and signal analysis workspace",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "Signal Finder Pro" },
-      { name: "twitter:description", content: "Technical trading research and signal analysis workspace" },
+      {
+        name: "twitter:description",
+        content: "Technical trading research and signal analysis workspace",
+      },
     ],
     links: [
       {

@@ -1,11 +1,5 @@
 import { CRABEL_ORB_WINDOW_MINUTES } from "@/lib/strategies/crabel-orb";
-import {
-  SESSION_WINDOWS_EAT,
-  eatDay,
-  eatParts,
-  minutesIntoSession,
-  sessionOf,
-} from "./time";
+import { SESSION_WINDOWS_EAT, eatDay, eatParts, minutesIntoSession, sessionOf } from "./time";
 import type { Candle } from "./types";
 
 export interface RangeWindow {
@@ -30,7 +24,14 @@ export interface OpeningRange extends RangeWindow {
 }
 
 function usable(c: Candle | undefined): boolean {
-  return !!c && !c.invalid && c.open !== undefined && c.high !== undefined && c.low !== undefined && c.close !== undefined;
+  return (
+    !!c &&
+    !c.invalid &&
+    c.open !== undefined &&
+    c.high !== undefined &&
+    c.low !== undefined &&
+    c.close !== undefined
+  );
 }
 
 /** Daily H/L/C aggregated on the EAT calendar day — the pivot reset we define. */
@@ -41,7 +42,15 @@ export function dailyAggregates(candles: Candle[]): DayAggregate[] {
     if (!usable(c)) continue;
     const day = eatDay(c.datetime);
     if (!current || current.day !== day) {
-      current = { day, open: c.open!, high: c.high!, low: c.low!, close: c.close!, start: c.index, end: c.index };
+      current = {
+        day,
+        open: c.open!,
+        high: c.high!,
+        low: c.low!,
+        close: c.close!,
+        start: c.index,
+        end: c.index,
+      };
       out.push(current);
     } else {
       current.high = Math.max(current.high, c.high!);

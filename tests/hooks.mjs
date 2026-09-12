@@ -19,7 +19,15 @@ function asFileUrl(p) {
 }
 
 function tryCandidates(base) {
-  for (const candidate of [base, `${base}.ts`, `${base}.tsx`, `${base}.mjs`, `${base}.js`, `${base}/index.ts`, `${base}/index.tsx`]) {
+  for (const candidate of [
+    base,
+    `${base}.ts`,
+    `${base}.tsx`,
+    `${base}.mjs`,
+    `${base}.js`,
+    `${base}/index.ts`,
+    `${base}/index.tsx`,
+  ]) {
     try {
       if (existsSync(candidate) && statSync(candidate).isFile()) {
         return asFileUrl(candidate);

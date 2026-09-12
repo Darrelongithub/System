@@ -78,7 +78,6 @@ export function computeMarketStructure(candles: Candle[], byDatetime: Map<string
   }
 }
 
-
 interface AggregateBar {
   startMs: number;
   endMs: number;
@@ -93,31 +92,37 @@ type HtfKey = "h1" | "h4" | "d1";
 function parseDatetimeMs(datetime: string): number {
   const normalized = datetime.trim().replace(" ", "T");
   // Source timestamps are EAT when no explicit offset is supplied.
-  return new Date(/(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized)
-    ? normalized
-    : `${normalized}+03:00`).getTime();
+  return new Date(
+    /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized) ? normalized : `${normalized}+03:00`,
+  ).getTime();
 }
 
 function bucketStartMs(ms: number, key: HtfKey): number {
   const d = new Date(ms);
-  if (key === "d1") return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - 3 * 60 * 60 * 1000;
+  if (key === "d1")
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()) - 3 * 60 * 60 * 1000;
   const eatMs = ms + 3 * 60 * 60 * 1000;
   const eat = new Date(eatMs);
   const hour = eat.getUTCHours();
   const size = key === "h1" ? 1 : 4;
   const flooredHour = Math.floor(hour / size) * size;
-  return Date.UTC(
-    eat.getUTCFullYear(),
-    eat.getUTCMonth(),
-    eat.getUTCDate(),
-    flooredHour,
-  ) - 3 * 60 * 60 * 1000;
+  return (
+    Date.UTC(eat.getUTCFullYear(), eat.getUTCMonth(), eat.getUTCDate(), flooredHour) -
+    3 * 60 * 60 * 1000
+  );
 }
 
 function aggregate30m(candles: Candle[], key: HtfKey): AggregateBar[] {
   const map = new Map<number, AggregateBar>();
   for (const c of candles) {
-    if (c.invalid || c.open === undefined || c.high === undefined || c.low === undefined || c.close === undefined) continue;
+    if (
+      c.invalid ||
+      c.open === undefined ||
+      c.high === undefined ||
+      c.low === undefined ||
+      c.close === undefined
+    )
+      continue;
     const startMs = bucketStartMs(parseDatetimeMs(c.datetime), key);
     const existing = map.get(startMs);
     if (!existing) {
@@ -238,10 +243,7 @@ export function computeHtfTrendContext(candles: Candle[]): HtfTrendContext[] {
   return result;
 }
 
-export function htfAllowsDirection(
-  context: HtfTrendContext,
-  side: "long" | "short",
-): boolean {
+export function htfAllowsDirection(context: HtfTrendContext, side: "long" | "short"): boolean {
   if (side === "long") {
     return [context.h1, context.h4, context.d1].every((t) => t === "bullish" || t === "ranging");
   }

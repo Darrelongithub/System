@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { format, addDays, subDays } from "date-fns";
 import JSZip from "jszip";
-import { AVAILABLE_SYMBOLS, requestMarketData } from "@/lib/market-data";
+import { AVAILABLE_SYMBOLS, isCalibratedSymbol, requestMarketData } from "@/lib/market-data";
 import {
   buildOhlcCsv,
   MAX_RATE_LIMIT_RETRIES,
@@ -45,6 +45,20 @@ import {
 } from "@/components/ui/command";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+
+/**
+ * A chart candle: a provider row (`ProviderCandle`, prices as strings) parsed
+ * into numbers for the SVG chart, the ZIP export and the flatline filter.
+ * `time` is the provider's `datetime` string, kept under the name the chart
+ * code already uses.
+ */
+interface ChartCandle {
+  time: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
 
 export default function Home() {
   // Real-time EAT clock
@@ -111,7 +125,7 @@ export default function Home() {
       time: string;
       type: string;
       date?: string;
-      candleData?: any[];
+      candleData?: ChartCandle[];
     }[]
   >([]);
   const generatedFilesRef = useRef<string[]>([]);
@@ -121,7 +135,7 @@ export default function Home() {
       time: string;
       type: string;
       date?: string;
-      candleData?: any[];
+      candleData?: ChartCandle[];
     }[]
   >([]);
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
@@ -157,7 +171,11 @@ export default function Home() {
   const removeRepeatedFlatlineArtifacts = removeRepeatedFlatlineArtifactsShared;
 
   // Generate TradingView-style SVG chart with real API data
-  const createSvgContent = (fileName: string, timeframe: string, candleData: any[]): string => {
+  const createSvgContent = (
+    fileName: string,
+    timeframe: string,
+    candleData: ChartCandle[],
+  ): string => {
     // Filter out weekend dates (Saturday = 6, Sunday = 0)
     const processedCandles = candleData.filter((c) => {
       // Explicit weekend filter based on date
@@ -294,7 +312,7 @@ export default function Home() {
       return `${Number(day)}/${Number(month)}/${year} ${Number(hour)}:${minute}`;
     };
     const screenshotTimeframe = timeframe === "4h" ? "4HR" : timeframe === "1h" ? "1HR" : "30MIN";
-    const screenshotTitle = `${symbol.replace(/[\/\\]/g, "")} ${screenshotTimeframe} ${formatScreenshotDateTime(processedCandles[0].time)} to ${formatScreenshotDateTime(processedCandles[processedCandles.length - 1].time)}`;
+    const screenshotTitle = `${symbol.replace(/[/\\]/g, "")} ${screenshotTimeframe} ${formatScreenshotDateTime(processedCandles[0].time)} to ${formatScreenshotDateTime(processedCandles[processedCandles.length - 1].time)}`;
 
     const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
@@ -534,7 +552,7 @@ export default function Home() {
                 const svgContent = createSvgContent(file.name, timeframe, file.candleData);
                 const pngBlob = await svgToPng(svgContent);
                 // Never allow the forex pair slash to become a ZIP folder.
-                const safeFileName = file.name.replace(/[\/\\]/g, "");
+                const safeFileName = file.name.replace(/[/\\]/g, "");
                 if (pngBlob) {
                   zip.file(safeFileName.replace(".svg", ".png"), pngBlob);
                 } else {
@@ -602,7 +620,7 @@ export default function Home() {
     fromDate: string,
     toDate: string,
     endDateStrParam?: string,
-  ): Promise<any[]> => {
+  ): Promise<ChartCandle[]> => {
     // Bounded rate-limit retry: the chart fetch path previously retried a
     // Twelve Data 429 forever (while(true)), so a persistently rate-limited
     // account hung the UI with isGenerating stuck true and no way to stop it.
@@ -680,7 +698,7 @@ export default function Home() {
         }
 
         // Format candle data from API response
-        const candles = (data.values || []).map((v: any) => ({
+        const candles: ChartCandle[] = (data.values || []).map((v) => ({
           time: v.datetime,
           open: parseFloat(v.open),
           close: parseFloat(v.close),
@@ -743,7 +761,7 @@ export default function Home() {
         generatedTargetDates.add(targetDateKey);
 
         // If we already generated this file in a previous run, skip it
-        const safeSymbol = symbol.replace(/[\/\\]/g, "");
+        const safeSymbol = symbol.replace(/[/\\]/g, "");
         const expectedFileName = `${safeSymbol}_${label}_`; // Prefix matching
         const fileExists = generatedFilesRef.current.some(
           (name) =>
@@ -802,7 +820,7 @@ export default function Home() {
 
           if (candleData && candleData.length > 0) {
             // We use the EAT dates for the file name so the user sees their time
-            const safeSymbol = symbol.replace(/[\/\\]/g, "");
+            const safeSymbol = symbol.replace(/[/\\]/g, "");
             const newFile = {
               name: `${safeSymbol}_${label}_${format(chartStartDate, "MMM-dd-HH")}_${format(chartEndDate, "MMM-dd-HH")}_Day${dayOffset}.svg`,
               time: formatEATTime(),
@@ -1138,6 +1156,15 @@ export default function Home() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                {symbol && !isCalibratedSymbol(symbol) ? (
+                  <p className="text-[10px] leading-snug text-amber-400">
+                    ⚠️ {symbol} is offered by the provider but sits outside the calibrated set
+                    (forex + metals; XAU/USD is the only golden baseline). Crypto trades 24/7 and
+                    the oil products follow futures/ETF hours, so the weekend policy, session
+                    buckets, spread parsing and ATR reliability thresholds do not describe this
+                    instrument — treat any output as unvalidated.
+                  </p>
+                ) : null}
               </div>
 
               {/* Date range */}

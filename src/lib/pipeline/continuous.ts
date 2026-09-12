@@ -5,14 +5,22 @@
  * caller later requests them via explicit strategyIds on runAnalysis.
  */
 import { runAnalysis, type RunOutcome } from "@/lib/analyzer/run";
-import { isTradeStrategy, formatContextChannel, type ContextEvent } from "@/lib/analyzer/strategy-kind";
+import {
+  isTradeStrategy,
+  formatContextChannel,
+  type ContextEvent,
+} from "@/lib/analyzer/strategy-kind";
 import type { ResultRow } from "@/lib/analyzer/types";
 import type { DayTrigger, TriggerOutcome } from "@/lib/backtest/engine";
 
 function outcomeOf(row: ResultRow): TriggerOutcome {
   if (row.outcome) return row.outcome;
   const note = row.statusNote ?? "";
-  if (note.includes("TP hit") || note.includes("Turtle exit") || note.includes("Donchian 5-day trailing exit"))
+  if (
+    note.includes("TP hit") ||
+    note.includes("Turtle exit") ||
+    note.includes("Donchian 5-day trailing exit")
+  )
     return "TP";
   if (note.includes("SL broken before fill") || note.includes("no fill within")) return "NO_FILL";
   if (note.includes("SL hit") || note.includes("stop hit")) return "SL";

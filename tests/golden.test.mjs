@@ -8,8 +8,20 @@ import { test, assert, assertEqual } from "./tiny.mjs";
 import { baselineAnalysis, loadGoldenSummary, loadGoldenTrades } from "./fixtures.mjs";
 
 const TRADE_FIELDS = [
-  "strategyId", "datetime", "index", "side", "entry", "sl", "tp", "rr",
-  "setupStatus", "outcome", "exitDatetime", "exitPrice", "rMultiple", "reason",
+  "strategyId",
+  "datetime",
+  "index",
+  "side",
+  "entry",
+  "sl",
+  "tp",
+  "rr",
+  "setupStatus",
+  "outcome",
+  "exitDatetime",
+  "exitPrice",
+  "rMultiple",
+  "reason",
 ];
 
 const keyOf = (t) => `${t.strategyId}|${t.datetime}|${t.index}|${t.side}`;
@@ -37,7 +49,8 @@ test("golden: baseline reproduces locked trades row-for-row and aggregate-for-ag
       // JSON normalization: golden artifacts serialize absent optionals as null.
       if ((c[f] ?? null) !== (g[f] ?? null)) {
         mismatches++;
-        if (mismatches <= 5) console.error(`  field mismatch ${k}.${f}: golden=${g[f]} current=${c[f]}`);
+        if (mismatches <= 5)
+          console.error(`  field mismatch ${k}.${f}: golden=${g[f]} current=${c[f]}`);
         break;
       }
     }
@@ -76,10 +89,7 @@ test("golden: baseline reproduces locked trades row-for-row and aggregate-for-ag
     assertEqual(agg.sl, g.sl, "sl");
     assertEqual(agg.open, g.open, "open");
     assertEqual(agg.noFill, g.noFill, "noFill");
-    assert(
-      Math.abs(agg.rSum - g.rSum) < 1e-6,
-      `rSum drift: golden ${g.rSum} current ${agg.rSum}`,
-    );
+    assert(Math.abs(agg.rSum - g.rSum) < 1e-6, `rSum drift: golden ${g.rSum} current ${agg.rSum}`);
   }
 
   // Per-strategy aggregate comparison.

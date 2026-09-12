@@ -12,7 +12,18 @@ const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
 
 function fullFingerprint(analysis) {
   return JSON.stringify(
-    analysis.tradePasses.map((t) => [t.strategyId, t.index, t.side, t.entry, t.sl, t.tp, t.outcome, t.exitDatetime, t.exitPrice, t.rMultiple]),
+    analysis.tradePasses.map((t) => [
+      t.strategyId,
+      t.index,
+      t.side,
+      t.entry,
+      t.sl,
+      t.tp,
+      t.outcome,
+      t.exitDatetime,
+      t.exitPrice,
+      t.rMultiple,
+    ]),
   );
 }
 

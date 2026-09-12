@@ -15,7 +15,10 @@ test("F1: extreme (1e308) candle yields zero non-finite/impossible PASS rows", (
   const big = 1e308;
   rows[i] = csvRow(
     eatDateTime(Date.parse("2025-01-01T00:00:00+03:00") + i * 1800000),
-    String(big), String(big), String(big * (1 - 1e-13)), String(big * (1 - 5e-14)),
+    String(big),
+    String(big),
+    String(big * (1 - 1e-13)),
+    String(big * (1 - 5e-14)),
   );
   const result = runAnalysis(makeCsv(rows), { seriesEndsComplete: true });
   assert(result.ok, "parse must succeed for finite prices");
@@ -23,10 +26,7 @@ test("F1: extreme (1e308) candle yields zero non-finite/impossible PASS rows", (
     for (const f of ["entry", "sl", "tp", "rr", "rMultiple", "exitPrice"]) {
       const v = t[f];
       if (v === undefined || v === null) continue;
-      assert(
-        Number.isFinite(v),
-        `non-finite ${f} (${String(v)}) on ${t.strategyId}@${t.index}`,
-      );
+      assert(Number.isFinite(v), `non-finite ${f} (${String(v)}) on ${t.strategyId}@${t.index}`);
     }
     assert(t.entry > 0 && t.sl > 0 && t.tp > 0, `non-positive price on ${t.strategyId}@${t.index}`);
   }
@@ -44,11 +44,17 @@ test("F1: applySpreadAndRR rejects impossible and non-finite price sets", () => 
   assert(r3 && r3.invalidReason !== undefined, "negative tp must carry invalidReason");
   // Denormal risk: RR overflows to Infinity → rejected.
   const rDen = applySpreadAndRR({ side: "long", entry: 100, sl: 100 - 5e-324, tp: 200 }, 0);
-  assert(rDen && rDen.invalidReason !== undefined, "denormal-risk Infinite-RR must carry invalidReason");
+  assert(
+    rDen && rDen.invalidReason !== undefined,
+    "denormal-risk Infinite-RR must carry invalidReason",
+  );
   // Astronomical-but-finite set: finite and positive → NOT impossible; it
   // fails the RR threshold downstream (rr = 0), never becomes Infinity.
   const rBig = applySpreadAndRR({ side: "long", entry: 1e308, sl: 5e307, tp: 1e308 }, 0.2);
-  assert(rBig && rBig.invalidReason === undefined, "finite positive huge set is geometrically sane");
+  assert(
+    rBig && rBig.invalidReason === undefined,
+    "finite positive huge set is geometrically sane",
+  );
   assertEqual(rBig.rr, 0, "huge-set rr is 0 (fails the RR gate as FAIL, never non-finite)");
   // Sane trade unaffected.
   const r4 = applySpreadAndRR({ side: "long", entry: 100, sl: 99, tp: 103 }, 0.2);
