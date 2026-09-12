@@ -451,27 +451,45 @@ function resolvedWinRate(rows: ResultRow[]) {
 }
 
 /**
- * Runs the analyzer twice on identical source data — once without the HTF
- * direction filter and once with it — and reports the before/after numbers per
- * strategy that actually produced triggers.
+ * HTF direction-alignment numbers per strategy — the Analysis page's
+ * "HTF direction filter: before vs after" table.
+ *
+ * This used to run the whole engine TWICE on identical source data (once with
+ * `enableHtfDirectionFilter: false`, once with `true`), on top of the analysis
+ * the caller had just run. Measured on the locked 9738-row baseline: 2.11s for
+ * the pair (~1.2s per pass) of blocked main thread — and both passes returned
+ * identical rows, because the flag is inert for trade generation (see
+ * `RunOptions.enableHtfDirectionFilter`: `runAnalysis` never reads it). Every
+ * before/after pair was therefore equal by construction and the table's
+ * "Δ win rate" column was always +0.0 pp.
+ *
+ * One pass returns byte-identical output at half the cost.
+ * `tests/analyzer-htf-inert.test.mjs` pins both halves of that claim (the flag
+ * is inert, and this function makes exactly one engine pass): if the filter is
+ * ever activated that test fails first, and the two-pass comparison must be
+ * restored here.
  */
 export function compareHtfDirectionFilter(csv: string): HtfFilterComparison[] {
-  const before = runAnalysis(csv, { enableHtfDirectionFilter: false });
-  const after = runAnalysis(csv, { enableHtfDirectionFilter: true });
-  if (!before.ok) throw new Error(before.error);
-  if (!after.ok) throw new Error(after.error);
+  const run = runAnalysis(csv, { enableHtfDirectionFilter: true });
+  if (!run.ok) throw new Error(run.error);
+  const rows = run.analysis.passing;
 
   const names = new Map<string, string>();
-  for (const row of [...before.analysis.passing, ...after.analysis.passing]) {
+  for (const row of rows) {
     if (!names.has(row.strategyId)) names.set(row.strategyId, row.strategy);
   }
 
   return [...names.entries()]
-    .map(([strategyId, strategy]) => ({
-      strategyId,
-      strategy,
-      before: resolvedWinRate(before.analysis.passing.filter((r) => r.strategyId === strategyId)),
-      after: resolvedWinRate(after.analysis.passing.filter((r) => r.strategyId === strategyId)),
-    }))
+    .map(([strategyId, strategy]) => {
+      const strategyRows = rows.filter((r) => r.strategyId === strategyId);
+      return {
+        strategyId,
+        strategy,
+        // Both sides come from the same pass (see above); kept as two objects
+        // so the shape — and the UI's before/after rendering — is unchanged.
+        before: resolvedWinRate(strategyRows),
+        after: resolvedWinRate(strategyRows),
+      };
+    })
     .sort((a, b) => b.before.triggers - a.before.triggers || a.strategy.localeCompare(b.strategy));
 }

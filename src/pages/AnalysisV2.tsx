@@ -79,15 +79,35 @@ export default function AnalysisV2() {
       return;
     }
     setAnalysis(outcome.analysis);
-    try {
-      setHtfComparison(compareHtfDirectionFilter(csv));
-    } catch {
-      setHtfComparison([]);
-    }
+    // Cleared here, filled by the deferred effect below — never left showing
+    // the previous CSV's numbers.
+    setHtfComparison([]);
     setStrategyFilter("all");
     setResultFilter("all");
     setStatus("ready");
   }, [csv]);
+
+  // The HTF alignment table is secondary. It used to be computed synchronously
+  // inside the callback above, which blocked the main thread for a full extra
+  // engine pass (~1.1s on the locked 9.7k-row baseline) before ANY result could
+  // paint. Deferred to an effect + macrotask so the results table renders first
+  // and this fills in a frame later; cancelled if the CSV changes meanwhile.
+  useEffect(() => {
+    if (!csv || !analysis) return;
+    let cancelled = false;
+    const timer = setTimeout(() => {
+      try {
+        const comparison = compareHtfDirectionFilter(csv);
+        if (!cancelled) setHtfComparison(comparison);
+      } catch {
+        if (!cancelled) setHtfComparison([]);
+      }
+    }, 0);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [csv, analysis]);
 
   const handleVerdict = useCallback(
     (result: VerifyResult) => {
@@ -270,7 +290,12 @@ export default function AnalysisV2() {
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     Baseline and filtered runs use the same CSV, structure, RR rules, and
-                    no-lookahead HTF context.
+                    no-lookahead HTF context. The HTF direction filter is currently{" "}
+                    <strong className="font-medium text-foreground">inert</strong> for trade
+                    generation (see <code className="num">RunOptions.enableHtfDirectionFilter</code>
+                    ), so Before and After are identical by construction and Δ win rate is always
+                    +0.0 pp — read the trend-fighting count as an alignment mix, not as a filter
+                    effect.
                   </p>
                   <div className="overflow-x-auto rounded-md border border-border">
                     <table className="data-table w-full text-xs">

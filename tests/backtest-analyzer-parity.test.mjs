@@ -227,10 +227,11 @@ test("parity: Analyzer UI config diverges ONLY via final-bar live-candle policy"
   );
 });
 
-test("parity: state isolation — A→(compareHtf×2)→A and A→B→A identical", () => {
+test("parity: state isolation — A→(compareHtf)→A and A→B→A identical", () => {
   const csv = loadBaselineCsv();
   const a1 = runAnalysis(csv, UI_OPTS);
-  compareHtfDirectionFilter(csv); // the UI runs two further analyses right after the main one
+  compareHtfDirectionFilter(csv); // the UI defers one further analysis after the main one
+  // (it used to run two — see tests/analyzer-htf-inert.test.mjs)
   const a2 = runAnalysis(csv, UI_OPTS);
   const same = (x, y) =>
     x.length === y.length &&
