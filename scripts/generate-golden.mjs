@@ -26,8 +26,20 @@ const CSV = readFileSync(new URL("../artifacts/baseline-xauusd-ohlc.csv", import
 const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
 
 const TRADE_FIELDS = [
-  "strategyId", "datetime", "index", "side", "entry", "sl", "tp", "rr",
-  "setupStatus", "outcome", "exitDatetime", "exitPrice", "rMultiple", "reason",
+  "strategyId",
+  "datetime",
+  "index",
+  "side",
+  "entry",
+  "sl",
+  "tp",
+  "rr",
+  "setupStatus",
+  "outcome",
+  "exitDatetime",
+  "exitPrice",
+  "rMultiple",
+  "reason",
 ];
 
 const started = Date.now();
@@ -81,7 +93,9 @@ for (const id of order) {
 // Any strategy not present in the prior summary (shouldn't happen) is appended.
 for (const t of analysis.tradePasses) {
   if (!(t.strategyId in perStrategy)) {
-    perStrategy[t.strategyId] = agg(analysis.tradePasses.filter((x) => x.strategyId === t.strategyId));
+    perStrategy[t.strategyId] = agg(
+      analysis.tradePasses.filter((x) => x.strategyId === t.strategyId),
+    );
   }
 }
 
@@ -130,4 +144,6 @@ writeFileSync(
 console.log(
   `golden regenerated: ${trades.length} trades | TP ${totals.tp} / SL ${totals.sl} / OPEN ${totals.open} / NO_FILL ${totals.noFill} | R ${totals.rSum}`,
 );
-console.log(`contextPasses: ${analysis.contextPasses.length}, analyzedRows: ${analysis.analyzedRows}`);
+console.log(
+  `contextPasses: ${analysis.contextPasses.length}, analyzedRows: ${analysis.analyzedRows}`,
+);

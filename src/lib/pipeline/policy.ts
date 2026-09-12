@@ -9,10 +9,7 @@ export const STANDARD_LOOKBACK_CALENDAR_DAYS = 30;
 export const SAME_CANDLE_TP_SL_RULE =
   "After fill, if both TP and SL are touched in the same OHLC candle, TP is resolved first (deterministic OHLC ambiguity convention; not a claim about true tick order).";
 
-export function closedSignalCandleCount(
-  candleCount: number,
-  seriesEndsComplete: boolean,
-): number {
+export function closedSignalCandleCount(candleCount: number, seriesEndsComplete: boolean): number {
   if (candleCount <= 0) return 0;
   if (seriesEndsComplete) return candleCount;
   return Math.max(0, candleCount - 1);

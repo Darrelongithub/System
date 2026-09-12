@@ -227,24 +227,35 @@ export function applyTriggers(state: BacktestState, triggers: DayTrigger[]) {
         resolvedCount: 0,
       } satisfies StrategyStats);
     existing.triggers += 1;
-    if (typeof trigger.rr === "number" && Number.isFinite(trigger.rr) && trigger.rr > 0) { existing.rrSum += trigger.rr; existing.rrCount += 1; }
+    if (typeof trigger.rr === "number" && Number.isFinite(trigger.rr) && trigger.rr > 0) {
+      existing.rrSum += trigger.rr;
+      existing.rrCount += 1;
+    }
     // Realised R comes from the actual exit price when the analyzer produced
     // one; only then do we fall back to the planned RR / -1R approximation.
     const realised =
       typeof trigger.rMultiple === "number" && Number.isFinite(trigger.rMultiple)
         ? trigger.rMultiple
         : trigger.outcome === "TP"
-          ? (typeof trigger.rr === "number" && Number.isFinite(trigger.rr) ? trigger.rr : undefined)
+          ? typeof trigger.rr === "number" && Number.isFinite(trigger.rr)
+            ? trigger.rr
+            : undefined
           : trigger.outcome === "SL"
             ? -1
             : undefined;
 
     if (trigger.outcome === "TP") {
       existing.tpHits += 1;
-      if (realised !== undefined) { existing.resolvedRrSum += realised; existing.resolvedCount += 1; }
+      if (realised !== undefined) {
+        existing.resolvedRrSum += realised;
+        existing.resolvedCount += 1;
+      }
     } else if (trigger.outcome === "SL") {
       existing.slHits += 1;
-      if (realised !== undefined) { existing.resolvedRrSum += realised; existing.resolvedCount += 1; }
+      if (realised !== undefined) {
+        existing.resolvedRrSum += realised;
+        existing.resolvedCount += 1;
+      }
     } else if (trigger.outcome === "NO_FILL") {
       existing.noFill += 1;
     } else existing.open += 1;
@@ -375,7 +386,9 @@ export function buildDayReport(input: DayReportInput): string {
   lines.push("=== ROLLING CUMULATIVE STATS PER STRATEGY ===");
   lines.push(`since first backtest day: ${state.firstDay ?? day}`);
   lines.push(`days completed (incl. this one): ${state.days.length}`);
-  lines.push("strategy | total triggers | TP hits | SL hits | no fill | still open | win rate | avg realised R");
+  lines.push(
+    "strategy | total triggers | TP hits | SL hits | no fill | still open | win rate | avg realised R",
+  );
   const rows = Object.values(state.stats).sort((a, b) => a.strategy.localeCompare(b.strategy));
   if (rows.length === 0) lines.push("no triggers recorded yet");
   for (const stats of rows) {
@@ -441,16 +454,26 @@ export function batchBacktestReports(
       key = `${year}-W${String(week).padStart(2, "0")}`;
     } else key = report.day.slice(0, 7);
     const bucket = groups.get(key) ?? [];
-    bucket.push(report); groups.set(key, bucket);
+    bucket.push(report);
+    groups.set(key, bucket);
   }
   return [...groups.entries()].map(([key, entries]) => ({
     name: runLength <= 31 ? `backtest_week_${key}.txt` : `backtest_month_${key}.txt`,
     content: (() => {
-      const ordered = entries.sort((a,b) => a.day.localeCompare(b.day));
+      const ordered = entries.sort((a, b) => a.day.localeCompare(b.day));
       const subtotal = new Map<string, number>();
-      for (const entry of ordered) for (const trigger of entry.triggers ?? []) subtotal.set(trigger.strategy, (subtotal.get(trigger.strategy) ?? 0) + 1);
-      const subtotalLines = ["=== PACKAGE SUBTOTAL PER STRATEGY ===", ...STRATEGIES.map((s) => `${s.name} | triggers in package: ${subtotal.get(s.name) ?? 0}`), ""];
-      return subtotalLines.join("\n") + ordered.map((r) => r.content).join("\n\n\n=== END OF DAY / NEXT DAY ===\n\n");
+      for (const entry of ordered)
+        for (const trigger of entry.triggers ?? [])
+          subtotal.set(trigger.strategy, (subtotal.get(trigger.strategy) ?? 0) + 1);
+      const subtotalLines = [
+        "=== PACKAGE SUBTOTAL PER STRATEGY ===",
+        ...STRATEGIES.map((s) => `${s.name} | triggers in package: ${subtotal.get(s.name) ?? 0}`),
+        "",
+      ];
+      return (
+        subtotalLines.join("\n") +
+        ordered.map((r) => r.content).join("\n\n\n=== END OF DAY / NEXT DAY ===\n\n")
+      );
     })(),
   }));
 }
@@ -464,14 +487,49 @@ export function batchBacktestReports(
  * the current hyphenated ids and the actual coded rules.
  */
 const REQUIREMENTS: Record<string, string[]> = {
-  "opening-range-breakout": ["opening range built for the candle's own session", "past the opening window", "Stretch-adjusted stop entry above/below the range", "opposite-side Stretch-adjusted protective stop", "no canonical fixed TP"],
-  turtle: ["Wilder-smoothed N(20) from completed daily history", "System 1: prior 20-day extreme plus one instrument tick; System 2: prior 55-day extreme", "System 1 skip rule based on prior same-direction breakout outcome", "0.5N pyramiding from actual fills, maximum 4 units per market", "2N stop re-anchored to most recent fill", "System 1 10-day / System 2 20-day trailing exit"],
-  "raschke-keltner": ["EMA(20) centerline", "ATR band convention", "condition only; no canonical TP"],
-  "previous-day-high-low": ["raw prior EAT-day high/low level", "level break", "no canonical full entry/SL/TP system"],
-  "bollinger-bands": ["20-period SMA", "2 population-standard-deviation bands", "indicator condition only; no canonical trade system"],
-  donchian: ["20 completed-day channel breakout", "5-day opposite-channel exit is the documented structure and is simulated dynamically", "no fixed TP"],
-  "crabel-contraction": ["completed EAT-day Inside Day / NR4 / NR7", "diagnostic/precondition rather than standalone canonical entry"],
-  "crabel-outside-expansion": ["completed EAT-day outside day", "diagnostic; empirical close-location edge tables require replication"],
+  "opening-range-breakout": [
+    "opening range built for the candle's own session",
+    "past the opening window",
+    "Stretch-adjusted stop entry above/below the range",
+    "opposite-side Stretch-adjusted protective stop",
+    "no canonical fixed TP",
+  ],
+  turtle: [
+    "Wilder-smoothed N(20) from completed daily history",
+    "System 1: prior 20-day extreme plus one instrument tick; System 2: prior 55-day extreme",
+    "System 1 skip rule based on prior same-direction breakout outcome",
+    "0.5N pyramiding from actual fills, maximum 4 units per market",
+    "2N stop re-anchored to most recent fill",
+    "System 1 10-day / System 2 20-day trailing exit",
+  ],
+  "raschke-keltner": [
+    "EMA(20) centerline",
+    "ATR band convention",
+    "condition only; no canonical TP",
+  ],
+  "previous-day-high-low": [
+    "raw prior EAT-day high/low level",
+    "level break",
+    "no canonical full entry/SL/TP system",
+  ],
+  "bollinger-bands": [
+    "20-period SMA",
+    "2 population-standard-deviation bands",
+    "indicator condition only; no canonical trade system",
+  ],
+  donchian: [
+    "20 completed-day channel breakout",
+    "5-day opposite-channel exit is the documented structure and is simulated dynamically",
+    "no fixed TP",
+  ],
+  "crabel-contraction": [
+    "completed EAT-day Inside Day / NR4 / NR7",
+    "diagnostic/precondition rather than standalone canonical entry",
+  ],
+  "crabel-outside-expansion": [
+    "completed EAT-day outside day",
+    "diagnostic; empirical close-location edge tables require replication",
+  ],
   "fvg-ict": ["three-candle FVG condition", "no canonical mechanical entry/SL/TP"],
 };
 
@@ -480,9 +538,16 @@ export function triggerReasoning(trigger: DayTrigger): string[] {
   const lines = ["    requirements:"];
   for (const requirement of reqs) lines.push(`      - satisfied: ${requirement}`);
   lines.push(`    actual strategy evidence: ${trigger.reason}`);
-  const risk = trigger.entry !== undefined && trigger.sl !== undefined ? Math.abs(trigger.entry - trigger.sl) : undefined;
-  lines.push(`    TP placement: ${num(trigger.tp)} — structure target if available; no generic 2R fallback${risk !== undefined ? ` (risk ${risk.toFixed(5)})` : ""}.`);
-  lines.push(`    SL placement: ${num(trigger.sl)} — strategy invalidation extreme/level with its configured ATR buffer.`);
+  const risk =
+    trigger.entry !== undefined && trigger.sl !== undefined
+      ? Math.abs(trigger.entry - trigger.sl)
+      : undefined;
+  lines.push(
+    `    TP placement: ${num(trigger.tp)} — structure target if available; no generic 2R fallback${risk !== undefined ? ` (risk ${risk.toFixed(5)})` : ""}.`,
+  );
+  lines.push(
+    `    SL placement: ${num(trigger.sl)} — strategy invalidation extreme/level with its configured ATR buffer.`,
+  );
   if (trigger.statusNote) lines.push(`    resolution: ${trigger.statusNote}`);
   return lines;
 }

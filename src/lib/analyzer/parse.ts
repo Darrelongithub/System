@@ -141,14 +141,22 @@ export function parseCsv(text: string): ParseResult {
       : String(metaRaw["section_marker_convention"]).trim();
 
   const rawTick = metaRaw["turtle_tick_size"];
-  const parsedTick = rawTick === undefined || rawTick === null || String(rawTick).trim() === "" ? undefined : Number(rawTick);
+  const parsedTick =
+    rawTick === undefined || rawTick === null || String(rawTick).trim() === ""
+      ? undefined
+      : Number(rawTick);
   const meta: Metadata = {
     data_age: String(metaRaw["data_age"]).trim(),
     spread_convention: String(metaRaw["spread_convention"]).trim(),
     atr_method: String(metaRaw["atr_method"]).trim(),
     similar_swing_selection_rule: String(metaRaw["similar_swing_selection_rule"]).trim(),
     section_marker_convention: sectionConvention,
-    turtle_tick_size: Number.isFinite(parsedTick) && parsedTick! > 0 ? parsedTick : rawTick === undefined ? undefined : String(rawTick).trim(),
+    turtle_tick_size:
+      Number.isFinite(parsedTick) && parsedTick! > 0
+        ? parsedTick
+        : rawTick === undefined
+          ? undefined
+          : String(rawTick).trim(),
   };
 
   const markers = sectionMarkers(sectionConvention);
@@ -199,7 +207,8 @@ export function parseCsv(text: string): ParseResult {
 
     const coreMissing: string[] = [];
     if (!candle.datetime.trim()) coreMissing.push("datetime");
-    else if (!isValidEATDatetime(candle.datetime)) candle.invalid = "INVALID: malformed or timezone-bearing datetime";
+    else if (!isValidEATDatetime(candle.datetime))
+      candle.invalid = "INVALID: malformed or timezone-bearing datetime";
     if (candle.open === undefined) coreMissing.push("open");
     if (candle.high === undefined) coreMissing.push("high");
     if (candle.low === undefined) coreMissing.push("low");
@@ -246,9 +255,7 @@ export function parseCsv(text: string): ParseResult {
 /** Extracts a numeric spread from the free-text spread_convention value. */
 export function parseSpread(convention: string): number {
   // Numbers adjacent to letters (e.g. a symbol like "US30") are never prices.
-  const matches = Array.from(
-    convention.matchAll(/(?<![A-Za-z0-9.])-?\d+(\.\d+)?(?![A-Za-z0-9])/g),
-  );
+  const matches = Array.from(convention.matchAll(/(?<![A-Za-z0-9.])-?\d+(\.\d+)?(?![A-Za-z0-9])/g));
   if (matches.length === 0) return Number.NaN;
   // Prefer the first number that is NOT itself denominated in pips. Generator
   // templates write the value in price units followed by an approximate pip
@@ -268,7 +275,9 @@ export function parseSpread(convention: string): number {
 /** Source OHLC timestamps are EAT wall-clock values; explicit timezone offsets are rejected. */
 export function isValidEATDatetime(value: string): boolean {
   const normalized = value.trim().replace(" ", "T");
-  const match = normalized.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?$/);
+  const match = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?$/,
+  );
   if (!match) return false;
   const year = Number(match[1]);
   const month = Number(match[2]);

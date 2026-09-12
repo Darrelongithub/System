@@ -121,7 +121,11 @@ function priorDayExtremes(
 function evaluateCrabelOrbStatus(row: ResultRow, candles: Candle[]): StatusEvaluation {
   const candlesSinceTrigger = countForwardValid(candles, row.index);
   if (row.entry === undefined || row.sl === undefined || row.side === undefined) {
-    return { setupStatus: "PENDING", candlesSinceTrigger, statusNote: "no ORB price levels to track" };
+    return {
+      setupStatus: "PENDING",
+      candlesSinceTrigger,
+      statusNote: "no ORB price levels to track",
+    };
   }
 
   const triggerCandle =
@@ -148,7 +152,8 @@ function evaluateCrabelOrbStatus(row: ResultRow, candles: Candle[]): StatusEvalu
     return {
       setupStatus: "PENDING",
       candlesSinceTrigger,
-      statusNote: "Crabel ORB stop order has not filled yet; one-hour breakeven clock has not started.",
+      statusNote:
+        "Crabel ORB stop order has not filled yet; one-hour breakeven clock has not started.",
     };
   }
 
@@ -161,14 +166,19 @@ function evaluateCrabelOrbStatus(row: ResultRow, candles: Candle[]): StatusEvalu
     if (candle.invalid) continue;
     last = candle;
     const t = parseTime(candle.datetime);
-    const elapsedMinutes = fillTime !== undefined && t !== undefined ? (t - fillTime) / 60000 : Infinity;
+    const elapsedMinutes =
+      fillTime !== undefined && t !== undefined ? (t - fillTime) / 60000 : Infinity;
     const effectiveStop = crabelOrbEffectiveStop(row.entry, row.sl, elapsedMinutes);
     breakevenActive = effectiveStop === row.entry;
 
     if (touched(candle, effectiveStop)) {
       // A stop-entry candle that also touches the initial protective stop is
       // intrabar ambiguous with OHLC data; do not manufacture a fill/exit.
-      if (candle.index === fillCandle.index && effectiveStop !== row.entry && touched(candle, row.entry)) {
+      if (
+        candle.index === fillCandle.index &&
+        effectiveStop !== row.entry &&
+        touched(candle, row.entry)
+      ) {
         return {
           setupStatus: "FILLED",
           candlesSinceTrigger,
@@ -199,7 +209,11 @@ function evaluateCrabelOrbStatus(row: ResultRow, candles: Candle[]): StatusEvalu
 function evaluateDonchianStatus(row: ResultRow, candles: Candle[]): StatusEvaluation {
   const candlesSinceTrigger = countForwardValid(candles, row.index);
   if (row.entry === undefined || row.side === undefined) {
-    return { setupStatus: "PENDING", candlesSinceTrigger, statusNote: "no Donchian entry to track" };
+    return {
+      setupStatus: "PENDING",
+      candlesSinceTrigger,
+      statusNote: "no Donchian entry to track",
+    };
   }
 
   const dayIndex = getDayExtremesIndex(candles);
@@ -211,9 +225,7 @@ function evaluateDonchianStatus(row: ResultRow, candles: Candle[]): StatusEvalua
     const ds = priorDayExtremes(dayIndex, day, 5);
     if (ds.length < 5) continue;
     const exit =
-      row.side === "long"
-        ? Math.min(...ds.map((d) => d.low))
-        : Math.max(...ds.map((d) => d.high));
+      row.side === "long" ? Math.min(...ds.map((d) => d.low)) : Math.max(...ds.map((d) => d.high));
     if (row.side === "long" && candle.low !== undefined && candle.low <= exit) {
       return {
         setupStatus: "RESOLVED",
@@ -269,8 +281,7 @@ export function evaluateSetupStatus(
       : undefined;
 
   // Market: fill at signal-bar close (trigger included). Limit/stop: fill only on later touch.
-  const startIndex =
-    row.orderType === "market" && triggerCandle ? row.index : row.index + 1;
+  const startIndex = row.orderType === "market" && triggerCandle ? row.index : row.index + 1;
 
   let filled = false;
   let fillCandle: Candle | undefined;

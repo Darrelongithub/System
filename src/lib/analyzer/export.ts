@@ -121,5 +121,3 @@ export function buildHistoryReport(analysis: Analysis): string {
 export function buildReport(analysis: Analysis, kind: ReportKind = "LIVE"): string {
   return kind === "LIVE" ? buildLiveReport(analysis) : buildHistoryReport(analysis);
 }
-
-

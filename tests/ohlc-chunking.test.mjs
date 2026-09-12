@@ -71,7 +71,10 @@ test("chunkDateRange: wide range splits into contiguous, non-overlapping chunks 
     const days =
       (new Date(`${c.end}T00:00:00Z`).getTime() - new Date(`${c.start}T00:00:00Z`).getTime()) /
       86_400_000;
-    assert(days < CHUNK_SPAN_DAYS, `chunk ${c.start}->${c.end} must stay under the per-request cap`);
+    assert(
+      days < CHUNK_SPAN_DAYS,
+      `chunk ${c.start}->${c.end} must stay under the per-request cap`,
+    );
   }
 });
 
@@ -111,7 +114,9 @@ test("buildOhlcCsv: wide window fetches multiple contiguous chunks and merges th
       "must log that it split into chunks",
     );
     assert(
-      logs.some((l) => l.includes("Combined") && l.includes("deduplicated") && l.includes("sorted")),
+      logs.some(
+        (l) => l.includes("Combined") && l.includes("deduplicated") && l.includes("sorted"),
+      ),
       "must log the merge/dedup/sort step",
     );
   } finally {
@@ -166,7 +171,9 @@ test("buildOhlcCsv: a hard provider error on any chunk aborts the whole fetch �
     return { status: 500, body: { status: "error", message: "internal provider failure" } };
   });
   try {
-    const csv = await buildOhlcCsv(baseOptions({ startDate: "2026-01-01", endDate: "2026-06-01" }, logs));
+    const csv = await buildOhlcCsv(
+      baseOptions({ startDate: "2026-01-01", endDate: "2026-06-01" }, logs),
+    );
     assertEqual(csv, null, "must abort with null, never a partially-built or fabricated CSV");
     assert(
       logs.some((l) => l.includes("internal provider failure")),
@@ -185,11 +192,19 @@ test("buildOhlcCsv: terminal rate limit during a chunked fetch aborts cleanly (r
   }));
   try {
     const csv = await Promise.race([
-      buildOhlcCsv(baseOptions({ startDate: "2026-01-01", endDate: "2026-07-15", rateLimitRetries: 0 }, logs)),
-      new Promise((_, reject) => setTimeout(() => reject(new Error("hung — unbounded retry")), 10000)),
+      buildOhlcCsv(
+        baseOptions({ startDate: "2026-01-01", endDate: "2026-07-15", rateLimitRetries: 0 }, logs),
+      ),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("hung — unbounded retry")), 10000),
+      ),
     ]);
     assertEqual(csv, null, "terminal rate-limit must return null");
-    assertEqual(stub.calls.length, 1, "exactly one upstream attempt when no retries remain, even mid-chunk-plan");
+    assertEqual(
+      stub.calls.length,
+      1,
+      "exactly one upstream attempt when no retries remain, even mid-chunk-plan",
+    );
     assert(logs.some((l) => l.includes("aborting this fetch instead of retrying forever")));
   } finally {
     stub.restore();

@@ -57,7 +57,6 @@ export const AVAILABLE_SYMBOLS = [
   "BCO/USD",
 ].sort();
 
-
 export interface MarketDataRequest {
   symbol: string;
   interval: string;
@@ -68,7 +67,9 @@ export interface MarketDataRequest {
 }
 
 /** Proxy market-data requests through the server so provider credentials never enter the client bundle. */
-export async function requestMarketData(request: MarketDataRequest): Promise<{ response: Response; data: any }> {
+export async function requestMarketData(
+  request: MarketDataRequest,
+): Promise<{ response: Response; data: any }> {
   const response = await fetch("/api/market-data", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -76,7 +77,9 @@ export async function requestMarketData(request: MarketDataRequest): Promise<{ r
   });
   const text = await response.text();
   let data: any = {};
-  try { data = JSON.parse(text); } catch {
+  try {
+    data = JSON.parse(text);
+  } catch {
     data = { status: "error", message: text || `HTTP ${response.status}` };
   }
   return { response, data };

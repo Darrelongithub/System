@@ -7,7 +7,12 @@ import { evaluateSetupStatus, isLive } from "./status";
 import { ALL_STRATEGIES, STRATEGIES } from "./strategies";
 import { consume } from "./strategies/util";
 import { turtleEvents } from "./strategies/turtle";
-import { buildIndex, computeHtfTrendContext, computeMarketStructure, htfAllowsDirection } from "./structure";
+import {
+  buildIndex,
+  computeHtfTrendContext,
+  computeMarketStructure,
+  htfAllowsDirection,
+} from "./structure";
 import { rejectFilterC, FILTER_C_REASON } from "./regime-filters";
 import {
   formatContextChannel,
@@ -74,7 +79,7 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   // Chronological integrity: valid rows must be non-decreasing by datetime.
   // Invalid rows do not become chronological barriers; compare each valid row
   // against the previous valid row so unsorted data cannot hide behind corruption.
-  let previousValid: typeof candles[number] | undefined;
+  let previousValid: (typeof candles)[number] | undefined;
   for (const cur of candles) {
     if (cur.invalid) continue;
     if (previousValid && cur.datetime < previousValid.datetime) {
@@ -133,26 +138,30 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
     if (barAtr && row.entry !== undefined && row.sl !== undefined && row.tp !== undefined) {
       const slDist = Math.abs(row.entry - row.sl);
       const tpDist = Math.abs(row.tp - row.entry);
-      lines.push(`SL distance: ${slDist.toFixed(5)} (${(slDist / barAtr).toFixed(3)}×ATR), level ${row.sl.toFixed(5)}`);
-      lines.push(`TP distance: ${tpDist.toFixed(5)} (${(tpDist / barAtr).toFixed(3)}×ATR), level ${row.tp.toFixed(5)}`);
+      lines.push(
+        `SL distance: ${slDist.toFixed(5)} (${(slDist / barAtr).toFixed(3)}×ATR), level ${row.sl.toFixed(5)}`,
+      );
+      lines.push(
+        `TP distance: ${tpDist.toFixed(5)} (${(tpDist / barAtr).toFixed(3)}×ATR), level ${row.tp.toFixed(5)}`,
+      );
     }
-    lines.push(`TP placement rule/evidence: strategy-produced target ${row.tp === undefined ? "not canonical / not applicable" : row.tp.toFixed(5)}; see satisfied requirement evidence above.`);
-    lines.push(`SL placement rule/evidence: strategy-produced stop ${row.sl === undefined ? "unavailable" : row.sl.toFixed(5)}; see satisfied requirement evidence above.`);
+    lines.push(
+      `TP placement rule/evidence: strategy-produced target ${row.tp === undefined ? "not canonical / not applicable" : row.tp.toFixed(5)}; see satisfied requirement evidence above.`,
+    );
+    lines.push(
+      `SL placement rule/evidence: strategy-produced stop ${row.sl === undefined ? "unavailable" : row.sl.toFixed(5)}; see satisfied requirement evidence above.`,
+    );
     return lines;
   };
   const invalidRowList: { datetime: string; reason: string }[] = [];
 
   const seriesEndsComplete = options.seriesEndsComplete ?? false;
-  const signalLimit = seriesEndsComplete
-    ? candles.length
-    : Math.max(0, candles.length - 1);
+  const signalLimit = seriesEndsComplete ? candles.length : Math.max(0, candles.length - 1);
   // When the series end is flagged incomplete, the final bar is untrusted: it
   // is excluded from signal generation, and it must not resolve trades either.
   // "Now" for status evaluation is the last signal-eligible bar. A single
   // shared prefix slice keeps index-based caches (WeakMap) stable per run.
-  const resolutionCandles = seriesEndsComplete
-    ? candles
-    : candles.slice(0, signalLimit);
+  const resolutionCandles = seriesEndsComplete ? candles : candles.slice(0, signalLimit);
 
   for (const candle of candles) {
     if (candle.invalid) {
@@ -178,7 +187,8 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
 
       if (outcome.result === "PASS") {
         // Step 4: spread + RR are applied only to PASS results.
-        const hasCompleteTradeMath = outcome.entry !== undefined && outcome.sl !== undefined && outcome.tp !== undefined;
+        const hasCompleteTradeMath =
+          outcome.entry !== undefined && outcome.sl !== undefined && outcome.tp !== undefined;
         // Source-aligned diagnostics/signals without canonical TP (or a complete canonical trade model) remain PASS.
         // RR/backtest math is simply not applicable to those rows.
         if (!hasCompleteTradeMath) {
@@ -193,38 +203,38 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
             row.result = "FAIL";
             row.reason = "invalid canonical entry/SL/TP price set";
           } else {
-          row.entry = math.entry;
-          row.sl = math.sl;
-          row.tp = math.tp;
-          // No absolute "TP distance > 10×ATR" gate.
-          // Production nine size TP as a fixed RR multiple of |entry−SL|. Absolute
-          // ATR distance is the wrong unit for that model: structure-based stops
-          // (pattern extreme, kijun, Donchian channel) legitimately produce large
-          // risk in price terms while planned RR stays in [2.5, 4]. Minimum RR is
-          // enforced below; SL-side / non-positive risk is enforced in applySpreadAndRR.
-          if (math.invalidReason || math.rr === undefined) {
-            // No RR at all when risk is non-positive; never report a faked positive.
-            row.rr = undefined;
-            row.result = "FAIL";
-            row.reason = math.invalidReason ?? "INVALID: RR not computable";
-          } else {
-            row.rr = math.rr;
-            if (math.rr <= RR_THRESHOLD) {
+            row.entry = math.entry;
+            row.sl = math.sl;
+            row.tp = math.tp;
+            // No absolute "TP distance > 10×ATR" gate.
+            // Production nine size TP as a fixed RR multiple of |entry−SL|. Absolute
+            // ATR distance is the wrong unit for that model: structure-based stops
+            // (pattern extreme, kijun, Donchian channel) legitimately produce large
+            // risk in price terms while planned RR stays in [2.5, 4]. Minimum RR is
+            // enforced below; SL-side / non-positive risk is enforced in applySpreadAndRR.
+            if (math.invalidReason || math.rr === undefined) {
+              // No RR at all when risk is non-positive; never report a faked positive.
+              row.rr = undefined;
               row.result = "FAIL";
-              row.reason = RR_FAIL_REASON;
-            } else if (
-              (options.enableFilterC ?? true) &&
-              outcome.side &&
-              rejectFilterC(ctx, candle.index, candle.trend, outcome.side)
-            ) {
-              // Global regime reject (Filter C). Do not consume — slot stays free.
-              row.result = "FAIL";
-              row.reason = FILTER_C_REASON;
-            } else if (outcome.consumeKey) {
-              // A2 fix: commit de-dupe slot only after spread/RR validation succeeds.
-              consume(ctx, strategy.id, outcome.consumeKey);
+              row.reason = math.invalidReason ?? "INVALID: RR not computable";
+            } else {
+              row.rr = math.rr;
+              if (math.rr <= RR_THRESHOLD) {
+                row.result = "FAIL";
+                row.reason = RR_FAIL_REASON;
+              } else if (
+                (options.enableFilterC ?? true) &&
+                outcome.side &&
+                rejectFilterC(ctx, candle.index, candle.trend, outcome.side)
+              ) {
+                // Global regime reject (Filter C). Do not consume — slot stays free.
+                row.result = "FAIL";
+                row.reason = FILTER_C_REASON;
+              } else if (outcome.consumeKey) {
+                // A2 fix: commit de-dupe slot only after spread/RR validation succeeds.
+                consume(ctx, strategy.id, outcome.consumeKey);
+              }
             }
-          }
           }
         }
       }
@@ -235,8 +245,14 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
         row.setupStatus = status.setupStatus;
         row.statusNote = status.statusNote;
         row.candlesSinceTrigger = status.candlesSinceTrigger;
-        if (status.resolutionCandle && status.resolutionPrice !== undefined && status.resolutionLevel) {
-          row.detail.push(`Resolution: ${status.resolutionLevel} hit at ${status.resolutionCandle.datetime}; trigger price ${status.resolutionPrice.toFixed(5)}; candle O/H/L/C ${status.resolutionCandle.open}/${status.resolutionCandle.high}/${status.resolutionCandle.low}/${status.resolutionCandle.close}.`);
+        if (
+          status.resolutionCandle &&
+          status.resolutionPrice !== undefined &&
+          status.resolutionLevel
+        ) {
+          row.detail.push(
+            `Resolution: ${status.resolutionLevel} hit at ${status.resolutionCandle.datetime}; trigger price ${status.resolutionPrice.toFixed(5)}; candle O/H/L/C ${status.resolutionCandle.open}/${status.resolutionCandle.high}/${status.resolutionCandle.low}/${status.resolutionCandle.close}.`,
+          );
           row.exitDatetime = status.resolutionCandle.datetime;
           row.exitPrice = status.resolutionPrice;
         }
@@ -252,17 +268,20 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   const turtleEventMap = turtleActive ? turtleEvents(ctx) : new Map();
   for (const row of results) {
     if (row.strategyId !== "turtle") continue;
-    const eventKey = row.turtleSystem && row.side ? `${row.index}:${row.turtleSystem}:${row.side}` : undefined;
+    const eventKey =
+      row.turtleSystem && row.side ? `${row.index}:${row.turtleSystem}:${row.side}` : undefined;
     const event = eventKey ? turtleEventMap.get(eventKey) : undefined;
     if (!event) continue;
     row.setupStatus = event.outcome === "OPEN" ? "FILLED" : "RESOLVED";
-    const exitCandle = event.resolutionIndex === undefined ? undefined : candles[event.resolutionIndex];
+    const exitCandle =
+      event.resolutionIndex === undefined ? undefined : candles[event.resolutionIndex];
     row.exitDatetime = exitCandle?.datetime;
-    row.exitPrice = event.resolutionPrice ?? (event.outcome === "OPEN" ? undefined : event.finalStop);
+    row.exitPrice =
+      event.resolutionPrice ?? (event.outcome === "OPEN" ? undefined : event.finalStop);
     if (event.outcome === "LOSS") {
-      row.statusNote = `SL hit at ${event.resolutionIndex === undefined ? "end of data" : candles[event.resolutionIndex]?.datetime ?? "end of data"} at ${event.resolutionPrice?.toFixed(5) ?? event.finalStop.toFixed(5)}; final unified stop ${event.finalStop.toFixed(5)} after ${event.unitsAtExit} unit(s).`;
+      row.statusNote = `SL hit at ${event.resolutionIndex === undefined ? "end of data" : (candles[event.resolutionIndex]?.datetime ?? "end of data")} at ${event.resolutionPrice?.toFixed(5) ?? event.finalStop.toFixed(5)}; final unified stop ${event.finalStop.toFixed(5)} after ${event.unitsAtExit} unit(s).`;
     } else if (event.outcome === "WIN") {
-      row.statusNote = `Turtle exit: ${event.exitReason ?? "trailing channel exit"} at ${event.resolutionIndex === undefined ? "end of data" : candles[event.resolutionIndex]?.datetime ?? "end of data"}; unified stop path ended at ${event.finalStop.toFixed(5)} after ${event.unitsAtExit} unit(s).`;
+      row.statusNote = `Turtle exit: ${event.exitReason ?? "trailing channel exit"} at ${event.resolutionIndex === undefined ? "end of data" : (candles[event.resolutionIndex]?.datetime ?? "end of data")}; unified stop path ended at ${event.finalStop.toFixed(5)} after ${event.unitsAtExit} unit(s).`;
     } else {
       row.statusNote = `Turtle trade still open at last candle; current unified 2N stop ${event.finalStop.toFixed(5)} after ${event.unitsAtExit} unit(s).`;
     }
@@ -350,8 +369,6 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   return { ok: true, analysis };
 }
 
-
-
 /**
  * Turn a forward-tested row into a machine-readable outcome plus a realised R
  * multiple. R is always measured from the actual exit price against the
@@ -369,7 +386,8 @@ function attachOutcome(row: ResultRow, level: "TP" | "SL" | undefined) {
     return;
   }
 
-  const risk = row.entry !== undefined && row.sl !== undefined ? Math.abs(row.entry - row.sl) : undefined;
+  const risk =
+    row.entry !== undefined && row.sl !== undefined ? Math.abs(row.entry - row.sl) : undefined;
   const exit = row.exitPrice;
   if (row.entry !== undefined && exit !== undefined && risk !== undefined && risk > 0 && row.side) {
     const profit = row.side === "long" ? exit - row.entry : row.entry - exit;
@@ -411,8 +429,12 @@ export interface HtfFilterComparison {
 function resolvedWinRate(rows: ResultRow[]) {
   const longs = rows.filter((r) => r.side === "long").length;
   const shorts = rows.filter((r) => r.side === "short").length;
-  const trendAligned = rows.filter((r) => r.side !== undefined && htfAllowsDirection(r.htfTrend, r.side)).length;
-  const trendFighting = rows.filter((r) => r.side !== undefined && !htfAllowsDirection(r.htfTrend, r.side)).length;
+  const trendAligned = rows.filter(
+    (r) => r.side !== undefined && htfAllowsDirection(r.htfTrend, r.side),
+  ).length;
+  const trendFighting = rows.filter(
+    (r) => r.side !== undefined && !htfAllowsDirection(r.htfTrend, r.side),
+  ).length;
   const wins = rows.filter((r) => r.statusNote?.includes("TP hit")).length;
   const losses = rows.filter((r) => r.statusNote?.includes("SL hit")).length;
   return {

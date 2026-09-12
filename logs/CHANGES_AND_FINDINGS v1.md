@@ -17,7 +17,7 @@ The codebase already had the fix half-written: `STANDARD_LOOKBACK_CALENDAR_DAYS
 the intended replacement that never got wired in after Turtle was retired.
 
 **Fix:** `Backtest.tsx` now fetches a 30-day warm-up window instead of 120.
-30 days comfortably covers the largest warm-up any *active* strategy needs
+30 days comfortably covers the largest warm-up any _active_ strategy needs
 (Donchian's 20-completed-day requirement), with margin for weekends/holidays.
 
 Files: `src/pages/Backtest.tsx`, `src/lib/backtest/engine.ts`,
@@ -58,8 +58,10 @@ Files: `src/routes/api/market-data.ts`
 ## 3. Dead / stale code removed
 
 ### Turtle-only dead code (matches your exact example)
+
 Once the 120-day fetch was gone, an entire secondary code path built to
 support it also had zero remaining callers:
+
 - `analyseDay()` — the old per-day analysis function that took a separate
   `turtleCsv` argument. Nothing called it anymore (the app moved to
   `analyseContinuous` a while back and this was never cleaned up).
@@ -76,6 +78,7 @@ support it also had zero remaining callers:
   with `loadState()` gone, this whole file became orphaned.
 
 ### 13 orphaned strategy implementation files
+
 This was the big one, matching what you described as a broader pattern.
 The app went through a strategy-set redesign at some point: the current,
 live strategy set (9 production strategies + 7 context/diagnostic tools +
@@ -93,21 +96,23 @@ fib-pattern.ts    fvg-fill.ts      liquidity-sweep.ts opening-range.ts
 order-block.ts    pin-bar.ts       pivot-rejection.ts range-rejection.ts
 swing-failure.ts
 ```
+
 All 13 deleted. Your own `AUDIT-2026-08-30.md` had already flagged this
 exact same set as "13 orphan strategy files" — I independently re-verified
 it rather than trusting the doc, and it checked out.
 
 ### Other confirmed-dead code
+
 - `generateMockCandles()` in `DataGenerator.tsx` — a fake/random OHLC
   generator that was defined but never called anywhere. Risky to leave
-  around since if it *were* ever wired in by accident it would silently
+  around since if it _were_ ever wired in by accident it would silently
   inject fabricated candles into a real data pipeline.
 - `downloadReport()`, `downloadReports()`, and the local `inIframe()`
   helper in `src/lib/analyzer/export.ts` — zero external callers. (The
   singular `buildReport()`/`buildLiveReport()`/`buildHistoryReport()`
   functions they wrapped are still used elsewhere and were **not** touched.)
 
-**What I deliberately did *not* touch:** `turtle.ts` itself, its wiring in
+**What I deliberately did _not_ touch:** `turtle.ts` itself, its wiring in
 `spec-strategies.ts`/`strategy-kind.ts`/`types.ts`, and the `/analysis/v1`
 route. These are all explicitly commented as intentional — Turtle/ORB are
 kept reachable for research via explicit `strategyIds`, and `/analysis/v1`
@@ -123,6 +128,7 @@ You already had a fully-built Gemini console at `/gemini-console`
 (`src/pages/GeminiConsole.tsx` + `src/routes/api/gemini-console.ts`) — it
 just wasn't linked from anywhere except the main menu. I added a "Gemini
 console" button to the header of:
+
 - `src/pages/Backtest.tsx`
 - `src/pages/AnalysisV2.tsx` (the live/canonical analyser)
 - `src/pages/Analysis.tsx` (the deprecated v1 analyser, for completeness)
@@ -139,6 +145,7 @@ sizeable, stateful page — safer to link to it than to fork it).
 I do **not** have network access in this environment, so I could not run
 `npm install`, `npm test`, or `npx tsc --noEmit` here. Every change above
 was verified by:
+
 - reading the full surrounding code before and after each edit,
 - exhaustively grepping the entire `src/` tree (and `tests/`) for every
   symbol/file I removed, to confirm zero remaining references, and
@@ -169,7 +176,7 @@ files listed above — happy to fix immediately.
   hang you reported and touching it risks a UI behavior change I can't
   verify without running the app. Worth a follow-up if you want it.
 - The project's own docs (`FIXES_APPLIED.md`, `AUDIT-2026-08-30.md`,
-  `ARCHITECTURE-NOTES.md`, `README-FINAL.md`) describe the *old* state
+  `ARCHITECTURE-NOTES.md`, `README-FINAL.md`) describe the _old_ state
   (120-day Turtle window, `analyseDay`, etc.) in places and will now be
   slightly out of date. I left them alone since you didn't ask me to
   rewrite documentation, but flagging it so they don't cause confusion

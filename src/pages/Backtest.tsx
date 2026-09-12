@@ -136,7 +136,6 @@ export default function Backtest() {
       return;
     }
 
-
     const todayDate = today();
     if (toDate > todayDate) {
       toast.error("The To date cannot be in the future.");
@@ -160,233 +159,235 @@ export default function Backtest() {
     setState(working);
 
     try {
-    addLog(
-      `Auto-Backtest ${symbol} | ${days[0]} → ${days[days.length - 1]} (${days.length} day(s))`,
-    );
-    addLog(
-      `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context). AI stage: ${AI_STAGE_LABELS[aiStage]}.`,
-    );
-    addLog(
-      `Closed-candle policy: seriesEndsComplete=true (historical bars). Future bars only resolve already-generated trades.`,
-    );
+      addLog(
+        `Auto-Backtest ${symbol} | ${days[0]} → ${days[days.length - 1]} (${days.length} day(s))`,
+      );
+      addLog(
+        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context). AI stage: ${AI_STAGE_LABELS[aiStage]}.`,
+      );
+      addLog(
+        `Closed-candle policy: seriesEndsComplete=true (historical bars). Future bars only resolve already-generated trades.`,
+      );
 
-    const collected: { day: string; content: string; triggers: DayTrigger[] }[] = [];
+      const collected: { day: string; content: string; triggers: DayTrigger[] }[] = [];
 
-    const rangeStart = days[0]!;
-    const rangeEnd = days[days.length - 1]!;
-    // Warm-up window before the first analysed day so every production
-    // strategy's indicators (max: Donchian's 20 completed days) have enough
-    // history on day one. Turtle (55-day S2) is not part of the production
-    // set, so its wider 120-day window is no longer fetched here — that was
-    // pulling in ~90 extra unused days on every run.
-    const dataStart = addUtcDays(rangeStart, -STANDARD_LOOKBACK_CALENDAR_DAYS);
-    const requestedEnd = addUtcDays(rangeEnd, Math.max(0, forwardDays));
-    const resolutionEnd = requestedEnd > today() ? today() : requestedEnd;
+      const rangeStart = days[0]!;
+      const rangeEnd = days[days.length - 1]!;
+      // Warm-up window before the first analysed day so every production
+      // strategy's indicators (max: Donchian's 20 completed days) have enough
+      // history on day one. Turtle (55-day S2) is not part of the production
+      // set, so its wider 120-day window is no longer fetched here — that was
+      // pulling in ~90 extra unused days on every run.
+      const dataStart = addUtcDays(rangeStart, -STANDARD_LOOKBACK_CALENDAR_DAYS);
+      const requestedEnd = addUtcDays(rangeEnd, Math.max(0, forwardDays));
+      const resolutionEnd = requestedEnd > today() ? today() : requestedEnd;
 
-    addLog(`Fetching continuous OHLC ${dataStart} → ${resolutionEnd} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up window from first day)…`);
-    setCurrentDay(rangeStart);
+      addLog(
+        `Fetching continuous OHLC ${dataStart} → ${resolutionEnd} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up window from first day)…`,
+      );
+      setCurrentDay(rangeStart);
 
-    let continuousCsv: string | null = null;
-    let continuousError: string | undefined;
-    try {
-      continuousCsv = await buildOhlcCsv({
-        symbol,
-        startDate: dataStart,
-        endDate: resolutionEnd,
-        specifyTime: false,
-        startTime: "00:00",
-        endTime: "23:59",
-        log: addLog,
-        setCooldown: setCooldownSeconds,
-      });
-      if (!continuousCsv) continuousError = "no usable OHLC data for continuous window";
-    } catch (error) {
-      continuousError = `data pull failed: ${String(error)}`;
-    }
-
-    if (!isCurrent()) return;
-
-    if (continuousError || !continuousCsv) {
-      addLog(`Continuous backtest aborted — ${continuousError}`);
-      toast.error(continuousError ?? "No data");
-      return;
-    }
-
-    addLog("Running analyseContinuous (single shared analyzer pass)…");
-    const continuous = analyseContinuous(continuousCsv, { seriesEndsComplete: true });
-    if (!isCurrent()) return;
-    if (!continuous.ok) {
-      addLog(`Continuous analysis failed: ${continuous.error}`);
-      toast.error(continuous.error);
-      return;
-    }
-
-    addLog(
-      `Continuous pass: ${continuous.tradeTriggers.length} trade trigger(s), ${continuous.contextEvents.length} context observation(s).`,
-    );
-    if (continuous.contextLog) {
-      for (const line of continuous.contextLog.split("\n").slice(0, 40)) addLog(line);
-    }
-
-
-    // Day-level candle stats derived from the continuous result table (one row per strategy per bar).
-    const dayCandleMeta = (() => {
-      const map = new Map<string, { analyzed: number; invalid: number; lastDatetime: string }>();
-      const seenBars = new Map<string, Set<string>>();
-      for (const row of continuous.analysis.results) {
-        const dayKey = row.datetime.slice(0, 10);
-        let meta = map.get(dayKey);
-        if (!meta) {
-          meta = { analyzed: 0, invalid: 0, lastDatetime: row.datetime };
-          map.set(dayKey, meta);
-          seenBars.set(dayKey, new Set());
-        }
-        const bars = seenBars.get(dayKey)!;
-        if (!bars.has(row.datetime)) {
-          bars.add(row.datetime);
-          meta.analyzed += 1;
-          if (row.datetime > meta.lastDatetime) meta.lastDatetime = row.datetime;
-        }
+      let continuousCsv: string | null = null;
+      let continuousError: string | undefined;
+      try {
+        continuousCsv = await buildOhlcCsv({
+          symbol,
+          startDate: dataStart,
+          endDate: resolutionEnd,
+          specifyTime: false,
+          startTime: "00:00",
+          endTime: "23:59",
+          log: addLog,
+          setCooldown: setCooldownSeconds,
+        });
+        if (!continuousCsv) continuousError = "no usable OHLC data for continuous window";
+      } catch (error) {
+        continuousError = `data pull failed: ${String(error)}`;
       }
-      for (const inv of continuous.analysis.invalidRowList) {
-        const dayKey = inv.datetime.slice(0, 10);
-        let meta = map.get(dayKey);
-        if (!meta) {
-          meta = { analyzed: 0, invalid: 0, lastDatetime: inv.datetime };
-          map.set(dayKey, meta);
-        }
-        meta.invalid += 1;
-      }
-      return map;
-    })();
 
-    for (let i = 0; i < days.length; i++) {
       if (!isCurrent()) return;
-      if (stopRef.current) {
-        addLog("Run halted by user.");
-        break;
+
+      if (continuousError || !continuousCsv) {
+        addLog(`Continuous backtest aborted — ${continuousError}`);
+        toast.error(continuousError ?? "No data");
+        return;
       }
 
-      const day = days[i]!;
-      setCurrentDay(day);
-      const windowStart = dataStart;
-      const triggers = continuous.tradesOnDay(day);
-      const dayContext = continuous.contextOnDay(day);
-      const contextLog = contextLogForDay(continuous.contextEvents, day);
-      const meta = dayCandleMeta.get(day);
-      const strategyBreakdown = buildStrategyBreakdown(continuous.analysis.results, day);
+      addLog("Running analyseContinuous (single shared analyzer pass)…");
+      const continuous = analyseContinuous(continuousCsv, { seriesEndsComplete: true });
+      if (!isCurrent()) return;
+      if (!continuous.ok) {
+        addLog(`Continuous analysis failed: ${continuous.error}`);
+        toast.error(continuous.error);
+        return;
+      }
 
-      // Weekends (and other calendar days with no bars) produce no market candles.
-      // Do not invent data; emit a SKIPPED report and keep rolling stats unchanged.
-      if (isWeekend(day) || (!meta && triggers.length === 0 && dayContext.length === 0)) {
-        const reason = isWeekend(day)
-          ? "weekend — no market session / no OHLC expected"
-          : "no OHLC bars for this calendar day in the continuous series";
-        working.skipped.push({ day, reason });
+      addLog(
+        `Continuous pass: ${continuous.tradeTriggers.length} trade trigger(s), ${continuous.contextEvents.length} context observation(s).`,
+      );
+      if (continuous.contextLog) {
+        for (const line of continuous.contextLog.split("\n").slice(0, 40)) addLog(line);
+      }
+
+      // Day-level candle stats derived from the continuous result table (one row per strategy per bar).
+      const dayCandleMeta = (() => {
+        const map = new Map<string, { analyzed: number; invalid: number; lastDatetime: string }>();
+        const seenBars = new Map<string, Set<string>>();
+        for (const row of continuous.analysis.results) {
+          const dayKey = row.datetime.slice(0, 10);
+          let meta = map.get(dayKey);
+          if (!meta) {
+            meta = { analyzed: 0, invalid: 0, lastDatetime: row.datetime };
+            map.set(dayKey, meta);
+            seenBars.set(dayKey, new Set());
+          }
+          const bars = seenBars.get(dayKey)!;
+          if (!bars.has(row.datetime)) {
+            bars.add(row.datetime);
+            meta.analyzed += 1;
+            if (row.datetime > meta.lastDatetime) meta.lastDatetime = row.datetime;
+          }
+        }
+        for (const inv of continuous.analysis.invalidRowList) {
+          const dayKey = inv.datetime.slice(0, 10);
+          let meta = map.get(dayKey);
+          if (!meta) {
+            meta = { analyzed: 0, invalid: 0, lastDatetime: inv.datetime };
+            map.set(dayKey, meta);
+          }
+          meta.invalid += 1;
+        }
+        return map;
+      })();
+
+      for (let i = 0; i < days.length; i++) {
+        if (!isCurrent()) return;
+        if (stopRef.current) {
+          addLog("Run halted by user.");
+          break;
+        }
+
+        const day = days[i]!;
+        setCurrentDay(day);
+        const windowStart = dataStart;
+        const triggers = continuous.tradesOnDay(day);
+        const dayContext = continuous.contextOnDay(day);
+        const contextLog = contextLogForDay(continuous.contextEvents, day);
+        const meta = dayCandleMeta.get(day);
+        const strategyBreakdown = buildStrategyBreakdown(continuous.analysis.results, day);
+
+        // Weekends (and other calendar days with no bars) produce no market candles.
+        // Do not invent data; emit a SKIPPED report and keep rolling stats unchanged.
+        if (isWeekend(day) || (!meta && triggers.length === 0 && dayContext.length === 0)) {
+          const reason = isWeekend(day)
+            ? "weekend — no market session / no OHLC expected"
+            : "no OHLC bars for this calendar day in the continuous series";
+          working.skipped.push({ day, reason });
+          setProgress({ done: i + 1, total: days.length });
+          addLog(`${day}: SKIPPED — ${reason}`);
+          const report = buildDayReport({
+            symbol,
+            day,
+            checkpoint: "23:59",
+            windowStart,
+            state: working,
+            triggers: [],
+            skipReason: reason,
+            resolutionEnd,
+          });
+          collected.push({ day, content: report, triggers: [] });
+          continue;
+        }
+
+        // Cumulative stats grow strictly with completed trading days (chronological).
+        applyTriggers(working, triggers);
+        working.firstDay = working.firstDay ?? day;
+        working.days.push(day);
+        working.lastCompletedDay = day;
+        setState({ ...working, stats: { ...working.stats } });
         setProgress({ done: i + 1, total: days.length });
-        addLog(`${day}: SKIPPED — ${reason}`);
-        const report = buildDayReport({
+
+        const resolved = triggers.filter((t) => t.outcome === "TP" || t.outcome === "SL").length;
+        const stillOpen = triggers.filter((t) => t.outcome === "OPEN").length;
+        addLog(
+          `${day}: ${triggers.length} trade(s) · ${dayContext.length} context · ${resolved} resolved · ${stillOpen} open`,
+        );
+
+        let report = buildDayReport({
           symbol,
           day,
           checkpoint: "23:59",
           windowStart,
           state: working,
-          triggers: [],
-          skipReason: reason,
+          triggers,
+          analyzedRows: meta?.analyzed ?? 0,
+          invalidRows: meta?.invalid ?? 0,
+          lastRowDatetime: meta?.lastDatetime ?? continuous.analysis.lastRowDatetime,
+          strategyBreakdown,
           resolutionEnd,
         });
-        collected.push({ day, content: report, triggers: [] });
-        continue;
-      }
-
-      // Cumulative stats grow strictly with completed trading days (chronological).
-      applyTriggers(working, triggers);
-      working.firstDay = working.firstDay ?? day;
-      working.days.push(day);
-      working.lastCompletedDay = day;
-      setState({ ...working, stats: { ...working.stats } });
-      setProgress({ done: i + 1, total: days.length });
-
-      const resolved = triggers.filter((t) => t.outcome === "TP" || t.outcome === "SL").length;
-      const stillOpen = triggers.filter((t) => t.outcome === "OPEN").length;
-      addLog(
-        `${day}: ${triggers.length} trade(s) · ${dayContext.length} context · ${resolved} resolved · ${stillOpen} open`,
-      );
-
-      let report = buildDayReport({
-        symbol,
-        day,
-        checkpoint: "23:59",
-        windowStart,
-        state: working,
-        triggers,
-        analyzedRows: meta?.analyzed ?? 0,
-        invalidRows: meta?.invalid ?? 0,
-        lastRowDatetime: meta?.lastDatetime ?? continuous.analysis.lastRowDatetime,
-        strategyBreakdown,
-        resolutionEnd,
-      });
-      if (dayContext.length > 0) {
-        report = report + "\n\n" + contextLog;
-      }
-
-      const aiSections: { title: string; body: string }[] = [];
-      const canRunAi = aiStage !== "off" && triggers.length > 0;
-      if (aiStage !== "off" && !canRunAi) {
-        addLog(`${day}: AI stage skipped — no trade triggers this day.`);
-      }
-
-      if (canRunAi && aiStage === "verifier") {
-        try {
-          addLog(`${day}: running V2 verifier / picker…`);
-          const outcome = await runVerifier({ data: { scoutData: report, ohlcCsv: continuousCsv } });
-          if (!isCurrent()) return;
-          aiSections.push({
-            title: `V2 VERIFIER VERDICT (${outcome.provider} · ${outcome.model})`,
-            body: outcome.warnings.length
-              ? `${outcome.verdict}\n\nwarnings: ${outcome.warnings.join(" | ")}`
-              : outcome.verdict,
-          });
-          addLog(`${day}: verifier done via ${outcome.provider} · ${outcome.model}`);
-        } catch (error) {
-          if (!isCurrent()) return;
-          const message = error instanceof Error ? error.message : String(error);
-          aiSections.push({ title: "V2 VERIFIER VERDICT", body: `FAILED: ${message}` });
-          addLog(`${day}: verifier failed — ${message}`);
+        if (dayContext.length > 0) {
+          report = report + "\n\n" + contextLog;
         }
+
+        const aiSections: { title: string; body: string }[] = [];
+        const canRunAi = aiStage !== "off" && triggers.length > 0;
+        if (aiStage !== "off" && !canRunAi) {
+          addLog(`${day}: AI stage skipped — no trade triggers this day.`);
+        }
+
+        if (canRunAi && aiStage === "verifier") {
+          try {
+            addLog(`${day}: running V2 verifier / picker…`);
+            const outcome = await runVerifier({
+              data: { scoutData: report, ohlcCsv: continuousCsv },
+            });
+            if (!isCurrent()) return;
+            aiSections.push({
+              title: `V2 VERIFIER VERDICT (${outcome.provider} · ${outcome.model})`,
+              body: outcome.warnings.length
+                ? `${outcome.verdict}\n\nwarnings: ${outcome.warnings.join(" | ")}`
+                : outcome.verdict,
+            });
+            addLog(`${day}: verifier done via ${outcome.provider} · ${outcome.model}`);
+          } catch (error) {
+            if (!isCurrent()) return;
+            const message = error instanceof Error ? error.message : String(error);
+            aiSections.push({ title: "V2 VERIFIER VERDICT", body: `FAILED: ${message}` });
+            addLog(`${day}: verifier failed — ${message}`);
+          }
+        }
+
+        report = appendAiSections(report, aiSections);
+        collected.push({ day, content: report, triggers });
       }
 
-      report = appendAiSections(report, aiSections);
-      collected.push({ day, content: report, triggers });
-    }
+      if (collected.length === 0) {
+        toast.error("Nothing was analysed.");
+        return;
+      }
 
-
-    if (collected.length === 0) {
-      toast.error("Nothing was analysed.");
-      return;
-    }
-
-    if (!isCurrent()) return;
-
-    try {
-      const packaged = batchBacktestReports(collected, days.length);
-      const bundle = new JSZip();
-      for (const file of packaged) bundle.file(file.name, file.content);
-      const blob = await bundle.generateAsync({ type: "blob" });
       if (!isCurrent()) return;
-      const name = `backtest_${symbol.replace("/", "")}_${collected[0]!.day}_to_${collected[collected.length - 1]!.day}.zip`;
-      downloadBlob(blob, name);
-      revokeZipUrl();
-      const url = URL.createObjectURL(blob);
-      zipUrlRef.current = url;
-      setZip({ name, url });
-      addLog(`Bundled ${packaged.length} packaged report file(s) into ${name}.`);
-      toast.success(`Backtest finished — ${packaged.length} packaged report file(s) zipped`);
-    } catch (error) {
-      if (!isCurrent()) return;
-      addLog(`ZIP packaging failed: ${String(error)}`);
-      toast.error("ZIP packaging failed.");
-    }
+
+      try {
+        const packaged = batchBacktestReports(collected, days.length);
+        const bundle = new JSZip();
+        for (const file of packaged) bundle.file(file.name, file.content);
+        const blob = await bundle.generateAsync({ type: "blob" });
+        if (!isCurrent()) return;
+        const name = `backtest_${symbol.replace("/", "")}_${collected[0]!.day}_to_${collected[collected.length - 1]!.day}.zip`;
+        downloadBlob(blob, name);
+        revokeZipUrl();
+        const url = URL.createObjectURL(blob);
+        zipUrlRef.current = url;
+        setZip({ name, url });
+        addLog(`Bundled ${packaged.length} packaged report file(s) into ${name}.`);
+        toast.success(`Backtest finished — ${packaged.length} packaged report file(s) zipped`);
+      } catch (error) {
+        if (!isCurrent()) return;
+        addLog(`ZIP packaging failed: ${String(error)}`);
+        toast.error("ZIP packaging failed.");
+      }
     } catch (error) {
       if (!isCurrent()) return;
       const message = error instanceof Error ? error.message : String(error);
@@ -408,7 +409,10 @@ export default function Backtest() {
       <div className="mx-auto flex max-w-5xl flex-col gap-5">
         <header className="flex flex-col gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <Link to="/" className="flex w-fit items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-bold text-muted-foreground transition-colors hover:text-foreground">
+            <Link
+              to="/"
+              className="flex w-fit items-center gap-1.5 rounded-lg border border-border/60 px-3 py-1.5 text-[11px] font-bold text-muted-foreground transition-colors hover:text-foreground"
+            >
               <ArrowLeft size={12} /> Main menu
             </Link>
           </div>
@@ -417,7 +421,6 @@ export default function Backtest() {
               <h1 className="flex items-center gap-2 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 <History size={22} className="text-primary" /> Auto-Backtester
               </h1>
-
             </div>
             <span className="inline-flex items-center gap-2 text-xs text-muted-foreground">
               <span
@@ -591,8 +594,8 @@ export default function Backtest() {
                     <th className="py-1.5 pr-3">SL</th>
                     <th className="py-1.5 pr-3">No fill</th>
                     <th className="py-1.5 pr-3">Open</th>
-                        <th className="py-1.5 pr-3">Planned RR avg</th>
-                        <th className="py-1.5 pr-3">Avg realized R</th>
+                    <th className="py-1.5 pr-3">Planned RR avg</th>
+                    <th className="py-1.5 pr-3">Avg realized R</th>
                     <th className="py-1.5">Win rate</th>
                   </tr>
                 </thead>
@@ -609,8 +612,14 @@ export default function Backtest() {
                         <td className="py-1.5 pr-3 text-destructive">{row.slHits}</td>
                         <td className="py-1.5 pr-3">{row.noFill ?? 0}</td>
                         <td className="py-1.5 pr-3">{row.open}</td>
-                        <td className="py-1.5 pr-3">{avgRr === null ? "n/a" : `${avgRr.toFixed(2)}R`}</td>
-                        <td className="py-1.5 pr-3">{realized === null ? "n/a" : `${realized >= 0 ? "+" : ""}${realized.toFixed(2)}R`}</td>
+                        <td className="py-1.5 pr-3">
+                          {avgRr === null ? "n/a" : `${avgRr.toFixed(2)}R`}
+                        </td>
+                        <td className="py-1.5 pr-3">
+                          {realized === null
+                            ? "n/a"
+                            : `${realized >= 0 ? "+" : ""}${realized.toFixed(2)}R`}
+                        </td>
                         <td className="py-1.5">{rate === null ? "n/a" : `${rate.toFixed(1)}%`}</td>
                       </tr>
                     );

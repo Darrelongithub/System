@@ -26,7 +26,14 @@ test("tz-matrix: parseTime suite passes under UTC, New York, Tokyo and Nairobi h
   for (const tz of TZS) {
     const res = spawnSync(
       process.execPath,
-      ["--experimental-strip-types", "--import", "./tests/register.mjs", "--input-type=module", "-e", RUNNER],
+      [
+        "--experimental-strip-types",
+        "--import",
+        "./tests/register.mjs",
+        "--input-type=module",
+        "-e",
+        RUNNER,
+      ],
       {
         cwd: path.resolve(here, ".."),
         env: { ...process.env, TZ: tz },

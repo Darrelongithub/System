@@ -1,8 +1,5 @@
 import type { StrategyCheck } from "../types";
-import {
-  ALL_STRATEGY_IMPLEMENTATIONS,
-  SPEC_STRATEGIES,
-} from "./spec-strategies";
+import { ALL_STRATEGY_IMPLEMENTATIONS, SPEC_STRATEGIES } from "./spec-strategies";
 import { FINAL_STRATEGY_IDS, FINAL_TRADE_STRATEGIES } from "./final-survivors";
 
 /**

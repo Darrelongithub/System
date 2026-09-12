@@ -32,7 +32,12 @@ export interface TradePathRecord {
 }
 
 export function walkTradePath(trigger: ResultRow, candles: Candle[]): TradePathRecord | null {
-  if (trigger.entry === undefined || trigger.sl === undefined || trigger.tp === undefined || !trigger.side) {
+  if (
+    trigger.entry === undefined ||
+    trigger.sl === undefined ||
+    trigger.tp === undefined ||
+    !trigger.side
+  ) {
     return null;
   }
   const direction = trigger.side;
@@ -62,7 +67,8 @@ export function walkTradePath(trigger: ResultRow, candles: Candle[]): TradePathR
   if (journalOutcome !== "no_fill") {
     for (let i = excursionStart; i <= lastIndex && i < candles.length; i++) {
       const candle = candles[i];
-      if (!candle || candle.invalid || candle.high === undefined || candle.low === undefined) continue;
+      if (!candle || candle.invalid || candle.high === undefined || candle.low === undefined)
+        continue;
       const favorable =
         direction === "long" ? candle.high - trigger.entry : trigger.entry - candle.low;
       const adverse =
@@ -99,5 +105,7 @@ export function walkTradePath(trigger: ResultRow, candles: Candle[]): TradePathR
 }
 
 export function buildTradeJournal(triggers: ResultRow[], candles: Candle[]): TradePathRecord[] {
-  return triggers.map((t) => walkTradePath(t, candles)).filter((x): x is TradePathRecord => x !== null);
+  return triggers
+    .map((t) => walkTradePath(t, candles))
+    .filter((x): x is TradePathRecord => x !== null);
 }

@@ -9,11 +9,11 @@ reproduced by actually running the project (Node v22, `npm install` clean, `npx 
 
 **Baseline verification summary:**
 
-| Gate | Result |
-|---|---|
-| `npx tsc --noEmit` | PASS (0 errors) |
-| `npm run build` | PASS (vite + nitro) |
-| `npm test` | **FAIL — 89 passed / 5 failed** |
+| Gate                                       | Result                                                         |
+| ------------------------------------------ | -------------------------------------------------------------- |
+| `npx tsc --noEmit`                         | PASS (0 errors)                                                |
+| `npm run build`                            | PASS (vite + nitro)                                            |
+| `npm test`                                 | **FAIL — 89 passed / 5 failed**                                |
 | Golden lock ("CERTIFIED" per prior audits) | **BROKEN** — production no longer reproduces the frozen golden |
 
 The headline: **the repo's own certification suite is red.** Prior audit documents
@@ -38,7 +38,7 @@ default in production analysis (`runAnalysis`)." That single change is
 `src/lib/analyzer/run.ts`:
 
 ```ts
-(options.enableFilterC ?? true)   // was `?? false`
+options.enableFilterC ?? true; // was `?? false`
 ```
 
 `rejectFilterC` (`src/lib/analyzer/regime-filters.ts`) drops PASS candidates that are
@@ -62,18 +62,19 @@ But the frozen golden and the whole test harness still encode the **pre-C** worl
 - `README.md` still advertises "2384 trades / TP 768 / SL 1612 / OPEN 4 / R 507.83".
 
 `logs/v1.3-changes.md` explicitly says the golden "remain[s] the frozen pre-C reference", so the
-*v1.3 intent* was to keep the golden as the pre-C regression lock — but nobody updated the test
+_v1.3 intent_ was to keep the golden as the pre-C regression lock — but nobody updated the test
 harness to pass `enableFilterC:false`, and no new post-C golden was added. The result is that the
 single safety net the repo built (the row-for-row golden gate + the `test:golden` script) now fails
 on every run, and the "CERTIFIED" claims in the audit docs are stale.
 
-**Why it matters:** the golden lock exists precisely to catch *accidental* behavior changes. With
+**Why it matters:** the golden lock exists precisely to catch _accidental_ behavior changes. With
 it red, a future accidental strategy change would be invisible behind the same pre-existing failure.
 This is the most important stale-code issue in the repo.
 
 **Fix options (deliberate — do not silently regenerate):**
+
 1. (Recommended, matches the documented intent) Update the golden/parity/G1 test harness to pass
-   `enableFilterC:false`, restoring the frozen pre-C lock; then add a *separate* post-C golden for
+   `enableFilterC:false`, restoring the frozen pre-C lock; then add a _separate_ post-C golden for
    the production default. `analyseContinuous` currently doesn't forward `enableFilterC`, so the
    G1 test's dependency would also need plumbing.
 2. Or re-baseline the golden to the C-on default (2384→2323) as an explicit, documented
@@ -101,6 +102,7 @@ This is a real secret-leak and repo-bloat blindspot. I added a `.gitignore` in t
 ## 3. MEDIUM — Gemini Console "removed" but its UI contract test and a large code surface remain
 
 The v1.2 change removed the Gemini Console from production:
+
 - `src/pages/GeminiConsole.tsx` → `return null` ("UI removed from production")
 - `src/routes/gemini-console.tsx` and `src/routes/api/gemini-console.ts` → 410 "removed"
 - `src/routes/api/analysis.ts` → 503 "Gemini AI debate integration is removed"
@@ -113,8 +115,9 @@ But:
    FAIL economic-calendar route ↔ console contract cannot drift again
    Error: console consumes the route's events/byDay shape (not a phantom {upcoming,recent} field)
    ```
+
    It asserts `src/pages/GeminiConsole.tsx` contains `data["events"]` — impossible now that the
-   page returns `null`. This is the 5th failing test and is a *different* root cause from §1.
+   page returns `null`. This is the 5th failing test and is a _different_ root cause from §1.
 
 2. **~30 files of AI plumbing still ship and are still tested**, even though the runtime is
    disabled: `src/lib/ai/**` (`console.ts` 341 lines, `evaluate.ts`, `research.ts`,
@@ -134,6 +137,7 @@ research-only, or (b) reconcile the test with the new reality. As-is it's self-c
 ## 4. MEDIUM — Stale README references artifacts that do not exist
 
 `README.md` §"Artifacts" lists:
+
 - `artifacts/final-validation-report.json` ❌ not present
 - `artifacts/robustness-batch2-report.json` ❌ not present
 - `artifacts/discovery-batch2-report.json` ❌ not present
@@ -158,8 +162,9 @@ candidate for lazy/deferred computation or removal, and for moving engine work i
 
 ## 6. MEDIUM — Temporary diagnostic instrumentation still wired into production UI
 
-`src/lib/analyzer/strategies/diagnostics.ts` self-describes: *"Remove this file and its call sites …
-this is not meant to ship long-term."* It is still wired in:
+`src/lib/analyzer/strategies/diagnostics.ts` self-describes: _"Remove this file and its call sites …
+this is not meant to ship long-term."_ It is still wired in:
+
 - `track(...)` calls inside `spec-strategies.ts`
 - `resetDiagnostics()` + `getDiagnosticsReportLines()` inside `src/pages/Backtest.tsx` (lines 159/391)
 
@@ -172,6 +177,7 @@ kind of stale instrument the comment says to delete.
 ## 7. MEDIUM — Stale/duplicated Gemini research scripts in `scripts/`
 
 Two generations of the same tooling coexist:
+
 - Superseded `.ts`: `gemini-report.ts`, `gemini-research.ts`, `gemini-select.ts`
 - Newer `.mjs`: `gemini-prompt-sub-eval.mjs`, `gemini-prompt-substitute-eval.mjs`,
   `gemini-trade-select-experiment.mjs`, `run-gemini-prompt-sub.mjs`

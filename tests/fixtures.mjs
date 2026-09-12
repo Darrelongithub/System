@@ -18,11 +18,15 @@ export function loadBaselineCsv() {
 }
 
 export function loadGoldenTrades() {
-  return JSON.parse(readFileSync(new URL("../artifacts/golden-trades.json", import.meta.url), "utf8"));
+  return JSON.parse(
+    readFileSync(new URL("../artifacts/golden-trades.json", import.meta.url), "utf8"),
+  );
 }
 
 export function loadGoldenSummary() {
-  return JSON.parse(readFileSync(new URL("../artifacts/golden-summary.json", import.meta.url), "utf8"));
+  return JSON.parse(
+    readFileSync(new URL("../artifacts/golden-summary.json", import.meta.url), "utf8"),
+  );
 }
 
 /** Runs the analyzer once with the locked golden options; shared across tests. */
@@ -65,10 +69,33 @@ export function csvRow(
 ) {
   const f = (v) => (typeof v === "number" ? String(v) : v);
   return [
-    datetime, f(o), f(h), f(l), f(c),
-    "Bullish", "1", "0", "0", "2", "50%", "0%", "0%", "No",
-    reliable, "5", session, atr, "", "", refs, "", "false", "1",
-  ].map(csvEscape).join(",");
+    datetime,
+    f(o),
+    f(h),
+    f(l),
+    f(c),
+    "Bullish",
+    "1",
+    "0",
+    "0",
+    "2",
+    "50%",
+    "0%",
+    "0%",
+    "No",
+    reliable,
+    "5",
+    session,
+    atr,
+    "",
+    "",
+    refs,
+    "",
+    "false",
+    "1",
+  ]
+    .map(csvEscape)
+    .join(",");
 }
 
 export function makeCsv(rows) {
@@ -76,14 +103,23 @@ export function makeCsv(rows) {
 }
 
 /** Gentle synthetic price walk; startMs defaults to 2025-01-01 00:00 EAT. */
-export function walkRows(n, { start = Date.parse("2025-01-01T00:00:00+03:00"), stepMs = 1800000, startPrice = 4000 } = {}) {
+export function walkRows(
+  n,
+  { start = Date.parse("2025-01-01T00:00:00+03:00"), stepMs = 1800000, startPrice = 4000 } = {},
+) {
   const rows = [];
   let ms = start;
   let p = startPrice;
   for (let i = 0; i < n; i++) {
     p += Math.sin(i / 3) * 12 + (i % 11 === 0 ? 15 : -4);
     rows.push(
-      csvRow(eatDateTime(ms), p.toFixed(2), (p + 8).toFixed(2), (p - 8).toFixed(2), (p + 1).toFixed(2)),
+      csvRow(
+        eatDateTime(ms),
+        p.toFixed(2),
+        (p + 8).toFixed(2),
+        (p - 8).toFixed(2),
+        (p + 1).toFixed(2),
+      ),
     );
     ms += stepMs;
   }
