@@ -457,25 +457,32 @@ export function batchBacktestReports(
     bucket.push(report);
     groups.set(key, bucket);
   }
-  return [...groups.entries()].map(([key, entries]) => ({
-    name: runLength <= 31 ? `backtest_week_${key}.txt` : `backtest_month_${key}.txt`,
-    content: (() => {
-      const ordered = entries.sort((a, b) => a.day.localeCompare(b.day));
-      const subtotal = new Map<string, number>();
-      for (const entry of ordered)
-        for (const trigger of entry.triggers ?? [])
-          subtotal.set(trigger.strategy, (subtotal.get(trigger.strategy) ?? 0) + 1);
-      const subtotalLines = [
-        "=== PACKAGE SUBTOTAL PER STRATEGY ===",
-        ...STRATEGIES.map((s) => `${s.name} | triggers in package: ${subtotal.get(s.name) ?? 0}`),
-        "",
-      ];
-      return (
-        subtotalLines.join("\n") +
-        ordered.map((r) => r.content).join("\n\n\n=== END OF DAY / NEXT DAY ===\n\n")
-      );
-    })(),
-  }));
+  // Sorted by bucket key, not by first appearance in `reports`: week
+  // (`2020-W53`) and month (`2026-02`) keys are lexicographically
+  // chronological, so the package order inside the ZIP no longer depends on the
+  // order the caller happened to collect days in. Days inside a package were
+  // already sorted below.
+  return [...groups.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, entries]) => ({
+      name: runLength <= 31 ? `backtest_week_${key}.txt` : `backtest_month_${key}.txt`,
+      content: (() => {
+        const ordered = entries.sort((a, b) => a.day.localeCompare(b.day));
+        const subtotal = new Map<string, number>();
+        for (const entry of ordered)
+          for (const trigger of entry.triggers ?? [])
+            subtotal.set(trigger.strategy, (subtotal.get(trigger.strategy) ?? 0) + 1);
+        const subtotalLines = [
+          "=== PACKAGE SUBTOTAL PER STRATEGY ===",
+          ...STRATEGIES.map((s) => `${s.name} | triggers in package: ${subtotal.get(s.name) ?? 0}`),
+          "",
+        ];
+        return (
+          subtotalLines.join("\n") +
+          ordered.map((r) => r.content).join("\n\n\n=== END OF DAY / NEXT DAY ===\n\n")
+        );
+      })(),
+    }));
 }
 
 /**
