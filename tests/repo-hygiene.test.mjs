@@ -57,20 +57,41 @@ function effectiveAttrs(path, attributesText) {
   return out;
 }
 
-test("repo hygiene: .gitattributes normalises text files to LF in the index", () => {
+test("repo hygiene: .gitattributes pins every text file to LF, in the index and the working tree", () => {
   assert(
     existsSync(new URL("../.gitattributes", import.meta.url)),
     ".gitattributes must exist at the repo root",
   );
-  const attrs = effectiveAttrs("src/lib/server-env.ts", read(".gitattributes"));
+  const attributes = read(".gitattributes");
+  const attrs = effectiveAttrs("src/lib/server-env.ts", attributes);
   assert(
     attrs.text === "auto" || attrs.text === true,
     `* text=auto must apply to ordinary source files (got text=${JSON.stringify(attrs.text)})`,
   );
+  // eol=lf is what keeps `npm run lint` and `npm run format` usable on Windows:
+  // prettier's endOfLine defaults to "lf", so a core.autocrlf=true checkout (CRLF)
+  // produced 14,118 "Delete ␍" errors across 140 files, and `npm run format`
+  // then rewrote every file to LF — which git reports as modified with an EMPTY
+  // diff, blocking any pull that touches one of them.
   assertEqual(
-    effectiveAttrs("System-v1.3.zip", read(".gitattributes")).text,
+    attrs.eol,
+    "lf",
+    "ordinary source files must be checked out LF (prettier/vite/node all write LF)",
+  );
+  assertEqual(
+    effectiveAttrs("logs/v1.7-changes.md", attributes).eol,
+    "lf",
+    "markdown/docs are LF too — the rule is repo-wide, not per-extension",
+  );
+  assertEqual(
+    effectiveAttrs("System-v1.3.zip", attributes).text,
     false,
     "archives stay binary — never line-ending converted",
+  );
+  assertEqual(
+    effectiveAttrs("public/favicon.ico", attributes).text,
+    false,
+    "icons stay binary — never line-ending converted",
   );
 });
 

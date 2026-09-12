@@ -22,21 +22,49 @@ is `src/routes/__root.tsx`.
 
 ## Line endings (Windows)
 
-`src/routeTree.gen.ts` is regenerated on **every** `npm run dev` / `npm run build`,
-and the generator always writes LF. `.gitattributes` therefore pins it with
-`text eol=lf`; without that pin a Windows checkout (`core.autocrlf=true`) stores
-the file with CRLF, the dev server rewrites it to LF, and git reports it as
-modified **with an empty diff** — which makes any `git pull` that touches the
-file abort with `Your local changes ... would be overwritten by merge`.
+`.gitattributes` pins **every text file to LF, in the index and in the working
+tree, on every platform** (`* text=auto eol=lf`; archives and icons are `-text`).
+That is what the toolchain already writes — prettier (`endOfLine` defaults to
+`"lf"`), vite/nitro, node's `fs.writeFile`, and the TanStack router generator —
+so a CRLF working tree fights all of it:
 
-If it ever goes dirty anyway, discarding the local copy is always safe (it is
-generated — `git checkout -- src/routeTree.gen.ts` or any dev/build run
-reproduces the committed bytes):
+- `npm run lint` reported **14,118 `Delete ␍` errors across 140 files** on a
+  Windows checkout with `core.autocrlf=true` (the git-for-Windows default).
+- `npm run format` "fixed" those by rewriting every file to LF, which git then
+  reported as modified **with an empty diff** — blocking any pull that touched
+  one of them.
+- `src/routeTree.gen.ts` is regenerated on **every** `npm run dev` /
+  `npm run build`, and the generator compares the bytes it read with the text it
+  produced, so a CRLF copy is rewritten to LF on every run. That made the file
+  permanently dirty and aborted pulls with
+  `Your local changes ... would be overwritten by merge: src/routeTree.gen.ts`.
+
+Nothing changes for Linux/macOS checkouts (already LF) and nothing changes in the
+index — `git add --renormalize .` stages no changes.
+
+### One-time normalisation of an existing Windows clone
+
+With a clean `git status`, after pulling `.gitattributes`:
+
+```bash
+git rm --cached -r .
+git reset --hard
+```
+
+`git ls-files --eol` should then show `w/lf` for every text file, `npm run lint`
+goes green, and `npm run format` becomes a no-op.
+
+### If the generated route tree ever goes dirty
+
+Discarding the local copy is always safe — it is generated, and
+`git checkout -- src/routeTree.gen.ts` (or any dev/build run) reproduces the
+committed bytes exactly:
 
 ```bash
 git checkout -- src/routeTree.gen.ts
 git pull
 ```
 
-`tests/repo-hygiene.test.mjs` guards the pin and the matching `.prettierignore`
-entry, so `npm run format` cannot reformat generator output either.
+`tests/repo-hygiene.test.mjs` guards the `eol=lf` pins, the binary rules and the
+matching `.prettierignore` entry, so `npm run format` cannot reformat generator
+output either.
