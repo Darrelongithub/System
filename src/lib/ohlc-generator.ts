@@ -1,8 +1,71 @@
 import { format, addDays, subDays } from "date-fns";
-import { requestMarketData } from "./market-data";
+import { requestMarketData, type ProviderCandle } from "./market-data";
 
 export type LogFn = (msg: string) => void;
 export type CooldownSetter = (seconds: number | null) => void;
+
+/**
+ * Row shapes flowing through the generator. These used to be `any[]`, which hid
+ * every field access from the compiler across ~1300 lines. The pipeline has
+ * three stages:
+ *
+ *   ProviderCandle (see ./market-data) — raw provider JSON, prices as strings
+ *   FilteredCandle                     — parsed + normalised, prices as numbers
+ *   EnrichedCandle                     — plus every derived column written to CSV
+ */
+export type SessionName = "asian" | "london" | "ny";
+
+/**
+ * The minimum the flatline filter needs. It runs over two different row types —
+ * parsed candles (timestamp in `datetimeEAT`) and chart candles (timestamp in
+ * `time`) — so both timestamp fields are optional and either satisfies it.
+ */
+export interface OhlcLike {
+  time?: string | number;
+  datetimeEAT?: string;
+  open?: number | string;
+  high?: number | string;
+  low?: number | string;
+  close?: number | string;
+}
+
+/** A candle after parsing/normalisation, before enrichment. */
+export interface FilteredCandle extends OhlcLike {
+  datetimeEAT: string;
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+  /** Present only when the provider supplied real tick volume for the symbol. */
+  volume?: string | null;
+  direction: "Bullish" | "Bearish";
+  body: number;
+  upperWick: number;
+  lowerWick: number;
+  range: number;
+  bodyPercent: number;
+}
+
+/** FilteredCandle plus the derived columns `enrichOhlcRows` adds. */
+export interface EnrichedCandle extends FilteredCandle {
+  index: number;
+  session: SessionName;
+  /** Assigned for every row by the reliability pass before anything reads it. */
+  localAvgRange: number;
+  isReliable: boolean;
+  reliableStreakLength: number;
+  atr30m: number | null;
+  swingType: "high" | "low" | null;
+  swingPrice: number | null;
+  swingRange: number | null;
+  observedRetracePct: number | null;
+  swingOutcome: "continued" | "reversed" | "unresolved" | null;
+  swingInvalidated: boolean;
+  similarSwingRetracePct: number | null;
+  similarSwingContinuedPct: number | null;
+  similarSwingRefs: string[];
+  swingContextSource: string | null;
+}
 
 export function turtleTickSizeForSymbol(symbol: string): number {
   const s = symbol.toUpperCase();
@@ -97,22 +160,25 @@ export const cooldown = async (seconds: number, setCooldown: CooldownSetter) => 
 // Remove only contiguous exact-flatline artifacts (identical OHLC with zero range).
 // Repeated low-volatility candles are retained because deleting them can alter
 // valid time-series structure on instruments whose price increments are small.
-export const removeRepeatedFlatlineArtifacts = (candles: any[], intervalMinutes: number) => {
+export const removeRepeatedFlatlineArtifacts = <T extends OhlcLike>(
+  candles: T[],
+  intervalMinutes: number,
+) => {
   const expectedIntervalMs = intervalMinutes * 60 * 1000;
-  const getTimestampMs = (value: any) => {
+  const getTimestampMs = (value: unknown) => {
     const raw = String(value);
     const normalized = raw.replace(" ", "T");
     const hasTimezone = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized);
     const parsed = new Date(hasTimezone ? normalized : `${normalized}+03:00`).getTime();
     return Number.isFinite(parsed) ? parsed : null;
   };
-  const hasSameOhlc = (left: any, right: any) =>
+  const hasSameOhlc = (left: OhlcLike, right: OhlcLike) =>
     left.open === right.open &&
     left.high === right.high &&
     left.low === right.low &&
     left.close === right.close;
 
-  const cleaned: any[] = [];
+  const cleaned: T[] = [];
   let removedCount = 0;
   let index = 0;
 
@@ -149,7 +215,7 @@ export const removeRepeatedFlatlineArtifacts = (candles: any[], intervalMinutes:
   return { candles: cleaned, removedCount };
 };
 
-export const enrichOhlcRows = (rows: any[]) => {
+export const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   const RANGE_LOOKBACK = 20;
   const ATR_PERIODS = 14;
   // Swing detection width. This is the real driver of swing coverage: with a
@@ -184,7 +250,7 @@ export const enrichOhlcRows = (rows: any[]) => {
     if (utcHour < 13) return "london";
     return "ny";
   };
-  const isAdjacent = (left: any, right: any) => {
+  const isAdjacent = (left: EnrichedCandle, right: EnrichedCandle) => {
     const leftTime = getDate(left.datetimeEAT).getTime();
     const rightTime = getDate(right.datetimeEAT).getTime();
     return (
@@ -193,16 +259,18 @@ export const enrichOhlcRows = (rows: any[]) => {
       Math.abs(rightTime - leftTime - EXPECTED_INTERVAL_MS) < 1000
     );
   };
-  const isSameSession = (left: any, right: any) => left.session === right.session;
+  const isSameSession = (left: EnrichedCandle, right: EnrichedCandle) =>
+    left.session === right.session;
   const average = (values: number[]) =>
     values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
 
-  const workingRows = rows.map((row, index) => ({
+  const workingRows: EnrichedCandle[] = rows.map((row, index) => ({
     ...row,
     index,
     range: row.high - row.low,
     session: getSession(getUtcHour(row.datetimeEAT)),
-    localAvgRange: null as number | null,
+    // 0 is a placeholder: the reliability pass below assigns every row before any read.
+    localAvgRange: 0,
     isReliable: true,
     reliableStreakLength: 0,
     atr30m: null as number | null,
@@ -344,7 +412,10 @@ export const enrichOhlcRows = (rows: any[]) => {
 
     if (isSwingHigh === isSwingLow) continue;
     row.swingType = isSwingHigh ? "high" : "low";
-    row.swingPrice = isSwingHigh ? row.high : row.low;
+    // Captured in a const so the closures below keep the non-null narrowing
+    // (the row field itself is `number | null`).
+    const swingPrice = isSwingHigh ? row.high : row.low;
+    row.swingPrice = swingPrice;
 
     // Magnitude is measured from the nearest prior opposite swing. If there
     // isn't one yet, fall back to the opposite extreme of the preceding
@@ -369,23 +440,21 @@ export const enrichOhlcRows = (rows: any[]) => {
           : null;
     if (anchorPrice === null) continue;
 
-    row.swingRange = Math.abs(row.swingPrice - anchorPrice);
+    row.swingRange = Math.abs(swingPrice - anchorPrice);
     if (row.swingRange <= 0) continue;
 
     const futureRows = workingRows.slice(index + 1, index + 1 + SWING_RETRACE_HORIZON);
     const counterMove = isSwingHigh
-      ? Math.max(0, row.swingPrice - Math.min(...futureRows.map((item) => item.low)))
-      : Math.max(0, Math.max(...futureRows.map((item) => item.high)) - row.swingPrice);
+      ? Math.max(0, swingPrice - Math.min(...futureRows.map((item) => item.low)))
+      : Math.max(0, Math.max(...futureRows.map((item) => item.high)) - swingPrice);
     row.observedRetracePct = Math.min(100, (counterMove / row.swingRange) * 100);
 
     // Outcome: after the retracement, did price close beyond the original
     // swing (continued) or break past the retracement extreme the other
     // way (reversed)? Unresolved if neither happens inside the horizon.
-    const retraceExtreme = isSwingHigh
-      ? row.swingPrice - counterMove
-      : row.swingPrice + counterMove;
+    const retraceExtreme = isSwingHigh ? swingPrice - counterMove : swingPrice + counterMove;
     const continued = futureRows.some((item) =>
-      isSwingHigh ? item.close > row.swingPrice : item.close < row.swingPrice,
+      isSwingHigh ? item.close > swingPrice : item.close < swingPrice,
     );
     const reversed = futureRows.some((item) =>
       isSwingHigh ? item.close < retraceExtreme : item.close > retraceExtreme,
@@ -396,22 +465,33 @@ export const enrichOhlcRows = (rows: any[]) => {
     // price at all (not limited to the retrace horizon)?
     const allLaterRows = workingRows.slice(index + 1);
     row.swingInvalidated = allLaterRows.some((item) =>
-      isSwingHigh ? item.close > row.swingPrice : item.close < row.swingPrice,
+      isSwingHigh ? item.close > swingPrice : item.close < swingPrice,
     );
   }
 
   workingRows.forEach((row) => {
     if (!row.swingType || row.swingRange === null) return;
+    // Guarded above; captured so the sort comparator keeps the narrowing.
+    const rowSwingRange = row.swingRange;
 
     // Tolerance is symmetric: comparing against the larger of the two
     // magnitudes so a small swing can match a bigger one and vice versa.
     // (The old one-sided ratio silently rejected halves of legitimate pairs.)
-    const withinTolerance = (candidate: any) =>
-      Math.abs(candidate.swingRange - row.swingRange) /
-        Math.max(candidate.swingRange, row.swingRange) <=
-      0.5;
+    const withinTolerance = (candidate: EnrichedCandle) => {
+      // Candidates are pre-filtered to swingRange !== null; the guard keeps the
+      // arithmetic honest (a null magnitude could never be within tolerance —
+      // the untyped version coerced null to 0 and returned false either way).
+      if (candidate.swingRange === null || row.swingRange === null) return false;
+      return (
+        Math.abs(candidate.swingRange - row.swingRange) /
+          Math.max(candidate.swingRange, row.swingRange) <=
+        0.5
+      );
+    };
     const baseCandidates = workingRows.filter(
-      (candidate) =>
+      (
+        candidate,
+      ): candidate is EnrichedCandle & { swingRange: number; observedRetracePct: number } =>
         candidate.index < row.index &&
         candidate.swingType === row.swingType &&
         candidate.swingRange !== null &&
@@ -424,8 +504,8 @@ export const enrichOhlcRows = (rows: any[]) => {
     const pool = sameSession.length > 0 ? sameSession : baseCandidates;
     const comparableSwings = pool
       .sort((left, right) => {
-        const leftDistance = Math.abs(left.swingRange - row.swingRange);
-        const rightDistance = Math.abs(right.swingRange - row.swingRange);
+        const leftDistance = Math.abs(left.swingRange - rowSwingRange);
+        const rightDistance = Math.abs(right.swingRange - rowSwingRange);
         if (leftDistance !== rightDistance) return leftDistance - rightDistance;
         return right.index - left.index;
       })
@@ -500,8 +580,8 @@ export const validateOhlcExport = ({
   startDate,
   endDate,
 }: {
-  rows: any[];
-  exportedRows: any[];
+  rows: EnrichedCandle[];
+  exportedRows: EnrichedCandle[];
   headerColumns: string[];
   dataRows: unknown[][];
   startDate: string;
@@ -523,11 +603,12 @@ export const validateOhlcExport = ({
     if (lower === upper) return sorted[lower];
     return sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
   };
-  const isAdjacent = (left: any, right: any) => {
+  const isAdjacent = (left: EnrichedCandle, right: EnrichedCandle) => {
     const delta = getDate(right.datetimeEAT).getTime() - getDate(left.datetimeEAT).getTime();
     return Math.abs(delta - EXPECTED_INTERVAL_MS) < 1000;
   };
-  const isSameSession = (left: any, right: any) => left.session === right.session;
+  const isSameSession = (left: EnrichedCandle, right: EnrichedCandle) =>
+    left.session === right.session;
 
   const schemaMismatches = dataRows
     .map((fields, index) => ({
@@ -592,7 +673,8 @@ export const validateOhlcExport = ({
     previousReliableClose = row.close;
   }
   const atrCandidates = exportedRows.filter(
-    (row) => row.atr30m !== null && independentAtr.has(row.datetimeEAT),
+    (row): row is EnrichedCandle & { atr30m: number } =>
+      row.atr30m !== null && independentAtr.has(row.datetimeEAT),
   );
   // Deterministic stride sample across the window: same rows every run,
   // no Math.random() luck deciding whether a broken ATR region is checked.
@@ -773,7 +855,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     const fetchEnd = format(addDays(new Date(ohlcEndDate), 2), "yyyy-MM-dd");
     const apiSpanDays = daysBetween(fetchStart, fetchEnd);
 
-    let values: any[];
+    let values: ProviderCandle[] | undefined;
 
     if (apiSpanDays <= CHUNK_SPAN_DAYS) {
       // Single request covers the whole window — unchanged from the original path.
@@ -843,7 +925,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
         `📦 Requested window spans ${apiSpanDays} day(s) — splitting into ${ranges.length} chunk(s) of up to ${CHUNK_SPAN_DAYS} day(s) each (Twelve Data per-request row cap).`,
       );
       let retriesLeft = options.rateLimitRetries ?? MAX_RATE_LIMIT_RETRIES;
-      const merged: any[] = [];
+      const merged: ProviderCandle[] = [];
 
       for (let i = 0; i < ranges.length; i++) {
         const { start, end } = ranges[i];
@@ -911,7 +993,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       // contiguous, non-overlapping calendar windows, so duplicates are not
       // expected in normal operation — this is a defensive guarantee, not a
       // correction of provider data.
-      const byDatetime = new Map<string, any>();
+      const byDatetime = new Map<string, ProviderCandle>();
       for (const row of merged) {
         const key = String(row?.datetime ?? "");
         if (!key) continue;
@@ -934,7 +1016,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     const reqEndStr = `${ohlcEndDate} ${ohlcSpecifyTime ? ohlcEndTime : "23:59"}:59`;
 
     const hasRealTickVolume = values.some(
-      (v: any) =>
+      (v) =>
         v.volume !== undefined &&
         v.volume !== null &&
         String(v.volume).trim() !== "" &&
@@ -943,7 +1025,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     );
 
     const filtered = values
-      .map((v: any) => {
+      .map((v): FilteredCandle => {
         // The API response is already in Africa/Nairobi because of the
         // timezone parameter above. Compare wall-clock strings directly.
         const datetimeEAT = String(v.datetime).replace("T", " ");
@@ -971,9 +1053,9 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
           bodyPercent,
         };
       })
-      .filter((v: any) => v.datetimeEAT >= reqStartStr && v.datetimeEAT <= reqEndStr);
+      .filter((v) => v.datetimeEAT >= reqStartStr && v.datetimeEAT <= reqEndStr);
 
-    filtered.sort((a: any, b: any) => a.datetimeEAT.localeCompare(b.datetimeEAT));
+    filtered.sort((a, b) => a.datetimeEAT.localeCompare(b.datetimeEAT));
     const cleanedOhlc = removeRepeatedFlatlineArtifacts(filtered, 30);
     const cleanedFiltered = cleanedOhlc.candles;
     if (cleanedOhlc.removedCount > 0) {
@@ -1033,8 +1115,8 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       }
     }
 
-    const rowsByUtcDay = new Map<string, any[]>();
-    enrichedRows.forEach((row: any) => {
+    const rowsByUtcDay = new Map<string, EnrichedCandle[]>();
+    enrichedRows.forEach((row) => {
       const utcDayKey = toUtcDayKey(row.datetimeEAT);
       const rows = rowsByUtcDay.get(utcDayKey) || [];
       rows.push(row);
@@ -1093,7 +1175,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
 
       exportRows.push(formatUtcDayHeader(dayKey));
       const dayRows = rowsByUtcDay.get(dayKey) || [];
-      dayRows.forEach((row: any) => {
+      dayRows.forEach((row) => {
         // Build by column name first, then project through headerColumns.
         // This prevents a missing field from silently shifting later values.
         const rowByColumn: Record<string, unknown> = {
@@ -1133,7 +1215,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       });
     }
 
-    const safeSymbol = symbol.replace(/[\/\\]/g, "");
+    const safeSymbol = symbol.replace(/[/\\]/g, "");
     const spreadConvention = (() => {
       const normalizedSymbol = safeSymbol.toUpperCase();
       if (normalizedSymbol === "XAUUSD") {
@@ -1199,13 +1281,13 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       addLog(`✅ Validation PASSED: all hard checks green`);
     }
 
-    const reliableRows = enrichedRows.filter((row: any) => row.isReliable === true);
+    const reliableRows = enrichedRows.filter((row) => row.isReliable === true);
     // swing_coverage_pct is defined on similar_swing_retrace_pct specifically.
     const reliableWithRetrace = reliableRows.filter(
-      (row: any) => row.similarSwingRetracePct !== null && row.similarSwingRetracePct !== undefined,
+      (row) => row.similarSwingRetracePct !== null && row.similarSwingRetracePct !== undefined,
     );
     const reliableWithRefs = reliableRows.filter(
-      (row: any) => Array.isArray(row.similarSwingRefs) && row.similarSwingRefs.length > 0,
+      (row) => Array.isArray(row.similarSwingRefs) && row.similarSwingRefs.length > 0,
     );
     const swingCoveragePct =
       reliableRows.length > 0 ? (reliableWithRetrace.length / reliableRows.length) * 100 : 0;
@@ -1215,7 +1297,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       `📐 Swing coverage: retrace_pct ${swingCoveragePct.toFixed(2)}% (${reliableWithRetrace.length}/${reliableRows.length}) | refs ${swingRefsCoveragePct.toFixed(2)}% (${reliableWithRefs.length}/${reliableRows.length}) of reliable rows`,
     );
     addLog(
-      `🔎 Swing sources: ${reliableRows.filter((r: any) => r.swingContextSource === "own_swing").length} own swing, ${reliableRows.filter((r: any) => typeof r.swingContextSource === "string" && r.swingContextSource.startsWith("inherited")).length} inherited, ${reliableRows.filter((r: any) => !r.swingContextSource).length} no context`,
+      `🔎 Swing sources: ${reliableRows.filter((r) => r.swingContextSource === "own_swing").length} own swing, ${reliableRows.filter((r) => typeof r.swingContextSource === "string" && r.swingContextSource.startsWith("inherited")).length} inherited, ${reliableRows.filter((r) => !r.swingContextSource).length} no context`,
     );
 
     if (reliableWithRefs.length !== reliableWithRetrace.length) {
