@@ -19,6 +19,7 @@ await import("./server-env.test.mjs");
 await import("./repo-hygiene.test.mjs");
 await import("./analyzer-htf-inert.test.mjs");
 await import("./backtest-week-bucketing.test.mjs");
+await import("./market-data-symbols.test.mjs");
 await import("./status-parse-time-tz.test.mjs");
 await import("./tz-matrix.test.mjs");
 

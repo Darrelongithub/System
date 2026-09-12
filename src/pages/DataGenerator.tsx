@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { format, addDays, subDays } from "date-fns";
 import JSZip from "jszip";
-import { AVAILABLE_SYMBOLS, requestMarketData } from "@/lib/market-data";
+import { AVAILABLE_SYMBOLS, isCalibratedSymbol, requestMarketData } from "@/lib/market-data";
 import {
   buildOhlcCsv,
   MAX_RATE_LIMIT_RETRIES,
@@ -1156,6 +1156,15 @@ export default function Home() {
                     </Command>
                   </PopoverContent>
                 </Popover>
+                {symbol && !isCalibratedSymbol(symbol) ? (
+                  <p className="text-[10px] leading-snug text-amber-400">
+                    ⚠️ {symbol} is offered by the provider but sits outside the calibrated set
+                    (forex + metals; XAU/USD is the only golden baseline). Crypto trades 24/7 and
+                    the oil products follow futures/ETF hours, so the weekend policy, session
+                    buckets, spread parsing and ATR reliability thresholds do not describe this
+                    instrument — treat any output as unvalidated.
+                  </p>
+                ) : null}
               </div>
 
               {/* Date range */}

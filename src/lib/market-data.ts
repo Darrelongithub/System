@@ -57,6 +57,48 @@ export const AVAILABLE_SYMBOLS = [
   "BCO/USD",
 ].sort();
 
+/**
+ * Provider-offered symbols the analyzer is NOT calibrated for
+ * (AUDIT-ARENA-2026-09-08 §9).
+ *
+ * Everything else in `AVAILABLE_SYMBOLS` is forex (24/5, session-bucketed) or a
+ * London/NY metal, which is what the pipeline is built for: the asian/london/ny
+ * session buckets, the weekend-skip policy, the spread parser, the ATR
+ * reliability thresholds and every strategy calibration are forex/metals-tuned,
+ * and XAU/USD is the only golden baseline (README).
+ *
+ * These symbols still fetch and analyse end to end — the point is that the
+ * result is unvalidated, so the UI says so out loud instead of returning
+ * confident-looking numbers for an asset whose volatility and session structure
+ * are completely different:
+ *
+ * - Crypto trades 24/7, so weekend skips never fire and the session buckets
+ *   describe a market that does not close.
+ * - USO is a US-listed ETF (equity hours) and BCO a futures contract — neither
+ *   follows the forex 24/5 calendar the day/continuity logic assumes.
+ */
+export const UNVALIDATED_SYMBOLS: readonly string[] = [
+  "BTC/USD",
+  "ETH/USD",
+  "SOL/USD",
+  "XRP/USD",
+  "ADA/USD",
+  "DOGE/USD",
+  "DOT/USD",
+  "LTC/USD",
+  "USO/USD",
+  "BCO/USD",
+];
+
+/**
+ * True when `symbol` is offered by the provider AND inside the calibrated set
+ * (forex + metals). Unknown symbols are uncalibrated by definition.
+ */
+export function isCalibratedSymbol(symbol: string): boolean {
+  const normalized = symbol.trim().toUpperCase();
+  return AVAILABLE_SYMBOLS.includes(normalized) && !UNVALIDATED_SYMBOLS.includes(normalized);
+}
+
 export interface MarketDataRequest {
   symbol: string;
   interval: string;
