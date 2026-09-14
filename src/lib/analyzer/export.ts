@@ -40,7 +40,7 @@ function header(analysis: Analysis, title: string): string[] {
 }
 
 /** File 1: only PENDING/FILLED setups — what can still be acted on. */
-export function buildLiveReport(analysis: Analysis): string {
+function buildLiveReport(analysis: Analysis): string {
   const lines = header(analysis, "SUMMARY");
   lines.push(`Total candles: ${analysis.totalRows}`);
   lines.push(`Analyzed candles: ${analysis.analyzedRows}`);
@@ -70,7 +70,7 @@ export function buildLiveReport(analysis: Analysis): string {
 }
 
 /** File 2: resolved/expired setups plus the full diagnostic result table. */
-export function buildHistoryReport(analysis: Analysis): string {
+function buildHistoryReport(analysis: Analysis): string {
   const lines = header(analysis, "HISTORICAL RECORD");
   lines.push(`INVALID rows: ${analysis.invalidRows}`);
   lines.push(`Historical (RESOLVED/EXPIRED) setups: ${analysis.historical.length}`);

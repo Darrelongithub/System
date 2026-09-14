@@ -5,7 +5,7 @@
  * silently shift a session boundary.
  */
 
-export const EAT_OFFSET = "+03:00";
+const EAT_OFFSET = "+03:00";
 
 export interface EatParts {
   day: string; // yyyy-mm-dd in EAT

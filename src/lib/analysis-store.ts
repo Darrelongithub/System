@@ -34,7 +34,7 @@ export function setAnalysisSnapshot(next: AnalysisSnapshot) {
   listeners.forEach((listener) => listener());
 }
 
-export function getAnalysisSnapshot(): AnalysisSnapshot | null {
+function getAnalysisSnapshot(): AnalysisSnapshot | null {
   hydrate();
   return snapshot;
 }

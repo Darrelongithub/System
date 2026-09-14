@@ -5,7 +5,7 @@
 
 import { ensureServerEnv } from "./server-env";
 
-export const VERIFIER_SYSTEM_PROMPT = `I'm sending this app's own analysis output: the SUMMARY block, the Live/Actionable PASS setups list
+const VERIFIER_SYSTEM_PROMPT = `I'm sending this app's own analysis output: the SUMMARY block, the Live/Actionable PASS setups list
 (with setup_status), the Overlaps section, and the raw 30M OHLC with precomputed columns (is_reliable,
 atr_30m, similar_swing_retrace_pct, similar_swing_refs) and metadata (data_age, spread_convention,
 atr_method, similar_swing_selection_rule). Find the one trade worth taking from the PASS list — any
@@ -79,9 +79,9 @@ interface ChatResponse {
  * seven model/provider combinations sequentially, so a dead host could block
  * the panel for the whole session with no error and no Stop.
  */
-export const AI_UPSTREAM_TIMEOUT_MS = 45_000;
+const AI_UPSTREAM_TIMEOUT_MS = 45_000;
 
-export async function callChat(
+async function callChat(
   url: string,
   apiKey: string,
   model: string,

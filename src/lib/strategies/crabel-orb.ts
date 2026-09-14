@@ -9,7 +9,7 @@
 export const CRABEL_ORB_WINDOW_MINUTES = 30;
 export const CRABEL_ORB_BREAKEVEN_MINUTES = 60;
 
-export function crabelOrbBreakevenActive(elapsedMinutes: number): boolean {
+function crabelOrbBreakevenActive(elapsedMinutes: number): boolean {
   return elapsedMinutes >= CRABEL_ORB_BREAKEVEN_MINUTES;
 }
 

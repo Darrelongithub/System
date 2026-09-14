@@ -57,7 +57,7 @@ function falling(values: number[]): boolean {
   return values.length >= 2 && values.every((v, i) => i === 0 || v < values[i - 1]!);
 }
 
-export function trendFrom(swings: SwingSet): Trend {
+function trendFrom(swings: SwingSet): Trend {
   // Structure is defined by the most recent confirmed swing pair. Requiring all
   // five historical pivots to be monotonic made a single older counter-swing
   // permanently mask a current bearish H4 sequence.

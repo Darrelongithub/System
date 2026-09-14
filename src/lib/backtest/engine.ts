@@ -430,7 +430,7 @@ export function buildDayReport(input: DayReportInput): string {
   return lines.join("\n");
 }
 
-export function dayFileName(day: string): string {
+function dayFileName(day: string): string {
   return `backtest_${day}.txt`;
 }
 

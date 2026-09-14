@@ -72,7 +72,7 @@ export interface EnrichedCandle extends FilteredCandle {
   swingContextSource: string | null;
 }
 
-export function turtleTickSizeForSymbol(symbol: string): number {
+function turtleTickSizeForSymbol(symbol: string): number {
   const s = symbol.toUpperCase();
   if (s.includes("JPY")) return 0.01;
   if (s === "XAU/USD") return 0.01;
@@ -171,19 +171,25 @@ export const cooldown = async (
   }
   for (let remaining = seconds; remaining > 0; remaining--) {
     setCooldown(remaining);
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(resolve, 1000);
-      signal?.addEventListener(
-        "abort",
-        () => {
-          clearTimeout(timer);
-          // Clear the visible countdown on the way out, as documented; the
-          // normal completion path below would otherwise be skipped by throw.
-          setCooldown(null);
-          reject(signal.reason instanceof Error ? signal.reason : new Error("aborted"));
-        },
-        { once: true },
-      );
+    if (!signal) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 1000));
+      continue;
+    }
+    await new Promise<void>((resolve, reject) => {
+      const onAbort = () => {
+        clearTimeout(timer);
+        // Clear the visible countdown on the way out, as documented; the
+        // normal completion path below would otherwise be skipped by throw.
+        setCooldown(null);
+        reject(signal.reason instanceof Error ? signal.reason : new Error("aborted"));
+      };
+      const timer = setTimeout(() => {
+        // Detach on normal completion so a run-scoped signal does not carry
+        // one dead closure per tick across dozens of 60s cooldown waits.
+        signal.removeEventListener("abort", onAbort);
+        resolve();
+      }, 1000);
+      signal.addEventListener("abort", onAbort, { once: true });
     });
   }
   setCooldown(null);
@@ -247,7 +253,7 @@ export const removeRepeatedFlatlineArtifacts = <T extends OhlcLike>(
   return { candles: cleaned, removedCount };
 };
 
-export const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
+const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   const RANGE_LOOKBACK = 20;
   const ATR_PERIODS = 14;
   // Swing detection width. This is the real driver of swing coverage: with a
@@ -603,7 +609,7 @@ export const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   return workingRows;
 };
 
-export const validateOhlcExport = ({
+const validateOhlcExport = ({
   log,
   rows,
   exportedRows,

@@ -8,7 +8,7 @@ export interface ParseResult {
   totalRows: number;
 }
 
-export function splitCsvLine(line: string): string[] {
+function splitCsvLine(line: string): string[] {
   const out: string[] = [];
   let field = "";
   let quoted = false;
@@ -73,14 +73,14 @@ const DEFAULT_MARKERS = ["===", "---", "###", "***", "~~~"];
  * marker tokens it documents (any run of 2+ symbol characters). Falls back to the
  * common markers when the field is absent or purely descriptive.
  */
-export function sectionMarkers(convention: string | undefined): string[] {
+function sectionMarkers(convention: string | undefined): string[] {
   const found = convention ? (convention.match(/[=\-#*~_+>|]{2,}/g) ?? []) : [];
   const tokens = [...new Set(found)].filter((t) => t.length >= 2);
   return tokens.length > 0 ? tokens : DEFAULT_MARKERS;
 }
 
 /** True when a raw CSV line is a section/day divider rather than a candle row. */
-export function isDividerLine(line: string, cells: string[], markers: string[]): boolean {
+function isDividerLine(line: string, cells: string[], markers: string[]): boolean {
   const trimmed = line.trim();
   if (trimmed === "") return true;
   const first = (cells[0] ?? "").trim();
@@ -285,7 +285,7 @@ export function parseSpread(convention: string): number {
 }
 
 /** Source OHLC timestamps are EAT wall-clock values; explicit timezone offsets are rejected. */
-export function isValidEATDatetime(value: string): boolean {
+function isValidEATDatetime(value: string): boolean {
   const normalized = value.trim().replace(" ", "T");
   const match = normalized.match(
     /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2})(?:\.(\d{1,3}))?)?$/,

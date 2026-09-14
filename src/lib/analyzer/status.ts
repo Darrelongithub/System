@@ -2,7 +2,7 @@ import type { Candle, ResultRow, SetupStatus } from "./types";
 import { crabelOrbEffectiveStop } from "@/lib/strategies/crabel-orb";
 
 /** Candles a limit order may wait for a fill before it is considered stale. */
-export const PENDING_EXPIRY_CANDLES = 20;
+const PENDING_EXPIRY_CANDLES = 20;
 
 export interface StatusEvaluation {
   setupStatus: SetupStatus;
@@ -62,7 +62,7 @@ export interface DayExtremesIndex {
 
 const dayIndexCache = new WeakMap<Candle[], DayExtremesIndex>();
 
-export function buildDayExtremesIndex(candles: Candle[]): DayExtremesIndex {
+function buildDayExtremesIndex(candles: Candle[]): DayExtremesIndex {
   const extremes = new Map<string, { high: number; low: number }>();
   for (const candle of candles) {
     if (candle.invalid) continue;
@@ -382,8 +382,8 @@ export function evaluateSetupStatus(
   };
 }
 
-export const LIVE_STATUSES: SetupStatus[] = ["PENDING", "FILLED"];
+const LIVE_STATUSES: SetupStatus[] = ["PENDING", "FILLED"];
 
 export function isLive(status: SetupStatus | undefined): boolean {
-  return status === "PENDING" || status === "FILLED";
+  return status !== undefined && LIVE_STATUSES.includes(status);
 }

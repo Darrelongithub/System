@@ -6,7 +6,7 @@ import type { AnalysisContext, Outcome, StrategyCheck } from "../types";
 import { eatDay } from "../time";
 import { isConsumed } from "./util";
 
-export const FINAL_PARAMS = {
+const FINAL_PARAMS = {
   dualThrustN: 20,
   dualThrustK: 0.5,
   atrStopMult: 1.5,
@@ -114,7 +114,7 @@ function tpR(entry: number, sl: number, side: "long" | "short", mult: number) {
 }
 
 /** LOCKED: Dual Thrust */
-export const dualThrustSpec: StrategyCheck = {
+const dualThrustSpec: StrategyCheck = {
   id: "dual-thrust",
   name: "Dual Thrust Breakout",
   run(ctx, i) {
@@ -179,7 +179,7 @@ export const dualThrustSpec: StrategyCheck = {
  * is part of the tested strategy definition; changing it would alter historical
  * results and invalidate the locked survivor backtests.
  */
-export const macdCrossSpec: StrategyCheck = {
+const macdCrossSpec: StrategyCheck = {
   id: "macd-cross",
   name: "MACD Signal Cross",
   run(ctx, i) {
@@ -243,7 +243,7 @@ export const macdCrossSpec: StrategyCheck = {
 };
 
 /** LOCKED: PDH Retest */
-export const pdhRetestSpec: StrategyCheck = {
+const pdhRetestSpec: StrategyCheck = {
   id: "pdh-retest",
   name: "PDH/PDL Break Retest",
   run(ctx, i) {
@@ -291,7 +291,7 @@ export const pdhRetestSpec: StrategyCheck = {
   },
 };
 
-export const williamsRFadeSpec: StrategyCheck = {
+const williamsRFadeSpec: StrategyCheck = {
   id: "williams-r-fade",
   name: "Williams %R Fade",
   run(ctx, i) {
@@ -343,7 +343,7 @@ export const williamsRFadeSpec: StrategyCheck = {
   },
 };
 
-export const threeSoldiersSpec: StrategyCheck = {
+const threeSoldiersSpec: StrategyCheck = {
   id: "three-soldiers",
   name: "Three Soldiers/Crows",
   run(ctx, i) {
@@ -408,7 +408,7 @@ export const threeSoldiersSpec: StrategyCheck = {
   },
 };
 
-export const morningStarSpec: StrategyCheck = {
+const morningStarSpec: StrategyCheck = {
   id: "morning-star",
   name: "Morning/Evening Star",
   run(ctx, i) {
@@ -471,7 +471,7 @@ export const morningStarSpec: StrategyCheck = {
   },
 };
 
-export const classicPivotSpec: StrategyCheck = {
+const classicPivotSpec: StrategyCheck = {
   id: "classic-pivot",
   name: "Classic Pivot S1/R1",
   run(ctx, i) {
@@ -527,7 +527,7 @@ export const classicPivotSpec: StrategyCheck = {
  * does not apply that lag/displacement. The current-bar cloud is part of the
  * tested strategy definition; changing it would alter historical results.
  */
-export const ichimokuTkSpec: StrategyCheck = {
+const ichimokuTkSpec: StrategyCheck = {
   id: "ichimoku-tk",
   name: "Ichimoku TK Cross",
   run(ctx, i) {
@@ -584,7 +584,7 @@ export const ichimokuTkSpec: StrategyCheck = {
   },
 };
 
-export const donchian55Spec: StrategyCheck = {
+const donchian55Spec: StrategyCheck = {
   id: "donchian-55",
   name: "Donchian 55 Breakout",
   run(ctx, i) {

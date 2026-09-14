@@ -47,14 +47,14 @@ const gapFill = (
   return undefined;
 };
 
-export const turtleSpec: StrategyCheck = {
+const turtleSpec: StrategyCheck = {
   id: "turtle",
   name: "Turtle Trading (20/55-day stateful)",
   run(ctx, i) {
     return turtleRun(ctx, i);
   },
 };
-export const orbSpec: StrategyCheck = {
+const orbSpec: StrategyCheck = {
   id: "opening-range-breakout",
   name: "Crabel Opening Range Breakout (ORB)",
   run(ctx, i) {
@@ -157,7 +157,7 @@ const atr10Wilder = (ctx: AnalysisContext, i: number): number | undefined => {
 // where price crosses from inside to outside, using ctx.state to remember
 // whether the previous bar was already beyond the level; crossing back inside
 // resets it so a genuinely new breakout later can still fire.
-export const keltnerSpec: StrategyCheck = {
+const keltnerSpec: StrategyCheck = {
   id: "raschke-keltner",
   name: "Raschke Keltner Channel",
   run(ctx, i) {
@@ -199,7 +199,7 @@ export const keltnerSpec: StrategyCheck = {
     return fail("no Keltner condition");
   },
 };
-export const pdhSpec: StrategyCheck = {
+const pdhSpec: StrategyCheck = {
   id: "previous-day-high-low",
   name: "Previous Day High/Low Breakout",
   run(ctx, i) {
@@ -241,7 +241,7 @@ export const pdhSpec: StrategyCheck = {
     return fail("no PDH/PDL level break");
   },
 };
-export const bollingerSpec: StrategyCheck = {
+const bollingerSpec: StrategyCheck = {
   id: "bollinger-bands",
   name: "Bollinger Bands",
   run(ctx, i) {
@@ -269,7 +269,7 @@ export const bollingerSpec: StrategyCheck = {
     return fail("price remains within 20-SMA ± 2 population-SD bands");
   },
 };
-export const donchianSpec: StrategyCheck = {
+const donchianSpec: StrategyCheck = {
   id: "donchian",
   name: "Donchian Channel / 5-20 Rule",
   run(ctx, i) {
@@ -308,7 +308,7 @@ export const donchianSpec: StrategyCheck = {
     return fail("no 20-day Donchian breakout");
   },
 };
-export const insideNrSpec: StrategyCheck = {
+const insideNrSpec: StrategyCheck = {
   id: "crabel-contraction",
   name: "Crabel Inside Day / NR4 / NR7",
   run(ctx, i) {
@@ -334,7 +334,7 @@ export const insideNrSpec: StrategyCheck = {
     );
   },
 };
-export const outsideSpec: StrategyCheck = {
+const outsideSpec: StrategyCheck = {
   id: "crabel-outside-expansion",
   name: "Crabel Outside Day / Expansion Rules",
   run(ctx, i) {
@@ -354,7 +354,7 @@ export const outsideSpec: StrategyCheck = {
     );
   },
 };
-export const fvgSpec: StrategyCheck = {
+const fvgSpec: StrategyCheck = {
   id: "fvg-ict",
   name: "FVG / ICT",
   run(ctx, i) {
@@ -381,7 +381,7 @@ export const fvgSpec: StrategyCheck = {
   },
 };
 /** Context / diagnostic tools — logged, never counted as trades. */
-export const CONTEXT_STRATEGIES: StrategyCheck[] = [
+const CONTEXT_STRATEGIES: StrategyCheck[] = [
   outsideSpec,
   keltnerSpec,
   pdhSpec,
@@ -395,7 +395,7 @@ export const CONTEXT_STRATEGIES: StrategyCheck[] = [
  * Legacy / reference trade systems retained for research and explicit strategyIds runs.
  * Not part of the default production set (see FINAL_TRADE_STRATEGIES / FINAL_STRATEGY_IDS).
  */
-export const LEGACY_TRADE_STRATEGIES: StrategyCheck[] = [turtleSpec, orbSpec];
+const LEGACY_TRADE_STRATEGIES: StrategyCheck[] = [turtleSpec, orbSpec];
 
 /**
  * Full implementation registry (legacy + final 9 + context).
