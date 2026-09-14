@@ -1,8 +1,8 @@
 import { useSyncExternalStore } from "react";
 import { parseAnalysisSnapshot } from "./analysis-store-validation";
-import type { AnalysisSnapshot, AnalysisChart } from "./analysis-store-validation";
+import type { AnalysisSnapshot } from "./analysis-store-validation";
 
-export type { AnalysisSnapshot, AnalysisChart } from "./analysis-store-validation";
+export type { AnalysisSnapshot } from "./analysis-store-validation";
 export { parseAnalysisSnapshot } from "./analysis-store-validation";
 
 const STORAGE_KEY = "forexlens.analysis.snapshot";
@@ -34,7 +34,7 @@ export function setAnalysisSnapshot(next: AnalysisSnapshot) {
   listeners.forEach((listener) => listener());
 }
 
-export function getAnalysisSnapshot(): AnalysisSnapshot | null {
+function getAnalysisSnapshot(): AnalysisSnapshot | null {
   hydrate();
   return snapshot;
 }
@@ -53,48 +53,3 @@ export function useAnalysisSnapshot(): AnalysisSnapshot | null {
     () => null as AnalysisSnapshot | null,
   );
 }
-
-export const DEFAULT_SUMMARY_FIELDS = `Symbol:
-Direction:
-Entry Type:
-Entry:
-Stop Loss:
-Take Profit:
-Spread-Adjusted RR:
-Trade Thesis:
--
--
--
-4H Structure:
-1H Structure:
-30M Structure:
-Entry Reason:
--
--
-SL Reason:
--
--
-TP Reason:
--
--
-Historical Follow-Through:
-- Continuation/Reversal Ratio:
-- Sample Size:
-- Evidence Strength:
-Fill Logic:
--
--
-Counterarguments Considered:
--
--
-Structural Risk Check:
-- Recent Invalidation:
-- Momentum Divergence:
-- Opposing Higher-Timeframe Level:
-- News/Session Risk:
-Invalidation Window:
-Resolved Issues From Stress Test:
--
--
--
-Data Age:`;

@@ -71,9 +71,9 @@ export function dailyAggregates(candles: Candle[]): DayAggregate[] {
  * here — asian is intentionally excluded (an opening range is a different
  * construct from a full-session range).
  */
-export const OPENING_WINDOW_MINUTES = CRABEL_ORB_WINDOW_MINUTES;
+const OPENING_WINDOW_MINUTES = CRABEL_ORB_WINDOW_MINUTES;
 
-export function openingRangeKey(day: string, session: string): string {
+function openingRangeKey(day: string, session: string): string {
   return `${day}|${session}`;
 }
 

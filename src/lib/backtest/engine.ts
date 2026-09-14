@@ -63,7 +63,7 @@ export interface BacktestState {
  * Context tools are logged only — they never produce trade stats, so seeding
  * them here would render permanently empty rows in the rolling-stats table.
  */
-export function seededStats(): Record<string, StrategyStats> {
+function seededStats(): Record<string, StrategyStats> {
   const stats: Record<string, StrategyStats> = {};
   for (const strategy of STRATEGIES.filter((s) => isTradeStrategy(s.id))) {
     stats[strategy.id] = {
@@ -95,11 +95,11 @@ export function emptyState(symbol: string): BacktestState {
 }
 
 /** yyyy-MM-dd helpers that never touch local timezone drift. */
-export function toDayKey(date: Date): string {
+function toDayKey(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
-export function dayDate(dayKey: string): Date {
+function dayDate(dayKey: string): Date {
   return new Date(`${dayKey}T00:00:00Z`);
 }
 
@@ -430,7 +430,7 @@ export function buildDayReport(input: DayReportInput): string {
   return lines.join("\n");
 }
 
-export function dayFileName(day: string): string {
+function dayFileName(day: string): string {
   return `backtest_${day}.txt`;
 }
 
@@ -540,7 +540,7 @@ const REQUIREMENTS: Record<string, string[]> = {
   "fvg-ict": ["three-candle FVG condition", "no canonical mechanical entry/SL/TP"],
 };
 
-export function triggerReasoning(trigger: DayTrigger): string[] {
+function triggerReasoning(trigger: DayTrigger): string[] {
   const reqs = REQUIREMENTS[trigger.strategyId] ?? ["strategy-specific entry conditions"];
   const lines = ["    requirements:"];
   for (const requirement of reqs) lines.push(`      - satisfied: ${requirement}`);
@@ -558,10 +558,3 @@ export function triggerReasoning(trigger: DayTrigger): string[] {
   if (trigger.statusNote) lines.push(`    resolution: ${trigger.statusNote}`);
   return lines;
 }
-
-/**
- * Post-hoc trade journal: resolves generated triggers against the complete candle
- * history, without inheriting the per-day live-simulation horizon.
- */
-export { buildTradeJournal, walkTradePath } from "@/lib/journal/path-walker";
-export type { TradePathRecord, JournalOutcome } from "@/lib/journal/path-walker";

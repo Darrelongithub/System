@@ -5,7 +5,7 @@
  * silently shift a session boundary.
  */
 
-export const EAT_OFFSET = "+03:00";
+const EAT_OFFSET = "+03:00";
 
 export interface EatParts {
   day: string; // yyyy-mm-dd in EAT
@@ -30,10 +30,6 @@ export function eatParts(datetime: string): EatParts | undefined {
 /** Calendar day in EAT — the daily reset used for pivot levels. */
 export function eatDay(datetime: string): string {
   return eatParts(datetime)?.day ?? String(datetime).trim().split(/[ T]/)[0] ?? "";
-}
-
-export function eatMinutes(datetime: string): number | undefined {
-  return eatParts(datetime)?.minutesOfDay;
 }
 
 /**

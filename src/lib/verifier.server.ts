@@ -5,7 +5,7 @@
 
 import { ensureServerEnv } from "./server-env";
 
-export const VERIFIER_SYSTEM_PROMPT = `I'm sending this app's own analysis output: the SUMMARY block, the Live/Actionable PASS setups list
+const VERIFIER_SYSTEM_PROMPT = `I'm sending this app's own analysis output: the SUMMARY block, the Live/Actionable PASS setups list
 (with setup_status), the Overlaps section, and the raw 30M OHLC with precomputed columns (is_reliable,
 atr_30m, similar_swing_retrace_pct, similar_swing_refs) and metadata (data_age, spread_convention,
 atr_method, similar_swing_selection_rule). Find the one trade worth taking from the PASS list — any
@@ -72,22 +72,41 @@ interface ChatResponse {
   error?: { message?: string };
 }
 
+/**
+ * Per-request ceiling for an AI provider call. Unlike the market-data proxy
+ * (which already had AbortSignal.timeout), a stalled chat endpoint previously
+ * hung a verifier request indefinitely — and runVerification tries up to
+ * seven model/provider combinations sequentially, so a dead host could block
+ * the panel for the whole session with no error and no Stop.
+ */
+const AI_UPSTREAM_TIMEOUT_MS = 45_000;
+
 async function callChat(
   url: string,
   apiKey: string,
   model: string,
   messages: { role: string; content: string }[],
   extraHeaders: Record<string, string> = {},
+  timeoutMs: number = AI_UPSTREAM_TIMEOUT_MS,
 ): Promise<string> {
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      ...extraHeaders,
-    },
-    body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: 2000 }),
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        ...extraHeaders,
+      },
+      body: JSON.stringify({ model, messages, temperature: 0.2, max_tokens: 2000 }),
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    if (error instanceof Error && error.name === "TimeoutError") {
+      throw new Error(`model did not respond within ${Math.round(timeoutMs / 1000)}s`);
+    }
+    throw error;
+  }
 
   const text = await res.text();
   let payload: ChatResponse = {};

@@ -8,7 +8,7 @@
  */
 export type StrategyKind = "trade" | "context";
 
-export const STRATEGY_KIND: Record<string, StrategyKind> = {
+const STRATEGY_KIND: Record<string, StrategyKind> = {
   turtle: "trade",
   "opening-range-breakout": "trade",
   "dual-thrust": "trade",
@@ -29,7 +29,7 @@ export const STRATEGY_KIND: Record<string, StrategyKind> = {
   "crabel-outside-expansion": "context",
 };
 
-export function strategyKind(strategyId: string): StrategyKind {
+function strategyKind(strategyId: string): StrategyKind {
   return STRATEGY_KIND[strategyId] ?? "context";
 }
 
