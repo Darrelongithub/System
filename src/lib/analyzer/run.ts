@@ -75,6 +75,15 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   if (candles.length === 0) {
     return { ok: false, error: "INVALID FILE: no data rows found after the header" };
   }
+  // Every row invalid used to surface as an "ok" analysis with zero trades,
+  // hiding a corrupted/wrong-format file behind an empty result.
+  if (candles.every((candle) => candle.invalid)) {
+    const firstReason = candles.find((candle) => candle.invalid)?.invalid ?? "unknown";
+    return {
+      ok: false,
+      error: `INVALID FILE: no valid data rows; ${candles.length} row(s) rejected (first reason: ${firstReason})`,
+    };
+  }
 
   // Chronological integrity: valid rows must be non-decreasing by datetime.
   // Invalid rows do not become chronological barriers; compare each valid row

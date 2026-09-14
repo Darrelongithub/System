@@ -14,7 +14,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { STRATEGIES } from "@/lib/analyzer/strategies";
 import { AVAILABLE_SYMBOLS } from "@/lib/market-data";
 import { buildOhlcCsv } from "@/lib/ohlc-generator";
 import { verifySetup } from "@/lib/verifier.functions";
@@ -23,12 +22,12 @@ import {
   applyTriggers,
   buildDayReport,
   buildStrategyBreakdown,
-  dayFileName,
   batchBacktestReports,
+  dayReportSkipReason,
   emptyState,
   addUtcDays,
   rangeDays,
-  isWeekend,
+  isSunday,
   winRate,
   averageRr,
   realizedR,
@@ -95,6 +94,8 @@ export default function Backtest() {
 
   const runVerifier = useServerFn(verifySetup);
   const stopRef = useRef(false);
+  /** Aborts the continuous OHLC pull and its cooldown waits on Stop. */
+  const abortRef = useRef<AbortController | null>(null);
   /** Synchronous lock — React state alone cannot block a same-tick double-click race. */
   const runLockRef = useRef(false);
   /** Monotonic generation so a superseded async path never writes after a newer run. */
@@ -121,6 +122,9 @@ export default function Backtest() {
 
   const handleStop = () => {
     stopRef.current = true;
+    // Also interrupt an in-flight continuous OHLC fetch / cooldown wait,
+    // otherwise Stop could take up to several minutes to take effect.
+    abortRef.current?.abort();
     addLog("Stop requested — finishing the current day, then halting.");
   };
 
@@ -131,8 +135,12 @@ export default function Backtest() {
       toast.error("The From date must be on or before the To date.");
       return;
     }
-    if (days.every((day) => isWeekend(day))) {
-      toast.error("The selected range contains no trading days (weekends only).");
+    // Only Sunday-only selections are unrunnable: Saturday EAT carries the
+    // Friday NY session tail (Saturday 00:00–01:00 EAT), which produces real
+    // triggers. The day loop below classifies each day with the same tested
+    // predicate the engine's accounting tests pin (dayReportSkipReason).
+    if (days.every((day) => isSunday(day))) {
+      toast.error("The selected range contains no session days (Sunday only).");
       return;
     }
 
@@ -147,6 +155,8 @@ export default function Backtest() {
     const isCurrent = () => runGeneration === runGenerationRef.current;
 
     stopRef.current = false;
+    const abortController = new AbortController();
+    abortRef.current = abortController;
     setIsRunning(true);
     setLogs([]);
     revokeZipUrl();
@@ -199,6 +209,7 @@ export default function Backtest() {
           endTime: "23:59",
           log: addLog,
           setCooldown: setCooldownSeconds,
+          signal: abortController.signal,
         });
         if (!continuousCsv) continuousError = "no usable OHLC data for continuous window";
       } catch (error) {
@@ -206,6 +217,12 @@ export default function Backtest() {
       }
 
       if (!isCurrent()) return;
+
+      // Stop pressed during the long continuous pull: exit quietly, no toast.
+      if (abortController.signal.aborted) {
+        addLog("Run halted by user.");
+        return;
+      }
 
       if (continuousError || !continuousCsv) {
         addLog(`Continuous backtest aborted — ${continuousError}`);
@@ -276,12 +293,19 @@ export default function Backtest() {
         const meta = dayCandleMeta.get(day);
         const strategyBreakdown = buildStrategyBreakdown(continuous.analysis.results, day);
 
-        // Weekends (and other calendar days with no bars) produce no market candles.
-        // Do not invent data; emit a SKIPPED report and keep rolling stats unchanged.
-        if (isWeekend(day) || (!meta && triggers.length === 0 && dayContext.length === 0)) {
-          const reason = isWeekend(day)
-            ? "weekend — no market session / no OHLC expected"
-            : "no OHLC bars for this calendar day in the continuous series";
+        // One skip predicate, pinned by tests/weekend-tail-accounting.test.mjs:
+        // a Saturday EAT carrying the Friday NY session tail (00:00–01:00 EAT)
+        // can hold real triggers and must be PROCESSED. A hard-coded
+        // isWeekend(day) here previously dropped 37 such trades from rolling
+        // stats and the packaged reports (2286 vs 2323 on the golden baseline).
+        const skipReason = dayReportSkipReason(
+          day,
+          Boolean(meta),
+          triggers.length,
+          dayContext.length,
+        );
+        if (skipReason) {
+          const reason = skipReason;
           working.skipped.push({ day, reason });
           setProgress({ done: i + 1, total: days.length });
           addLog(`${day}: SKIPPED — ${reason}`);
@@ -363,6 +387,10 @@ export default function Backtest() {
       }
 
       if (collected.length === 0) {
+        if (stopRef.current) {
+          addLog("Run halted by user.");
+          return;
+        }
         toast.error("Nothing was analysed.");
         return;
       }
@@ -382,7 +410,11 @@ export default function Backtest() {
         zipUrlRef.current = url;
         setZip({ name, url });
         addLog(`Bundled ${packaged.length} packaged report file(s) into ${name}.`);
-        toast.success(`Backtest finished — ${packaged.length} packaged report file(s) zipped`);
+        toast.success(
+          stopRef.current
+            ? `Backtest stopped — partial bundle with ${packaged.length} report file(s)`
+            : `Backtest finished — ${packaged.length} packaged report file(s) zipped`,
+        );
       } catch (error) {
         if (!isCurrent()) return;
         addLog(`ZIP packaging failed: ${String(error)}`);
@@ -400,6 +432,7 @@ export default function Backtest() {
         setCooldownSeconds(null);
         setIsRunning(false);
         runLockRef.current = false;
+        abortRef.current = null;
       }
     }
   };

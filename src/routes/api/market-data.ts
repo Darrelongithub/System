@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { AVAILABLE_SYMBOLS, type MarketDataJson } from "@/lib/market-data";
+import {
+  AVAILABLE_SYMBOLS,
+  isProviderRateLimit,
+  redactSecrets,
+  type MarketDataJson,
+} from "@/lib/market-data";
 import { ensureServerEnv } from "@/lib/server-env";
 
 const RequestSchema = z.object({
@@ -54,29 +59,18 @@ function configuredKeys(): string[] {
  */
 const UPSTREAM_TIMEOUT_MS = 20_000;
 
-/**
- * Twelve Data signals a rate limit in three different shapes (HTTP 429, a
- * numeric `code` inside a 200 body, or an error envelope mentioning credits),
- * so all three are checked. `data` is the parsed upstream body — untrusted.
- */
-function isRateLimited(response: Response, data: MarketDataJson | undefined): boolean {
-  const message = String(data?.message ?? "").toLowerCase();
-  return (
-    response.status === 429 ||
-    data?.code === 429 ||
-    (data?.status === "error" && message.includes("credit"))
-  );
-}
-
 async function proxy(request: Request): Promise<Response> {
   await ensureServerEnv(); // .env defaults; platform env wins; edge-safe no-op without fs
   try {
     return await proxyInner(request);
   } catch (error) {
-    // Provider transports can throw (DNS/TLS/offline hosts); a route must's
+    // Provider transports can throw (DNS/TLS/offline hosts); a route's
     // failure surface stays structured JSON — never an HTML stack page — so
     // callers can show the real reason instead of a generic "no data".
-    const message = error instanceof Error ? error.message : String(error);
+    const rawMessage = error instanceof Error ? error.message : String(error);
+    // Defense in depth: the keys only live in the upstream query string, but
+    // never let a stringified URL/request detail echo one back to the client.
+    const message = redactSecrets(rawMessage, collectTwelveDataKeys());
     return new Response(
       JSON.stringify({
         status: "error",
@@ -92,8 +86,17 @@ async function proxyInner(request: Request): Promise<Response> {
   try {
     body = RequestSchema.parse(await request.json());
   } catch (error) {
+    // String(new ZodError) serializes the ENTIRE issue tree, including the
+    // untrusted received values; report concise path/message pairs instead and
+    // cap the length so a malformed body cannot blow up the response.
+    const detail =
+      error instanceof z.ZodError
+        ? error.issues
+            .map((issue) => `${issue.path.join(".") || "body"}: ${issue.message}`)
+            .join("; ")
+        : String(error);
     return new Response(
-      JSON.stringify({ status: "error", message: `Invalid request: ${String(error)}` }),
+      JSON.stringify({ status: "error", message: `Invalid request: ${detail.slice(0, 300)}` }),
       {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -109,8 +112,7 @@ async function proxyInner(request: Request): Promise<Response> {
   }
 
   const keys = configuredKeys();
-  const keys0 = keys;
-  if (keys0.length === 0) {
+  if (keys.length === 0) {
     return new Response(
       JSON.stringify({
         status: "error",
@@ -145,18 +147,21 @@ async function proxyInner(request: Request): Promise<Response> {
       });
     } catch (error) {
       const timedOut = error instanceof Error && error.name === "TimeoutError";
+      const detail = error instanceof Error ? error.message : String(error);
       lastData = {
         status: "error",
+        // Redact before the envelope is returned: a URL-bearing transport
+        // error must not echo the ?apikey= query parameter.
         message: timedOut
           ? `Twelve Data did not respond within ${UPSTREAM_TIMEOUT_MS / 1000}s`
-          : `Twelve Data request failed: ${error instanceof Error ? error.message : String(error)}`,
+          : `Twelve Data request failed: ${redactSecrets(detail, collectTwelveDataKeys())}`,
       };
       lastWasRateLimit = false;
       continue; // try the next configured key, same as a rate-limit fallthrough
     }
     const data: MarketDataJson = await response.json().catch(() => ({}));
     lastData = data;
-    const rateLimited = isRateLimited(response, data);
+    const rateLimited = isProviderRateLimit(response, data);
     lastWasRateLimit = rateLimited;
     if (!rateLimited) {
       return new Response(JSON.stringify(data), {

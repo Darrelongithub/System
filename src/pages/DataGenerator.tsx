@@ -1,15 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import { format, addDays, subDays } from "date-fns";
+import { format } from "date-fns";
 import JSZip from "jszip";
-import { AVAILABLE_SYMBOLS, isCalibratedSymbol, requestMarketData } from "@/lib/market-data";
+import {
+  AVAILABLE_SYMBOLS,
+  isCalibratedSymbol,
+  isProviderNoData,
+  isProviderRateLimit,
+  requestMarketData,
+} from "@/lib/market-data";
 import {
   buildOhlcCsv,
+  cooldown,
   MAX_RATE_LIMIT_RETRIES,
-  removeRepeatedFlatlineArtifacts as removeRepeatedFlatlineArtifactsShared,
+  removeRepeatedFlatlineArtifacts,
 } from "@/lib/ohlc-generator";
 import { Link } from "@tanstack/react-router";
-import { setAnalysisSnapshot, type AnalysisChart } from "@/lib/analysis-store";
-import html2canvas from "html2canvas";
+import { setAnalysisSnapshot } from "@/lib/analysis-store";
 import {
   LineChart,
   Download,
@@ -20,20 +26,11 @@ import {
   Search,
   Brain,
   History,
+  Square,
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
   Command,
@@ -141,6 +138,9 @@ export default function Home() {
   const [consoleLogs, setConsoleLogs] = useState<string[]>([]);
   const [resumeTimer, setResumeTimer] = useState<number | null>(null);
 
+  /** Cancellation for an in-flight Generate run (Stop button). */
+  const abortRef = useRef<AbortController | null>(null);
+
   /**
    * Parses a "yyyy-MM-dd" string into a local-midnight Date. Using new Date(str)
    * yields UTC midnight, which then shifts by the browser offset once the value is
@@ -168,14 +168,12 @@ export default function Home() {
     }).format(new Date());
   };
 
-  const removeRepeatedFlatlineArtifacts = removeRepeatedFlatlineArtifactsShared;
+  /** Single source of truth for the OHLC CSV's name inside the ZIP/snapshot. */
+  const ohlcCsvFileName = () =>
+    `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`;
 
   // Generate TradingView-style SVG chart with real API data
-  const createSvgContent = (
-    fileName: string,
-    timeframe: string,
-    candleData: ChartCandle[],
-  ): string => {
+  const createSvgContent = (timeframe: string, candleData: ChartCandle[]): string => {
     // Filter out weekend dates (Saturday = 6, Sunday = 0)
     const processedCandles = candleData.filter((c) => {
       // Explicit weekend filter based on date
@@ -214,7 +212,6 @@ export default function Home() {
     const pricePadding = Math.max(0.5, (actualMax - actualMin) * 0.15);
     const displayMin = actualMin - pricePadding;
     const displayMax = actualMax + pricePadding;
-    const basePrice = processedCandles[processedCandles.length - 1].close;
 
     const priceToY = (price: number) => {
       return chartBottom - ((price - displayMin) / (displayMax - displayMin)) * chartHeight;
@@ -234,7 +231,6 @@ export default function Home() {
       time: string;
       isDate: boolean;
       x: number;
-      isEndTime?: boolean;
     }[] = [];
     let lastDate = "";
 
@@ -450,7 +446,7 @@ export default function Home() {
         }
       };
 
-      img.onerror = (e) => {
+      img.onerror = () => {
         clearTimeout(timeoutId);
         console.error("SVG to Image load error");
         resolve(null);
@@ -460,59 +456,19 @@ export default function Home() {
     });
   };
 
-  // Capture the freshly generated charts + CSV so the Analysis tab can feed them to the models.
-  const saveAnalysisSnapshot = async (csvOverride?: string | null) => {
-    try {
-      const filesSnapshot = generatedFilesDataRef.current;
-      const charts: AnalysisChart[] = [];
-      for (const tf of ["4h", "1h", "30m"]) {
-        const file = filesSnapshot.find(
-          (f) => f.type === tf && !!f.candleData && f.candleData.length > 0,
-        );
-        if (!file || !file.candleData) continue;
-        const svgContent = createSvgContent(file.name, tf, file.candleData);
-        const pngBlob = await svgToPng(svgContent);
-        if (!pngBlob) continue;
-        const pngDataUrl = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(String(reader.result));
-          reader.readAsDataURL(pngBlob);
-        });
-        charts.push({ name: file.name, timeframe: tf, pngDataUrl });
-      }
-      const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
-      setAnalysisSnapshot({
-        symbol,
-        createdAt: `${format(new Date(), "yyyy-MM-dd")} ${formatEATTime()}`,
-        range: `${ohlcStartDate} \u2192 ${ohlcEndDate}`,
-        csvName: csv
-          ? `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`
-          : null,
-        ohlcCsv: csv ?? null,
-        charts,
-      });
-    } catch (e) {
-      console.error("Failed to capture analysis snapshot", e);
-    }
-  };
-
-  const handleDownloadCsv = (csvOverride?: string | null) => {
-    const csvToUse = csvOverride !== undefined ? csvOverride : ohlcCsvData;
-    if (!csvToUse) {
-      toast.error("No OHLC data available yet");
-      return;
-    }
-    const csvFileName = `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`;
-    const blob = new Blob([csvToUse], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = csvFileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    toast.success(`Downloaded ${csvFileName}`);
+  // Persist the freshly generated CSV for the Analysis tab. Chart PNGs are NOT
+  // snapshotted: no page or verifier call reads snapshot images, and
+  // rasterizing three 1920x1080 PNGs into sessionStorage on every run used to
+  // burn time and overflow the quota, silently dropping the whole snapshot.
+  const saveAnalysisSnapshot = (csvOverride?: string | null) => {
+    const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
+    setAnalysisSnapshot({
+      symbol,
+      createdAt: `${format(new Date(), "yyyy-MM-dd")} ${formatEATTime()}`,
+      range: `${ohlcStartDate} → ${ohlcEndDate}`,
+      csvName: csv ? ohlcCsvFileName() : null,
+      ohlcCsv: csv ?? null,
+    });
   };
 
   const handleDownload = async (csvOverride?: string | null) => {
@@ -549,7 +505,7 @@ export default function Home() {
           for (const file of files) {
             try {
               if (file.candleData && file.candleData.length > 0) {
-                const svgContent = createSvgContent(file.name, timeframe, file.candleData);
+                const svgContent = createSvgContent(timeframe, file.candleData);
                 const pngBlob = await svgToPng(svgContent);
                 // Never allow the forex pair slash to become a ZIP folder.
                 const safeFileName = file.name.replace(/[/\\]/g, "");
@@ -569,7 +525,7 @@ export default function Home() {
 
       // Add OHLC CSV if applicable
       if (hasCsv && csvToUse) {
-        const csvFileName = `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`;
+        const csvFileName = ohlcCsvFileName();
         zip.file(csvFileName, csvToUse);
         addedCount++;
       }
@@ -609,6 +565,7 @@ export default function Home() {
         endTime: ohlcEndTime,
         log: addLog,
         setCooldown: setResumeTimer,
+        signal: abortRef.current?.signal,
       });
     } catch {
       return null;
@@ -619,18 +576,21 @@ export default function Home() {
     tf: string,
     fromDate: string,
     toDate: string,
-    endDateStrParam?: string,
-  ): Promise<ChartCandle[]> => {
+    signal?: AbortSignal,
+  ): Promise<ChartCandle[] | null> => {
     // Bounded rate-limit retry: the chart fetch path previously retried a
     // Twelve Data 429 forever (while(true)), so a persistently rate-limited
     // account hung the UI with isGenerating stuck true and no way to stop it.
     // The OHLC path (ohlc-generator.ts) already aborts after MAX_RATE_LIMIT_RETRIES;
     // mirror that contract here. Non-rate-limit failures still return [] immediately.
+    // A user Stop returns null so callers can tell cancellation from "no data".
     let rateLimitAttempts = 0;
     while (rateLimitAttempts <= MAX_RATE_LIMIT_RETRIES) {
+      if (signal?.aborted) return null;
       try {
         // Add delay to respect rate limits (8 credits per minute max)
         await new Promise((resolve) => setTimeout(resolve, 150));
+        if (signal?.aborted) return null;
 
         // The browser never receives a provider credential; the server proxy owns key rotation.
         const interval = tf === "4h" ? "4h" : tf === "30m" ? "30min" : "1h";
@@ -641,20 +601,14 @@ export default function Home() {
           symbol,
           interval,
           start_date: cleanFromDate,
-          end_date: endDateStrParam ? endDateStrParam.replace(" ", "T") : cleanToDate,
+          end_date: cleanToDate,
           timezone: "Africa/Nairobi",
           outputsize: "5000",
+          signal,
         });
 
-        // Detect rate limit (can be HTTP 429 OR a 200 OK with status: 'error')
-        const isRateLimit =
-          response.status === 429 ||
-          (data.status === "error" &&
-            data.message &&
-            data.message.includes("run out of API credits")) ||
-          data.code === 429;
-
-        if (isRateLimit) {
+        // Same three-shape rate-limit classification every other fetch uses.
+        if (isProviderRateLimit(response, data)) {
           rateLimitAttempts += 1;
           if (rateLimitAttempts > MAX_RATE_LIMIT_RETRIES) {
             addLog(
@@ -666,25 +620,20 @@ export default function Home() {
           addLog(
             `🛑 Twelve Data rate limit reached. Waiting 60 seconds before retrying (${rateLimitAttempts}/${MAX_RATE_LIMIT_RETRIES})...`,
           );
-          setResumeTimer(60);
-          await new Promise((resolve) => setTimeout(resolve, 60000));
-          setResumeTimer(null);
+          // Shared, Stop-interruptible countdown (a second interval here used
+          // to race this wait and tick the display at double speed).
+          await cooldown(60, setResumeTimer, signal);
           addLog(`✅ Timer expired, retrying.`);
           continue;
         }
 
-        // Handle specific "No data" API response which sometimes comes as a 400
-        const isNoData =
-          (data.code === 400 || data.status === "error") &&
-          data.message &&
-          data.message.includes("No data is available");
-
-        if (isNoData) {
+        // Twelve Data answers an empty trading window with a 400 envelope.
+        if (isProviderNoData(data)) {
           addLog(`⚠️ API returned no data for this period`);
           return [];
         }
 
-        if (!response.ok && !isRateLimit) {
+        if (!response.ok) {
           addLog(
             `❌ API Error: ${response.status} - ${String(data?.message ?? "").substring(0, 50)}`,
           );
@@ -719,6 +668,10 @@ export default function Home() {
 
         return cleanedCandles.candles;
       } catch (error) {
+        if (signal?.aborted) {
+          addLog(`🛑 Chart generation stopped by user.`);
+          return null;
+        }
         const errMsg = `❌ Fetch error: ${String(error).substring(0, 50)}`;
         addLog(errMsg);
         return [];
@@ -729,21 +682,26 @@ export default function Home() {
 
   const executeGeneration = async (
     startDateObj: Date,
-    endDateObj: Date,
     daysSpan: number,
     endHour: number,
     endMin: number,
     timeframes: Array<{ tf: string; label: string; lookbackHours: number }>,
+    signal?: AbortSignal,
   ) => {
     let totalFilesAdded = 0;
 
     // Generate one chart per trading day for each timeframe.
     for (const { tf, label, lookbackHours } of timeframes) {
+      if (signal?.aborted) break;
       addLog(`\n📊 Starting ${label} generation...`);
       let fileCount = 0;
       const generatedTargetDates = new Set<string>();
 
       for (let dayOffset = 0; dayOffset < daysSpan; dayOffset++) {
+        if (signal?.aborted) {
+          addLog(`🛑 Chart generation stopped by user.`);
+          return totalFilesAdded;
+        }
         // Resolve weekend selections to the previous trading day instead of
         // silently producing no charts (for example, a Sunday-only range).
         const currentTargetDate = new Date(startDateObj);
@@ -810,13 +768,15 @@ export default function Home() {
         const fromDateStr = format(chartStartDate, "yyyy-MM-dd HH:mm");
         const toDateStr = format(chartEndDate, "yyyy-MM-dd HH:mm");
 
-        // ALWAYS use the end date. The TwelveData API needs the end date to know *where* to stop counting backwards from.
-        // If we omit it, it defaults to "now", but we might be fetching data for yesterday!
-        const endDateStrParam = toDateStr;
-
+        // The end date tells Twelve Data where to count backwards from;
+        // omitting it would default to "now" and silently fetch today instead
+        // of the requested historical day.
         try {
           // Fetch real data from API
-          const candleData = await fetchCandleData(tf, fromDateStr, toDateStr, endDateStrParam);
+          const candleData = await fetchCandleData(tf, fromDateStr, toDateStr, signal);
+
+          // null = user stopped the run; stop all scheduling immediately.
+          if (candleData === null) return totalFilesAdded;
 
           if (candleData && candleData.length > 0) {
             // We use the EAT dates for the file name so the user sees their time
@@ -867,29 +827,16 @@ export default function Home() {
     return totalFilesAdded;
   };
 
-  useEffect(() => {
-    if (resumeTimer === null) return;
+  // The visible cooldown countdown is driven exclusively by cooldown()
+  // (src/lib/ohlc-generator.ts), which ticks setResumeTimer once per second
+  // and is Stop-interruptible. A second setInterval here used to race that
+  // driver, ticking the displayed countdown at double speed.
 
-    let timerRef: NodeJS.Timeout;
-
-    // Only set up interval if we actually have a timer running
-    if (resumeTimer > 0) {
-      timerRef = setInterval(() => {
-        setResumeTimer((prev) => {
-          if (prev === null) return null;
-          if (prev <= 1) {
-            clearInterval(timerRef);
-            return 0; // Reach 0 to trigger the effect
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (timerRef) clearInterval(timerRef);
-    };
-  }, [resumeTimer]);
+  const handleStop = () => {
+    abortRef.current?.abort();
+    setResumeTimer(null);
+    addLog("🛑 Stop requested — halting generation.");
+  };
 
   const handleGenerate = async () => {
     if (!symbol || !chartStartDate || !chartEndDate) {
@@ -900,7 +847,11 @@ export default function Home() {
     // Guard against an inverted date range, which would compute a negative
     // daysSpan and silently generate nothing (with a misleading success toast).
     if (parseLocalDate(chartEndDate) < parseLocalDate(chartStartDate)) {
-      toast.error("End date must be on or after the start date");
+      toast.error("Chart end date must be on or after the start date");
+      return;
+    }
+    if (includeOhlc && parseLocalDate(ohlcEndDate) < parseLocalDate(ohlcStartDate)) {
+      toast.error("OHLC end date must be on or after the start date");
       return;
     }
 
@@ -908,15 +859,12 @@ export default function Home() {
       setConsoleLogs([]); // Clear console
       setResumeTimer(null);
 
-      // Don't clear generated files on resume, only on fresh start
-      if (!isGenerating) {
-        setGeneratedFiles([]);
-        generatedFilesRef.current = [];
-        generatedFilesDataRef.current = [];
-        addLog("🚀 Starting generation...");
-      } else {
-        addLog("▶️ Resuming generation...");
-      }
+      // The Generate button is disabled for the whole run, so every entry is
+      // a fresh start (there is no resume path anymore).
+      setGeneratedFiles([]);
+      generatedFilesRef.current = [];
+      generatedFilesDataRef.current = [];
+      addLog("🚀 Starting generation...");
 
       setIsGenerating(true);
 
@@ -927,26 +875,18 @@ export default function Home() {
         [endHour, endMin] = endTime.split(":").map(Number);
       }
 
-      if (!isGenerating) {
-        if (useCustomEndTime) {
-          addLog(`⏰ Time: 00:00 to ${endHour}:${String(endMin).padStart(2, "0")} EAT`);
-        } else {
-          addLog(`⏰ Time: Latest available data`);
-        }
-
-        // Calculate date range
-        const startDateObj = parseLocalDate(chartStartDate);
-        const endDateObj = parseLocalDate(chartEndDate);
-        const daysSpan =
-          Math.floor((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-
-        addLog(`📅 Dates: ${chartStartDate} to ${chartEndDate} (${daysSpan} days)`);
+      if (useCustomEndTime) {
+        addLog(`⏰ Time: 00:00 to ${endHour}:${String(endMin).padStart(2, "0")} EAT`);
+      } else {
+        addLog(`⏰ Time: Latest available data`);
       }
 
       const startDateObj = parseLocalDate(chartStartDate);
       const endDateObj = parseLocalDate(chartEndDate);
       const daysSpan =
         Math.floor((endDateObj.getTime() - startDateObj.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+      addLog(`📅 Dates: ${chartStartDate} to ${chartEndDate} (${daysSpan} days)`);
 
       // Chart windows are expressed in trading days:
       // 4H = 13 days, 1H = 5 days, 30M = 3 days.
@@ -956,15 +896,17 @@ export default function Home() {
         { tf: "30m", label: "30M", lookbackHours: 3 },
       ];
 
-      if (!isGenerating) {
-        setProgress({
-          "4h": { status: "running", current: 0, total: daysSpan },
-          "30m": { status: "running", current: 0, total: daysSpan },
-          "1h": { status: "running", current: 0, total: daysSpan },
-        });
-      }
+      setProgress({
+        "4h": { status: "running", current: 0, total: daysSpan },
+        "30m": { status: "running", current: 0, total: daysSpan },
+        "1h": { status: "running", current: 0, total: daysSpan },
+      });
 
-      const localRateLimitHit = false;
+      // Fresh cancellation scope for this run; Stop aborts in-flight fetches
+      // and any 60s rate-limit cooldown immediately.
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
 
       const runBatch = async () => {
         try {
@@ -981,12 +923,16 @@ export default function Home() {
           if (includeCharts) {
             filesAdded = await executeGeneration(
               startDateObj,
-              endDateObj,
               daysSpan,
               finalEndHour,
               finalEndMin,
               timeframes,
+              controller.signal,
             );
+            if (controller.signal.aborted) {
+              addLog(`🛑 Generation stopped; ${filesAdded} chart file(s) kept.`);
+              return;
+            }
             if (filesAdded === 0) {
               addLog(
                 `⚠️ No chart files were generated. Check the selected dates and API response.`,
@@ -997,11 +943,15 @@ export default function Home() {
 
           // Step 2: Fetch OHLC data if selected
           let fetchedCsv: string | null = null;
-          if (includeOhlc) {
+          if (includeOhlc && !controller.signal.aborted) {
             fetchedCsv = await fetchOhlcData();
+            if (controller.signal.aborted) {
+              addLog(`🛑 OHLC fetch stopped; ${filesAdded} chart file(s) kept.`);
+              return;
+            }
             setOhlcCsvData(fetchedCsv);
             if (fetchedCsv) {
-              const csvFileName = `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`;
+              const csvFileName = ohlcCsvFileName();
               const ohlcEntry = {
                 name: csvFileName,
                 time: formatEATTime(),
@@ -1013,24 +963,30 @@ export default function Home() {
             }
           }
 
-          setIsGenerating(false);
           setResumeTimer(null);
           addLog(`\n🎉 All done! Starting download...`);
           toast.success(`Complete! Packaging download...`);
 
           if (filesAdded > 0 || fetchedCsv) {
-            await saveAnalysisSnapshot(fetchedCsv);
-            handleDownload(fetchedCsv);
+            saveAnalysisSnapshot(fetchedCsv);
+            void handleDownload(fetchedCsv);
           }
         } catch (error) {
-          addLog(`❌ Error: ${String(error)}`);
-          toast.error("Error during generation");
+          if (controller.signal.aborted) {
+            addLog(`🛑 Generation stopped.`);
+          } else {
+            addLog(`❌ Error: ${String(error)}`);
+            toast.error("Error during generation");
+          }
+        } finally {
           setIsGenerating(false);
+          setResumeTimer(null);
+          abortRef.current = null;
         }
       };
 
       // Start the first batch
-      runBatch();
+      void runBatch();
     } catch (error) {
       addLog(`❌ Error: ${String(error)}`);
       toast.error("Error starting generation");
@@ -1380,24 +1336,41 @@ export default function Home() {
               </label>
             </div>
 
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating || (!includeCharts && !includeOhlc)}
-              className="w-full h-12 font-black text-sm tracking-wide rounded-xl bg-primary hover:bg-primary/85 text-white shadow-lg shadow-primary/20 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
-              data-testid="button-generate"
-            >
+            <div className="flex gap-2">
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating || (!includeCharts && !includeOhlc)}
+                className="flex-1 h-12 font-black text-sm tracking-wide rounded-xl bg-primary hover:bg-primary/85 text-white shadow-lg shadow-primary/20 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed"
+                data-testid="button-generate"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing…
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-4 w-4" />
+                    Generate & Download
+                  </>
+                )}
+              </Button>
               {isGenerating ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processing…
-                </>
-              ) : (
-                <>
-                  <Download className="mr-2 h-4 w-4" />
-                  Generate & Download
-                </>
-              )}
-            </Button>
+                <Button
+                  onClick={handleStop}
+                  variant="outline"
+                  className="h-12 px-4 rounded-xl border-red-500/40 text-red-400 hover:bg-red-500/10"
+                  data-testid="button-stop"
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              ) : null}
+            </div>
+            {resumeTimer !== null && resumeTimer > 0 ? (
+              <p className="text-center text-[11px] font-mono text-amber-400">
+                Provider rate limit — retrying in {resumeTimer}s
+              </p>
+            ) : null}
           </div>
         </aside>
 

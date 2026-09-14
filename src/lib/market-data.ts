@@ -106,6 +106,8 @@ export interface MarketDataRequest {
   end_date?: string;
   timezone: string;
   outputsize: string;
+  /** Caller-owned cancellation (Stop button). Never sent to the server. */
+  signal?: AbortSignal;
 }
 
 /**
@@ -141,14 +143,60 @@ export interface MarketDataJson {
   values?: ProviderCandle[];
 }
 
+/**
+ * Remove any configured secret from a human-readable error string before it
+ * crosses a trust boundary (logs, toasts, JSON error envelopes). Keys travel
+ * only in the upstream query string, but a transport error (or future code
+ * path) that stringifies a URL would otherwise leak them. Splitting/joining
+ * avoids regex-meta issues and leaves short fragments (<4 chars) untouched so
+ * normal text is never mangled.
+ */
+export function redactSecrets(text: string, secrets: readonly string[]): string {
+  let out = text;
+  for (const secret of secrets) {
+    if (secret && secret.length >= 4) out = out.split(secret).join("[redacted]");
+  }
+  return out;
+}
+
+/**
+ * Twelve Data signals a rate limit in three different shapes (HTTP 429, a
+ * numeric `code` inside a 200 body, or an error envelope mentioning credits),
+ * so all three are checked. `data` is the parsed body — untrusted. Single
+ * source of truth for every retry loop (generator charts, OHLC builder and
+ * the server proxy must classify a response identically).
+ */
+export function isProviderRateLimit(response: Response, data: MarketDataJson): boolean {
+  const message = String(data.message ?? "").toLowerCase();
+  return (
+    response.status === 429 ||
+    data.code === 429 ||
+    (data.status === "error" && message.includes("credit"))
+  );
+}
+
+/** Twelve Data answers a valid-but-empty window with a 400 "No data is available" envelope. */
+export function isProviderNoData(data: MarketDataJson): boolean {
+  return (
+    (data.code === 400 || data.status === "error") &&
+    String(data.message ?? "")
+      .toLowerCase()
+      .includes("no data is available")
+  );
+}
+
 /** Proxy market-data requests through the server so provider credentials never enter the client bundle. */
 export async function requestMarketData(
   request: MarketDataRequest,
 ): Promise<{ response: Response; data: MarketDataJson }> {
+  const { signal, ...body } = request;
   const response = await fetch("/api/market-data", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(request),
+    body: JSON.stringify(body),
+    // Forwarded to the same-origin proxy; lets the Stop button cancel an
+    // in-flight provider call instead of waiting for its 20s timeout.
+    signal,
   });
   const text = await response.text();
   let data: MarketDataJson = {};

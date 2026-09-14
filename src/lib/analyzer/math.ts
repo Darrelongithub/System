@@ -2,10 +2,10 @@ import type { Outcome } from "./types";
 
 export const RR_THRESHOLD = 2;
 export const RR_FAIL_REASON = "RR below 1:2 threshold";
-export const SL_SIDE_REASON = "INVALID: SL on wrong side of entry";
-export const NON_POSITIVE_RISK_REASON = "INVALID: non-positive risk — SL invalid for direction";
-export const IMPOSSIBLE_PRICES_REASON = "INVALID: non-finite or non-positive price after spread";
-export const NON_FINITE_RR_REASON = "INVALID: non-finite RR";
+const SL_SIDE_REASON = "INVALID: SL on wrong side of entry";
+const NON_POSITIVE_RISK_REASON = "INVALID: non-positive risk — SL invalid for direction";
+const IMPOSSIBLE_PRICES_REASON = "INVALID: non-finite or non-positive price after spread";
+const NON_FINITE_RR_REASON = "INVALID: non-finite RR";
 
 export interface SpreadAdjusted {
   entry: number;

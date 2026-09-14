@@ -339,9 +339,10 @@ export function evaluateSetupStatus(
       continue;
     }
 
-    // Deterministic OHLC ambiguity policy (SAME_CANDLE_TP_SL_RULE in pipeline/policy.ts):
-    // when both TP and SL are touched on this post-fill candle, TP is checked first.
-    // This is not a claim about true tick order; changing it requires golden re-baseline.
+    // Deterministic same-candle ambiguity policy: when both TP and SL are
+    // touched on this post-fill candle, TP is checked first. This is not a
+    // claim about true tick order; changing it requires a golden re-baseline
+    // (pinned by tests/causality.test.mjs and the golden trades).
     if (touched(candle, row.tp)) {
       return {
         setupStatus: "RESOLVED",

@@ -32,10 +32,6 @@ export function eatDay(datetime: string): string {
   return eatParts(datetime)?.day ?? String(datetime).trim().split(/[ T]/)[0] ?? "";
 }
 
-export function eatMinutes(datetime: string): number | undefined {
-  return eatParts(datetime)?.minutesOfDay;
-}
-
 /**
  * Session windows in EAT. These mirror the generator's labels
  * (asian / london / ny) so both sides of the pipeline agree.

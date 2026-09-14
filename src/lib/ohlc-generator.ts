@@ -1,5 +1,10 @@
 import { format, addDays, subDays } from "date-fns";
-import { requestMarketData, type ProviderCandle } from "./market-data";
+import {
+  isProviderNoData,
+  isProviderRateLimit,
+  requestMarketData,
+  type ProviderCandle,
+} from "./market-data";
 
 export type LogFn = (msg: string) => void;
 export type CooldownSetter = (seconds: number | null) => void;
@@ -100,6 +105,8 @@ export interface OhlcCsvOptions {
   setCooldown: CooldownSetter;
   /** Internal: remaining 60s rate-limit retries. Never retried forever. */
   rateLimitRetries?: number;
+  /** User cancellation (Stop button). Aborts in-flight fetches and cooldown waits. */
+  signal?: AbortSignal;
 }
 
 /** Hard cap on consecutive 60s rate-limit waits per OHLC fetch. */
@@ -148,11 +155,36 @@ export function chunkDateRange(
  * Shared per-second cooldown / credit-replenishment timer used by the generator
  * and by the Auto-Backtester between daily iterations. It ticks the visible
  * countdown once per second instead of blocking silently.
+ *
+ * Pass an AbortSignal so the Stop button can interrupt a 60s rate-limit wait
+ * instead of leaving the UI locked. Abortion throws the signal's reason (an
+ * AbortError by default) and clears the countdown on the way out.
  */
-export const cooldown = async (seconds: number, setCooldown: CooldownSetter) => {
+export const cooldown = async (
+  seconds: number,
+  setCooldown: CooldownSetter,
+  signal?: AbortSignal,
+) => {
+  if (signal?.aborted) {
+    setCooldown(null);
+    throw signal.reason instanceof Error ? signal.reason : new Error("aborted");
+  }
   for (let remaining = seconds; remaining > 0; remaining--) {
     setCooldown(remaining);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, 1000);
+      signal?.addEventListener(
+        "abort",
+        () => {
+          clearTimeout(timer);
+          // Clear the visible countdown on the way out, as documented; the
+          // normal completion path below would otherwise be skipped by throw.
+          setCooldown(null);
+          reject(signal.reason instanceof Error ? signal.reason : new Error("aborted"));
+        },
+        { once: true },
+      );
+    });
   }
   setCooldown(null);
 };
@@ -577,15 +609,11 @@ export const validateOhlcExport = ({
   exportedRows,
   headerColumns,
   dataRows,
-  startDate,
-  endDate,
 }: {
   rows: EnrichedCandle[];
   exportedRows: EnrichedCandle[];
   headerColumns: string[];
   dataRows: unknown[][];
-  startDate: string;
-  endDate: string;
   log: LogFn;
 }) => {
   const ATR_PERIODS = 14;
@@ -634,7 +662,15 @@ export const validateOhlcExport = ({
 
   const reliableTrueCount = exportedRows.filter((row) => row.isReliable === true).length;
   const reliableFalseCount = exportedRows.filter((row) => row.isReliable === false).length;
-  const reliabilityPassed = reliableTrueCount > 0 && reliableFalseCount > 0;
+  // The "must contain at least one unreliable row" check is a canary for a
+  // dead/constant is_reliable column, NOT a property of valid data. On real
+  // full-scale windows unreliable rows always occur (~20% of the golden
+  // baseline), so require the canary past ~10 trading days; below that a
+  // genuinely clean short window (e.g. a same-day fetch) must not be blocked.
+  const RELIABILITY_CANARY_MIN_ROWS = 500;
+  const reliabilityCanaryActive = exportedRows.length >= RELIABILITY_CANARY_MIN_ROWS;
+  const reliabilityPassed =
+    reliableTrueCount > 0 && (!reliabilityCanaryActive || reliableFalseCount > 0);
   const thresholdRows = exportedRows.filter(
     (row) => row.localAvgRange > 0 && row.range < 0.1 * row.localAvgRange,
   );
@@ -794,7 +830,7 @@ export const validateOhlcExport = ({
 
   const report = [
     `Schema integrity: ${schemaPassed ? "PASS" : "FAIL"} (${dataRows.length}/${dataRows.length} rows match header${schemaMismatches.length > 0 ? `; first mismatch row ${schemaMismatches[0].index + 1} at ${schemaMismatches[0].timestamp}` : ""}${emptyColumns.length > 0 ? `; empty columns: ${emptyColumns.join(", ")}` : ""})`,
-    `is_reliable: ${reliabilityPassed ? "PASS" : "FAIL"} (${reliableTrueCount} true / ${reliableFalseCount} false)`,
+    `is_reliable: ${reliabilityPassed ? "PASS" : "FAIL"} (${reliableTrueCount} true / ${reliableFalseCount} false${reliabilityCanaryActive ? "" : `; false-row canary skipped below ${RELIABILITY_CANARY_MIN_ROWS} rows`})`,
     `is_reliable threshold match: ${thresholdPassed ? "PASS" : "FAIL"} (${thresholdRows.length - thresholdMismatches.length}/${thresholdRows.length} flatline candles correctly flagged)`,
     `Continuity: PASS (max gap ${maxContinuityGap.toFixed(5)}, 95th pct ${p95ContinuityGap.toFixed(5)})`,
     `ATR spot-check: ${atrPassed ? "PASS" : "FAIL"} (avg diff ${atrAverageDifference.toFixed(5)}, tolerance ${atrTolerance.toFixed(5)})`,
@@ -865,6 +901,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
         start_date: fetchStart + " 00:00:00",
         end_date: fetchEnd + " 23:59:59",
         timezone: "Africa/Nairobi",
+        signal: options.signal,
         outputsize: String(
           Math.min(
             5000,
@@ -882,15 +919,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
         ),
       });
 
-      const isRateLimit =
-        response.status === 429 ||
-        data.code === 429 ||
-        (data.status === "error" &&
-          String(data.message || "")
-            .toLowerCase()
-            .includes("credit"));
-
-      if (isRateLimit) {
+      if (isProviderRateLimit(response, data)) {
         const retriesLeft = options.rateLimitRetries ?? MAX_RATE_LIMIT_RETRIES;
         if (retriesLeft <= 0) {
           addLog(
@@ -902,7 +931,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
         addLog(
           `🛑 Twelve Data rate limit reached. Waiting 60 seconds before retrying (${attempt}/${MAX_RATE_LIMIT_RETRIES})...`,
         );
-        await cooldown(60, setCooldown);
+        await cooldown(60, setCooldown, options.signal);
         addLog(`✅ OHLC retry window opened.`);
         return buildOhlcCsv({ ...options, rateLimitRetries: retriesLeft - 1 });
       }
@@ -939,18 +968,11 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
             start_date: start + " 00:00:00",
             end_date: end + " 23:59:59",
             timezone: "Africa/Nairobi",
+            signal: options.signal,
             outputsize: String(Math.min(5000, Math.max(100, (chunkSpanDays + 3) * 48))),
           });
 
-          const isRateLimit =
-            response.status === 429 ||
-            data.code === 429 ||
-            (data.status === "error" &&
-              String(data.message || "")
-                .toLowerCase()
-                .includes("credit"));
-
-          if (isRateLimit) {
+          if (isProviderRateLimit(response, data)) {
             if (retriesLeft <= 0) {
               addLog(
                 `❌ Twelve Data rate limit persisted through ${MAX_RATE_LIMIT_RETRIES} retry windows; aborting this fetch instead of retrying forever. Try a smaller window or later.`,
@@ -962,18 +984,12 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
               `🛑 Twelve Data rate limit reached on chunk ${i + 1}/${ranges.length}. Waiting 60 seconds before retrying (${attempt}/${MAX_RATE_LIMIT_RETRIES})...`,
             );
             retriesLeft -= 1;
-            await cooldown(60, setCooldown);
+            await cooldown(60, setCooldown, options.signal);
             addLog(`✅ OHLC retry window opened.`);
             continue; // retry the same chunk
           }
 
-          const isNoDataForChunk =
-            (data.code === 400 || data.status === "error") &&
-            String(data.message || "")
-              .toLowerCase()
-              .includes("no data is available");
-
-          if (isNoDataForChunk) {
+          if (isProviderNoData(data)) {
             addLog(`⚠️ No OHLC data found for chunk ${i + 1}/${ranges.length} (${start} → ${end})`);
             break; // contributes zero rows; move to next chunk
           }
@@ -1271,8 +1287,6 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       exportedRows: enrichedRows,
       headerColumns,
       dataRows,
-      startDate: ohlcStartDate,
-      endDate: ohlcEndDate,
     });
 
     if (!validation.passed) {
@@ -1353,6 +1367,13 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     );
     return csv;
   } catch (error) {
+    // User-initiated Stop: keep the message neutral and never enter the
+    // (potentially 5×60s) retry path — the caller discards the result anyway.
+    if (options.signal?.aborted) {
+      setCooldown(null);
+      addLog(`🛑 OHLC fetch stopped by user.`);
+      return null;
+    }
     addLog(`❌ OHLC fetch error: ${String(error)}`);
     return null;
   }
