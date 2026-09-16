@@ -35,6 +35,7 @@ import {
   type DayTrigger,
 } from "@/lib/backtest/engine";
 import { analyseContinuous, contextLogForDay } from "@/lib/pipeline/continuous";
+import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 
 const AI_STAGE_LABELS: Record<AiStage, string> = {
@@ -238,6 +239,20 @@ export default function Backtest() {
         toast.error(continuous.error);
         return;
       }
+
+      // Same production gate as the live page: the replay must not present a
+      // book from a series whose warm-up or trend layer cannot support the
+      // decision. A short/spliced window would silently replay a different
+      // engine than the one the live analyzer runs.
+      const contract = continuous.analysis.contract;
+      if (!contract.ok) {
+        const message = `Series rejected: ${contract.failures.join("; ")}`;
+        addLog(message);
+        addLog(formatSeriesContract(contract));
+        toast.error(message);
+        return;
+      }
+      for (const warning of contract.warnings) addLog(`Series contract warning: ${warning}`);
 
       addLog(
         `Continuous pass: ${continuous.tradeTriggers.length} trade trigger(s), ${continuous.contextEvents.length} context observation(s).`,

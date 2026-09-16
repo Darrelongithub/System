@@ -17,6 +17,7 @@
  */
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
 import { ANALYZER_CERTIFIED_OPTIONS } from "../src/lib/analyzer/config.ts";
+import { formatSeriesContract } from "../src/lib/analyzer/series-contract.ts";
 import { readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
@@ -130,6 +131,9 @@ const summary = {
   runAnalysisMs,
   options: OPTIONS,
   inputs: inputHashes,
+  // The locked fixture must satisfy the production series contract, otherwise the
+  // regression lock would be replaying a series the live product refuses.
+  seriesContract: analysis.contract,
   note:
     "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped " +
     "product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) " +
@@ -168,3 +172,4 @@ console.log(
 console.log(
   `contextPasses: ${analysis.contextPasses.length}, analyzedRows: ${analysis.analyzedRows}`,
 );
+console.log(`series contract: ${formatSeriesContract(analysis.contract)}`);

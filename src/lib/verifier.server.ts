@@ -4,13 +4,18 @@
  */
 
 import { ensureServerEnv } from "./server-env";
+import { stripHindsightColumns } from "./verifier-input";
 
 const VERIFIER_SYSTEM_PROMPT = `I'm sending this app's own analysis output: the SUMMARY block, the Live/Actionable PASS setups list
 (with setup_status), the Overlaps section, and the raw 30M OHLC with precomputed columns (is_reliable,
-atr_30m, similar_swing_retrace_pct, similar_swing_refs) and metadata (data_age, spread_convention,
-atr_method, similar_swing_selection_rule). Find the one trade worth taking from the PASS list — any
-strategy the data already validated. Prefer a limit order at an untouched level over forcing a
-market entry.
+atr_30m, similar_swing_refs) and metadata (data_age, spread_convention, atr_method,
+similar_swing_selection_rule). Find the one trade worth taking from the PASS list — any strategy the
+data already validated. Prefer a limit order at an untouched level over forcing a market entry.
+
+The CSV's similar_swing_retrace_pct, similar_swing_continued_pct and swing_invalidated columns are
+blanked on purpose: they are measured from bars AFTER the row they describe, so they are hindsight and
+are never knowable when the decision is made. Do not ask for them, estimate them, or reason from any
+forward-looking outcome.
 
 Gate: confirm all 4 metadata fields are present and at least one Live/Actionable setup exists. If
 either is missing, say so and stop — don't compute substitutes.
@@ -27,9 +32,9 @@ Rules:
   broken math and must never be picked, regardless of which strategy produced them.
 - If citing any candle beyond the setup's own trigger candle (e.g. supporting structure), cite only
   is_reliable=true rows — trust the flag.
-- Use atr_30m and similar_swing_retrace_pct/similar_swing_refs directly, don't recompute. For limit
-  entries, check distance vs similar_swing_retrace_pct using cited similar_swing_refs; flag
-  atypically deep retracement with no move toward it, prefer the next setup.
+- Use atr_30m and similar_swing_refs directly, don't recompute. For limit entries, judge distance
+  against the swing levels the similar_swing_refs timestamps point at, using that row's own OHLC —
+  never against a retracement percentage (see the hindsight note above).
 - Prioritize fill probability over max RR; avoid the deepest zone edge unless a full retrace is
   likely.
 - State data_age, diffed vs today, in the output.
@@ -146,12 +151,23 @@ export async function runVerification(input: {
   ohlcCsv?: string;
 }): Promise<VerifyResult> {
   await ensureServerEnv(); // .env defaults; platform env wins; edge-safe no-op without fs
+  // Hindsight-derived columns are removed before anything is sent to the model:
+  // the verifier must see what the live analyzer would have seen at decision time
+  // (see verifier-input.ts). Done before trimming so the truncation notice still
+  // describes the document the model receives.
+  const { csv: liveOnlyCsv, strippedColumns } = stripHindsightColumns((input.ohlcCsv ?? "").trim());
+
   const userContent = [
     "--- ANALYZER OUTPUT (SUMMARY + LIVE/ACTIONABLE PASS setups + Overlaps) ---",
     input.scoutData.trim(),
     "",
     "--- RAW 30M OHLC WITH PRECOMPUTED COLUMNS AND METADATA ---",
-    trimCsv((input.ohlcCsv ?? "").trim()) || "(none supplied)",
+    trimCsv(liveOnlyCsv) || "(none supplied)",
+    ...(strippedColumns.length > 0
+      ? [
+          `(note: ${strippedColumns.join(", ")} omitted — measured from later bars, not knowable at decision time)`,
+        ]
+      : []),
   ].join("\n");
 
   const messages = [

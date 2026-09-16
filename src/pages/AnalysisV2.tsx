@@ -13,6 +13,7 @@ import {
   type HtfFilterComparison,
 } from "@/lib/analyzer/run";
 import { ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
+import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
 import type { VerifyResult } from "@/lib/verifier.functions";
@@ -79,6 +80,21 @@ export default function AnalysisV2() {
       setStatus("error");
       return;
     }
+    // Production gate: a series that cannot support the decision (too short a
+    // warm-up, unresolved swing references, collapsed trend distribution) must
+    // not be presented as an actionable analysis. Refusing here is the product
+    // behaviour the backtest↔live parity tests assume.
+    const contract = outcome.analysis.contract;
+    if (!contract.ok) {
+      setAnalysis(null);
+      setError(
+        `CSV rejected before analysis could be trusted: ${contract.failures.join("; ")}. ` +
+          `(${formatSeriesContract(contract)})`,
+      );
+      setStatus("error");
+      return;
+    }
+    for (const warning of contract.warnings) console.warn(`[series contract] ${warning}`);
     setAnalysis(outcome.analysis);
     // Cleared here, filled by the deferred effect below — never left showing
     // the previous CSV's numbers.

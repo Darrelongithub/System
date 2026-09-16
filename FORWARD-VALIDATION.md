@@ -1,6 +1,17 @@
 # Forward validation
 
-How a rule that is already shipped gets judged on data it has never seen.
+How a **loss-reduction rule** that is already shipped gets judged on data it has never seen.
+
+Scope check (see `PROJECT-CHARTER.md`): this is loss-reduction / trade-quality research on an
+existing system. The question forward validation answers is **not** "can the historical
+backtest produce more R?" It is:
+
+> Does this specific loss condition, identified historically, also appear in genuinely unseen
+> data — and does rejecting it improve the resulting trade book once the engine's real
+> slot/refill mechanics are applied?
+
+A **FAILS** verdict is therefore not a tuning signal. It is the answer, and the answer removes
+the rule.
 
 The point of this document is to make one behaviour impossible: **using future data to
 re-decide a rule, then re-evaluating on the same future data until it looks good.** Once a
@@ -42,7 +53,9 @@ objective is a faithful live analyzer, not a maximised backtest (see §1).
 ## 3. Pre-registered criteria
 
 Registered here, before any evaluation data exists, so the verdict cannot be chosen after
-seeing the numbers. A rule **HOLDS** when all three pass, and **FAILS** otherwise:
+seeing the numbers. They judge **loss reduction measured on the whole book** (engine-level R
+after rejections, slot refills and dedupe state), not win rate, not profit factor, not the
+golden R number. A rule **HOLDS** when all three pass, and **FAILS** otherwise:
 
 | Criterion | Threshold                                        | Why                                             |
 | --------- | ------------------------------------------------ | ----------------------------------------------- |
@@ -102,5 +115,20 @@ line in `artifacts/validation/ledger.jsonl`:
 ## 6. Current state of the ledger
 
 Empty. No shipped rule has been evaluated on out-of-sample data yet — the v1.8 Filter F
-result is entirely within its discovery window, which is why it is described as a
-hypothesis in `AUDIT-V1.8-LIVE-FIDELITY.md` §4 and not as a validated improvement.
+result is entirely within its discovery window, which is why it is described as a provisional
+loss-reduction hypothesis in `AUDIT-V1.8-LIVE-FIDELITY.md` §4 and not as a validated
+improvement.
+
+## 7. Prerequisites (all met as of v1.8.1)
+
+Forward validation only means something over a stable, trustworthy artifact, so these must
+hold first (`logs/v1.8.1-hardening.md`):
+
+| Prerequisite                                                                     | State                                                                      |
+| -------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Production refuses series below the measured warm-up floor (1,000 bars)          | ✅ `MIN_PRODUCTION_BARS` + series contract, enforced on both product paths |
+| No hindsight-derived columns reach the AI verifier                               | ✅ `stripHindsightColumns` + prompt change, engine-independence pinned     |
+| Swing-ref integrity validated (generator) and trend collapse detected (analyzer) | ✅ pruning + "Swing references resolve in-file" + contract gate            |
+| Live/backtest parity pinned, rules frozen                                        | ✅ `analyzer-config-parity`, `backtest-analyzer-parity`, `ruleset-freeze`  |
+
+Only then does the ledger below measure the rule rather than the plumbing.

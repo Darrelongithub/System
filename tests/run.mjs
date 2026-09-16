@@ -27,6 +27,10 @@ await import("./analyzer-config-parity.test.mjs");
 await import("./filter-optout-legacy.test.mjs");
 await import("./warmup-window-sufficiency.test.mjs");
 await import("./trend-input-causality.test.mjs");
+await import("./series-contract.test.mjs");
+await import("./verifier-hindsight-strip.test.mjs");
+await import("./ruleset-freeze.test.mjs");
+await import("./generator-ref-integrity.test.mjs");
 await import("./regime-filter-f.test.mjs");
 
 const filter = process.argv[2];

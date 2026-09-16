@@ -25,6 +25,18 @@
  */
 import type { RunOptions } from "./run";
 
+/**
+ * Minimum number of bars a series must carry before the product will make live
+ * decisions from it.
+ *
+ * Below this the warm-up is not saturated and the live answer for the newest bar
+ * stops matching a full-history run of the same bar. Measured on the locked
+ * baseline (live policy, final row untrusted): a 150–800 bar window changes the
+ * newest actionable bar; 900+ bars matches full history.
+ * `tests/warmup-window-sufficiency.test.mjs` owns that measurement.
+ */
+export const MIN_PRODUCTION_BARS = 1000;
+
 /** Live analysis: the final row is treated as possibly-in-progress. */
 export const ANALYZER_LIVE_OPTIONS: RunOptions = {
   enableHtfDirectionFilter: true,

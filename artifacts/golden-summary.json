@@ -85,8 +85,8 @@
     "noFill": 0,
     "rSum": 541.3570458970024
   },
-  "generatedAt": "2026-09-16T15:29:56.036Z",
-  "runAnalysisMs": 1079,
+  "generatedAt": "2026-09-16T16:40:36.032Z",
+  "runAnalysisMs": 1468,
   "options": {
     "enableHtfDirectionFilter": true,
     "seriesEndsComplete": true
@@ -95,9 +95,31 @@
     "baselineCsv": "87d2ac67585afe4b373be6107fcc66183a43d5e67f14aa56bc77b968ea3473bf",
     "rules": {
       "src/lib/analyzer/regime-filters.ts": "026d7aab56226b97a7988407ba31832d1f11952847bad954dfefdeb49ef30905",
-      "src/lib/analyzer/run.ts": "029bc8373bae275197ed3df5308dd44a5e964d3d921d730fe2041a4af8f5adcf",
+      "src/lib/analyzer/run.ts": "d9f4265e1e6797078a61a6e0909fd53d2af71e966dabca0f0db230037ec88fb4",
       "src/lib/analyzer/strategies/final-survivors.ts": "e0ffc30b6a5fe726d7fe4348491d0e98120733ed50c24e658489762ab2e04dcd"
     }
+  },
+  "seriesContract": {
+    "bars": 9738,
+    "rowsWithRefs": 9699,
+    "swingRefs": 44652,
+    "resolvedRefs": 41613,
+    "danglingRefs": 3039,
+    "outsideWindowRefs": 0,
+    "danglingRefShare": 0.0680596613813491,
+    "unresolvedRefs": 3039,
+    "unresolvedRefShare": 0.0680596613813491,
+    "trendCapableRows": 9030,
+    "trendCapableShare": 0.9272951324707333,
+    "trendCounts": {
+      "bullish": 4449,
+      "bearish": 4087,
+      "ranging": 1202
+    },
+    "nonRangingShare": 0.8765660299856234,
+    "ok": true,
+    "failures": [],
+    "warnings": []
   },
   "note": "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend momentum bars that close on their high (+17.7 R net after slot refills)."
 }

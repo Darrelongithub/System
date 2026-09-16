@@ -5,6 +5,7 @@ import {
   requestMarketData,
   type ProviderCandle,
 } from "./market-data";
+import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 
 export type LogFn = (msg: string) => void;
 export type CooldownSetter = (seconds: number | null) => void;
@@ -609,6 +610,41 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   return workingRows;
 };
 
+/**
+ * Drop swing refs that do not resolve inside the exported file.
+ *
+ * Refs are computed on the enriched working set, but the export omits whole UTC
+ * weekend days, so a ref can be left pointing at a row the analyzer will never
+ * see. The analyzer drops such refs anyway (fail-closed), so pruning changes no
+ * engine decision — it makes the file self-describing instead of silently
+ * degraded. When a row loses every ref, its derived columns are cleared too, so
+ * the export invariant `refs.length > 0 === retrace !== null` still holds.
+ *
+ * Exported for tests: the invariant it enforces is asserted by
+ * `validateOhlcExport` ("Swing references resolve in-file").
+ */
+export const pruneSwingRefsToExport = (
+  rows: EnrichedCandle[],
+  exportedDatetimes: Set<string>,
+): { prunedRefs: number; rowsLeftWithoutRefs: number } => {
+  let prunedRefs = 0;
+  let rowsLeftWithoutRefs = 0;
+  for (const row of rows) {
+    if (row.similarSwingRefs.length === 0) continue;
+    const kept = row.similarSwingRefs.filter((ref) => exportedDatetimes.has(ref));
+    if (kept.length === row.similarSwingRefs.length) continue;
+    prunedRefs += row.similarSwingRefs.length - kept.length;
+    row.similarSwingRefs = kept;
+    if (kept.length === 0) {
+      row.similarSwingRetracePct = null;
+      row.similarSwingContinuedPct = null;
+      row.swingContextSource = null;
+      rowsLeftWithoutRefs += 1;
+    }
+  }
+  return { prunedRefs, rowsLeftWithoutRefs };
+};
+
 const validateOhlcExport = ({
   log,
   rows,
@@ -753,6 +789,25 @@ const validateOhlcExport = ({
       row.reliableStreakLength >= 0 &&
       (row.isReliable ? row.reliableStreakLength >= 1 : row.reliableStreakLength === 0),
   );
+  // Swing references must resolve INSIDE the exported file. Refs are computed on
+  // the enriched working set; the export drops whole UTC weekend days, so this
+  // asserts the invariant that survived the pruning step in buildOhlcCsv
+  // (`exportedDatetimes`). A ref that dangles means a row the analyzer needs was
+  // dropped by something other than the documented weekend policy — a hole in the
+  // series, which silently degrades (or kills) every trend-derived decision.
+  const exportedDatetimes = new Set(exportedRows.map((row) => row.datetimeEAT));
+  let swingRefsTotal = 0;
+  let swingRefsDangling = 0;
+  for (const row of exportedRows) {
+    const refs = Array.isArray(row.similarSwingRefs) ? row.similarSwingRefs : [];
+    for (const ref of refs) {
+      swingRefsTotal += 1;
+      if (!exportedDatetimes.has(ref)) swingRefsDangling += 1;
+    }
+  }
+  const swingRefResolutionPassed = swingRefsDangling === 0;
+  const historyDepthPassed = exportedRows.length >= MIN_PRODUCTION_BARS;
+
   const maxSwingRefs = exportedRows.reduce(
     (max, row) =>
       Math.max(max, Array.isArray(row.similarSwingRefs) ? row.similarSwingRefs.length : 0),
@@ -841,6 +896,8 @@ const validateOhlcExport = ({
     `Continuity: PASS (max gap ${maxContinuityGap.toFixed(5)}, 95th pct ${p95ContinuityGap.toFixed(5)})`,
     `ATR spot-check: ${atrPassed ? "PASS" : "FAIL"} (avg diff ${atrAverageDifference.toFixed(5)}, tolerance ${atrTolerance.toFixed(5)})`,
     `similar_swing_refs: ${swingStructurePassed ? "PASS" : "FAIL"} (max ${maxSwingRefs}, structure consistent)`,
+    `Swing references resolve in-file: ${swingRefResolutionPassed ? "PASS" : "FAIL"} (${swingRefsTotal - swingRefsDangling}/${swingRefsTotal} resolve; dangling refs would silently cost trend information)`,
+    `History depth: ${historyDepthPassed ? "PASS" : "WARN"} (${exportedRows.length} rows vs production floor ${MIN_PRODUCTION_BARS}; the analyzer refuses shorter series)`,
     `similar_swing_continued_pct: ${continuedPctPassed ? "PASS" : "FAIL"}`,
     `reliable_streak_length: ${streakPassed ? "PASS" : "FAIL"}`,
     `Weekend gaps: ${weekendPassed ? "PASS" : "FAIL"} (${expectedWeekendGaps} weekend closures + ${expectedHolidayGaps} holiday closures accepted, ${unexpectedLargeGaps} unexpected long gaps; ${actualLargeGaps} total${unexpectedGapSummary ? `; unexpected: ${unexpectedGapSummary}` : ""})`,
@@ -856,6 +913,7 @@ const validateOhlcExport = ({
     !continuedPctPassed && "similar_swing_continued_pct range",
     !streakPassed && "reliable_streak_length consistency",
     !weekendPassed && "Weekend gaps",
+    !swingRefResolutionPassed && "swing reference resolution",
   ].filter(Boolean) as string[];
 
   return {
@@ -874,6 +932,9 @@ const validateOhlcExport = ({
       atrAverageDifference,
       atrTolerance,
       maxSwingRefs,
+      swingRefsTotal,
+      swingRefsDangling,
+      historyDepthPassed,
       actualLargeGaps,
       expectedWeekendGaps,
     },
@@ -1179,6 +1240,35 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       "swing_invalidated",
       "reliable_streak_length",
     ];
+    // ---- export consistency: swing refs must resolve inside the exported file ----
+    // Swing refs are computed on the enriched working set, but the export drops
+    // whole UTC weekend days (see the WEEKEND / SKIPPED markers below). A ref
+    // left pointing at a dropped row is unusable to the analyzer, which resolves
+    // refs strictly by datetime: it silently costs trend information, and on an
+    // edited/spliced file the same mechanism collapses every row to "ranging".
+    // Prune those refs here (fail-closed: a removed ref can only reduce trend
+    // information, never fabricate it) and null the derived columns when a row is
+    // left with no refs. The analyzer's result is unchanged — it already ignores
+    // unresolvable refs — but the file becomes self-describing.
+    const exportedDatetimes = new Set<string>();
+    for (let day = new Date(exportStartDay); day <= exportEndDay; day = addUtcDay(day)) {
+      const weekday = day.getUTCDay();
+      if (weekday === 0 || weekday === 6) continue;
+      for (const row of rowsByUtcDay.get(day.toISOString().slice(0, 10)) || []) {
+        exportedDatetimes.add(row.datetimeEAT);
+      }
+    }
+    const { prunedRefs: prunedSwingRefs, rowsLeftWithoutRefs } = pruneSwingRefsToExport(
+      enrichedRows,
+      exportedDatetimes,
+    );
+    if (prunedSwingRefs > 0) {
+      addLog(
+        `🧷 Pruned ${prunedSwingRefs} swing reference(s) that pointed at rows outside the exported file ` +
+          `(${rowsLeftWithoutRefs} row(s) left with no swing context).`,
+      );
+    }
+
     const dataRows: string[][] = [];
     const csvEscape = (value: unknown) => {
       if (value === null || value === undefined) return "";

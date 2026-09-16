@@ -10,6 +10,9 @@
  *     discovery baseline cannot be re-mined under a new name;
  *   - it refuses windows shorter than the measured warm-up floor, because a
  *     short window changes the answer (see tests/warmup-window-sufficiency);
+ *   - it refuses a series that fails the production series contract (swing refs
+ *     that do not resolve, collapsed trend distribution) — validating a rule on
+ *     data the product itself would reject measures nothing;
  *   - its verdict follows the criteria pre-registered in FORWARD-VALIDATION.md,
  *     computed mechanically from the numbers below;
  *   - every evaluation is appended to a ledger that records the data hash, the
@@ -99,10 +102,30 @@ if (dataLines.length < WARMUP_FLOOR_BARS) {
 const run = (enableFilterF) => {
   const out = runAnalysis(csv, { seriesEndsComplete: true, enableFilterF });
   if (!out.ok) throw new Error(out.error);
-  return out.analysis.results.filter((r) => r.result === "PASS" && isTradeStrategy(r.strategyId));
+  return out;
 };
-const withF = run(true);
-const withoutF = run(false);
+const shippedRun = run(true);
+const contract = shippedRun.analysis.contract;
+console.log(`series contract: ${contract.ok ? "OK" : "FAILED"}`);
+console.log(
+  `  bars ${contract.bars} | swing refs ${contract.resolvedRefs}/${contract.swingRefs} resolved ` +
+    `(${contract.unresolvedRefShare.toFixed(3)} unresolved) | trend-capable ` +
+    `${contract.trendCapableShare.toFixed(3)} | non-ranging ${contract.nonRangingShare.toFixed(3)}`,
+);
+if (!contract.ok) {
+  console.error(
+    `REFUSED: the series does not satisfy the production contract:\n  ${contract.failures.join("\n  ")}\n` +
+      "The product would refuse this file too; validating a rule on it would measure nothing.",
+  );
+  process.exit(1);
+}
+
+const withF = shippedRun.analysis.results.filter(
+  (r) => r.result === "PASS" && isTradeStrategy(r.strategyId),
+);
+const withoutF = run(false).analysis.results.filter(
+  (r) => r.result === "PASS" && isTradeStrategy(r.strategyId),
+);
 const R = (rows) => rows.reduce((s, t) => s + (t.rMultiple ?? 0), 0);
 
 const monthOf = (r) => r.datetime.slice(0, 7);
@@ -198,6 +221,13 @@ const record = {
   rerun,
   rules: ruleHashes,
   options: { seriesEndsComplete: true, shippedDefaults: true },
+  seriesContract: {
+    bars: contract.bars,
+    unresolvedRefShare: contract.unresolvedRefShare,
+    trendCapableShare: contract.trendCapableShare,
+    nonRangingShare: contract.nonRangingShare,
+    ok: contract.ok,
+  },
   gitHead: (() => {
     try {
       return execSync("git rev-parse HEAD").toString().trim();

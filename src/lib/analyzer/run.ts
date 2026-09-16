@@ -15,6 +15,7 @@ import {
 } from "./structure";
 import { rejectFilterC, FILTER_C_REASON, rejectFilterF, FILTER_F_REASON } from "./regime-filters";
 import { ANALYZER_LIVE_OPTIONS } from "./config";
+import { inspectSeriesContract } from "./series-contract";
 import {
   formatContextChannel,
   isContextStrategy,
@@ -389,6 +390,7 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
     perStrategy,
     overlaps,
     lastRowDatetime: lastSignalCandle?.datetime ?? candles[candles.length - 1]?.datetime ?? "",
+    contract: inspectSeriesContract(candles),
   };
 
   return { ok: true, analysis };
