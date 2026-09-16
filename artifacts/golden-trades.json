@@ -81,22 +81,6 @@
   },
   {
     "strategyId": "donchian-55",
-    "datetime": "2026-02-05 05:30:00",
-    "index": 3275,
-    "side": "short",
-    "entry": 4816.78,
-    "sl": 4880.533811281252,
-    "tp": 4562.764754874988,
-    "rr": 3.984314663234994,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-02-05 06:30:00",
-    "exitPrice": 4880.533811281252,
-    "rMultiple": -1,
-    "reason": "D55 S"
-  },
-  {
-    "strategyId": "donchian-55",
     "datetime": "2026-02-06 17:30:00",
     "index": 3347,
     "side": "long",
@@ -156,6 +140,22 @@
     "outcome": "SL",
     "exitDatetime": "2026-01-29 18:00:00",
     "exitPrice": 5367.969010240116,
+    "rMultiple": -1,
+    "reason": "D55 L"
+  },
+  {
+    "strategyId": "donchian-55",
+    "datetime": "2026-03-27 18:00:00",
+    "index": 5028,
+    "side": "long",
+    "entry": 4546.429999999999,
+    "sl": 4502.824124371799,
+    "tp": 4719.8535025128,
+    "rr": 3.97706731064122,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-27 20:00:00",
+    "exitPrice": 4502.824124371799,
     "rMultiple": -1,
     "reason": "D55 L"
   },
@@ -236,22 +236,6 @@
     "outcome": "SL",
     "exitDatetime": "2026-06-12 03:30:00",
     "exitPrice": 4205.234012045726,
-    "rMultiple": -1,
-    "reason": "D55 L"
-  },
-  {
-    "strategyId": "donchian-55",
-    "datetime": "2026-03-27 17:30:00",
-    "index": 5027,
-    "side": "long",
-    "entry": 4512.21,
-    "sl": 4474.151364708092,
-    "tp": 4663.444541167633,
-    "rr": 3.9737247541240213,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-30 04:30:00",
-    "exitPrice": 4474.151364708092,
     "rMultiple": -1,
     "reason": "D55 L"
   },
@@ -369,22 +353,6 @@
   },
   {
     "strategyId": "donchian-55",
-    "datetime": "2026-03-16 04:00:00",
-    "index": 4568,
-    "side": "short",
-    "entry": 4989,
-    "sl": 5021.58541601189,
-    "tp": 4859.65833595244,
-    "rr": 3.9693114244840633,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-16 07:00:00",
-    "exitPrice": 5021.58541601189,
-    "rMultiple": -1,
-    "reason": "D55 S"
-  },
-  {
-    "strategyId": "donchian-55",
     "datetime": "2026-06-11 01:00:00",
     "index": 7292,
     "side": "short",
@@ -444,6 +412,22 @@
     "outcome": "SL",
     "exitDatetime": "2026-05-27 16:30:00",
     "exitPrice": 4434.07100801498,
+    "rMultiple": -1,
+    "reason": "D55 S"
+  },
+  {
+    "strategyId": "donchian-55",
+    "datetime": "2026-03-16 12:30:00",
+    "index": 4585,
+    "side": "short",
+    "entry": 4975.52,
+    "sl": 5006.449477882419,
+    "tp": 4852.802088470325,
+    "rr": 3.9676683840638796,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-16 14:00:00",
+    "exitPrice": 5006.449477882419,
     "rMultiple": -1,
     "reason": "D55 S"
   },
@@ -718,22 +702,6 @@
     "exitPrice": 4506.886137762087,
     "rMultiple": -1,
     "reason": "D55 L"
-  },
-  {
-    "strategyId": "donchian-55",
-    "datetime": "2025-12-31 08:30:00",
-    "index": 2033,
-    "side": "short",
-    "entry": 4286.83,
-    "sl": 4313.598423015644,
-    "tp": 4180.756307937424,
-    "rr": 3.9626425509110237,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-31 09:30:00",
-    "exitPrice": 4313.598423015644,
-    "rMultiple": -1,
-    "reason": "D55 S"
   },
   {
     "strategyId": "donchian-55",
@@ -1294,6 +1262,22 @@
     "exitPrice": 4127.4065443381705,
     "rMultiple": -1,
     "reason": "D55 L"
+  },
+  {
+    "strategyId": "donchian-55",
+    "datetime": "2026-07-07 22:00:00",
+    "index": 8198,
+    "side": "short",
+    "entry": 4105.96,
+    "sl": 4128.0248280332335,
+    "tp": 4018.7006878670654,
+    "rr": 3.9546790032311643,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-07-08 06:00:00",
+    "exitPrice": 4128.0248280332335,
+    "rMultiple": -1,
+    "reason": "D55 S"
   },
   {
     "strategyId": "donchian-55",
@@ -2033,22 +2017,6 @@
   },
   {
     "strategyId": "donchian-55",
-    "datetime": "2026-01-08 08:00:00",
-    "index": 2320,
-    "side": "short",
-    "entry": 4424.93,
-    "sl": 4442.609633810661,
-    "tp": 4355.211464757357,
-    "rr": 3.9434377425059504,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-01-08 18:00:00",
-    "exitPrice": 4442.609633810661,
-    "rMultiple": -1,
-    "reason": "D55 S"
-  },
-  {
-    "strategyId": "donchian-55",
     "datetime": "2025-11-05 23:00:00",
     "index": 142,
     "side": "long",
@@ -2305,22 +2273,6 @@
   },
   {
     "strategyId": "donchian-55",
-    "datetime": "2026-05-26 07:30:00",
-    "index": 6729,
-    "side": "short",
-    "entry": 4524.3,
-    "sl": 4540.700113101237,
-    "tp": 4459.699547595053,
-    "rr": 3.939024810754281,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-05-27 13:30:00",
-    "exitPrice": 4459.699547595053,
-    "rMultiple": 3.939024810754281,
-    "reason": "D55 S"
-  },
-  {
-    "strategyId": "donchian-55",
     "datetime": "2026-07-29 16:30:00",
     "index": 8955,
     "side": "short",
@@ -2510,22 +2462,6 @@
     "exitPrice": 4543.4849781912935,
     "rMultiple": 3.9335161397835385,
     "reason": "D55 L"
-  },
-  {
-    "strategyId": "donchian-55",
-    "datetime": "2026-07-07 04:00:00",
-    "index": 8162,
-    "side": "short",
-    "entry": 4127.12,
-    "sl": 4142.008039201432,
-    "tp": 4068.567843194269,
-    "rr": 3.9328319877138105,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-07 04:30:00",
-    "exitPrice": 4142.008039201432,
-    "rMultiple": -1,
-    "reason": "D55 S"
   },
   {
     "strategyId": "donchian-55",
@@ -3248,6 +3184,22 @@
     "reason": "Ichi L"
   },
   {
+    "strategyId": "morning-star",
+    "datetime": "2026-03-03 16:00:00",
+    "index": 4160,
+    "side": "short",
+    "entry": 5172.99,
+    "sl": 5228.282679430776,
+    "tp": 5007.911961707671,
+    "rr": 2.9855315385646874,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-03-03 18:00:00",
+    "exitPrice": 5007.911961707671,
+    "rMultiple": 2.9855315385646874,
+    "reason": "ES"
+  },
+  {
     "strategyId": "williams-r-fade",
     "datetime": "2026-02-03 21:30:00",
     "index": 3211,
@@ -3520,22 +3472,6 @@
     "reason": "Ichi L"
   },
   {
-    "strategyId": "morning-star",
-    "datetime": "2026-03-03 13:30:00",
-    "index": 4155,
-    "side": "short",
-    "entry": 5245.13,
-    "sl": 5292.550756562007,
-    "tp": 5103.667730313978,
-    "rr": 2.9831297503878247,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-03 14:30:00",
-    "exitPrice": 5103.667730313978,
-    "rMultiple": 2.9831297503878247,
-    "reason": "ES"
-  },
-  {
     "strategyId": "williams-r-fade",
     "datetime": "2026-03-23 04:00:00",
     "index": 4808,
@@ -3744,22 +3680,6 @@
     "reason": "MS"
   },
   {
-    "strategyId": "morning-star",
-    "datetime": "2026-03-16 04:00:00",
-    "index": 4568,
-    "side": "short",
-    "entry": 4989,
-    "sl": 5031.339270800595,
-    "tp": 4862.7821875982145,
-    "rr": 2.9811050123237353,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-16 09:00:00",
-    "exitPrice": 5031.339270800595,
-    "rMultiple": -1,
-    "reason": "ES"
-  },
-  {
     "strategyId": "ichimoku-tk",
     "datetime": "2026-05-28 17:00:00",
     "index": 6844,
@@ -3902,22 +3822,6 @@
     "exitPrice": 4420.785,
     "rMultiple": -1,
     "reason": "Ichi S"
-  },
-  {
-    "strategyId": "morning-star",
-    "datetime": "2026-03-31 16:30:00",
-    "index": 5121,
-    "side": "long",
-    "entry": 4607.5199999999995,
-    "sl": 4566.924373293648,
-    "tp": 4728.506880119054,
-    "rr": 2.980293443779398,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-04-01 09:30:00",
-    "exitPrice": 4728.506880119054,
-    "rMultiple": 2.980293443779398,
-    "reason": "MS"
   },
   {
     "strategyId": "williams-r-fade",
@@ -4336,22 +4240,6 @@
     "reason": "Ichi S"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-03-30 06:30:00",
-    "index": 5053,
-    "side": "short",
-    "entry": 4496.41,
-    "sl": 4531.098868918967,
-    "tp": 4393.143393243097,
-    "rr": 2.9769378470693852,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-30 09:00:00",
-    "exitPrice": 4531.098868918967,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
     "strategyId": "morning-star",
     "datetime": "2026-06-11 05:00:00",
     "index": 7300,
@@ -4752,22 +4640,6 @@
     "reason": "Ichi L"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-02-13 07:30:00",
-    "index": 3567,
-    "side": "short",
-    "entry": 4975.14,
-    "sl": 5007.26420814344,
-    "tp": 4879.567375569682,
-    "rr": 2.975096662416482,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-02-13 17:30:00",
-    "exitPrice": 5007.26420814344,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
     "strategyId": "ichimoku-tk",
     "datetime": "2026-02-27 16:00:00",
     "index": 4064,
@@ -4830,6 +4702,22 @@
     "exitPrice": 5051.975,
     "rMultiple": -1,
     "reason": "Ichi L"
+  },
+  {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-03-30 10:00:00",
+    "index": 5060,
+    "side": "short",
+    "entry": 4522.45,
+    "sl": 4553.945938365094,
+    "tp": 4428.762184904717,
+    "rr": 2.9745998994941556,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-30 14:30:00",
+    "exitPrice": 4553.945938365094,
+    "rMultiple": -1,
+    "reason": "WR S"
   },
   {
     "strategyId": "morning-star",
@@ -5153,6 +5041,22 @@
   },
   {
     "strategyId": "williams-r-fade",
+    "datetime": "2026-02-13 18:30:00",
+    "index": 3589,
+    "side": "short",
+    "entry": 4977.76,
+    "sl": 5007.54395739912,
+    "tp": 4889.208127802641,
+    "rr": 2.973139902489153,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-02-13 19:00:00",
+    "exitPrice": 5007.54395739912,
+    "rMultiple": -1,
+    "reason": "WR S"
+  },
+  {
+    "strategyId": "williams-r-fade",
     "datetime": "2026-01-27 08:00:00",
     "index": 2944,
     "side": "short",
@@ -5165,6 +5069,22 @@
     "exitDatetime": "2026-01-27 10:30:00",
     "exitPrice": 5094.954871667019,
     "rMultiple": -1,
+    "reason": "WR S"
+  },
+  {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-03-03 06:30:00",
+    "index": 4141,
+    "side": "short",
+    "entry": 5366.66,
+    "sl": 5396.096164704299,
+    "tp": 5279.151505887103,
+    "rr": 2.9728225464140565,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-03-03 12:00:00",
+    "exitPrice": 5279.151505887103,
+    "rMultiple": 2.9728225464140565,
     "reason": "WR S"
   },
   {
@@ -5184,22 +5104,6 @@
     "reason": "S1"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-03-03 04:30:00",
-    "index": 4137,
-    "side": "short",
-    "entry": 5340.96,
-    "sl": 5370.190181481053,
-    "tp": 5254.069455556842,
-    "rr": 2.9726310286332693,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-03 05:30:00",
-    "exitPrice": 5370.190181481053,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
     "strategyId": "ichimoku-tk",
     "datetime": "2026-03-30 03:00:00",
     "index": 5046,
@@ -5214,22 +5118,6 @@
     "exitPrice": 4482.215,
     "rMultiple": -1,
     "reason": "Ichi S"
-  },
-  {
-    "strategyId": "morning-star",
-    "datetime": "2026-04-29 04:00:00",
-    "index": 6104,
-    "side": "short",
-    "entry": 4581.6900000000005,
-    "sl": 4610.894773908331,
-    "tp": 4494.875678275007,
-    "rr": 2.972607218172264,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-30 11:00:00",
-    "exitPrice": 4610.894773908331,
-    "rMultiple": -1,
-    "reason": "ES"
   },
   {
     "strategyId": "classic-pivot",
@@ -6096,6 +5984,22 @@
     "reason": "WR L"
   },
   {
+    "strategyId": "classic-pivot",
+    "datetime": "2026-04-08 20:30:00",
+    "index": 5417,
+    "side": "short",
+    "entry": 4733.83,
+    "sl": 4759.11251064941,
+    "tp": 4658.782468051769,
+    "rr": 2.9683575729051284,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-09 16:00:00",
+    "exitPrice": 4759.11251064941,
+    "rMultiple": -1,
+    "reason": "R1"
+  },
+  {
     "strategyId": "morning-star",
     "datetime": "2026-06-12 17:30:00",
     "index": 7373,
@@ -6286,6 +6190,22 @@
     "exitPrice": 4387.860000000001,
     "rMultiple": -1,
     "reason": "Ichi L"
+  },
+  {
+    "strategyId": "morning-star",
+    "datetime": "2026-04-29 21:00:00",
+    "index": 6138,
+    "side": "short",
+    "entry": 4531.1,
+    "sl": 4555.676087774218,
+    "tp": 4458.171736677346,
+    "rr": 2.967448032927416,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-30 02:30:00",
+    "exitPrice": 4555.676087774218,
+    "rMultiple": -1,
+    "reason": "ES"
   },
   {
     "strategyId": "williams-r-fade",
@@ -6670,6 +6590,22 @@
     "exitPrice": 4319.384947748122,
     "rMultiple": -1,
     "reason": "Ichi S"
+  },
+  {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-04-07 12:30:00",
+    "index": 5353,
+    "side": "short",
+    "entry": 4671.93,
+    "sl": 4695.453393703744,
+    "tp": 4602.159818888768,
+    "rr": 2.9659913016771915,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-07 22:00:00",
+    "exitPrice": 4695.453393703744,
+    "rMultiple": -1,
+    "reason": "WR S"
   },
   {
     "strategyId": "ichimoku-tk",
@@ -7920,22 +7856,6 @@
     "reason": "WR L"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-04-13 03:30:00",
-    "index": 5527,
-    "side": "long",
-    "entry": 4694.46,
-    "sl": 4674.047552734901,
-    "tp": 4754.897341795298,
-    "rr": 2.9608082269798635,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-04-14 01:30:00",
-    "exitPrice": 4754.897341795298,
-    "rMultiple": 2.9608082269798635,
-    "reason": "WR L"
-  },
-  {
     "strategyId": "morning-star",
     "datetime": "2026-03-25 05:30:00",
     "index": 4907,
@@ -8032,22 +7952,6 @@
     "reason": "Ichi L"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-04-07 08:00:00",
-    "index": 5344,
-    "side": "short",
-    "entry": 4632.66,
-    "sl": 4652.651404321483,
-    "tp": 4573.48578703555,
-    "rr": 2.9599828012512566,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-07 09:30:00",
-    "exitPrice": 4652.651404321483,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
     "strategyId": "classic-pivot",
     "datetime": "2026-01-16 19:00:00",
     "index": 2630,
@@ -8080,6 +7984,22 @@
     "reason": "MS"
   },
   {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-03-13 16:00:00",
+    "index": 4544,
+    "side": "short",
+    "entry": 5108.01,
+    "sl": 5127.864253668601,
+    "tp": 5049.247238994197,
+    "rr": 2.9597063675445803,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-03-13 17:30:00",
+    "exitPrice": 5049.247238994197,
+    "rMultiple": 2.9597063675445803,
+    "reason": "WR S"
+  },
+  {
     "strategyId": "morning-star",
     "datetime": "2026-04-06 09:30:00",
     "index": 5299,
@@ -8094,22 +8014,6 @@
     "exitPrice": 4644.5769759489785,
     "rMultiple": -1,
     "reason": "MS"
-  },
-  {
-    "strategyId": "classic-pivot",
-    "datetime": "2026-04-08 17:30:00",
-    "index": 5411,
-    "side": "short",
-    "entry": 4739.58,
-    "sl": 4759.400373305659,
-    "tp": 4680.9188800830225,
-    "rr": 2.9596374907948446,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-08 18:30:00",
-    "exitPrice": 4759.400373305659,
-    "rMultiple": -1,
-    "reason": "R1"
   },
   {
     "strategyId": "morning-star",
@@ -8641,22 +8545,6 @@
   },
   {
     "strategyId": "morning-star",
-    "datetime": "2025-12-24 05:00:00",
-    "index": 1786,
-    "side": "short",
-    "entry": 4507.6900000000005,
-    "sl": 4526.803546366068,
-    "tp": 4451.149360901797,
-    "rr": 2.95814486832127,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2025-12-24 18:30:00",
-    "exitPrice": 4451.149360901797,
-    "rMultiple": 2.95814486832127,
-    "reason": "ES"
-  },
-  {
-    "strategyId": "morning-star",
     "datetime": "2026-03-12 08:30:00",
     "index": 4481,
     "side": "long",
@@ -9089,6 +8977,22 @@
   },
   {
     "strategyId": "williams-r-fade",
+    "datetime": "2026-04-13 13:30:00",
+    "index": 5547,
+    "side": "long",
+    "entry": 4721.72,
+    "sl": 4703.419025510228,
+    "tp": 4775.822923469319,
+    "rr": 2.9562864807856903,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-13 18:00:00",
+    "exitPrice": 4703.419025510228,
+    "rMultiple": -1,
+    "reason": "WR L"
+  },
+  {
+    "strategyId": "williams-r-fade",
     "datetime": "2026-05-19 03:00:00",
     "index": 6480,
     "side": "short",
@@ -9312,6 +9216,22 @@
     "reason": "Ichi S"
   },
   {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-04-10 05:30:00",
+    "index": 5483,
+    "side": "long",
+    "entry": 4753.5599999999995,
+    "sl": 4735.509812419218,
+    "tp": 4806.910562742344,
+    "rr": 2.9556791309553447,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-10 11:30:00",
+    "exitPrice": 4735.509812419218,
+    "rMultiple": -1,
+    "reason": "WR L"
+  },
+  {
     "strategyId": "ichimoku-tk",
     "datetime": "2025-12-16 16:30:00",
     "index": 1521,
@@ -9360,38 +9280,6 @@
     "reason": "MS"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-03-13 05:30:00",
-    "index": 4523,
-    "side": "short",
-    "entry": 5111.81,
-    "sl": 5129.816834531316,
-    "tp": 5058.589496406053,
-    "rr": 2.955572424536473,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-13 17:30:00",
-    "exitPrice": 5058.589496406053,
-    "rMultiple": 2.955572424536473,
-    "reason": "WR S"
-  },
-  {
-    "strategyId": "morning-star",
-    "datetime": "2026-07-02 10:00:00",
-    "index": 8030,
-    "side": "short",
-    "entry": 4062.94,
-    "sl": 4080.9423924615644,
-    "tp": 4009.7328226153063,
-    "rr": 2.955561462083037,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-02 15:30:00",
-    "exitPrice": 4080.9423924615644,
-    "rMultiple": -1,
-    "reason": "ES"
-  },
-  {
     "strategyId": "ichimoku-tk",
     "datetime": "2026-07-06 09:00:00",
     "index": 8124,
@@ -9438,22 +9326,6 @@
     "exitPrice": 4464.8292169025735,
     "rMultiple": -1,
     "reason": "MS"
-  },
-  {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-05-21 07:00:00",
-    "index": 6584,
-    "side": "long",
-    "entry": 4540.179999999999,
-    "sl": 4522.358605998429,
-    "tp": 4592.844182004711,
-    "rr": 2.9551101333639345,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-05-21 08:30:00",
-    "exitPrice": 4522.358605998429,
-    "rMultiple": -1,
-    "reason": "WR L"
   },
   {
     "strategyId": "ichimoku-tk",
@@ -9729,6 +9601,22 @@
   },
   {
     "strategyId": "williams-r-fade",
+    "datetime": "2026-05-21 09:00:00",
+    "index": 6588,
+    "side": "long",
+    "entry": 4532.59,
+    "sl": 4515.061932552092,
+    "tp": 4584.374202343725,
+    "rr": 2.9543589159285926,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-05-21 10:00:00",
+    "exitPrice": 4515.061932552092,
+    "rMultiple": -1,
+    "reason": "WR L"
+  },
+  {
+    "strategyId": "williams-r-fade",
     "datetime": "2026-04-07 01:00:00",
     "index": 5330,
     "side": "long",
@@ -9968,22 +9856,6 @@
     "reason": "Ichi L"
   },
   {
-    "strategyId": "ichimoku-tk",
-    "datetime": "2025-11-21 04:00:00",
-    "index": 680,
-    "side": "short",
-    "entry": 4062.1200000000003,
-    "sl": 4079.361007830762,
-    "tp": 4011.1969765077147,
-    "rr": 2.9535990002526478,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-21 05:30:00",
-    "exitPrice": 4079.361007830762,
-    "rMultiple": -1,
-    "reason": "Ichi S"
-  },
-  {
     "strategyId": "classic-pivot",
     "datetime": "2026-02-11 16:30:00",
     "index": 3489,
@@ -10033,6 +9905,22 @@
   },
   {
     "strategyId": "williams-r-fade",
+    "datetime": "2026-08-17 17:30:00",
+    "index": 9581,
+    "side": "short",
+    "entry": 4415.18,
+    "sl": 4432.295727412856,
+    "tp": 4364.632817761433,
+    "rr": 2.953259363116615,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-08-18 03:30:00",
+    "exitPrice": 4432.295727412856,
+    "rMultiple": -1,
+    "reason": "WR S"
+  },
+  {
+    "strategyId": "williams-r-fade",
     "datetime": "2026-08-20 06:00:00",
     "index": 9702,
     "side": "long",
@@ -10044,22 +9932,6 @@
     "outcome": "SL",
     "exitDatetime": "2026-08-20 14:30:00",
     "exitPrice": 4477.2457034733425,
-    "rMultiple": -1,
-    "reason": "WR L"
-  },
-  {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-04-10 03:30:00",
-    "index": 5479,
-    "side": "long",
-    "entry": 4762.23,
-    "sl": 4745.143968134753,
-    "tp": 4812.68809559574,
-    "rr": 2.9531781278234366,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-10 05:00:00",
-    "exitPrice": 4745.143968134753,
     "rMultiple": -1,
     "reason": "WR L"
   },
@@ -10432,22 +10304,6 @@
     "reason": "S1"
   },
   {
-    "strategyId": "morning-star",
-    "datetime": "2026-07-23 05:30:00",
-    "index": 8741,
-    "side": "long",
-    "entry": 4128.34,
-    "sl": 4111.715723991438,
-    "tp": 4177.412828025688,
-    "rr": 2.951877603596859,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-23 10:00:00",
-    "exitPrice": 4111.715723991438,
-    "rMultiple": -1,
-    "reason": "MS"
-  },
-  {
     "strategyId": "williams-r-fade",
     "datetime": "2026-04-20 15:00:00",
     "index": 5790,
@@ -10800,6 +10656,22 @@
     "reason": "WR S"
   },
   {
+    "strategyId": "williams-r-fade",
+    "datetime": "2026-08-14 19:30:00",
+    "index": 9537,
+    "side": "short",
+    "entry": 4385.13,
+    "sl": 4401.4644843034275,
+    "tp": 4336.926547089717,
+    "rr": 2.951023859392279,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-08-17 04:00:00",
+    "exitPrice": 4401.4644843034275,
+    "rMultiple": -1,
+    "reason": "WR S"
+  },
+  {
     "strategyId": "ichimoku-tk",
     "datetime": "2026-04-28 07:30:00",
     "index": 6063,
@@ -11121,22 +10993,6 @@
   },
   {
     "strategyId": "williams-r-fade",
-    "datetime": "2026-08-14 17:30:00",
-    "index": 9533,
-    "side": "short",
-    "entry": 4380.87,
-    "sl": 4396.689714085658,
-    "tp": 4334.2108577430245,
-    "rr": 2.9494301859270307,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-17 03:30:00",
-    "exitPrice": 4396.689714085658,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
-    "strategyId": "williams-r-fade",
     "datetime": "2026-07-27 05:30:00",
     "index": 8837,
     "side": "short",
@@ -11180,22 +11036,6 @@
     "outcome": "SL",
     "exitDatetime": "2026-07-20 05:30:00",
     "exitPrice": 4026.1485561879817,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
-    "strategyId": "williams-r-fade",
-    "datetime": "2025-12-02 18:00:00",
-    "index": 1044,
-    "side": "short",
-    "entry": 4191.67,
-    "sl": 4207.4333006180395,
-    "tp": 4145.180098145881,
-    "rr": 2.94924920742273,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-02 23:30:00",
-    "exitPrice": 4207.4333006180395,
     "rMultiple": -1,
     "reason": "WR S"
   },
@@ -11793,6 +11633,22 @@
   },
   {
     "strategyId": "williams-r-fade",
+    "datetime": "2026-08-14 03:30:00",
+    "index": 9505,
+    "side": "long",
+    "entry": 4340.58,
+    "sl": 4325.294554851087,
+    "tp": 4385.636335446739,
+    "rr": 2.94766262989363,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-08-14 04:00:00",
+    "exitPrice": 4325.294554851087,
+    "rMultiple": -1,
+    "reason": "WR L"
+  },
+  {
+    "strategyId": "williams-r-fade",
     "datetime": "2026-05-18 03:30:00",
     "index": 6433,
     "side": "long",
@@ -11838,22 +11694,6 @@
     "exitPrice": 4152.7578733298105,
     "rMultiple": 2.947584374956459,
     "reason": "WR L"
-  },
-  {
-    "strategyId": "morning-star",
-    "datetime": "2026-08-14 06:00:00",
-    "index": 9510,
-    "side": "long",
-    "entry": 4326.04,
-    "sl": 4310.779066054362,
-    "tp": 4371.0228018369135,
-    "rr": 2.947578568726591,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-14 08:30:00",
-    "exitPrice": 4310.779066054362,
-    "rMultiple": -1,
-    "reason": "MS"
   },
   {
     "strategyId": "williams-r-fade",
@@ -12640,6 +12480,22 @@
     "reason": "ES"
   },
   {
+    "strategyId": "morning-star",
+    "datetime": "2026-03-16 07:30:00",
+    "index": 4575,
+    "side": "short",
+    "entry": 5012.900000000001,
+    "sl": 5027.312358872433,
+    "tp": 4970.462923382703,
+    "rr": 2.9444920843922717,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-16 09:00:00",
+    "exitPrice": 5027.312358872433,
+    "rMultiple": -1,
+    "reason": "ES"
+  },
+  {
     "strategyId": "williams-r-fade",
     "datetime": "2026-06-24 02:30:00",
     "index": 7727,
@@ -12897,22 +12753,6 @@
   },
   {
     "strategyId": "williams-r-fade",
-    "datetime": "2025-12-18 00:30:00",
-    "index": 1585,
-    "side": "short",
-    "entry": 4337.93,
-    "sl": 4352.161278028947,
-    "tp": 4296.0361659131595,
-    "rr": 2.9437857936320224,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-18 19:00:00",
-    "exitPrice": 4352.161278028947,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
-    "strategyId": "williams-r-fade",
     "datetime": "2026-04-17 08:30:00",
     "index": 5729,
     "side": "short",
@@ -12976,22 +12816,6 @@
     "reason": "Ichi S"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-08-14 01:00:00",
-    "index": 9500,
-    "side": "long",
-    "entry": 4357.7699999999995,
-    "sl": 4343.651517799234,
-    "tp": 4399.325446602296,
-    "rr": 2.9433366853020573,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-14 03:00:00",
-    "exitPrice": 4343.651517799234,
-    "rMultiple": -1,
-    "reason": "WR L"
-  },
-  {
     "strategyId": "morning-star",
     "datetime": "2025-11-04 00:00:00",
     "index": 48,
@@ -13009,17 +12833,17 @@
   },
   {
     "strategyId": "morning-star",
-    "datetime": "2026-06-16 04:30:00",
-    "index": 7443,
+    "datetime": "2026-07-02 12:00:00",
+    "index": 8034,
     "side": "short",
-    "entry": 4312.4800000000005,
-    "sl": 4326.572290028792,
-    "tp": 4271.003129913625,
-    "rr": 2.9432313698934083,
+    "entry": 4066.8900000000003,
+    "sl": 4080.98659340105,
+    "tp": 4025.4002197968507,
+    "rr": 2.943248700076736,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-06-16 06:30:00",
-    "exitPrice": 4326.572290028792,
+    "exitDatetime": "2026-07-02 15:30:00",
+    "exitPrice": 4080.98659340105,
     "rMultiple": -1,
     "reason": "ES"
   },
@@ -13134,6 +12958,22 @@
     "exitPrice": 4104.8574846635,
     "rMultiple": 2.942799240248856,
     "reason": "WR L"
+  },
+  {
+    "strategyId": "morning-star",
+    "datetime": "2026-08-14 18:30:00",
+    "index": 9535,
+    "side": "long",
+    "entry": 4392.12,
+    "sl": 4378.14988208147,
+    "tp": 4433.230353755589,
+    "rr": 2.9427349142888635,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-08-14 20:30:00",
+    "exitPrice": 4378.14988208147,
+    "rMultiple": -1,
+    "reason": "MS"
   },
   {
     "strategyId": "williams-r-fade",
@@ -13710,22 +13550,6 @@
     "exitPrice": 4423.694599793013,
     "rMultiple": -1,
     "reason": "R1"
-  },
-  {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-08-12 01:00:00",
-    "index": 9404,
-    "side": "long",
-    "entry": 4377.0599999999995,
-    "sl": 4363.438838155273,
-    "tp": 4417.123485534181,
-    "rr": 2.9412678588567704,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-12 02:00:00",
-    "exitPrice": 4363.438838155273,
-    "rMultiple": -1,
-    "reason": "WR L"
   },
   {
     "strategyId": "morning-star",
@@ -15504,22 +15328,6 @@
     "reason": "S1"
   },
   {
-    "strategyId": "williams-r-fade",
-    "datetime": "2026-08-17 04:30:00",
-    "index": 9555,
-    "side": "short",
-    "entry": 4395.33,
-    "sl": 4407.1786988303775,
-    "tp": 4360.583903508867,
-    "rr": 2.932482037778845,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-17 10:30:00",
-    "exitPrice": 4407.1786988303775,
-    "rMultiple": -1,
-    "reason": "WR S"
-  },
-  {
     "strategyId": "morning-star",
     "datetime": "2025-11-10 05:30:00",
     "index": 251,
@@ -16384,6 +16192,22 @@
     "reason": "R1"
   },
   {
+    "strategyId": "williams-r-fade",
+    "datetime": "2025-12-18 17:00:00",
+    "index": 1618,
+    "side": "short",
+    "entry": 4336.01,
+    "sl": 4346.627586448531,
+    "tp": 4304.957240654408,
+    "rr": 2.924653309499542,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-12-18 19:00:00",
+    "exitPrice": 4346.627586448531,
+    "rMultiple": -1,
+    "reason": "WR S"
+  },
+  {
     "strategyId": "ichimoku-tk",
     "datetime": "2025-12-12 10:00:00",
     "index": 1412,
@@ -16609,22 +16433,6 @@
   },
   {
     "strategyId": "classic-pivot",
-    "datetime": "2025-12-12 18:00:00",
-    "index": 1428,
-    "side": "short",
-    "entry": 4301.89,
-    "sl": 4312.206304680211,
-    "tp": 4271.7410859593665,
-    "rr": 2.9224528525670777,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-12 18:30:00",
-    "exitPrice": 4312.206304680211,
-    "rMultiple": -1,
-    "reason": "R1"
-  },
-  {
-    "strategyId": "classic-pivot",
     "datetime": "2026-07-03 09:00:00",
     "index": 8076,
     "side": "short",
@@ -16846,6 +16654,22 @@
     "exitPrice": 4387.407178671569,
     "rMultiple": -1,
     "reason": "MS"
+  },
+  {
+    "strategyId": "morning-star",
+    "datetime": "2025-12-24 08:00:00",
+    "index": 1792,
+    "side": "short",
+    "entry": 4492.35,
+    "sl": 4502.210383499946,
+    "tp": 4463.568849500162,
+    "rr": 2.918867252982232,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2025-12-24 17:30:00",
+    "exitPrice": 4463.568849500162,
+    "rMultiple": 2.918867252982232,
+    "reason": "ES"
   },
   {
     "strategyId": "morning-star",
@@ -20001,6 +19825,22 @@
   },
   {
     "strategyId": "three-soldiers",
+    "datetime": "2026-03-23 09:30:00",
+    "index": 4819,
+    "side": "short",
+    "entry": 4213.4400000000005,
+    "sl": 4360.22,
+    "tp": 3847.1900000000005,
+    "rr": 2.4952309578961755,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-23 14:00:00",
+    "exitPrice": 4360.22,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
+    "strategyId": "three-soldiers",
     "datetime": "2026-01-30 00:00:00",
     "index": 3072,
     "side": "long",
@@ -20353,22 +20193,6 @@
   },
   {
     "strategyId": "three-soldiers",
-    "datetime": "2026-03-23 08:30:00",
-    "index": 4817,
-    "side": "short",
-    "entry": 4311.55,
-    "sl": 4377.54,
-    "tp": 4147.275,
-    "rr": 2.489392332171558,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-23 10:00:00",
-    "exitPrice": 4147.275,
-    "rMultiple": 2.489392332171558,
-    "reason": "3C"
-  },
-  {
-    "strategyId": "three-soldiers",
     "datetime": "2026-02-09 04:30:00",
     "index": 3369,
     "side": "short",
@@ -20529,6 +20353,22 @@
   },
   {
     "strategyId": "macd-cross",
+    "datetime": "2026-02-05 13:00:00",
+    "index": 3290,
+    "side": "short",
+    "entry": 4856.650000000001,
+    "sl": 4915.443803754896,
+    "tp": 4710.365490612761,
+    "rr": 2.488093983459243,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-02-06 02:30:00",
+    "exitPrice": 4710.365490612761,
+    "rMultiple": 2.488093983459243,
+    "reason": "MACD short"
+  },
+  {
+    "strategyId": "macd-cross",
     "datetime": "2026-03-24 03:00:00",
     "index": 4854,
     "side": "short",
@@ -20577,22 +20417,6 @@
   },
   {
     "strategyId": "three-soldiers",
-    "datetime": "2026-04-20 04:00:00",
-    "index": 5768,
-    "side": "long",
-    "entry": 4803.349999999999,
-    "sl": 4746.82,
-    "tp": 4943.974999999999,
-    "rr": 2.487617194410059,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-21 17:30:00",
-    "exitPrice": 4746.82,
-    "rMultiple": -1,
-    "reason": "3S"
-  },
-  {
-    "strategyId": "three-soldiers",
     "datetime": "2026-02-10 18:30:00",
     "index": 3445,
     "side": "short",
@@ -20604,6 +20428,22 @@
     "outcome": "SL",
     "exitDatetime": "2026-02-11 13:30:00",
     "exitPrice": 5077.46,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2025-11-20 05:00:00",
+    "index": 634,
+    "side": "short",
+    "entry": 4055.34,
+    "sl": 4108.15,
+    "tp": 3924.015000000001,
+    "rr": 2.4867449346714756,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-11-20 17:30:00",
+    "exitPrice": 4108.15,
     "rMultiple": -1,
     "reason": "3C"
   },
@@ -20688,6 +20528,22 @@
     "reason": "3S"
   },
   {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-04-20 04:30:00",
+    "index": 5769,
+    "side": "long",
+    "entry": 4809.33,
+    "sl": 4759.54,
+    "tp": 4933.1050000000005,
+    "rr": 2.485940951998406,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-21 17:30:00",
+    "exitPrice": 4759.54,
+    "rMultiple": -1,
+    "reason": "3S"
+  },
+  {
     "strategyId": "macd-cross",
     "datetime": "2026-02-04 03:30:00",
     "index": 3223,
@@ -20702,38 +20558,6 @@
     "exitPrice": 4965.3302118482225,
     "rMultiple": -1,
     "reason": "MACD long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-02-05 05:30:00",
-    "index": 3275,
-    "side": "short",
-    "entry": 4816.78,
-    "sl": 4864.645358460939,
-    "tp": 4697.816603847651,
-    "rr": 2.4853756448816613,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-02-05 06:00:00",
-    "exitPrice": 4864.645358460939,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2026-02-05 05:30:00",
-    "index": 3275,
-    "side": "short",
-    "entry": 4816.78,
-    "sl": 4864.645358460939,
-    "tp": 4697.816603847651,
-    "rr": 2.4853756448816613,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-02-05 06:00:00",
-    "exitPrice": 4864.645358460939,
-    "rMultiple": -1,
-    "reason": "MACD short"
   },
   {
     "strategyId": "three-soldiers",
@@ -21296,22 +21120,6 @@
     "reason": "MACD long"
   },
   {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-06-05 10:00:00",
-    "index": 7118,
-    "side": "long",
-    "entry": 4466.2699999999995,
-    "sl": 4429.15,
-    "tp": 4558.37,
-    "rr": 2.4811422413793274,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-06-05 15:30:00",
-    "exitPrice": 4429.15,
-    "rMultiple": -1,
-    "reason": "3S"
-  },
-  {
     "strategyId": "macd-cross",
     "datetime": "2026-03-21 01:30:00",
     "index": 4803,
@@ -21536,22 +21344,6 @@
     "reason": "MACD long"
   },
   {
-    "strategyId": "pdh-retest",
-    "datetime": "2026-03-03 13:30:00",
-    "index": 4155,
-    "side": "short",
-    "entry": 5245.13,
-    "sl": 5279.903782810037,
-    "tp": 5158.895542974907,
-    "rr": 2.4798698921016635,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-03 14:00:00",
-    "exitPrice": 5158.895542974907,
-    "rMultiple": 2.4798698921016635,
-    "reason": "PDL retest short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2025-11-18 00:00:00",
     "index": 528,
@@ -21630,22 +21422,6 @@
     "exitPrice": 5129.15,
     "rMultiple": 2.4796274738067705,
     "reason": "3S"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2025-11-13 17:00:00",
-    "index": 418,
-    "side": "short",
-    "entry": 4210.13,
-    "sl": 4244.3,
-    "tp": 4125.404999999999,
-    "rr": 2.4795141937372285,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2025-11-14 15:00:00",
-    "exitPrice": 4125.404999999999,
-    "rMultiple": 2.4795141937372285,
-    "reason": "3C"
   },
   {
     "strategyId": "three-soldiers",
@@ -21744,6 +21520,22 @@
     "reason": "3S"
   },
   {
+    "strategyId": "macd-cross",
+    "datetime": "2026-03-09 18:30:00",
+    "index": 4357,
+    "side": "long",
+    "entry": 5101.13,
+    "sl": 5068.050023190941,
+    "tp": 5183.129942022649,
+    "rr": 2.478839162915989,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-03-10 04:30:00",
+    "exitPrice": 5183.129942022649,
+    "rMultiple": 2.478839162915989,
+    "reason": "MACD long"
+  },
+  {
     "strategyId": "dual-thrust",
     "datetime": "2026-01-28 22:30:00",
     "index": 3021,
@@ -21789,22 +21581,6 @@
     "exitDatetime": "2025-12-26 18:30:00",
     "exitPrice": 4536.13,
     "rMultiple": -1,
-    "reason": "3C"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-03-12 20:30:00",
-    "index": 4505,
-    "side": "short",
-    "entry": 5104.1,
-    "sl": 5136.97,
-    "tp": 5022.625,
-    "rr": 2.478703985397038,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-13 22:30:00",
-    "exitPrice": 5022.625,
-    "rMultiple": 2.478703985397038,
     "reason": "3C"
   },
   {
@@ -21969,22 +21745,6 @@
   },
   {
     "strategyId": "macd-cross",
-    "datetime": "2026-03-04 16:30:00",
-    "index": 4209,
-    "side": "short",
-    "entry": 5173.62,
-    "sl": 5204.736449971115,
-    "tp": 5096.528875072212,
-    "rr": 2.4775038604773627,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-03-05 16:00:00",
-    "exitPrice": 5096.528875072212,
-    "rMultiple": 2.4775038604773627,
-    "reason": "MACD short"
-  },
-  {
-    "strategyId": "macd-cross",
     "datetime": "2026-03-30 17:00:00",
     "index": 5074,
     "side": "short",
@@ -22030,22 +21790,6 @@
     "exitPrice": 4141.834999999999,
     "rMultiple": 2.4771017337258807,
     "reason": "3S"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2026-03-09 15:00:00",
-    "index": 4350,
-    "side": "long",
-    "entry": 5109.36,
-    "sl": 5078.8251442494375,
-    "tp": 5184.997139376406,
-    "rr": 2.4770753788484488,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-09 16:30:00",
-    "exitPrice": 5078.8251442494375,
-    "rMultiple": -1,
-    "reason": "MACD long"
   },
   {
     "strategyId": "pdh-retest",
@@ -22110,22 +21854,6 @@
     "exitPrice": 4598.52668259023,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-02-25 00:30:00",
-    "index": 3937,
-    "side": "short",
-    "entry": 5143.400000000001,
-    "sl": 5173.71,
-    "tp": 5068.325000000001,
-    "rr": 2.4769053117783266,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-02-25 04:00:00",
-    "exitPrice": 5173.71,
-    "rMultiple": -1,
-    "reason": "3C"
   },
   {
     "strategyId": "three-soldiers",
@@ -22321,22 +22049,6 @@
   },
   {
     "strategyId": "dual-thrust",
-    "datetime": "2026-03-27 17:30:00",
-    "index": 5027,
-    "side": "long",
-    "entry": 4512.21,
-    "sl": 4483.616023531069,
-    "tp": 4582.994941172328,
-    "rr": 2.4755193195755774,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-30 05:30:00",
-    "exitPrice": 4483.616023531069,
-    "rMultiple": -1,
-    "reason": "DT long"
-  },
-  {
-    "strategyId": "dual-thrust",
     "datetime": "2026-03-25 15:00:00",
     "index": 4926,
     "side": "short",
@@ -22432,22 +22144,6 @@
     "reason": "PDL retest short"
   },
   {
-    "strategyId": "pdh-retest",
-    "datetime": "2025-12-31 11:30:00",
-    "index": 2039,
-    "side": "short",
-    "entry": 4306.29,
-    "sl": 4334.679199560495,
-    "tp": 4236.01700109876,
-    "rr": 2.475342735588326,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-31 12:30:00",
-    "exitPrice": 4334.679199560495,
-    "rMultiple": -1,
-    "reason": "PDL retest short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-07-15 05:00:00",
     "index": 8452,
@@ -22510,22 +22206,6 @@
     "exitPrice": 4640.71,
     "rMultiple": -1,
     "reason": "3S"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2025-12-31 11:30:00",
-    "index": 2039,
-    "side": "short",
-    "entry": 4306.29,
-    "sl": 4334.27,
-    "tp": 4237.039999999998,
-    "rr": 2.474982130092947,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-31 12:30:00",
-    "exitPrice": 4334.27,
-    "rMultiple": -1,
-    "reason": "3C"
   },
   {
     "strategyId": "pdh-retest",
@@ -22625,6 +22305,22 @@
   },
   {
     "strategyId": "macd-cross",
+    "datetime": "2026-04-01 10:00:00",
+    "index": 5156,
+    "side": "long",
+    "entry": 4722.45,
+    "sl": 4695.040291536954,
+    "tp": 4790.274271157615,
+    "rr": 2.4744616035977502,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-04-01 19:00:00",
+    "exitPrice": 4790.274271157615,
+    "rMultiple": 2.4744616035977502,
+    "reason": "MACD long"
+  },
+  {
+    "strategyId": "macd-cross",
     "datetime": "2026-03-27 11:30:00",
     "index": 5015,
     "side": "short",
@@ -22654,22 +22350,6 @@
     "exitPrice": 5303.936973307347,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-04-15 05:30:00",
-    "index": 5627,
-    "side": "short",
-    "entry": 4823.58,
-    "sl": 4850.62,
-    "tp": 4756.679999999999,
-    "rr": 2.4741124260355263,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-17 16:00:00",
-    "exitPrice": 4850.62,
-    "rMultiple": -1,
-    "reason": "3C"
   },
   {
     "strategyId": "dual-thrust",
@@ -22929,22 +22609,6 @@
   },
   {
     "strategyId": "three-soldiers",
-    "datetime": "2026-03-10 03:00:00",
-    "index": 4374,
-    "side": "short",
-    "entry": 5130.71,
-    "sl": 5156.86,
-    "tp": 5066.035,
-    "rr": 2.473231357552623,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-10 04:00:00",
-    "exitPrice": 5156.86,
-    "rMultiple": -1,
-    "reason": "3C"
-  },
-  {
-    "strategyId": "three-soldiers",
     "datetime": "2026-03-11 03:00:00",
     "index": 4422,
     "side": "long",
@@ -23056,22 +22720,6 @@
     "reason": "3C"
   },
   {
-    "strategyId": "macd-cross",
-    "datetime": "2026-04-01 03:00:00",
-    "index": 5142,
-    "side": "long",
-    "entry": 4721.0599999999995,
-    "sl": 4695.425223687443,
-    "tp": 4784.446940781392,
-    "rr": 2.4726933447179533,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-01 04:00:00",
-    "exitPrice": 4695.425223687443,
-    "rMultiple": -1,
-    "reason": "MACD long"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-03-20 07:30:00",
     "index": 4767,
@@ -23118,6 +22766,22 @@
     "exitPrice": 5110.463039876159,
     "rMultiple": -1,
     "reason": "DT long"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-02-25 14:00:00",
+    "index": 3964,
+    "side": "short",
+    "entry": 5168.78,
+    "sl": 5194.33,
+    "tp": 5105.604999999999,
+    "rr": 2.4726027397260526,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-02-25 18:00:00",
+    "exitPrice": 5194.33,
+    "rMultiple": -1,
+    "reason": "3C"
   },
   {
     "strategyId": "three-soldiers",
@@ -23345,22 +23009,6 @@
   },
   {
     "strategyId": "three-soldiers",
-    "datetime": "2025-11-20 04:30:00",
-    "index": 633,
-    "side": "short",
-    "entry": 4083.6800000000003,
-    "sl": 4108.69,
-    "tp": 4021.8550000000014,
-    "rr": 2.472011195521816,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-20 17:30:00",
-    "exitPrice": 4108.69,
-    "rMultiple": -1,
-    "reason": "3C"
-  },
-  {
-    "strategyId": "three-soldiers",
     "datetime": "2026-01-12 05:00:00",
     "index": 2410,
     "side": "short",
@@ -23456,22 +23104,6 @@
     "reason": "MACD short"
   },
   {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-03-16 04:00:00",
-    "index": 4568,
-    "side": "short",
-    "entry": 4989,
-    "sl": 5013.489062008917,
-    "tp": 4928.477344977706,
-    "rr": 2.471415810056587,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-16 04:30:00",
-    "exitPrice": 5013.489062008917,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-07-30 03:30:00",
     "index": 8977,
@@ -23548,6 +23180,22 @@
     "outcome": "SL",
     "exitDatetime": "2026-08-14 14:30:00",
     "exitPrice": 4364.53,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2025-12-31 19:00:00",
+    "index": 2054,
+    "side": "short",
+    "entry": 4325.47,
+    "sl": 4349.74,
+    "tp": 4265.495000000001,
+    "rr": 2.4711578079934333,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-01-02 02:30:00",
+    "exitPrice": 4349.74,
     "rMultiple": -1,
     "reason": "3C"
   },
@@ -24928,6 +24576,22 @@
     "reason": "MACD long"
   },
   {
+    "strategyId": "three-soldiers",
+    "datetime": "2025-11-26 17:30:00",
+    "index": 851,
+    "side": "short",
+    "entry": 4144.92,
+    "sl": 4165.61,
+    "tp": 4093.8950000000004,
+    "rr": 2.4661672305461875,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-11-26 19:00:00",
+    "exitPrice": 4165.61,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
     "strategyId": "macd-cross",
     "datetime": "2026-06-26 20:30:00",
     "index": 7859,
@@ -25038,6 +24702,22 @@
     "exitPrice": 4073.9283198224966,
     "rMultiple": 2.4659057610681536,
     "reason": "MACD long"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-06-03 08:00:00",
+    "index": 7018,
+    "side": "short",
+    "entry": 4467.6,
+    "sl": 4488.13,
+    "tp": 4416.975,
+    "rr": 2.4659035557720714,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-06-04 14:00:00",
+    "exitPrice": 4488.13,
+    "rMultiple": -1,
+    "reason": "3C"
   },
   {
     "strategyId": "dual-thrust",
@@ -25198,22 +24878,6 @@
     "exitPrice": 5072.847482774019,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-12-31 08:30:00",
-    "index": 2033,
-    "side": "short",
-    "entry": 4286.83,
-    "sl": 4306.956317261733,
-    "tp": 4237.214206845667,
-    "rr": 2.465219667816235,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-31 09:00:00",
-    "exitPrice": 4306.956317261733,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "three-soldiers",
@@ -25628,6 +25292,22 @@
     "outcome": "SL",
     "exitDatetime": "2026-03-09 04:00:00",
     "exitPrice": 5063.367039047739,
+    "rMultiple": -1,
+    "reason": "MACD short"
+  },
+  {
+    "strategyId": "macd-cross",
+    "datetime": "2025-11-21 23:30:00",
+    "index": 719,
+    "side": "short",
+    "entry": 4062.88,
+    "sl": 4082.4112839055983,
+    "tp": 4014.751790236004,
+    "rr": 2.464160062216957,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-11-24 15:30:00",
+    "exitPrice": 4082.4112839055983,
     "rMultiple": -1,
     "reason": "MACD short"
   },
@@ -26288,6 +25968,22 @@
     "reason": "3S"
   },
   {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-03-10 03:30:00",
+    "index": 4375,
+    "side": "short",
+    "entry": 5130.13,
+    "sl": 5148.75,
+    "tp": 5084.28,
+    "rr": 2.462406015037628,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-10 04:00:00",
+    "exitPrice": 5148.75,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
     "strategyId": "macd-cross",
     "datetime": "2026-04-13 13:00:00",
     "index": 5546,
@@ -26366,6 +26062,22 @@
     "exitPrice": 4338.927280093711,
     "rMultiple": -1,
     "reason": "DT long"
+  },
+  {
+    "strategyId": "macd-cross",
+    "datetime": "2026-04-20 21:00:00",
+    "index": 5802,
+    "side": "long",
+    "entry": 4813.87,
+    "sl": 4795.458471536024,
+    "tp": 4859.19882115994,
+    "rr": 2.461980342839621,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-21 06:00:00",
+    "exitPrice": 4795.458471536024,
+    "rMultiple": -1,
+    "reason": "MACD long"
   },
   {
     "strategyId": "three-soldiers",
@@ -26688,22 +26400,6 @@
     "reason": "MACD long"
   },
   {
-    "strategyId": "macd-cross",
-    "datetime": "2026-04-20 09:30:00",
-    "index": 5779,
-    "side": "long",
-    "entry": 4794.87,
-    "sl": 4776.9654057690395,
-    "tp": 4838.931485577401,
-    "rr": 2.4609038891934567,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-21 09:30:00",
-    "exitPrice": 4776.9654057690395,
-    "rMultiple": -1,
-    "reason": "MACD long"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-04-30 05:30:00",
     "index": 6155,
@@ -26782,22 +26478,6 @@
     "exitPrice": 4193.378079006019,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2025-11-26 09:30:00",
-    "index": 835,
-    "side": "short",
-    "entry": 4149.070000000001,
-    "sl": 4166.87,
-    "tp": 4105.270000000002,
-    "rr": 2.4606741573033792,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-26 11:00:00",
-    "exitPrice": 4166.87,
-    "rMultiple": -1,
-    "reason": "3C"
   },
   {
     "strategyId": "macd-cross",
@@ -27009,6 +26689,22 @@
   },
   {
     "strategyId": "macd-cross",
+    "datetime": "2026-04-24 10:00:00",
+    "index": 5972,
+    "side": "long",
+    "entry": 4684.65,
+    "sl": 4667.049348365703,
+    "tp": 4727.951629085743,
+    "rr": 2.4602287452451543,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-04-24 17:00:00",
+    "exitPrice": 4727.951629085743,
+    "rMultiple": 2.4602287452451543,
+    "reason": "MACD long"
+  },
+  {
+    "strategyId": "macd-cross",
     "datetime": "2026-06-04 10:00:00",
     "index": 7070,
     "side": "short",
@@ -27168,6 +26864,22 @@
     "reason": "3C"
   },
   {
+    "strategyId": "dual-thrust",
+    "datetime": "2025-11-17 22:30:00",
+    "index": 525,
+    "side": "short",
+    "entry": 4011.92,
+    "sl": 4029.265393215408,
+    "tp": 3969.2565169614795,
+    "rr": 2.459643463177442,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-11-17 23:30:00",
+    "exitPrice": 4029.265393215408,
+    "rMultiple": -1,
+    "reason": "DT short"
+  },
+  {
     "strategyId": "macd-cross",
     "datetime": "2026-02-26 10:30:00",
     "index": 4005,
@@ -27232,22 +26944,6 @@
     "reason": "MACD short"
   },
   {
-    "strategyId": "macd-cross",
-    "datetime": "2025-11-21 04:00:00",
-    "index": 680,
-    "side": "short",
-    "entry": 4062.1200000000003,
-    "sl": 4079.361007830762,
-    "tp": 4019.7174804230954,
-    "rr": 2.4593991252210796,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-21 05:30:00",
-    "exitPrice": 4079.361007830762,
-    "rMultiple": -1,
-    "reason": "MACD short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2025-12-18 04:00:00",
     "index": 1592,
@@ -27262,22 +26958,6 @@
     "exitPrice": 4342.94,
     "rMultiple": -1,
     "reason": "3C"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-07-03 04:00:00",
-    "index": 8066,
-    "side": "long",
-    "entry": 4191.46,
-    "sl": 4174.2352719497985,
-    "tp": 4233.821820125504,
-    "rr": 2.4593607517076808,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-03 07:00:00",
-    "exitPrice": 4174.2352719497985,
-    "rMultiple": -1,
-    "reason": "DT long"
   },
   {
     "strategyId": "macd-cross",
@@ -27393,22 +27073,6 @@
   },
   {
     "strategyId": "macd-cross",
-    "datetime": "2026-04-24 03:00:00",
-    "index": 5958,
-    "side": "long",
-    "entry": 4705.21,
-    "sl": 4688.225479332222,
-    "tp": 4746.971301669446,
-    "rr": 2.4587860020490417,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-24 05:00:00",
-    "exitPrice": 4688.225479332222,
-    "rMultiple": -1,
-    "reason": "MACD long"
-  },
-  {
-    "strategyId": "macd-cross",
     "datetime": "2026-08-05 12:30:00",
     "index": 9187,
     "side": "short",
@@ -27454,6 +27118,22 @@
     "exitPrice": 4763.991776962426,
     "rMultiple": -1,
     "reason": "MACD short"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-05-25 13:00:00",
+    "index": 6692,
+    "side": "long",
+    "entry": 4571.639999999999,
+    "sl": 4554.72,
+    "tp": 4613.239999999998,
+    "rr": 2.4586288416076005,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-05-25 15:00:00",
+    "exitPrice": 4554.72,
+    "rMultiple": -1,
+    "reason": "3S"
   },
   {
     "strategyId": "macd-cross",
@@ -27582,6 +27262,22 @@
     "exitPrice": 4306.842270953932,
     "rMultiple": -1,
     "reason": "DT short"
+  },
+  {
+    "strategyId": "macd-cross",
+    "datetime": "2026-04-14 13:30:00",
+    "index": 5595,
+    "side": "short",
+    "entry": 4769.7,
+    "sl": 4786.422673446849,
+    "tp": 4728.593316382876,
+    "rr": 2.458140664396476,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-14 16:00:00",
+    "exitPrice": 4786.422673446849,
+    "rMultiple": -1,
+    "reason": "MACD short"
   },
   {
     "strategyId": "macd-cross",
@@ -27808,22 +27504,6 @@
     "reason": "DT short"
   },
   {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-01-12 17:00:00",
-    "index": 2434,
-    "side": "short",
-    "entry": 4587.38,
-    "sl": 4603.95873413504,
-    "tp": 4546.6331646624,
-    "rr": 2.457777234721444,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-01-12 17:30:00",
-    "exitPrice": 4603.95873413504,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
     "strategyId": "macd-cross",
     "datetime": "2025-12-24 06:00:00",
     "index": 1788,
@@ -27870,22 +27550,6 @@
     "exitPrice": 4071.163185953656,
     "rMultiple": -1,
     "reason": "MACD long"
-  },
-  {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-06-03 07:30:00",
-    "index": 7017,
-    "side": "short",
-    "entry": 4469.070000000001,
-    "sl": 4485.61,
-    "tp": 4428.420000000002,
-    "rr": 2.4576783555018773,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-06-04 01:00:00",
-    "exitPrice": 4428.420000000002,
-    "rMultiple": 2.4576783555018773,
-    "reason": "3C"
   },
   {
     "strategyId": "macd-cross",
@@ -27998,22 +27662,6 @@
     "exitPrice": 4421.86,
     "rMultiple": -1,
     "reason": "3C"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-11-13 17:00:00",
-    "index": 418,
-    "side": "short",
-    "entry": 4210.13,
-    "sl": 4226.579486576536,
-    "tp": 4169.70628355866,
-    "rr": 2.4574454803350867,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2025-11-13 21:30:00",
-    "exitPrice": 4169.70628355866,
-    "rMultiple": 2.4574454803350867,
-    "reason": "DT short"
   },
   {
     "strategyId": "three-soldiers",
@@ -28189,6 +27837,22 @@
     "exitDatetime": "2026-01-13 09:30:00",
     "exitPrice": 4579.68,
     "rMultiple": -1,
+    "reason": "3S"
+  },
+  {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-08-14 11:30:00",
+    "index": 9521,
+    "side": "long",
+    "entry": 4347.9,
+    "sl": 4331.56,
+    "tp": 4388.049999999998,
+    "rr": 2.4571603427172954,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-08-14 16:30:00",
+    "exitPrice": 4388.049999999998,
+    "rMultiple": 2.4571603427172954,
     "reason": "3S"
   },
   {
@@ -28784,22 +28448,6 @@
     "reason": "ES"
   },
   {
-    "strategyId": "macd-cross",
-    "datetime": "2026-04-14 08:00:00",
-    "index": 5584,
-    "side": "short",
-    "entry": 4764.08,
-    "sl": 4779.899178249462,
-    "tp": 4725.2320543763435,
-    "rr": 2.455749913872855,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-14 09:30:00",
-    "exitPrice": 4779.899178249462,
-    "rMultiple": -1,
-    "reason": "MACD short"
-  },
-  {
     "strategyId": "pdh-retest",
     "datetime": "2026-03-16 05:30:00",
     "index": 4571,
@@ -28976,22 +28624,6 @@
     "reason": "MACD short"
   },
   {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-11-17 08:00:00",
-    "index": 496,
-    "side": "short",
-    "entry": 4064.77,
-    "sl": 4080.4528817339965,
-    "tp": 4026.262795665008,
-    "rr": 2.45536534599493,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-17 10:30:00",
-    "exitPrice": 4080.4528817339965,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2025-11-18 10:00:00",
     "index": 548,
@@ -29022,22 +28654,6 @@
     "exitPrice": 4437.555954121392,
     "rMultiple": -1,
     "reason": "MACD long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-02-18 15:30:00",
-    "index": 3727,
-    "side": "long",
-    "entry": 4943.7,
-    "sl": 4928.049043008537,
-    "tp": 4982.1273924786565,
-    "rr": 2.455274300454521,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-02-18 17:30:00",
-    "exitPrice": 4982.1273924786565,
-    "rMultiple": 2.455274300454521,
-    "reason": "DT long"
   },
   {
     "strategyId": "macd-cross",
@@ -29552,22 +29168,6 @@
     "reason": "DT long"
   },
   {
-    "strategyId": "three-soldiers",
-    "datetime": "2026-05-25 12:30:00",
-    "index": 6691,
-    "side": "long",
-    "entry": 4569.0199999999995,
-    "sl": 4553.81,
-    "tp": 4606.3449999999975,
-    "rr": 2.453977646285348,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-05-25 15:00:00",
-    "exitPrice": 4553.81,
-    "rMultiple": -1,
-    "reason": "3S"
-  },
-  {
     "strategyId": "macd-cross",
     "datetime": "2026-01-13 07:00:00",
     "index": 2462,
@@ -29777,6 +29377,22 @@
   },
   {
     "strategyId": "macd-cross",
+    "datetime": "2026-08-14 08:00:00",
+    "index": 9514,
+    "side": "long",
+    "entry": 4319.429999999999,
+    "sl": 4304.394436398372,
+    "tp": 4356.318909004069,
+    "rr": 2.4534437139474043,
+    "setupStatus": "RESOLVED",
+    "outcome": "TP",
+    "exitDatetime": "2026-08-14 12:30:00",
+    "exitPrice": 4356.318909004069,
+    "rMultiple": 2.4534437139474043,
+    "reason": "MACD long"
+  },
+  {
+    "strategyId": "macd-cross",
     "datetime": "2026-01-13 09:30:00",
     "index": 2467,
     "side": "short",
@@ -29790,22 +29406,6 @@
     "exitPrice": 4595.943470578188,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "pdh-retest",
-    "datetime": "2026-03-31 05:00:00",
-    "index": 5098,
-    "side": "long",
-    "entry": 4582.92,
-    "sl": 4567.9351092803145,
-    "tp": 4619.682226799215,
-    "rr": 2.4532862792866568,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-03-31 05:30:00",
-    "exitPrice": 4567.9351092803145,
-    "rMultiple": -1,
-    "reason": "PDH retest long"
   },
   {
     "strategyId": "macd-cross",
@@ -29984,6 +29584,22 @@
     "reason": "DT short"
   },
   {
+    "strategyId": "three-soldiers",
+    "datetime": "2026-04-15 09:30:00",
+    "index": 5635,
+    "side": "short",
+    "entry": 4812.74,
+    "sl": 4827.53,
+    "tp": 4776.464999999999,
+    "rr": 2.4526707234618415,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-04-15 16:30:00",
+    "exitPrice": 4827.53,
+    "rMultiple": -1,
+    "reason": "3C"
+  },
+  {
     "strategyId": "macd-cross",
     "datetime": "2026-05-13 04:30:00",
     "index": 6291,
@@ -29998,22 +29614,6 @@
     "exitPrice": 4716.736908692524,
     "rMultiple": -1,
     "reason": "MACD short"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-12-12 18:00:00",
-    "index": 1428,
-    "side": "short",
-    "entry": 4301.89,
-    "sl": 4316.658914040637,
-    "tp": 4265.667714898409,
-    "rr": 2.452603150233404,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-12 18:30:00",
-    "exitPrice": 4316.658914040637,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "macd-cross",
@@ -30705,22 +30305,6 @@
   },
   {
     "strategyId": "macd-cross",
-    "datetime": "2025-12-18 00:30:00",
-    "index": 1585,
-    "side": "short",
-    "entry": 4337.93,
-    "sl": 4352.161278028947,
-    "tp": 4303.0518049276325,
-    "rr": 2.450812569428052,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-18 19:00:00",
-    "exitPrice": 4352.161278028947,
-    "rMultiple": -1,
-    "reason": "MACD short"
-  },
-  {
-    "strategyId": "macd-cross",
     "datetime": "2026-06-09 04:30:00",
     "index": 7203,
     "side": "long",
@@ -30750,22 +30334,6 @@
     "exitPrice": 4369.0650000000005,
     "rMultiple": 2.4507389162562028,
     "reason": "3S"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-04-22 15:30:00",
-    "index": 5887,
-    "side": "short",
-    "entry": 4744.12,
-    "sl": 4758.322955826284,
-    "tp": 4709.31261043429,
-    "rr": 2.450714484466367,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-22 16:30:00",
-    "exitPrice": 4758.322955826284,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "macd-cross",
@@ -30832,22 +30400,6 @@
     "reason": "3C"
   },
   {
-    "strategyId": "macd-cross",
-    "datetime": "2026-08-14 01:00:00",
-    "index": 9500,
-    "side": "long",
-    "entry": 4357.7699999999995,
-    "sl": 4343.651517799234,
-    "tp": 4392.366205501914,
-    "rr": 2.450419599639332,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-14 03:00:00",
-    "exitPrice": 4343.651517799234,
-    "rMultiple": -1,
-    "reason": "MACD long"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-02-23 08:00:00",
     "index": 3856,
@@ -30881,35 +30433,19 @@
   },
   {
     "strategyId": "macd-cross",
-    "datetime": "2026-07-07 11:00:00",
-    "index": 8176,
-    "side": "long",
-    "entry": 4138.5199999999995,
-    "sl": 4124.428182498715,
-    "tp": 4173.049543753212,
-    "rr": 2.450325783034304,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-07 11:30:00",
-    "exitPrice": 4124.428182498715,
-    "rMultiple": -1,
-    "reason": "MACD long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-04-29 04:00:00",
-    "index": 6104,
+    "datetime": "2026-08-18 17:30:00",
+    "index": 9629,
     "side": "short",
-    "entry": 4581.6900000000005,
-    "sl": 4595.7616086249645,
-    "tp": 4547.21097843759,
-    "rr": 2.4502544436350004,
+    "entry": 4369.610000000001,
+    "sl": 4383.703306588264,
+    "tp": 4335.07673352934,
+    "rr": 2.4503310315705584,
     "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-04-29 05:00:00",
-    "exitPrice": 4595.7616086249645,
-    "rMultiple": -1,
-    "reason": "DT short"
+    "outcome": "TP",
+    "exitDatetime": "2026-08-18 23:00:00",
+    "exitPrice": 4335.07673352934,
+    "rMultiple": 2.4503310315705584,
+    "reason": "MACD short"
   },
   {
     "strategyId": "three-soldiers",
@@ -31649,22 +31185,6 @@
   },
   {
     "strategyId": "dual-thrust",
-    "datetime": "2025-12-15 19:00:00",
-    "index": 1478,
-    "side": "short",
-    "entry": 4296,
-    "sl": 4309.454023594539,
-    "tp": 4263.064941013652,
-    "rr": 2.4479709549280817,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-15 21:30:00",
-    "exitPrice": 4309.454023594539,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
-    "strategyId": "dual-thrust",
     "datetime": "2026-04-16 16:30:00",
     "index": 5697,
     "side": "short",
@@ -31742,22 +31262,6 @@
     "exitPrice": 4064.326574637329,
     "rMultiple": 2.44755230289533,
     "reason": "MACD long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-11-11 18:00:00",
-    "index": 324,
-    "side": "short",
-    "entry": 4100.55,
-    "sl": 4113.8685955542915,
-    "tp": 4067.9535111142714,
-    "rr": 2.447441905781588,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-11 19:00:00",
-    "exitPrice": 4113.8685955542915,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "macd-cross",
@@ -32046,22 +31550,6 @@
     "exitPrice": 4999.910260355079,
     "rMultiple": -1,
     "reason": "3S"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2026-08-18 04:30:00",
-    "index": 9603,
-    "side": "short",
-    "entry": 4407.9400000000005,
-    "sl": 4421.056903682605,
-    "tp": 4375.84774079349,
-    "rr": 2.4466337470383563,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2026-08-18 17:30:00",
-    "exitPrice": 4375.84774079349,
-    "rMultiple": 2.4466337470383563,
-    "reason": "MACD short"
   },
   {
     "strategyId": "dual-thrust",
@@ -32753,22 +32241,6 @@
   },
   {
     "strategyId": "macd-cross",
-    "datetime": "2025-11-26 09:30:00",
-    "index": 835,
-    "side": "short",
-    "entry": 4149.070000000001,
-    "sl": 4161.526693423639,
-    "tp": 4118.628266440905,
-    "rr": 2.443805312036417,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-26 11:00:00",
-    "exitPrice": 4161.526693423639,
-    "rMultiple": -1,
-    "reason": "MACD short"
-  },
-  {
-    "strategyId": "macd-cross",
     "datetime": "2025-11-10 03:30:00",
     "index": 247,
     "side": "long",
@@ -32814,22 +32286,6 @@
     "exitPrice": 4057.529801031088,
     "rMultiple": -1,
     "reason": "3C"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2025-11-11 08:00:00",
-    "index": 304,
-    "side": "short",
-    "entry": 4123.2300000000005,
-    "sl": 4135.624845991969,
-    "tp": 4092.942885020079,
-    "rr": 2.443524913463794,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-11 12:00:00",
-    "exitPrice": 4135.624845991969,
-    "rMultiple": -1,
-    "reason": "MACD short"
   },
   {
     "strategyId": "macd-cross",
@@ -33104,22 +32560,6 @@
     "reason": "MACD long"
   },
   {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-11-26 15:30:00",
-    "index": 847,
-    "side": "short",
-    "entry": 4154.320000000001,
-    "sl": 4166.487300190293,
-    "tp": 4124.601749524269,
-    "rr": 2.442468749101934,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-11-26 19:30:00",
-    "exitPrice": 4166.487300190293,
-    "rMultiple": -1,
-    "reason": "DT short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2026-05-22 05:30:00",
     "index": 6629,
@@ -33198,6 +32638,22 @@
     "exitPrice": 5165.387190742218,
     "rMultiple": -1,
     "reason": "PDL retest short"
+  },
+  {
+    "strategyId": "macd-cross",
+    "datetime": "2025-11-26 23:30:00",
+    "index": 863,
+    "side": "short",
+    "entry": 4163.38,
+    "sl": 4175.4239574552275,
+    "tp": 4133.97010636193,
+    "rr": 2.4418795688542483,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-11-28 03:30:00",
+    "exitPrice": 4175.4239574552275,
+    "rMultiple": -1,
+    "reason": "MACD short"
   },
   {
     "strategyId": "pdh-retest",
@@ -33438,22 +32894,6 @@
     "exitPrice": 4331.559872290631,
     "rMultiple": -1,
     "reason": "DT long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2025-12-16 05:30:00",
-    "index": 1499,
-    "side": "short",
-    "entry": 4290.66,
-    "sl": 4302.425814782271,
-    "tp": 4261.9454630443215,
-    "rr": 2.440505607732787,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-16 16:30:00",
-    "exitPrice": 4302.425814782271,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "three-soldiers",
@@ -33840,6 +33280,22 @@
     "reason": "MACD long"
   },
   {
+    "strategyId": "macd-cross",
+    "datetime": "2025-12-09 18:00:00",
+    "index": 1284,
+    "side": "long",
+    "entry": 4207.04,
+    "sl": 4195.632796184323,
+    "tp": 4234.8580095391935,
+    "rr": 2.43863526843995,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-12-10 12:00:00",
+    "exitPrice": 4195.632796184323,
+    "rMultiple": -1,
+    "reason": "MACD long"
+  },
+  {
     "strategyId": "pdh-retest",
     "datetime": "2026-05-29 09:30:00",
     "index": 6877,
@@ -33998,22 +33454,6 @@
     "exitPrice": 4643.529745868407,
     "rMultiple": 2.437678626703437,
     "reason": "3C"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-07-07 04:00:00",
-    "index": 8162,
-    "side": "short",
-    "entry": 4127.12,
-    "sl": 4138.336029401074,
-    "tp": 4099.779926497315,
-    "rr": 2.4375893219456164,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-07 04:30:00",
-    "exitPrice": 4138.336029401074,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "three-soldiers",
@@ -34337,6 +33777,22 @@
   },
   {
     "strategyId": "pdh-retest",
+    "datetime": "2025-12-31 12:00:00",
+    "index": 2040,
+    "side": "short",
+    "entry": 4323.85,
+    "sl": 4334.844613877603,
+    "tp": 4297.063465305994,
+    "rr": 2.4363324617133326,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2025-12-31 12:30:00",
+    "exitPrice": 4334.844613877603,
+    "rMultiple": -1,
+    "reason": "PDL retest short"
+  },
+  {
+    "strategyId": "pdh-retest",
     "datetime": "2026-05-27 13:00:00",
     "index": 6788,
     "side": "short",
@@ -34430,22 +33886,6 @@
     "exitPrice": 4207.84,
     "rMultiple": -1,
     "reason": "3C"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2025-12-11 14:30:00",
-    "index": 1373,
-    "side": "short",
-    "entry": 4211.39,
-    "sl": 4222.27528232658,
-    "tp": 4184.87679418355,
-    "rr": 2.435692986272841,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2025-12-11 17:00:00",
-    "exitPrice": 4222.27528232658,
-    "rMultiple": -1,
-    "reason": "MACD short"
   },
   {
     "strategyId": "macd-cross",
@@ -34766,22 +34206,6 @@
     "exitPrice": 4217.35594953471,
     "rMultiple": -1,
     "reason": "PDH retest long"
-  },
-  {
-    "strategyId": "dual-thrust",
-    "datetime": "2026-07-28 12:30:00",
-    "index": 8899,
-    "side": "short",
-    "entry": 4018.9100000000003,
-    "sl": 4029.3799188023872,
-    "tp": 3993.4352029940324,
-    "rr": 2.4331417928628274,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-28 14:00:00",
-    "exitPrice": 4029.3799188023872,
-    "rMultiple": -1,
-    "reason": "DT short"
   },
   {
     "strategyId": "pdh-retest",
@@ -35601,22 +35025,6 @@
   },
   {
     "strategyId": "three-soldiers",
-    "datetime": "2026-08-14 01:00:00",
-    "index": 9500,
-    "side": "long",
-    "entry": 4357.7699999999995,
-    "sl": 4348.291011866156,
-    "tp": 4380.767470334609,
-    "rr": 2.426152455292086,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-08-14 03:00:00",
-    "exitPrice": 4348.291011866156,
-    "rMultiple": -1,
-    "reason": "3S"
-  },
-  {
-    "strategyId": "three-soldiers",
     "datetime": "2026-01-09 09:30:00",
     "index": 2371,
     "side": "long",
@@ -35662,6 +35070,22 @@
     "exitPrice": 4951.131682091514,
     "rMultiple": 2.425367780886101,
     "reason": "MACD short"
+  },
+  {
+    "strategyId": "pdh-retest",
+    "datetime": "2026-03-31 14:00:00",
+    "index": 5116,
+    "side": "long",
+    "entry": 4580.23,
+    "sl": 4570.864645822614,
+    "tp": 4602.943385443465,
+    "rr": 2.425256430590827,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-03-31 14:30:00",
+    "exitPrice": 4570.864645822614,
+    "rMultiple": -1,
+    "reason": "PDH retest long"
   },
   {
     "strategyId": "macd-cross",
@@ -35710,22 +35134,6 @@
     "exitPrice": 4514.798228791267,
     "rMultiple": -1,
     "reason": "3C"
-  },
-  {
-    "strategyId": "macd-cross",
-    "datetime": "2025-12-09 11:30:00",
-    "index": 1271,
-    "side": "long",
-    "entry": 4191.69,
-    "sl": 4182.381351180009,
-    "tp": 4214.261622049977,
-    "rr": 2.424801116302068,
-    "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2025-12-09 18:30:00",
-    "exitPrice": 4214.261622049977,
-    "rMultiple": 2.424801116302068,
-    "reason": "MACD long"
   },
   {
     "strategyId": "macd-cross",
@@ -36288,22 +35696,6 @@
     "reason": "3C"
   },
   {
-    "strategyId": "pdh-retest",
-    "datetime": "2026-07-07 07:30:00",
-    "index": 8169,
-    "side": "short",
-    "entry": 4125.93,
-    "sl": 4134.007159603782,
-    "tp": 4106.437100990544,
-    "rr": 2.4133358712298327,
-    "setupStatus": "RESOLVED",
-    "outcome": "SL",
-    "exitDatetime": "2026-07-07 10:30:00",
-    "exitPrice": 4134.007159603782,
-    "rMultiple": -1,
-    "reason": "PDL retest short"
-  },
-  {
     "strategyId": "three-soldiers",
     "datetime": "2025-12-22 11:00:00",
     "index": 1702,
@@ -36670,6 +36062,22 @@
     "exitPrice": 4213.931682370201,
     "rMultiple": -1,
     "reason": "3C"
+  },
+  {
+    "strategyId": "pdh-retest",
+    "datetime": "2026-07-07 08:00:00",
+    "index": 8170,
+    "side": "short",
+    "entry": 4127.14,
+    "sl": 4133.9452196320835,
+    "tp": 4110.826950919792,
+    "rr": 2.397137779844869,
+    "setupStatus": "RESOLVED",
+    "outcome": "SL",
+    "exitDatetime": "2026-07-07 10:30:00",
+    "exitPrice": 4133.9452196320835,
+    "rMultiple": -1,
+    "reason": "PDL retest short"
   },
   {
     "strategyId": "ichimoku-tk",

@@ -28,15 +28,18 @@ Turtle and Opening-Range-Breakout remain in the codebase as legacy/reference tra
 - Range: 2025-11-01 → 2026-08-20
 - Bars: 9738
 
-## Golden baseline (v1.4)
+## Golden baseline (v1.8)
 
-Production default options: `{ seriesEndsComplete: true, enableHtfDirectionFilter: true, enableFilterC: true }`
+Production default options: `{ seriesEndsComplete: true, enableHtfDirectionFilter: true, enableFilterC: true, enableFilterF: true }`
 
-- Resolved trades: 2323 (TP 756 / SL 1563 / OPEN 4 / NO_FILL 0)
-- Total R: 523.6813503963194
+- Resolved trades: 2286 (TP 751 / SL 1531 / OPEN 4 / NO_FILL 0)
+- Total R: 541.3570458970024
 
-The prior golden (2384 trades / R 507.83) predated the v1.2 A2 consume-after-RR
-fix (+3 trades) and the v1.3 Filter C default (−64 trades). See `logs/v1.4-changes.md`.
+The prior golden (2323 trades / R 523.6813503963194) was the v1.4 Filter-C-only
+default; Filter F removes 37 more counter-trend momentum bars and lifts the book
+by +17.7 R after slot refills. The 2323-book itself followed the v1.2 A2
+consume-after-RR fix (+3 trades) and the v1.3 Filter C default (−64 trades).
+See `logs/v1.4-changes.md` and `logs/v1.8-changes.md`.
 
 ## Pipeline invariants
 
@@ -46,6 +49,7 @@ fix (+3 trades) and the v1.3 Filter C default (−64 trades). See `logs/v1.4-cha
 - Trade vs context separation via `strategy-kind.ts`
 - No strategy rule/parameter optimization in this package
 - Filter C enabled by default (v1.3) — counter-trend + extreme ATR percentile (≥95%)
+- Filter F enabled by default (v1.8) — counter-trend bar closing on its high (body ≥80%, upper wick ≤2%)
 
 ## Run
 

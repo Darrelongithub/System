@@ -112,8 +112,10 @@ const summary = {
   runAnalysisMs,
   options: OPTIONS,
   note:
-    "v1.4 re-baseline: production default (A2 consume-after-RR + Filter C enabled). " +
-    "Prior golden (2384) predated both the v1.2 A2 fix (+3) and the v1.3 Filter C default (-64).",
+    "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped " +
+    "product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) " +
+    "was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend " +
+    "momentum bars that close on their high (+17.7 R net after slot refills).",
 };
 
 // ---- golden-regression-report.json (self-consistent: current == golden) ----

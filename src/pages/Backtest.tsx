@@ -296,8 +296,9 @@ export default function Backtest() {
         // One skip predicate, pinned by tests/weekend-tail-accounting.test.mjs:
         // a Saturday EAT carrying the Friday NY session tail (00:00–01:00 EAT)
         // can hold real triggers and must be PROCESSED. A hard-coded
-        // isWeekend(day) here previously dropped 37 such trades from rolling
-        // stats and the packaged reports (2286 vs 2323 on the golden baseline).
+        // isWeekend(day) here previously dropped 37 trigger-bearing Saturdays
+        // from rolling stats and the packaged reports; the count is pinned by
+        // tests/weekend-tail-accounting.test.mjs, not by a golden total.
         const skipReason = dayReportSkipReason(
           day,
           Boolean(meta),
