@@ -611,6 +611,51 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
 };
 
 /**
+ * The weekly market closure, in UTC — the single source of truth for "was the
+ * market shut at this instant?".
+ *
+ * The FX/metals week closes at 17:00 New York and reopens Sunday 18:00 New
+ * York. In UTC that is a 21:00/22:00 close and a 22:00/23:00 reopen depending
+ * on US daylight saving, and brokers differ by an hour either way, so a fixed
+ * UTC window can only be an approximation. This one is deliberately the
+ * CONSERVATIVE SUPERSET of the real closure: it starts at the latest possible
+ * close (Friday 22:00 UTC) and ends at the earliest possible open (Sunday
+ * 21:00 UTC). That can never delete an instant that might be live trading time;
+ * it can at worst retain an hour of closed-market filler.
+ *
+ * This replaces the previous rule, which skipped whole UTC Saturday/Sunday
+ * calendar days. Because every row is EAT wall clock (UTC+3), that rule deleted
+ * the weekly open — EAT Monday 00:00–02:30 = UTC Sunday 21:00–23:30 — from every
+ * exported file: all 41 EAT Mondays in the locked baseline start at 03:00, and
+ * the 3,039 dangling swing references pointed exactly at those dropped rows.
+ *
+ * Unparseable timestamps are NOT treated as closure: silently dropping a row
+ * because its datetime could not be read would be worse than keeping it.
+ */
+const CLOSURE_START_MINUTES_OF_WEEK = 4 * 1440 + 22 * 60; // Friday 22:00 UTC
+const CLOSURE_END_MINUTES_OF_WEEK = 6 * 1440 + 21 * 60; // Sunday 21:00 UTC
+
+export const isInsideWeekendClosure = (datetimeEAT: string): boolean => {
+  const parsed = new Date(`${String(datetimeEAT).replace(" ", "T")}+03:00`);
+  if (!Number.isFinite(parsed.getTime())) return false;
+  const minutesOfWeek =
+    ((parsed.getUTCDay() + 6) % 7) * 1440 + parsed.getUTCHours() * 60 + parsed.getUTCMinutes();
+  return (
+    minutesOfWeek >= CLOSURE_START_MINUTES_OF_WEEK && minutesOfWeek < CLOSURE_END_MINUTES_OF_WEEK
+  );
+};
+
+/**
+ * Rows the export will actually write — everything except the weekly closure,
+ * in the input's (chronological) order. The export day loop, the
+ * `exportedDatetimes` set handed to `pruneSwingRefsToExport`, the export
+ * validator and `metadata.data_age` all consume this one list, so the closure
+ * rule cannot drift between "what is dropped" and "what must resolve".
+ */
+export const selectExportedOhlcRows = <T extends { datetimeEAT: string }>(rows: T[]): T[] =>
+  rows.filter((row) => !isInsideWeekendClosure(row.datetimeEAT));
+
+/**
  * Drop swing refs that do not resolve inside the exported file.
  *
  * Refs are computed on the enriched working set, but the export omits whole UTC
@@ -645,6 +690,14 @@ export const pruneSwingRefsToExport = (
   return { prunedRefs, rowsLeftWithoutRefs };
 };
 
+/**
+ * Export gate. Two row sets are intentional and must not be conflated:
+ *   - `rows` is the enriched working set — every fetched row — that the derived
+ *     columns were computed on; the independent ATR re-derivation replays it;
+ *   - `exportedRows` is exactly what the CSV will contain — schema columns, ref
+ *     resolution, reliability canary, streaks, history depth and long gaps are
+ *     all judged on the file, never on rows the analyzer will never see.
+ */
 const validateOhlcExport = ({
   log,
   rows,
@@ -826,9 +879,13 @@ const validateOhlcExport = ({
     previousTimestamp: string;
     currentTimestamp: string;
   }
-  const longGapDetails = rows.reduce<LongGapDetail[]>((details, row, index) => {
+  // Gaps are judged on the EXPORTED timeline: the point of this check is that
+  // the shipped file's weekly closure is recognised as expected while any other
+  // >24h hole fails. (The independent ATR re-derivation above still walks `rows`,
+  // the working set the exported values were computed on.)
+  const longGapDetails = exportedRows.reduce<LongGapDetail[]>((details, row, index) => {
     if (index === 0) return details;
-    const previous = rows[index - 1];
+    const previous = exportedRows[index - 1];
     const previousTime = getDate(previous.datetimeEAT).getTime();
     const currentTime = getDate(row.datetimeEAT).getTime();
     const deltaMinutes = (currentTime - previousTime) / (60 * 1000);
@@ -1198,8 +1255,12 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       }
     }
 
+    // Rows the export will write. Grouped once here; the day loop, the prune set,
+    // the validator and the reported data age all read this same list.
+    const exportedEnrichedRows = selectExportedOhlcRows(enrichedRows);
+
     const rowsByUtcDay = new Map<string, EnrichedCandle[]>();
-    enrichedRows.forEach((row) => {
+    exportedEnrichedRows.forEach((row) => {
       const utcDayKey = toUtcDayKey(row.datetimeEAT);
       const rows = rowsByUtcDay.get(utcDayKey) || [];
       rows.push(row);
@@ -1241,23 +1302,19 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       "reliable_streak_length",
     ];
     // ---- export consistency: swing refs must resolve inside the exported file ----
-    // Swing refs are computed on the enriched working set, but the export drops
-    // whole UTC weekend days (see the WEEKEND / SKIPPED markers below). A ref
-    // left pointing at a dropped row is unusable to the analyzer, which resolves
-    // refs strictly by datetime: it silently costs trend information, and on an
-    // edited/spliced file the same mechanism collapses every row to "ranging".
-    // Prune those refs here (fail-closed: a removed ref can only reduce trend
-    // information, never fabricate it) and null the derived columns when a row is
-    // left with no refs. The analyzer's result is unchanged — it already ignores
-    // unresolvable refs — but the file becomes self-describing.
-    const exportedDatetimes = new Set<string>();
-    for (let day = new Date(exportStartDay); day <= exportEndDay; day = addUtcDay(day)) {
-      const weekday = day.getUTCDay();
-      if (weekday === 0 || weekday === 6) continue;
-      for (const row of rowsByUtcDay.get(day.toISOString().slice(0, 10)) || []) {
-        exportedDatetimes.add(row.datetimeEAT);
-      }
-    }
+    // Swing refs are computed on the enriched working set, but the export omits
+    // the weekly market closure, so a ref can be left pointing at a row the
+    // analyzer will never see. The prune set is built from the exact rows the day
+    // loop below writes (`exportedEnrichedRows`) rather than from a second
+    // re-derivation of the closure rule. A ref pointing at a dropped row is
+    // unusable to the analyzer, which resolves refs strictly by datetime: it
+    // silently costs trend information, and on an edited/spliced file the same
+    // mechanism collapses every row to "ranging". Prune here (fail-closed: a
+    // removed ref can only reduce trend information, never fabricate it) and null
+    // the derived columns when a row is left with no refs. The analyzer's result
+    // is unchanged — it already ignores unresolvable refs — but the file becomes
+    // self-describing.
+    const exportedDatetimes = new Set(exportedEnrichedRows.map((row) => row.datetimeEAT));
     const { prunedRefs: prunedSwingRefs, rowsLeftWithoutRefs } = pruneSwingRefsToExport(
       enrichedRows,
       exportedDatetimes,
@@ -1279,14 +1336,23 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     for (let day = new Date(exportStartDay); day <= exportEndDay; day = addUtcDay(day)) {
       const dayKey = day.toISOString().slice(0, 10);
       const utcWeekday = day.getUTCDay();
+      const dayRows = rowsByUtcDay.get(dayKey) || [];
 
-      if (utcWeekday === 0 || utcWeekday === 6) {
-        exportRows.push("=== WEEKEND / SKIPPED ===");
+      // Membership was decided by the closure predicate, not by the calendar
+      // weekday, so a day with no exported rows is the only thing left to label:
+      // weekend days carry the skip marker, empty weekdays keep their header
+      // (unchanged behaviour for provider holes). A Sunday that reopens at
+      // 21:00 UTC has rows here and is written normally.
+      if (dayRows.length === 0) {
+        exportRows.push(
+          utcWeekday === 0 || utcWeekday === 6
+            ? "=== WEEKEND / SKIPPED ==="
+            : formatUtcDayHeader(dayKey),
+        );
         continue;
       }
 
       exportRows.push(formatUtcDayHeader(dayKey));
-      const dayRows = rowsByUtcDay.get(dayKey) || [];
       dayRows.forEach((row) => {
         // Build by column name first, then project through headerColumns.
         // This prevents a missing field from silently shifting later values.
@@ -1379,8 +1445,13 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     // labeled VALIDATED. This supersedes the lighter inline checks above.
     const validation = validateOhlcExport({
       log: addLog,
+      // `rows` is the enriched working set the derived columns were computed on
+      // (the independent ATR re-derivation replays that exact chain), while
+      // `exportedRows` is what the CSV actually contains — every file-level
+      // assertion (ref resolution, reliability, streak, history depth, gaps) is
+      // judged on the file, not on rows the analyzer will never see.
       rows: enrichedRows,
-      exportedRows: enrichedRows,
+      exportedRows: exportedEnrichedRows,
       headerColumns,
       dataRows,
     });
@@ -1391,7 +1462,10 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       addLog(`✅ Validation PASSED: all hard checks green`);
     }
 
-    const reliableRows = enrichedRows.filter((row) => row.isReliable === true);
+    // Coverage is a property of the file being shipped: count exported rows only,
+    // so the logged/metadata percentages cannot describe rows the CSV does not
+    // contain.
+    const reliableRows = exportedEnrichedRows.filter((row) => row.isReliable === true);
     // swing_coverage_pct is defined on similar_swing_retrace_pct specifically.
     const reliableWithRetrace = reliableRows.filter(
       (row) => row.similarSwingRetracePct !== null && row.similarSwingRetracePct !== undefined,
@@ -1416,9 +1490,16 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       );
     }
 
+    // The newest row the analyzer will actually see. Taking `enrichedRows.at(-1)`
+    // instead is how a Monday-early series could report a data age (and a
+    // freshness banner) for a bar the CSV does not contain.
+    const newestExportedRow = exportedEnrichedRows.reduce<EnrichedCandle | null>(
+      (newest, row) => (newest === null || row.datetimeEAT > newest.datetimeEAT ? row : newest),
+      null,
+    );
+
     const metadata = {
-      data_age:
-        enrichedRows.length > 0 ? `${enrichedRows[enrichedRows.length - 1].datetimeEAT} EAT` : null,
+      data_age: newestExportedRow ? `${newestExportedRow.datetimeEAT} EAT` : null,
       generated_at: new Date().toISOString(),
       spread_convention: spreadConvention,
       turtle_tick_size: turtleTickSizeForSymbol(symbol),
