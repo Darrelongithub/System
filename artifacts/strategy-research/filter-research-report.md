@@ -49,7 +49,8 @@ The strongest batch-mined family was *NY-session + contraction bar + counter-tre
 
 | Measurement | Result |
 | --- | --- |
-| Batch, incremental over Filter C | 56 trades / **+16.0 R** removed (62–71 raw hits, +31.0 R, H1 +15.7 / H2 +15.3, symmetric long/short) |
+| Batch | 71 hits, +31.0 R removed (halves +16 / +15, long +15.7 ≈ short +15.3, 8/10 months) |
+| Batch, incremental over Filter C | 56 trades / **+16.0 R** removed (15 hits were already rejected by Filter C) |
 | **Engine, `C + D`** | **2,298 trades / R 520.051 — *minus* 3.63 R vs Filter C alone** |
 
 The engine decomposition explains it, one line at a time:
