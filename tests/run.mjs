@@ -23,6 +23,10 @@ await import("./backtest-week-bucketing.test.mjs");
 await import("./market-data-symbols.test.mjs");
 await import("./status-parse-time-tz.test.mjs");
 await import("./tz-matrix.test.mjs");
+await import("./analyzer-config-parity.test.mjs");
+await import("./filter-optout-legacy.test.mjs");
+await import("./warmup-window-sufficiency.test.mjs");
+await import("./trend-input-causality.test.mjs");
 await import("./regime-filter-f.test.mjs");
 
 const filter = process.argv[2];

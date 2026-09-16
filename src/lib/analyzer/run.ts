@@ -14,6 +14,7 @@ import {
   htfAllowsDirection,
 } from "./structure";
 import { rejectFilterC, FILTER_C_REASON, rejectFilterF, FILTER_F_REASON } from "./regime-filters";
+import { ANALYZER_LIVE_OPTIONS } from "./config";
 import {
   formatContextChannel,
   isContextStrategy,
@@ -494,7 +495,7 @@ function resolvedWinRate(rows: ResultRow[]) {
  * restored here.
  */
 export function compareHtfDirectionFilter(csv: string): HtfFilterComparison[] {
-  const run = runAnalysis(csv, { enableHtfDirectionFilter: true });
+  const run = runAnalysis(csv, ANALYZER_LIVE_OPTIONS);
   if (!run.ok) throw new Error(run.error);
   const rows = run.analysis.passing;
 

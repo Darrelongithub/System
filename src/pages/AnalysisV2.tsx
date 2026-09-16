@@ -12,6 +12,7 @@ import {
   runAnalysis,
   type HtfFilterComparison,
 } from "@/lib/analyzer/run";
+import { ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
 import type { VerifyResult } from "@/lib/verifier.functions";
@@ -71,7 +72,7 @@ export default function AnalysisV2() {
     setError(null);
     setBundle(null);
     bundledFor.current = null;
-    const outcome = runAnalysis(csv, { enableHtfDirectionFilter: true, seriesEndsComplete: false });
+    const outcome = runAnalysis(csv, ANALYZER_LIVE_OPTIONS);
     if (!outcome.ok) {
       setAnalysis(null);
       setError(outcome.error);

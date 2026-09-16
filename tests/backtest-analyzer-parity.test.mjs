@@ -20,11 +20,14 @@
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { runAnalysis, compareHtfDirectionFilter } from "../src/lib/analyzer/run.ts";
 import { analyseContinuous } from "../src/lib/pipeline/continuous.ts";
+import { ANALYZER_CERTIFIED_OPTIONS, ANALYZER_LIVE_OPTIONS } from "../src/lib/analyzer/config.ts";
 import { applyTriggers, dayReportSkipReason, rangeDays } from "../src/lib/backtest/engine.ts";
 import { loadBaselineCsv, loadGoldenTrades, loadGoldenSummary } from "./fixtures.mjs";
 
-const REF_OPTS = { enableHtfDirectionFilter: true, seriesEndsComplete: true };
-const UI_OPTS = { enableHtfDirectionFilter: true, seriesEndsComplete: false };
+// The two shipped configurations, imported rather than re-typed: this file is
+// the parity proof, so it must test the objects the product actually runs.
+const REF_OPTS = ANALYZER_CERTIFIED_OPTIONS;
+const UI_OPTS = ANALYZER_LIVE_OPTIONS;
 const keyOf = (t) => `${t.strategyId}|${t.datetime}|${t.index}|${t.side}`;
 const num = (v) => (typeof v === "number" ? v : undefined);
 const nearly = (a, b) =>

@@ -13,6 +13,25 @@
  *
  *  node --experimental-strip-types --import ./tests/register.mjs scripts/research/report-filter-families.mjs
  */
+
+// ---------------------------------------------------------------------------
+// Guardrail (added with the v1.8 live-fidelity review): this is a DISCOVERY
+// tool, not a validation tool. Any rule it turns up is selected on the same
+// locked baseline every earlier search used, so a "pass" here is in-sample by
+// construction and cannot justify a default change — see FORWARD-VALIDATION.md.
+// Requiring an explicit acknowledgement keeps a casual re-run from looking like
+// fresh evidence.
+// ---------------------------------------------------------------------------
+if (process.env.ALLOW_DISCOVERY_SEARCH !== "yes") {
+  console.error(
+    "This is a discovery tool: it mines the SAME series the shipped rules were\n" +
+      "selected on, so it cannot produce out-of-sample evidence. Results are hypotheses only.\n" +
+      "Re-run with ALLOW_DISCOVERY_SEARCH=yes if that is what you want, or evaluate the\n" +
+      "SHIPPED rules on new data with scripts/research/validate-on-new-data.mjs.",
+  );
+  process.exit(2);
+}
+
 import { readFileSync } from "node:fs";
 import { runAnalysis } from "../../src/lib/analyzer/run.ts";
 import { parseCsv } from "../../src/lib/analyzer/parse.ts";

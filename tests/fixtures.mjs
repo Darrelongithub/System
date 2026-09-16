@@ -33,10 +33,8 @@ export function loadGoldenSummary() {
 export async function baselineAnalysis() {
   if (!cached) {
     const { runAnalysis } = await import("../src/lib/analyzer/run.ts");
-    const result = runAnalysis(loadBaselineCsv(), {
-      seriesEndsComplete: true,
-      enableHtfDirectionFilter: true,
-    });
+    const { ANALYZER_CERTIFIED_OPTIONS } = await import("../src/lib/analyzer/config.ts");
+    const result = runAnalysis(loadBaselineCsv(), ANALYZER_CERTIFIED_OPTIONS);
     if (!result.ok) throw new Error(`baseline parse failed: ${result.error}`);
     cached = result.analysis;
   }

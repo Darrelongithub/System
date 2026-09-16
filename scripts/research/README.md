@@ -21,6 +21,23 @@ node --experimental-strip-types --import ./tests/register.mjs scripts/research/<
 | `control-filter-candidates.mjs` | Multiplicity control: outcome-shuffle placebo over the same rule space (`SHUFFLES`, default 60) and chronological discovery → validation in both directions. Writes `filter-multiplicity-control.json`.                                                                                                                |
 | `report-filter-families.mjs`    | Finalist families against the A2-only book: standalone strength, recurrence, breadth, incremental value over the shipped Filter C, and the resulting book when a family is added on top of C.                                                                                                                          |
 
+| `audit-filter-f-robustness.mjs` | Frozen-rule robustness audit of the shipped Filter F: per month (with a warm-up prefix), per strategy, per side, per session — engine-level ΔR = R(F on) − R(F off). Not a search; no thresholds, no candidates. |
+| `validate-on-new-data.mjs` | **The only sanctioned way to add evidence about a shipped rule.** Evaluates the shipped rules (no knobs) on data outside the discovery window; refuses the baseline, overlapping windows and windows below 1,000 bars; applies the pre-registered criteria from `FORWARD-VALIDATION.md`; appends to `artifacts/validation/ledger.jsonl`. |
+
+## Discovery tools are gated
+
+`search-filter-candidates.mjs`, `control-filter-candidates.mjs` and
+`report-filter-families.mjs` mine the **same locked series** the shipped rules were
+selected on, so anything they report is a hypothesis, never evidence. They refuse to run
+without an explicit acknowledgement:
+
+```bash
+ALLOW_DISCOVERY_SEARCH=yes node --experimental-strip-types --import ./tests/register.mjs scripts/research/<script>.mjs
+```
+
+To evaluate a **shipped** rule on data it has not seen, use `validate-on-new-data.mjs` and
+the protocol in `FORWARD-VALIDATION.md` instead.
+
 ## Conventions and traps
 
 - **Pin the filter flags.** `enableFilterF` defaults to `true` since v1.8, so a

@@ -85,11 +85,19 @@
     "noFill": 0,
     "rSum": 541.3570458970024
   },
-  "generatedAt": "2026-09-16T14:38:58.151Z",
-  "runAnalysisMs": 1015,
+  "generatedAt": "2026-09-16T15:29:56.036Z",
+  "runAnalysisMs": 1079,
   "options": {
-    "seriesEndsComplete": true,
-    "enableHtfDirectionFilter": true
+    "enableHtfDirectionFilter": true,
+    "seriesEndsComplete": true
+  },
+  "inputs": {
+    "baselineCsv": "87d2ac67585afe4b373be6107fcc66183a43d5e67f14aa56bc77b968ea3473bf",
+    "rules": {
+      "src/lib/analyzer/regime-filters.ts": "026d7aab56226b97a7988407ba31832d1f11952847bad954dfefdeb49ef30905",
+      "src/lib/analyzer/run.ts": "029bc8373bae275197ed3df5308dd44a5e964d3d921d730fe2041a4af8f5adcf",
+      "src/lib/analyzer/strategies/final-survivors.ts": "e0ffc30b6a5fe726d7fe4348491d0e98120733ed50c24e658489762ab2e04dcd"
+    }
   },
   "note": "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend momentum bars that close on their high (+17.7 R net after slot refills)."
 }

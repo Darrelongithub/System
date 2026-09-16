@@ -105,6 +105,13 @@ mechanism-level hypotheses carried from the strategy-failure report, it is
 **positive in both halves at every neighbouring threshold**, both sides, and it removes
 a class of bars that nine independent strategies all fail on the same way.
 
+**Correction (see `AUDIT-V1.8-LIVE-FIDELITY.md` §3.1).** That last sentence describes the
+*rejection set* — rejections do span all nine strategies — but it reads as a claim about
+*benefit*, which is not uniform: by strategy macd-cross +15.46 and dual-thrust +10.09 carry
+the gain while three-soldiers −7.45 and pdh-retest −2.48 cost money; by session asian
++28.07 while london −5.40 and ny −5.00. Six of ten months are positive. Filter F is a
+hypothesis with in-sample support, evaluated prospectively per `FORWARD-VALIDATION.md`.
+
 **Verdict: ship Filter F only.** The two strong triples are documented candidates for
 forward validation (out-of-sample / live), not for production defaults.
 

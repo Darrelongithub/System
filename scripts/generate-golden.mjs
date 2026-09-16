@@ -16,14 +16,16 @@
  * Run:  node --experimental-strip-types --import ./tests/register.mjs scripts/generate-golden.mjs
  */
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
+import { ANALYZER_CERTIFIED_OPTIONS } from "../src/lib/analyzer/config.ts";
 import { readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const REPO = fileURLToPath(new URL("..", import.meta.url));
 const CSV = readFileSync(new URL("../artifacts/baseline-xauusd-ohlc.csv", import.meta.url), "utf8");
 
 // Production options — MUST match the certification harness (tests/fixtures.mjs).
-const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
+const OPTIONS = ANALYZER_CERTIFIED_OPTIONS;
 
 const TRADE_FIELDS = [
   "strategyId",
@@ -41,6 +43,22 @@ const TRADE_FIELDS = [
   "rMultiple",
   "reason",
 ];
+
+// Provenance for the lock: which data and which rule sources produced it. A
+// re-baseline is only legitimate as a documented product decision, and this is
+// what makes "which code state does this lock describe?" answerable later.
+const sha256 = (text) => createHash("sha256").update(text, "utf8").digest("hex");
+const RULE_SOURCES = [
+  "src/lib/analyzer/regime-filters.ts",
+  "src/lib/analyzer/run.ts",
+  "src/lib/analyzer/strategies/final-survivors.ts",
+];
+const inputHashes = {
+  baselineCsv: sha256(CSV),
+  rules: Object.fromEntries(
+    RULE_SOURCES.map((p) => [p, sha256(readFileSync(new URL(`../${p}`, import.meta.url), "utf8"))]),
+  ),
+};
 
 const started = Date.now();
 const result = runAnalysis(CSV, OPTIONS);
@@ -111,6 +129,7 @@ const summary = {
   generatedAt: new Date().toISOString(),
   runAnalysisMs,
   options: OPTIONS,
+  inputs: inputHashes,
   note:
     "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped " +
     "product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) " +
