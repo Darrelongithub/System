@@ -69,14 +69,15 @@ default-on decision.
 ## 3. What a later, broader search found (and why nothing else shipped)
 
 A generic sweep was then run over every pair/triple of broad context atoms
-(n ≥ 120 trades): 39 atoms, 741 pairs, **75 rules passing** the in-sample gates
-(n ≥ 25, gain ≥ 12 R, t ≥ 2, both halves > 0, ≥ 3 of 4 folds > 0, breadth ≥ 4
-strategies, top-share ≤ 0.6, stress ≥ 0.6 × gain).
+(n ≥ 120 trades): 39 atoms, 741 pairs, 171 candidates recorded, **75 rules passing**
+the in-sample gates (n ≥ 25, gain ≥ 12 R, t ≥ 2, both halves > 0, ≥ 3 of 4 folds > 0,
+stress ≥ 0.6 × gain, kept-book expectancy above the base book, breadth ≥ 4 strategies,
+top-share ≤ 0.6).
 
 No *single* condition is a dead-weight block: the worst broad atom is hour 12–14
-(191 trades, own R −1.7); every other block is net positive (e.g. `session=asian`
-n=347 own R +395, `closeVsEma200Atr ≥ 5.4` n=216 mean R 0.446). Anything that works
-had to be a triple interaction — the classic overfit shape.
+(191 trades, own R −1.7); every other block is net positive (e.g. `closeVsEma200Atr ≥ 5.4`
+n=475 mean R 0.446, `session=asian` n=1,491 own R +395.6 mean R 0.265). Anything that
+works had to be a triple interaction — the classic overfit shape.
 
 Best-looking triples (removal gain = R removed; all in-sample):
 
