@@ -10,6 +10,7 @@ await import("./cooldown-abort.test.mjs");
 await import("./parse-fail-closed.test.mjs");
 await import("./ohlc-chunking.test.mjs");
 await import("./ny-session-tail.test.mjs");
+await import("./session-window-agreement.test.mjs");
 await import("./swing-ref-causality.test.mjs");
 await import("./accounting.test.mjs");
 await import("./determinism.test.mjs");

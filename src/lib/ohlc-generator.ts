@@ -1164,6 +1164,11 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       // contiguous, non-overlapping calendar windows, so duplicates are not
       // expected in normal operation — this is a defensive guarantee, not a
       // correction of provider data.
+      //
+      // Policy (pinned by tests/ohlc-chunking.test.mjs): chunks are fetched in
+      // ascending order and appended, so when a provider re-sends a bar — an
+      // overlapping boundary row, or a retry after a rate limit — the copy in
+      // the LATER response wins, i.e. the freshest revision of that timestamp.
       const byDatetime = new Map<string, ProviderCandle>();
       for (const row of merged) {
         const key = String(row?.datetime ?? "");

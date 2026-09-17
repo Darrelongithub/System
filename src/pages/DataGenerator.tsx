@@ -957,13 +957,22 @@ export default function Home() {
           }
 
           setResumeTimer(null);
-          addLog(`\n🎉 All done! Starting download...`);
-          toast.success(`Complete! Packaging download...`);
-
-          if (filesAdded > 0 || fetchedCsv) {
-            saveAnalysisSnapshot(fetchedCsv);
-            void handleDownload(fetchedCsv);
+          // A run that requested OHLC but produced no CSV is a failure, not a
+          // success, and it must not touch the snapshot the live analyzer reads.
+          // Both used to be wrong: the success toast fired unconditionally, and
+          // `saveAnalysisSnapshot(null)` overwrote the previous CSV (with its
+          // symbol/range) — so a chart-only run or a failed OHLC fetch silently
+          // cleared the Analysis tab, i.e. the product's own input.
+          if (includeOhlc && !fetchedCsv) {
+            addLog("❌ OHLC fetch produced no CSV — the previous analysis was left untouched.");
+            toast.error("OHLC fetch failed — no CSV was generated");
+          } else {
+            addLog(`\n🎉 All done! Starting download...`);
+            toast.success(`Complete! Packaging download...`);
           }
+
+          if (fetchedCsv) saveAnalysisSnapshot(fetchedCsv);
+          if (filesAdded > 0 || fetchedCsv) void handleDownload(fetchedCsv);
         } catch (error) {
           if (controller.signal.aborted) {
             addLog(`🛑 Generation stopped.`);
