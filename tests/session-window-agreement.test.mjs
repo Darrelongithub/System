@@ -18,6 +18,8 @@ import { test, assert, assertEqual, assertDeepEqual } from "./tiny.mjs";
 import { loadBaselineCsv } from "./fixtures.mjs";
 import { parseCsv } from "../src/lib/analyzer/parse.ts";
 import { eatParts, sessionOf, SESSION_WINDOWS_EAT } from "../src/lib/analyzer/time.ts";
+import { openingSessionDay } from "../src/lib/analyzer/daily.ts";
+import { isInsideWeekendClosure } from "../src/lib/ohlc-generator.ts";
 
 test("session windows: the generator's labels and the analyzer's fallback agree on every baseline row", () => {
   const parsed = parseCsv(loadBaselineCsv());
@@ -91,6 +93,74 @@ test("session windows: the exact transition instants are pinned, with no gap or 
   assertEqual(sessionOf(""), undefined, "an empty datetime yields no session");
   assertEqual(sessionOf("2026-01-05T11:00:00"), "london", "T separator accepted like the parser");
   assertEqual(eatParts("2026-01-05 11:00:00").minutesOfDay, 660, "minutes-of-day helper");
+});
+
+test("session windows: month, year and leap-day rollovers key the NY tail correctly", () => {
+  // The NY tail hour (00:00-00:59 EAT) belongs to the session that opened the
+  // previous calendar day — including across month, year and leap boundaries.
+  const openingDay = (datetime) => openingSessionDay(datetime, "ny");
+  assertEqual(openingDay("2026-01-01 00:30:00"), "2025-12-31", "New Year's Day tail");
+  assertEqual(openingDay("2026-03-01 00:30:00"), "2026-02-28", "March 1 tail");
+  assertEqual(openingDay("2028-03-01 00:30:00"), "2028-02-29", "leap day");
+  assertEqual(
+    openingDay("2026-12-31 23:30:00"),
+    "2026-12-31",
+    "the last bar of the year is same-day NY",
+  );
+  assertEqual(
+    openingDay("2026-01-05 00:00:00"),
+    "2026-01-04",
+    "Monday 00:00 EAT belongs to Sunday's NY session",
+  );
+  assertEqual(
+    openingDay("2026-01-05 16:00:00"),
+    "2026-01-05",
+    "the new NY session opens Monday 16:00 EAT",
+  );
+  // Non-NY sessions are untouched by the rollover.
+  assertEqual(openingSessionDay("2026-01-01 00:30:00", "london"), "2026-01-01", "london tail?");
+  assertEqual(openingSessionDay("2026-01-01 00:30:00", "asian"), "2026-01-01", "asian tail?");
+});
+
+test("session windows: the FX week reopens exactly at Monday 00:00 EAT / Sunday 21:00 UTC", () => {
+  // The weekly closure rule and the NY-session rollover describe the same
+  // instant from two sides: the first exported bar of the week is the Monday
+  // 00:00 EAT bar, and it belongs to the NY session that opened on Sunday.
+  // (Generator closure instants are pinned in tests/generator-weekend-boundary.)
+  const firstBarOfWeek = "2026-01-05 00:00:00"; // Monday 00:00 EAT = Sunday 21:00 UTC
+  assertEqual(isInsideWeekendClosure(firstBarOfWeek), false, "the weekly reopen bar is exported");
+  assertEqual(
+    isInsideWeekendClosure("2026-01-04 23:30:00"),
+    true,
+    "the bar before it is inside the closure",
+  );
+  assertEqual(
+    openingSessionDay(firstBarOfWeek, "ny"),
+    "2026-01-04",
+    "and it keys to Sunday's NY session",
+  );
+  assertEqual(sessionOf(firstBarOfWeek), "ny", "and it is an NY bar");
+  // A year boundary does not change the rule. In EAT the closure runs from
+  // Saturday 01:00 (= Friday 22:00 UTC) to Monday 00:00 (= Sunday 21:00 UTC), so
+  // the Friday-evening hour is still tradeable and is exported.
+  assertEqual(isInsideWeekendClosure("2027-01-01 00:00:00"), false, "Friday 00:00 EAT is open");
+  assertEqual(
+    isInsideWeekendClosure("2027-01-02 00:30:00"),
+    false,
+    "Sat 00:30 EAT = Fri 21:30 UTC is still open",
+  );
+  assertEqual(
+    isInsideWeekendClosure("2027-01-02 01:00:00"),
+    true,
+    "Sat 01:00 EAT = Fri 22:00 UTC starts the closure",
+  );
+  assertEqual(isInsideWeekendClosure("2027-01-03 12:00:00"), true, "Sunday midday EAT is closed");
+  assertEqual(isInsideWeekendClosure("2027-01-04 00:00:00"), false, "Monday 00:00 EAT reopens");
+  assertEqual(
+    isInsideWeekendClosure("2027-01-03 23:30:00"),
+    true,
+    "the bar before the reopen is closed",
+  );
 });
 
 function minutesToTime(minutes) {
