@@ -450,9 +450,9 @@ export default function Home() {
   };
 
   // Persist the freshly generated CSV for the Analysis tab. Chart PNGs are NOT
-  // snapshotted: no page or verifier call reads snapshot images, and
-  // rasterizing three 1920x1080 PNGs into sessionStorage on every run used to
-  // burn time and overflow the quota, silently dropping the whole snapshot.
+  // snapshotted: no page reads snapshot images, and rasterizing three 1920x1080
+  // PNGs into sessionStorage on every run used to burn time and overflow the
+  // quota, silently dropping the whole snapshot.
   const saveAnalysisSnapshot = (csvOverride?: string | null) => {
     const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
     setAnalysisSnapshot({

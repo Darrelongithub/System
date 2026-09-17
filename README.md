@@ -62,8 +62,9 @@ is the development/regression laboratory. See `PROJECT-CHARTER.md` and `FORWARD-
 - Production analysis requires ≥1,000 bars (measured warm-up floor) and a series that passes the
   series contract (swing refs resolve, trend distribution not collapsed)
 - Hindsight-derived columns (`similar_swing_retrace_pct`, `similar_swing_continued_pct`,
-  `swing_invalidated`) are blanked before the AI verifier sees the CSV — they are computed from
-  later bars and are not knowable at decision time
+  `swing_invalidated`) are computed from later bars and are never used by the trade engine or the
+  status engine; they exist only for offline analysis. The AI verifier that used to consume this
+  CSV has been removed — analysis is fully local and deterministic.
 - The rule set is frozen (`tests/ruleset-freeze.test.mjs`); changing it is a product decision
   that starts a new forward-validation window
 

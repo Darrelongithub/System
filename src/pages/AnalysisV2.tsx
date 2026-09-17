@@ -1,10 +1,7 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 
-import { VerifierPanel } from "@/components/verifier-panel";
-
-import { buildReport } from "@/lib/analyzer/export";
 import { downloadBundle, type BundleOutcome } from "@/lib/analyzer/bundle";
 
 import {
@@ -16,7 +13,6 @@ import { ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
-import type { VerifyResult } from "@/lib/verifier.functions";
 
 type Status = "idle" | "working" | "ready" | "error";
 
@@ -102,7 +98,18 @@ export default function AnalysisV2() {
     setStrategyFilter("all");
     setResultFilter("all");
     setStatus("ready");
-  }, [csv]);
+    // The bundle is zipped as soon as the analysis is trustworthy: this effect is
+    // the only thing that asks for it.
+    const key = outcome.analysis.lastRowDatetime || "analysis";
+    if (bundledFor.current !== key) {
+      bundledFor.current = key;
+      const expectedKey = key;
+      void downloadBundle(outcome.analysis, { csv, csvName }).then((result) => {
+        // Ignore a stale ZIP if a newer CSV analysis has already taken ownership.
+        if (result && bundledFor.current === expectedKey) setBundle(result);
+      });
+    }
+  }, [csv, csvName]);
 
   // The HTF alignment table is secondary. It used to be computed synchronously
   // inside the callback above, which blocked the main thread for a full extra
@@ -125,21 +132,6 @@ export default function AnalysisV2() {
       clearTimeout(timer);
     };
   }, [csv, analysis]);
-
-  const handleVerdict = useCallback(
-    (result: VerifyResult) => {
-      if (!analysis) return;
-      const key = analysis.lastRowDatetime || "analysis";
-      if (bundledFor.current === key) return;
-      bundledFor.current = key;
-      const expectedKey = key;
-      void downloadBundle(analysis, { csv, csvName, verdict: result.verdict }).then((outcome) => {
-        // Ignore stale ZIP if a newer CSV analysis has already taken ownership.
-        if (outcome && bundledFor.current === expectedKey) setBundle(outcome);
-      });
-    },
-    [analysis, csv, csvName],
-  );
 
   const rows: ResultRow[] = useMemo(() => {
     if (!analysis) return [];
@@ -178,7 +170,7 @@ export default function AnalysisV2() {
               </h2>
               <p className="text-xs text-muted-foreground">
                 {snapshot
-                  ? `${snapshot.symbol} · ${snapshot.range || "range unspecified"} — analysed automatically, verifier runs next, then the bundle downloads.`
+                  ? `${snapshot.symbol} · ${snapshot.range || "range unspecified"} — analysed automatically, then the report bundle downloads.`
                   : "No CSV yet — generate one on the fetcher page and it will be analysed here automatically."}
               </p>
             </div>
@@ -451,13 +443,6 @@ export default function AnalysisV2() {
                 </div>
               ) : null}
             </section>
-
-            <VerifierPanel
-              key={analysis.lastRowDatetime}
-              scoutData={buildReport(analysis, "LIVE")}
-              ohlcCsv={csv ?? ""}
-              onVerdict={handleVerdict}
-            />
 
             <section className="panel flex flex-col gap-4 p-6">
               <div className="flex flex-wrap items-center justify-between gap-3">
