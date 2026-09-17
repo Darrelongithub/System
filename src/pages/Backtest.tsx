@@ -28,6 +28,7 @@ import {
   addUtcDays,
   rangeDays,
   isSunday,
+  snapshotState,
   winRate,
   averageRr,
   realizedR,
@@ -36,6 +37,7 @@ import {
 } from "@/lib/backtest/engine";
 import { analyseContinuous, contextLogForDay } from "@/lib/pipeline/continuous";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
+import { truncateCsvAt } from "@/lib/verifier-input";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 
 const AI_STAGE_LABELS: Record<AiStage, string> = {
@@ -339,6 +341,10 @@ export default function Backtest() {
           continue;
         }
 
+        // The verifier's copy of the report must describe the book as of the
+        // PREVIOUS completed day: folding this day's triggers first would put
+        // their forward-resolved TP/SL counts in front of the model.
+        const stateBeforeDay = snapshotState(working);
         // Cumulative stats grow strictly with completed trading days (chronological).
         applyTriggers(working, triggers);
         working.firstDay = working.firstDay ?? day;
@@ -379,8 +385,31 @@ export default function Backtest() {
         if (canRunAi && aiStage === "verifier") {
           try {
             addLog(`${day}: running V2 verifier / picker…`);
+            // Decision-time copy: same day, same setups, but with every field the
+            // replay only learned from FORWARD bars withheld (see
+            // DayReportInput.resolutionView) and the CSV cut at the checkpoint.
+            // The packaged `report` above keeps the full historical record.
+            const checkpointEnd = `${day} 23:59:59`;
+            let verifierReport = buildDayReport({
+              symbol,
+              day,
+              checkpoint: "23:59",
+              windowStart,
+              state: stateBeforeDay,
+              triggers,
+              analyzedRows: meta?.analyzed ?? 0,
+              invalidRows: meta?.invalid ?? 0,
+              lastRowDatetime: meta?.lastDatetime ?? continuous.analysis.lastRowDatetime,
+              strategyBreakdown,
+              resolutionEnd,
+              resolutionView: "checkpoint",
+            });
+            // The context channel is decision-time knowable (observations of the
+            // bars up to the checkpoint) and the live verifier sees it too.
+            if (dayContext.length > 0) verifierReport = `${verifierReport}\n\n${contextLog}`;
+            const verifierCsv = truncateCsvAt(continuousCsv, checkpointEnd).csv;
             const outcome = await runVerifier({
-              data: { scoutData: report, ohlcCsv: continuousCsv },
+              data: { scoutData: verifierReport, ohlcCsv: verifierCsv },
             });
             if (!isCurrent()) return;
             aiSections.push({

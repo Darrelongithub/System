@@ -64,6 +64,53 @@ const escapeCell = (value: string): string =>
   /[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
 
 /**
+ * Keep only the part of an analyzer CSV that existed at `cutoff` ("YYYY-MM-DD
+ * HH:MM:SS", EAT — the same wall clock the rows carry).
+ *
+ * The backtest replays history, so the file it holds spans warm-up AND the
+ * forward bars used to resolve the day's trades. Handing that whole file to the
+ * verifier lets the model read the answer off the chart it is asked to judge;
+ * the live analyzer's CSV always ends at "now" instead. This drops every data row
+ * after the cutoff (and any `=== DAY ===` marker for a later day), preserving the
+ * metadata line, the header and the rows before it byte-for-byte, then appends a
+ * note that the tail was withheld so the model is not left guessing why the
+ * document ends early.
+ *
+ * Returns the input unchanged when nothing is after the cutoff.
+ */
+const DATA_ROW_START = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/;
+
+export function truncateCsvAt(csv: string, cutoff: string): { csv: string; droppedRows: number } {
+  const lines = csv.split("\n");
+  if (lines.length === 0) return { csv, droppedRows: 0 };
+  // Everything before the first data row is document structure (metadata header,
+  // column header, any comment block) and always survives.
+  const firstDataRow = lines.findIndex((line) => DATA_ROW_START.test(line));
+  const structural = firstDataRow === -1 ? lines.length : firstDataRow;
+  const out: string[] = lines.slice(0, structural);
+  const cutoffDay = cutoff.slice(0, 10);
+  let droppedRows = 0;
+  for (let i = structural; i < lines.length; i++) {
+    const line = lines[i]!;
+    if (DATA_ROW_START.test(line)) {
+      if (line.slice(0, 19) <= cutoff) out.push(line);
+      else droppedRows += 1;
+      continue;
+    }
+    // Section/day markers belong to the day they name; a marker for a day after
+    // the cutoff would announce rows this copy no longer contains.
+    const markerDay = /^===.*?(\d{4}-\d{2}-\d{2})/.exec(line);
+    if (markerDay && markerDay[1]! > cutoffDay) continue;
+    out.push(line);
+  }
+  if (droppedRows === 0) return { csv, droppedRows: 0 };
+  out.push(
+    `# note: ${droppedRows} row(s) after ${cutoff} withheld — bars later than the checkpoint are not knowable when the decision is made`,
+  );
+  return { csv: out.join("\n"), droppedRows };
+}
+
+/**
  * Blank the hindsight-derived columns in an analyzer CSV.
  *
  * Header and row count are preserved, every other column is byte-identical, and

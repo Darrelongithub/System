@@ -293,11 +293,47 @@ export interface DayReportInput {
   lastRowDatetime?: string | undefined;
   strategyBreakdown?: StrategyDayBreakdown[] | undefined;
   resolutionEnd?: string | undefined;
+  /**
+   * Which resolution facts the report may state.
+   *
+   * `"forward"` (default) is the packaged artifact: the day's triggers with the
+   * outcome the replay later learned (TP/SL/exit/realised R). It is a historical
+   * record, so it is allowed to be hindsight.
+   *
+   * `"checkpoint"` is the copy an AI stage may see: the same document with every
+   * field that only exists because bars AFTER the checkpoint were used (outcome,
+   * exit datetime/price, realised R, resolution note, live setup status) withheld,
+   * and the forward-resolution window line replaced by a statement that it is
+   * withheld. Feeding the packaged version to the verifier showed it each day's
+   * winners, so its verdict was not reproducible live — the live verifier only ever
+   * sees PENDING/FILLED setups with no outcome.
+   */
+  resolutionView?: "forward" | "checkpoint" | undefined;
+}
+
+/**
+ * Copy of the cumulative state with independent stat objects, taken BEFORE a
+ * day's triggers are folded in, so a checkpoint-view report can describe the
+ * book as of the previous completed day.
+ */
+export function snapshotState(state: BacktestState): BacktestState {
+  return {
+    ...state,
+    days: [...state.days],
+    skipped: state.skipped.map((entry) => ({ ...entry })),
+    stats: Object.fromEntries(
+      Object.entries(state.stats).map(([strategyId, stats]) => [strategyId, { ...stats }]),
+    ),
+  };
 }
 
 /** One self-contained file per day: new triggers plus cumulative trend stats. */
 export function buildDayReport(input: DayReportInput): string {
   const { symbol, day, checkpoint, windowStart, state, triggers, skipReason } = input;
+  // Decision-time copies must not state facts that were derived from bars after
+  // the checkpoint (see DayReportInput.resolutionView).
+  const checkpointView = input.resolutionView === "checkpoint";
+  const withheld = "(withheld — resolved from bars after this checkpoint)";
   const lines: string[] = [];
 
   lines.push("=== AUTO-BACKTEST DAY REPORT ===");
@@ -306,9 +342,15 @@ export function buildDayReport(input: DayReportInput): string {
   lines.push(`time_checkpoint (EAT): ${checkpoint}`);
   lines.push(`csv_window: ${windowStart} 00:00 -> ${day} ${checkpoint}`);
   if (input.resolutionEnd && input.resolutionEnd !== day) {
-    lines.push(
-      `forward_resolution_window: ${day} -> ${input.resolutionEnd} (used only to resolve TP/SL of triggers dated ${day}; no signal is generated from it)`,
-    );
+    if (checkpointView) {
+      lines.push(
+        `forward_resolution_window: withheld — TP/SL outcomes on ${day} are resolved with bars after this checkpoint, so they are not stated in this copy`,
+      );
+    } else {
+      lines.push(
+        `forward_resolution_window: ${day} -> ${input.resolutionEnd} (used only to resolve TP/SL of triggers dated ${day}; no signal is generated from it)`,
+      );
+    }
   }
   lines.push(
     `analysis_mode: local structure engine (AI verifier/debate sections, when run, are appended below)`,
@@ -335,15 +377,35 @@ export function buildDayReport(input: DayReportInput): string {
       lines.push("none — no strategy triggered on this day up to the checkpoint");
     }
     triggers.forEach((trigger, index) => {
+      const outcomeField = checkpointView ? `outcome: ${withheld}` : `outcome ${trigger.outcome}`;
+      const exitField =
+        checkpointView || !trigger.exitDatetime
+          ? ""
+          : ` @ ${trigger.exitDatetime} (${num(trigger.exitPrice)})`;
+      const realisedField =
+        checkpointView || typeof trigger.rMultiple !== "number"
+          ? ""
+          : ` | realised ${trigger.rMultiple.toFixed(2)}R`;
+      const statusField = checkpointView
+        ? ` | status: as of ${checkpoint} (withheld)`
+        : ` | status ${trigger.setupStatus}`;
       lines.push(
-        `${index + 1}. ${trigger.strategy} @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | SL ${num(trigger.sl)} | TP ${num(trigger.tp)} | RR ${trigger.rr === undefined ? "-" : trigger.rr.toFixed(2)} | outcome ${trigger.outcome}${trigger.exitDatetime ? ` @ ${trigger.exitDatetime} (${num(trigger.exitPrice)})` : ""}${typeof trigger.rMultiple === "number" ? ` | realised ${trigger.rMultiple.toFixed(2)}R` : ""} | status ${trigger.setupStatus}`,
+        `${index + 1}. ${trigger.strategy} @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | SL ${num(trigger.sl)} | TP ${num(trigger.tp)} | RR ${trigger.rr === undefined ? "-" : trigger.rr.toFixed(2)} | ${outcomeField}${exitField}${realisedField}${statusField}`,
       );
       lines.push(`    reason: ${trigger.reason}`);
       if (trigger.detail?.length) {
         lines.push("    detailed reasoning:");
-        for (const line of trigger.detail) lines.push(`      - ${line}`);
+        for (const line of trigger.detail) {
+          // run.ts appends "Resolution: <TP|SL> hit at <datetime>; trigger price
+          // ..." to detail once the forward status engine has resolved the row.
+          // That single line otherwise smuggles the outcome into the checkpoint
+          // copy through the detail block. Everything else in detail (ATR, SL/TP
+          // distances, requirement evidence) is decision-time and stays.
+          if (checkpointView && /^\s*resolution:/i.test(line)) continue;
+          lines.push(`      - ${line}`);
+        }
       }
-      lines.push(...triggerReasoning(trigger));
+      lines.push(...triggerReasoning(trigger, checkpointView));
     });
 
     lines.push("");
@@ -365,7 +427,7 @@ export function buildDayReport(input: DayReportInput): string {
       if (strategyTriggers.length > 0) {
         for (const trigger of strategyTriggers) {
           lines.push(
-            `  trigger @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | outcome ${trigger.outcome}`,
+            `  trigger @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | outcome ${checkpointView ? "withheld" : trigger.outcome}`,
           );
         }
       } else {
@@ -540,7 +602,7 @@ const REQUIREMENTS: Record<string, string[]> = {
   "fvg-ict": ["three-candle FVG condition", "no canonical mechanical entry/SL/TP"],
 };
 
-function triggerReasoning(trigger: DayTrigger): string[] {
+function triggerReasoning(trigger: DayTrigger, checkpointView = false): string[] {
   const reqs = REQUIREMENTS[trigger.strategyId] ?? ["strategy-specific entry conditions"];
   const lines = ["    requirements:"];
   for (const requirement of reqs) lines.push(`      - satisfied: ${requirement}`);
@@ -555,6 +617,14 @@ function triggerReasoning(trigger: DayTrigger): string[] {
   lines.push(
     `    SL placement: ${num(trigger.sl)} — strategy invalidation extreme/level with its configured ATR buffer.`,
   );
-  if (trigger.statusNote) lines.push(`    resolution: ${trigger.statusNote}`);
+  // statusNote is written by the forward status engine ("TP hit at ...", "SL
+  // hit at ..."), so it is exactly the hindsight a checkpoint copy must not carry.
+  if (checkpointView) {
+    lines.push(
+      `    resolution: withheld — not knowable from bars up to the ${trigger.datetime.slice(0, 10)} checkpoint`,
+    );
+  } else if (trigger.statusNote) {
+    lines.push(`    resolution: ${trigger.statusNote}`);
+  }
   return lines;
 }

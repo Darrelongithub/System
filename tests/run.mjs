@@ -29,6 +29,8 @@ await import("./warmup-window-sufficiency.test.mjs");
 await import("./trend-input-causality.test.mjs");
 await import("./series-contract.test.mjs");
 await import("./verifier-hindsight-strip.test.mjs");
+await import("./verifier-backtest-causality.test.mjs");
+await import("./consume-after-rr.test.mjs");
 await import("./ruleset-freeze.test.mjs");
 await import("./generator-ref-integrity.test.mjs");
 await import("./generator-weekend-boundary.test.mjs");
