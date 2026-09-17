@@ -646,6 +646,18 @@ export const isInsideWeekendClosure = (datetimeEAT: string): boolean => {
 };
 
 /**
+ * Rows a chart artifact may draw — the same closure rule as the export.
+ *
+ * The chart is generated from the provider response (EAT wall clock, like the
+ * CSV) and packaged next to it, so it has to be a picture of the same series.
+ * The old chart filter dropped every EAT Saturday and Sunday by calendar date,
+ * which deleted EAT Saturday 00:00–00:59 — Friday 21:00–21:59 UTC, live New York
+ * afternoon trading that the CSV carries and the analyzer trades on.
+ */
+export const selectChartCandles = <T extends { time: string }>(candles: T[]): T[] =>
+  candles.filter((candle) => !isInsideWeekendClosure(candle.time));
+
+/**
  * Rows the export will actually write — everything except the weekly closure,
  * in the input's (chronological) order. The export day loop, the
  * `exportedDatetimes` set handed to `pruneSwingRefsToExport`, the export

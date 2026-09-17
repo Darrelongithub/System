@@ -16,13 +16,16 @@
  * data age describing the file).
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
+import { readFileSync } from "node:fs";
 import {
   buildOhlcCsv,
   isInsideWeekendClosure,
   pruneSwingRefsToExport,
+  selectChartCandles,
   selectExportedOhlcRows,
 } from "../src/lib/ohlc-generator.ts";
 import { parseCsv } from "../src/lib/analyzer/parse.ts";
+import { repoPath } from "./fixtures.mjs";
 
 const BAR_MS = 30 * 60 * 1000;
 /** EAT wall-clock label encoded as UTC fields — what the provider returns. */
@@ -123,6 +126,47 @@ test("generator: the stored EAT strings around both transitions keep/drop correc
   assertEqual(isInsideWeekendClosure("2026-01-17 01:00:00"), true, "Sat 01:00 EAT (EST week)");
   assertEqual(isInsideWeekendClosure("2026-01-19 00:00:00"), false, "Mon 00:00 EAT (EST week)");
   assertEqual(isInsideWeekendClosure("2026-01-19 02:30:00"), false, "Mon 02:30 EAT (EST week)");
+});
+
+test("generator: the chart artifact draws exactly the exported series, not a date-based weekend drop", () => {
+  // The chart is built from the provider response, which carries the same EAT
+  // wall-clock strings as the CSV. Its selector must therefore apply the same
+  // closure rule: a "drop Saturday/Sunday by date" filter deleted EAT Saturday
+  // 00:00-00:59 (= Friday 21:00-21:59 UTC, live) even though the CSV keeps it.
+  const candles = [
+    { time: "2026-06-05 23:30:00" }, // Friday 20:30 UTC — live
+    { time: "2026-06-06 00:00:00" }, // EAT Saturday = Friday 21:00 UTC — live, must be drawn
+    { time: "2026-06-06 00:30:00" }, // EAT Saturday = Friday 21:30 UTC — live, must be drawn
+    { time: "2026-06-06 01:00:00" }, // EAT Saturday = Friday 22:00 UTC — closure
+    { time: "2026-06-06 12:00:00" }, // Saturday midday — closure
+    { time: "2026-06-07 23:30:00" }, // Sunday 20:30 UTC — closure
+    { time: "2026-06-08 00:00:00" }, // EAT Monday = Sunday 21:00 UTC — weekly open
+    { time: "not-a-timestamp" }, // unreadable kept, never silently dropped
+  ];
+  assertEqual(
+    selectChartCandles(candles)
+      .map((candle) => candle.time)
+      .join("|"),
+    [
+      "2026-06-05 23:30:00",
+      "2026-06-06 00:00:00",
+      "2026-06-06 00:30:00",
+      "2026-06-08 00:00:00",
+      "not-a-timestamp",
+    ].join("|"),
+    "chart rows must be the exported rows",
+  );
+  // Wiring: the page must call the shared selector — a reintroduced local
+  // date-of-week filter would silently drop the weekly open from every image.
+  const page = readFileSync(repoPath("src/pages/DataGenerator.tsx"), "utf8");
+  assert(
+    page.includes("selectChartCandles("),
+    "DataGenerator must build chart candles with the shared export predicate",
+  );
+  assert(
+    !/getUTCDay\(/.test(page),
+    "no naive day-of-week weekend filter may remain in the chart path",
+  );
 });
 
 test("generator: an unreadable timestamp is kept, never silently dropped", () => {
