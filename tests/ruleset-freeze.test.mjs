@@ -71,6 +71,17 @@ export function normalizedRuleHash(relativePath) {
 }
 
 test("freeze: the rule sources are unchanged since the freeze", () => {
+  // A rule file listed without a frozen hash would be skipped by the loop below
+  // (and a strategy file could then be added to RULE_FILES while still being
+  // unpinned) — so the two lists must stay in step.
+  assertEqual(
+    Object.keys(FROZEN_RULES).length,
+    RULE_FILES.length,
+    "every rule file needs a frozen hash",
+  );
+  for (const file of RULE_FILES) {
+    assert(FROZEN_RULES[file], `${file} has no frozen hash`);
+  }
   const drifts = [];
   for (const file of RULE_FILES) {
     const expected = FROZEN_RULES[file];
