@@ -72,6 +72,62 @@ test("F7: a header missing a required column is rejected before rows parse", () 
   assert(outcome.error?.includes("INVALID FILE"), `got: ${outcome.error ?? "none"}`);
 });
 
+test("F7: a duplicated timestamp keeps the FIRST row and invalidates its siblings", () => {
+  // The policy is deliberate (parse.ts: "keep the first; mark later siblings
+  // invalid") and decision-relevant: a duplicated bar must not be evaluated
+  // twice, and the row that survives decides the entry price.
+  // Mutation check (2026-09-17 bug hunt): inverting the policy (keep the last,
+  // mark the first invalid) survived the whole suite — nothing asserted which
+  // copy of a duplicated timestamp the engine actually uses.
+  const t0 = Date.parse("2025-11-03T09:30:00+03:00");
+  const dt = (i) =>
+    new Date(t0 + i * 1800000 + 3 * 3600 * 1000).toISOString().slice(0, 19).replace("T", " ");
+  const rows = [];
+  for (let i = 0; i < 12; i++) {
+    const base = 4000 + i;
+    rows.push(`${dt(i)},${base},${base + 1},${base - 1},${base + 0.5},true`);
+  }
+  // Row 6 repeats row 5's timestamp with visibly different prices.
+  rows[6] = `${dt(5)},5000,5001,4999,5000.5,true`;
+  const csv = [metadataLine, HEADER, ...rows].join("\n");
+
+  const parsed = parseCsv(csv);
+  assertEqual(parsed.metadataError, undefined, "header is fine");
+  assertEqual(parsed.candles.length, 12, "both rows are present in the file model");
+  assertEqual(
+    parsed.candles[5].invalid,
+    undefined,
+    "the first row at a duplicated timestamp stays usable",
+  );
+  assertEqual(parsed.candles[5].close, 4005.5, "the first row's own values are kept");
+  assert(
+    parsed.candles[6].invalid?.includes("duplicate datetime"),
+    `the later sibling must be marked invalid, got: ${parsed.candles[6].invalid ?? "none"}`,
+  );
+  assertEqual(
+    parsed.candles[6].close,
+    5000.5,
+    "the invalid sibling keeps its raw values for diagnosis",
+  );
+
+  const outcome = runAnalysis(csv, { seriesEndsComplete: true });
+  assert(outcome.ok, "the file is still analysable");
+  assertEqual(outcome.analysis.invalidRows, 1, "exactly one row excluded");
+  assertEqual(
+    outcome.analysis.invalidRowList.length,
+    1,
+    "and it is reported to the user rather than silently dropped",
+  );
+  assert(
+    outcome.analysis.invalidRowList[0].reason.includes("duplicate datetime"),
+    `report must name the reason: ${outcome.analysis.invalidRowList[0].reason}`,
+  );
+  // The kept bar is the first one: its price reaches the engine, the sibling's
+  // does not (both would otherwise appear as separate bars).
+  const usable = outcome.analysis.results.filter((r) => r.datetime === parsed.candles[5].datetime);
+  assert(usable.length > 0, "the kept bar was evaluated");
+});
+
 test("F7: an all-invalid body fails closed instead of returning an empty success", () => {
   const parsed = parseCsv([metadataLine, HEADER, rows({ invertGeometry: true })].join("\n"));
   assert(!parsed.metadataError, "header itself is fine");

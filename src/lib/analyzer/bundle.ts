@@ -25,10 +25,10 @@ function slug(analysis: Analysis): string {
     .replace(/\.txt$/, "");
 }
 
-/** Zips the LIVE + HISTORY reports, the source CSV and the verifier verdict, then auto-downloads. */
+/** Zips the LIVE + HISTORY reports and the source CSV, then auto-downloads. */
 export async function downloadBundle(
   analysis: Analysis,
-  options: { csv: string | null; csvName?: string | null; verdict?: string | null },
+  options: { csv: string | null; csvName?: string | null },
 ): Promise<BundleOutcome | undefined> {
   if (typeof document === "undefined") return undefined;
 
@@ -36,7 +36,6 @@ export async function downloadBundle(
   zip.file(exportFileName(analysis, "LIVE"), buildReport(analysis, "LIVE"));
   zip.file(exportFileName(analysis, "HISTORY"), buildReport(analysis, "HISTORY"));
   if (options.csv) zip.file(options.csvName || "generator-ohlc.csv", options.csv);
-  if (options.verdict) zip.file(`verifier-verdict_${slug(analysis)}.txt`, options.verdict);
 
   const blob = await zip.generateAsync({ type: "blob" });
   const fileName = `structure-scout_${slug(analysis)}.zip`;

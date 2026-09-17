@@ -1,95 +1,125 @@
 {
   "analyzedRows": 9738,
   "invalidRows": 0,
-  "tradePassCount": 2323,
+  "tradePassCount": 2286,
   "contextPassCount": 3184,
   "perStrategy": {
     "dual-thrust": {
-      "triggers": 165,
-      "tp": 59,
-      "sl": 105,
+      "triggers": 148,
+      "tp": 57,
+      "sl": 90,
       "open": 1,
       "noFill": 0,
-      "rSum": 39.507928508056196
+      "rSum": 49.59520872726657
     },
     "macd-cross": {
-      "triggers": 389,
-      "tp": 134,
-      "sl": 254,
+      "triggers": 384,
+      "tp": 137,
+      "sl": 246,
       "open": 1,
       "noFill": 0,
-      "rSum": 75.09939547758665
+      "rSum": 90.55585499450498
     },
     "pdh-retest": {
-      "triggers": 120,
-      "tp": 41,
+      "triggers": 119,
+      "tp": 40,
       "sl": 79,
       "open": 0,
       "noFill": 0,
-      "rSum": 20.701644248975164
+      "rSum": 18.221774356873503
     },
     "williams-r-fade": {
-      "triggers": 386,
+      "triggers": 384,
       "tp": 128,
-      "sl": 258,
+      "sl": 256,
       "open": 0,
       "noFill": 0,
-      "rSum": 118.91045104513022
+      "rSum": 120.92659930757252
     },
     "three-soldiers": {
-      "triggers": 396,
-      "tp": 134,
+      "triggers": 393,
+      "tp": 131,
       "sl": 261,
       "open": 1,
       "noFill": 0,
-      "rSum": 68.52284948294876
+      "rSum": 61.07472095885842
     },
     "morning-star": {
-      "triggers": 364,
-      "tp": 112,
-      "sl": 252,
+      "triggers": 361,
+      "tp": 111,
+      "sl": 250,
       "open": 0,
       "noFill": 0,
-      "rSum": 74.78949297397797
+      "rSum": 73.77232370303635
     },
     "classic-pivot": {
-      "triggers": 136,
+      "triggers": 135,
       "tp": 44,
-      "sl": 92,
+      "sl": 91,
       "open": 0,
       "noFill": 0,
-      "rSum": 36.11782239574696
+      "rSum": 37.11782239574696
     },
     "ichimoku-tk": {
-      "triggers": 190,
+      "triggers": 189,
       "tp": 58,
-      "sl": 131,
+      "sl": 130,
       "open": 1,
       "noFill": 0,
-      "rSum": 40.63673974303377
+      "rSum": 41.63673974303377
     },
     "donchian-55": {
-      "triggers": 177,
-      "tp": 46,
-      "sl": 131,
+      "triggers": 173,
+      "tp": 45,
+      "sl": 128,
       "open": 0,
       "noFill": 0,
-      "rSum": 49.395026520863595
+      "rSum": 48.45600171010932
     }
   },
   "totals": {
-    "triggers": 2323,
-    "tp": 756,
-    "sl": 1563,
+    "triggers": 2286,
+    "tp": 751,
+    "sl": 1531,
     "open": 4,
     "noFill": 0,
-    "rSum": 523.6813503963194
+    "rSum": 541.3570458970024
   },
-  "generatedAt": "2026-09-08T13:46:40.795Z",
-  "runAnalysisMs": 1265,
+  "generatedAt": "2026-09-16T16:40:36.032Z",
+  "runAnalysisMs": 1468,
   "options": {
-    "seriesEndsComplete": true,
-    "enableHtfDirectionFilter": true
+    "enableHtfDirectionFilter": true,
+    "seriesEndsComplete": true
   },
-  "note": "v1.4 re-baseline: production default (A2 consume-after-RR + Filter C enabled). Prior golden (2384) predated both the v1.2 A2 fix (+3) and the v1.3 Filter C default (-64)."
+  "inputs": {
+    "baselineCsv": "87d2ac67585afe4b373be6107fcc66183a43d5e67f14aa56bc77b968ea3473bf",
+    "rules": {
+      "src/lib/analyzer/regime-filters.ts": "026d7aab56226b97a7988407ba31832d1f11952847bad954dfefdeb49ef30905",
+      "src/lib/analyzer/run.ts": "d9f4265e1e6797078a61a6e0909fd53d2af71e966dabca0f0db230037ec88fb4",
+      "src/lib/analyzer/strategies/final-survivors.ts": "e0ffc30b6a5fe726d7fe4348491d0e98120733ed50c24e658489762ab2e04dcd"
+    }
+  },
+  "seriesContract": {
+    "bars": 9738,
+    "rowsWithRefs": 9699,
+    "swingRefs": 44652,
+    "resolvedRefs": 41613,
+    "danglingRefs": 3039,
+    "outsideWindowRefs": 0,
+    "danglingRefShare": 0.0680596613813491,
+    "unresolvedRefs": 3039,
+    "unresolvedRefShare": 0.0680596613813491,
+    "trendCapableRows": 9030,
+    "trendCapableShare": 0.9272951324707333,
+    "trendCounts": {
+      "bullish": 4449,
+      "bearish": 4087,
+      "ranging": 1202
+    },
+    "nonRangingShare": 0.8765660299856234,
+    "ok": true,
+    "failures": [],
+    "warnings": []
+  },
+  "note": "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend momentum bars that close on their high (+17.7 R net after slot refills)."
 }

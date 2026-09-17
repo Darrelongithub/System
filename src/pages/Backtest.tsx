@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import JSZip from "jszip";
 import { ArrowLeft, Download, History, Loader2, Play, Square } from "lucide-react";
 import { toast } from "sonner";
@@ -16,8 +15,6 @@ import {
 } from "@/components/ui/select";
 import { AVAILABLE_SYMBOLS } from "@/lib/market-data";
 import { buildOhlcCsv } from "@/lib/ohlc-generator";
-import { verifySetup } from "@/lib/verifier.functions";
-import { appendAiSections, type AiStage } from "@/lib/backtest/ai";
 import {
   applyTriggers,
   buildDayReport,
@@ -35,12 +32,8 @@ import {
   type DayTrigger,
 } from "@/lib/backtest/engine";
 import { analyseContinuous, contextLogForDay } from "@/lib/pipeline/continuous";
+import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
-
-const AI_STAGE_LABELS: Record<AiStage, string> = {
-  verifier: "Verifier / picker (default)",
-  off: "Local engine only",
-};
 
 function inIframe(): boolean {
   try {
@@ -90,9 +83,7 @@ export default function Backtest() {
   const [logs, setLogs] = useState<string[]>([]);
   const [state, setState] = useState<BacktestState>(() => emptyState("XAU/USD"));
   const [zip, setZip] = useState<{ name: string; url: string } | null>(null);
-  const [aiStage, setAiStage] = useState<AiStage>("verifier");
 
-  const runVerifier = useServerFn(verifySetup);
   const stopRef = useRef(false);
   /** Aborts the continuous OHLC pull and its cooldown waits on Stop. */
   const abortRef = useRef<AbortController | null>(null);
@@ -173,7 +164,7 @@ export default function Backtest() {
         `Auto-Backtest ${symbol} | ${days[0]} → ${days[days.length - 1]} (${days.length} day(s))`,
       );
       addLog(
-        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context). AI stage: ${AI_STAGE_LABELS[aiStage]}.`,
+        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context), local engine only.`,
       );
       addLog(
         `Closed-candle policy: seriesEndsComplete=true (historical bars). Future bars only resolve already-generated trades.`,
@@ -239,6 +230,20 @@ export default function Backtest() {
         return;
       }
 
+      // Same production gate as the live page: the replay must not present a
+      // book from a series whose warm-up or trend layer cannot support the
+      // decision. A short/spliced window would silently replay a different
+      // engine than the one the live analyzer runs.
+      const contract = continuous.analysis.contract;
+      if (!contract.ok) {
+        const message = `Series rejected: ${contract.failures.join("; ")}`;
+        addLog(message);
+        addLog(formatSeriesContract(contract));
+        toast.error(message);
+        return;
+      }
+      for (const warning of contract.warnings) addLog(`Series contract warning: ${warning}`);
+
       addLog(
         `Continuous pass: ${continuous.tradeTriggers.length} trade trigger(s), ${continuous.contextEvents.length} context observation(s).`,
       );
@@ -296,8 +301,9 @@ export default function Backtest() {
         // One skip predicate, pinned by tests/weekend-tail-accounting.test.mjs:
         // a Saturday EAT carrying the Friday NY session tail (00:00–01:00 EAT)
         // can hold real triggers and must be PROCESSED. A hard-coded
-        // isWeekend(day) here previously dropped 37 such trades from rolling
-        // stats and the packaged reports (2286 vs 2323 on the golden baseline).
+        // isWeekend(day) here previously dropped 37 trigger-bearing Saturdays
+        // from rolling stats and the packaged reports; the count is pinned by
+        // tests/weekend-tail-accounting.test.mjs, not by a golden total.
         const skipReason = dayReportSkipReason(
           day,
           Boolean(meta),
@@ -337,7 +343,7 @@ export default function Backtest() {
           `${day}: ${triggers.length} trade(s) · ${dayContext.length} context · ${resolved} resolved · ${stillOpen} open`,
         );
 
-        let report = buildDayReport({
+        const report = buildDayReport({
           symbol,
           day,
           checkpoint: "23:59",
@@ -350,40 +356,11 @@ export default function Backtest() {
           strategyBreakdown,
           resolutionEnd,
         });
-        if (dayContext.length > 0) {
-          report = report + "\n\n" + contextLog;
-        }
-
-        const aiSections: { title: string; body: string }[] = [];
-        const canRunAi = aiStage !== "off" && triggers.length > 0;
-        if (aiStage !== "off" && !canRunAi) {
-          addLog(`${day}: AI stage skipped — no trade triggers this day.`);
-        }
-
-        if (canRunAi && aiStage === "verifier") {
-          try {
-            addLog(`${day}: running V2 verifier / picker…`);
-            const outcome = await runVerifier({
-              data: { scoutData: report, ohlcCsv: continuousCsv },
-            });
-            if (!isCurrent()) return;
-            aiSections.push({
-              title: `V2 VERIFIER VERDICT (${outcome.provider} · ${outcome.model})`,
-              body: outcome.warnings.length
-                ? `${outcome.verdict}\n\nwarnings: ${outcome.warnings.join(" | ")}`
-                : outcome.verdict,
-            });
-            addLog(`${day}: verifier done via ${outcome.provider} · ${outcome.model}`);
-          } catch (error) {
-            if (!isCurrent()) return;
-            const message = error instanceof Error ? error.message : String(error);
-            aiSections.push({ title: "V2 VERIFIER VERDICT", body: `FAILED: ${message}` });
-            addLog(`${day}: verifier failed — ${message}`);
-          }
-        }
-
-        report = appendAiSections(report, aiSections);
-        collected.push({ day, content: report, triggers });
+        collected.push({
+          day,
+          content: dayContext.length > 0 ? `${report}\n\n${contextLog}` : report,
+          triggers,
+        });
       }
 
       if (collected.length === 0) {
@@ -539,29 +516,6 @@ export default function Backtest() {
                 resolve to TP/SL. Signal generation never uses those bars. 0 means no post-range
                 resolution data — more trades stay OPEN. This is not live/incomplete-bar mode;
                 seriesEndsComplete remains true for historical backtests.
-              </p>
-            </div>
-            <div className="flex flex-col gap-1.5 sm:col-span-3">
-              <Label className="text-[11px] uppercase tracking-wide">AI stage per day</Label>
-              <Select
-                value={aiStage}
-                onValueChange={(value) => setAiStage(value as AiStage)}
-                disabled={isRunning}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(["verifier", "off"] as AiStage[]).map((stage) => (
-                    <SelectItem key={stage} value={stage}>
-                      {AI_STAGE_LABELS[stage]}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-[11px] text-muted-foreground">
-                The verifier runs on every day that produced PASS setups and its verdict is written
-                into that day&apos;s report.
               </p>
             </div>
           </div>

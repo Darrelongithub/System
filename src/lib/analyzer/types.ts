@@ -1,3 +1,5 @@
+import type { SeriesContractReport } from "./series-contract";
+
 export type Trend = "bullish" | "bearish" | "ranging";
 
 export interface HtfTrendContext {
@@ -181,4 +183,10 @@ export interface Analysis {
   lastRowDatetime: string;
   live: ResultRow[];
   historical: ResultRow[];
+  /**
+   * Fit-for-purpose report for the source series (history depth, swing-ref
+   * resolution, trend distribution). Computed once per run; production paths
+   * refuse to present results when it reports a failure. See series-contract.ts.
+   */
+  contract: SeriesContractReport;
 }

@@ -13,6 +13,7 @@ import {
   cooldown,
   MAX_RATE_LIMIT_RETRIES,
   removeRepeatedFlatlineArtifacts,
+  selectChartCandles,
 } from "@/lib/ohlc-generator";
 import { Link } from "@tanstack/react-router";
 import { setAnalysisSnapshot } from "@/lib/analysis-store";
@@ -174,20 +175,12 @@ export default function Home() {
 
   // Generate TradingView-style SVG chart with real API data
   const createSvgContent = (timeframe: string, candleData: ChartCandle[]): string => {
-    // Filter out weekend dates (Saturday = 6, Sunday = 0)
-    const processedCandles = candleData.filter((c) => {
-      // Explicit weekend filter based on date
-      try {
-        const dateOnly = String(c.time).replace("T", " ").substring(0, 10);
-        const dateObj = new Date(`${dateOnly}T00:00:00Z`);
-        const dayOfWeek = dateObj.getUTCDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-      } catch (e) {
-        // Ignore date parsing errors
-      }
-
-      return true;
-    });
+    // The chart is packaged beside the CSV and read as a picture of the same
+    // series, so it draws exactly the exported rows: the shared weekly-closure
+    // rule, not a drop-Saturday/Sunday-by-date approximation. That old filter
+    // erased the first hour of the FX week (EAT Saturday 00:00-00:59 is Friday
+    // 21:00-21:59 UTC, live New York afternoon) which the CSV does contain.
+    const processedCandles = selectChartCandles(candleData);
 
     // Handle empty data
     if (!processedCandles || processedCandles.length === 0) {
@@ -457,9 +450,9 @@ export default function Home() {
   };
 
   // Persist the freshly generated CSV for the Analysis tab. Chart PNGs are NOT
-  // snapshotted: no page or verifier call reads snapshot images, and
-  // rasterizing three 1920x1080 PNGs into sessionStorage on every run used to
-  // burn time and overflow the quota, silently dropping the whole snapshot.
+  // snapshotted: no page reads snapshot images, and rasterizing three 1920x1080
+  // PNGs into sessionStorage on every run used to burn time and overflow the
+  // quota, silently dropping the whole snapshot.
   const saveAnalysisSnapshot = (csvOverride?: string | null) => {
     const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
     setAnalysisSnapshot({
@@ -964,13 +957,22 @@ export default function Home() {
           }
 
           setResumeTimer(null);
-          addLog(`\n🎉 All done! Starting download...`);
-          toast.success(`Complete! Packaging download...`);
-
-          if (filesAdded > 0 || fetchedCsv) {
-            saveAnalysisSnapshot(fetchedCsv);
-            void handleDownload(fetchedCsv);
+          // A run that requested OHLC but produced no CSV is a failure, not a
+          // success, and it must not touch the snapshot the live analyzer reads.
+          // Both used to be wrong: the success toast fired unconditionally, and
+          // `saveAnalysisSnapshot(null)` overwrote the previous CSV (with its
+          // symbol/range) — so a chart-only run or a failed OHLC fetch silently
+          // cleared the Analysis tab, i.e. the product's own input.
+          if (includeOhlc && !fetchedCsv) {
+            addLog("❌ OHLC fetch produced no CSV — the previous analysis was left untouched.");
+            toast.error("OHLC fetch failed — no CSV was generated");
+          } else {
+            addLog(`\n🎉 All done! Starting download...`);
+            toast.success(`Complete! Packaging download...`);
           }
+
+          if (fetchedCsv) saveAnalysisSnapshot(fetchedCsv);
+          if (filesAdded > 0 || fetchedCsv) void handleDownload(fetchedCsv);
         } catch (error) {
           if (controller.signal.aborted) {
             addLog(`🛑 Generation stopped.`);

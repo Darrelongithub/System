@@ -7,6 +7,7 @@
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { loadBaselineCsv } from "./fixtures.mjs";
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
+import { FINAL_STRATEGY_IDS } from "../src/lib/analyzer/strategies/index.ts";
 
 const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
 
@@ -42,7 +43,10 @@ test("independence: a strategy's signals do not change under subset/superset exe
   const csv = loadBaselineCsv();
   const full = runAnalysis(csv, OPTIONS);
   assert(full.ok, "full run ok");
-  const probe = ["macd-cross", "three-soldiers", "pdh-retest"];
+  // Every shipped trade strategy, taken from the registry rather than a hand
+  // list: a strategy whose signals depend on what else ran is a correctness bug
+  // (they share one AnalysisContext), and a hand-picked subset would hide it.
+  const probe = [...FINAL_STRATEGY_IDS];
   const sigOf = (analysis, id) =>
     analysis.tradePasses
       .filter((t) => t.strategyId === id)

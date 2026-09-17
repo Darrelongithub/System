@@ -26,6 +26,7 @@ function splitDataLines(csv) {
 function fingerprint(analysis) {
   return analysis.results.map((r) =>
     [
+      // 0-7: signal identity (compared at every cutoff).
       r.strategyId,
       r.index,
       r.result,
@@ -34,12 +35,25 @@ function fingerprint(analysis) {
       r.sl,
       r.tp,
       r.rr,
+      // 8-10: resolution (locked only when the resolution predates the cutoff).
       r.outcome,
       r.exitDatetime,
       r.exitPrice,
+      // 11+: the decision's own explanation and context — also causal, appended
+      // after the resolution block so those indexes stay stable.
+      r.reason,
+      r.orderType,
+      r.htfTrend?.h1,
+      r.htfTrend?.h4,
+      r.htfTrend?.d1,
     ].join("|"),
   );
 }
+
+/** Signal identity + the reason/context the row reported, without resolution. */
+const signalFields = (fields) => [...fields.slice(0, 8), ...fields.slice(11)].join("|");
+/** Outcome/exit fields, meaningful only once the resolution predates the cutoff. */
+const resolutionFields = (fields) => fields.slice(8, 11).join("|");
 
 function runText(text) {
   const r = runAnalysis(text, OPTIONS);
@@ -102,21 +116,22 @@ test("causality: future mutations never alter signals or pre-cutoff resolutions"
       for (let i = 0; i < refPrefix.length; i++) {
         const rf = refPrefix[i].split("|");
         const gf = gotPrefix[i].split("|");
-        // Signal identity (strategy, index, result, side, entry, sl, tp, rr):
-        // always required — no read-ahead allowed.
-        const refSig = rf.slice(0, 8).join("|");
-        const gotSig = gf.slice(0, 8).join("|");
-        assertEqual(gotSig, refSig, `${label} diverged on signal fields at row ${i} (K=${k})`);
+        // Signal identity (strategy, index, result, side, entry, sl, tp, rr,
+        // reason, orderType, HTF context): always required — no read-ahead
+        // allowed, not even in WHY a candidate passed or failed.
+        assertEqual(
+          signalFields(gf),
+          signalFields(rf),
+          `${label} diverged on signal fields at row ${i} (K=${k})`,
+        );
         // Resolution fields are only locked when the resolution completed at
         // or before the cutoff — later outcomes legitimately change when the
         // future itself changes (or vanishes).
         const refExitIdx = rf[9] ? (dtIndex.get(rf[9]) ?? -Infinity) : undefined;
         if (refExitIdx === undefined || refExitIdx <= k) {
-          const refOut = rf.slice(8).join("|");
-          const gotOut = gf.slice(8).join("|");
           assertEqual(
-            gotOut,
-            refOut,
+            resolutionFields(gf),
+            resolutionFields(rf),
             `${label} diverged on pre-cutoff resolution at row ${i} (K=${k})`,
           );
         }
