@@ -34,6 +34,7 @@ await import("./consume-after-rr.test.mjs");
 await import("./ruleset-freeze.test.mjs");
 await import("./generator-ref-integrity.test.mjs");
 await import("./generator-weekend-boundary.test.mjs");
+await import("./generator-window-stability.test.mjs");
 await import("./regime-filter-f.test.mjs");
 
 const filter = process.argv[2];

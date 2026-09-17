@@ -334,25 +334,44 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
     row.localAvgRange = average(rangeWindow) || 0;
   });
 
-  // Build the average open/previous-close gap independently for each UTC
-  // session. Gaps across missing candles/weekends are excluded from the
-  // baseline, so a market reopening does not make the threshold unusable.
-  const sessionGaps: Record<"asian" | "london" | "ny", number[]> = {
-    asian: [],
-    london: [],
-    ny: [],
+  // Per-session baseline of adjacent-candle open/previous-close gaps.
+  //
+  // The baseline is an expanding mean of the gaps seen BEFORE each row, never
+  // of the whole file. A row's reliability has to be a function of the bars at
+  // or before it: with a file-global average, the same calendar bar described
+  // itself differently in two exports of identical market data simply because
+  // one of them extended further (measured on the locked baseline: 216 of 4,812
+  // overlapping rows flipped `is_reliable`, and because reliability drives the
+  // ATR chain, `atr_30m` — the input behind every SL/TP — differed for 2,189 of
+  // them, mean 6.6%, max 61%; 82 PASS/FAIL decisions flipped inside one shared
+  // date range). Gaps across missing candles/weekends are still excluded from
+  // the baseline, so a market reopening does not make the threshold unusable.
+  const gapBaselines: number[] = new Array(workingRows.length).fill(0);
+  const sessionGapStats: Record<"asian" | "london" | "ny", { sum: number; count: number }> = {
+    asian: { sum: 0, count: 0 },
+    london: { sum: 0, count: 0 },
+    ny: { sum: 0, count: 0 },
   };
+  let overallGapSum = 0;
+  let overallGapCount = 0;
   workingRows.forEach((row, index) => {
+    const stats = sessionGapStats[row.session as "asian" | "london" | "ny"];
+    // Prior rows only: the baseline is read before this row's own gap is added.
+    gapBaselines[index] =
+      stats.count > 0
+        ? stats.sum / stats.count
+        : overallGapCount > 0
+          ? overallGapSum / overallGapCount
+          : 0;
     const previous = workingRows[index - 1];
     if (previous && isAdjacent(previous, row) && isSameSession(previous, row)) {
-      const session = row.session as "asian" | "london" | "ny";
-      sessionGaps[session].push(Math.abs(row.open - previous.close));
+      const gap = Math.abs(row.open - previous.close);
+      stats.sum += gap;
+      stats.count += 1;
+      overallGapSum += gap;
+      overallGapCount += 1;
     }
   });
-  const allGaps = Object.values(sessionGaps).flat();
-  const overallGapAverage = average(allGaps) || 0;
-  const sessionGapAverage = (session: "asian" | "london" | "ny") =>
-    average(sessionGaps[session]) || overallGapAverage;
 
   workingRows.forEach((row, index) => {
     const previous = workingRows[index - 1];
@@ -360,7 +379,7 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
       previous && isAdjacent(previous, row) && isSameSession(previous, row)
         ? Math.abs(row.open - previous.close)
         : 0;
-    const gapAverage = sessionGapAverage(row.session);
+    const gapAverage = gapBaselines[index] ?? 0;
     const rangeTooSmall = row.localAvgRange > 0 && row.range < 0.1 * row.localAvgRange;
     const previousIsNearZero =
       previous &&
