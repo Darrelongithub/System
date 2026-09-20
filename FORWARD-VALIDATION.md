@@ -37,9 +37,11 @@ objective is a faithful live analyzer, not a maximised backtest (see §1).
 ## 2. The cycle
 
 1. **Freeze.** A shipped rule is identified by the hashes of its sources
-   (`scripts/research/validate-on-new-data.mjs` records `regime-filters.ts`, `run.ts` and
-   the git HEAD). Changing the rule starts a _new_ hypothesis, with its own evaluation
-   window; the old evidence does not carry over.
+   (`scripts/research/validate-on-new-data.mjs` records the same rule files the golden
+   generator does — `regime-filters.ts`, `run.ts`, `strategies/final-survivors.ts`,
+   `status.ts` — plus the git HEAD). Exit resolution is part of that set because it prices
+   every `rMultiple` the verdict is computed from. Changing any of them starts a _new_
+   hypothesis, with its own evaluation window; the old evidence does not carry over.
 2. **Accumulate.** Fetch new data with the production generator, strictly after the
    discovery window ends (2026-08-20 for the v1.8 baseline) and at least the measured
    warm-up floor of 1,000 bars.
@@ -107,7 +109,8 @@ line in `artifacts/validation/ledger.jsonl`:
 
 ```json
 {"evaluatedAt":"…","dataSha256":"…","window":{…},"rerun":false,
- "rules":{"regime-filters.ts":"…","run.ts":"…"},"gitHead":"…",
+ "rules":{"regime-filters.ts":"…","run.ts":"…","final-survivors.ts":"…","status.ts":"…"},
+ "gitHead":"…",
  "totals":{"withF":{…},"withoutF":{…},"deltaR":…,"removed":…},
  "perMonth":[…],"perSide":[…],"criteria":[…],"verdict":"HOLDS"}
 ```

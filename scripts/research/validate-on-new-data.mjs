@@ -37,7 +37,21 @@ import { isTradeStrategy } from "../../src/lib/analyzer/strategy-kind.ts";
 const WARMUP_FLOOR_BARS = 1000; // tests/warmup-window-sufficiency.test.mjs
 const BASELINE = new URL("../../artifacts/baseline-xauusd-ohlc.csv", import.meta.url);
 const LEDGER = new URL("../../artifacts/validation/ledger.jsonl", import.meta.url);
-const RULES_SOURCES = ["src/lib/analyzer/regime-filters.ts", "src/lib/analyzer/run.ts"];
+/**
+ * The rule sources the evaluated ΔR depends on. This must be the same set the
+ * golden generator records (`scripts/generate-golden.mjs` → RULE_SOURCES), or
+ * the ledger would let two different rule sets look like one hypothesis: exit
+ * resolution (`status.ts`) prices every rMultiple in the comparison, and the
+ * entry rules + filter order live in the other files, so a change to any of them
+ * changes ΔR without touching the two files this used to hash. FORWARD-VALIDATION
+ * §2 defines "a shipped rule is identified by the hashes of its sources".
+ */
+const RULES_SOURCES = [
+  "src/lib/analyzer/regime-filters.ts",
+  "src/lib/analyzer/run.ts",
+  "src/lib/analyzer/strategies/final-survivors.ts",
+  "src/lib/analyzer/status.ts",
+];
 
 const args = process.argv.slice(2);
 const labelArg = args.find((a) => a.startsWith("--label="));

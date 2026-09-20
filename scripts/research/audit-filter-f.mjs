@@ -27,7 +27,15 @@ import { isTradeStrategy } from "../../src/lib/analyzer/strategy-kind.ts";
 
 const MOMENTUM_BODY_MIN = 0.8;
 const MOMENTUM_UPPER_WICK_MAX = 0.02;
-const C_ONLY_LOCK = { n: 2323, R: 523.6813503963194 };
+/**
+ * Historical lock for the Filter-C-only book. Re-pinned by v1.8.2: the gap-fill
+ * correction changed how a tracked level is resolved when a bar opens beyond it,
+ * which re-priced this book from 523.6813503963194 (v1.4) to 507.93925691611344
+ * — the number `tests/filter-optout-legacy.test.mjs` pins. Pinning the live
+ * value here is the point of the check: it is the cross-check that this script
+ * and the certified suite are reading the same book.
+ */
+const C_ONLY_LOCK = { n: 2323, R: 507.93925691611344 };
 
 const csv = readFileSync(
   new URL("../../artifacts/baseline-xauusd-ohlc.csv", import.meta.url),
