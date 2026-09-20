@@ -34,6 +34,7 @@ import {
 import { analyseContinuous, contextLogForDay } from "@/lib/pipeline/continuous";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
+import { todayEat } from "@/lib/analyzer/time";
 
 function inIframe(): boolean {
   try {
@@ -56,21 +57,10 @@ function downloadBlob(blob: Blob, fileName: string) {
   window.setTimeout(() => URL.revokeObjectURL(url), 120_000);
 }
 
-function today(): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Africa/Nairobi",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(new Date());
-  const map = Object.fromEntries(parts.map(({ type, value }) => [type, value]));
-  return `${map["year"]}-${map["month"]}-${map["day"]}`;
-}
-
 export default function Backtest() {
   const [symbol, setSymbol] = useState("XAU/USD");
-  const [fromDate, setFromDate] = useState(today());
-  const [toDate, setToDate] = useState(today());
+  const [fromDate, setFromDate] = useState(() => todayEat());
+  const [toDate, setToDate] = useState(() => todayEat());
   // Forward candles fetched AFTER each analysed day, used only to resolve each
   // trigger to TP/SL. Without this every signal stayed "OPEN" forever, because
   // the window ended on the same candle the signal was generated on.
@@ -135,7 +125,7 @@ export default function Backtest() {
       return;
     }
 
-    const todayDate = today();
+    const todayDate = todayEat();
     if (toDate > todayDate) {
       toast.error("The To date cannot be in the future.");
       return;
@@ -181,7 +171,7 @@ export default function Backtest() {
       // pulling in ~90 extra unused days on every run.
       const dataStart = addUtcDays(rangeStart, -STANDARD_LOOKBACK_CALENDAR_DAYS);
       const requestedEnd = addUtcDays(rangeEnd, Math.max(0, forwardDays));
-      const resolutionEnd = requestedEnd > today() ? today() : requestedEnd;
+      const resolutionEnd = requestedEnd > todayEat() ? todayEat() : requestedEnd;
 
       addLog(
         `Fetching continuous OHLC ${dataStart} → ${resolutionEnd} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up window from first day)…`,

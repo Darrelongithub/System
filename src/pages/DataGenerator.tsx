@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/command";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { todayEat } from "@/lib/analyzer/time";
 
 /**
  * A chart candle: a provider row (`ProviderCandle`, prices as strings) parsed
@@ -78,10 +79,15 @@ export default function Home() {
 
   const [symbol, setSymbol] = useState("XAU/USD");
   const [openSymbolSearch, setOpenSymbolSearch] = useState(false);
-  const [chartStartDate, setChartStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [chartEndDate, setChartEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [ohlcStartDate, setOhlcStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [ohlcEndDate, setOhlcEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  // Defaults are the current EAT date, not the browser's local date: the page
+  // displays an EAT clock, the export writes EAT timestamps and the provider is
+  // queried in Africa/Nairobi. On a client west of EAT the local date is still
+  // yesterday for the first hours of the EAT day, which would default the
+  // requested window to a series ending one day before the newest bar.
+  const [chartStartDate, setChartStartDate] = useState(() => todayEat());
+  const [chartEndDate, setChartEndDate] = useState(() => todayEat());
+  const [ohlcStartDate, setOhlcStartDate] = useState(() => todayEat());
+  const [ohlcEndDate, setOhlcEndDate] = useState(() => todayEat());
   const [useCustomEndTime, setUseCustomEndTime] = useState(false);
   const [endTime, setEndTime] = useState("11:45");
   const [includeCharts, setIncludeCharts] = useState(true);
@@ -457,7 +463,7 @@ export default function Home() {
     const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
     setAnalysisSnapshot({
       symbol,
-      createdAt: `${format(new Date(), "yyyy-MM-dd")} ${formatEATTime()}`,
+      createdAt: `${todayEat()} ${formatEATTime()}`,
       range: `${ohlcStartDate} → ${ohlcEndDate}`,
       csvName: csv ? ohlcCsvFileName() : null,
       ohlcCsv: csv ?? null,
