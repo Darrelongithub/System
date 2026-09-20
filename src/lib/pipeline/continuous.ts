@@ -5,6 +5,7 @@
  * caller later requests them via explicit strategyIds on runAnalysis.
  */
 import { runAnalysis, type RunOutcome } from "@/lib/analyzer/run";
+import { ANALYZER_CERTIFIED_OPTIONS, ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
 import {
   isTradeStrategy,
   formatContextChannel,
@@ -69,10 +70,10 @@ export function analyseContinuous(
   csv: string,
   options: { seriesEndsComplete?: boolean } = {},
 ): ContinuousAnalysis | ContinuousFailure {
-  const outcome = runAnalysis(csv, {
-    enableHtfDirectionFilter: true,
-    seriesEndsComplete: options.seriesEndsComplete ?? true,
-  });
+  const outcome = runAnalysis(
+    csv,
+    (options.seriesEndsComplete ?? true) ? ANALYZER_CERTIFIED_OPTIONS : ANALYZER_LIVE_OPTIONS,
+  );
   if (!outcome.ok) return { ok: false, error: outcome.error };
 
   const tradeTriggers = outcome.analysis.tradePasses.map(toTrigger);

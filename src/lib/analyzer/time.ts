@@ -33,6 +33,20 @@ export function eatDay(datetime: string): string {
 }
 
 /**
+ * Today's date in EAT (`yyyy-mm-dd`) at a given instant — the page defaults and
+ * stored timestamps must describe the same day the EAT clock shows.
+ *
+ * EAT is a fixed +03:00 offset with no DST, so this is exact arithmetic rather
+ * than a locale/ICU lookup (the same reason every other helper here parses
+ * timestamps by hand). Callers on a browser clock west of EAT would otherwise
+ * default an OHLC/chart window to *yesterday* for the first hours of the EAT
+ * day, silently requesting a series that stops one day short of the newest bar.
+ */
+export function todayEat(nowMs: number = Date.now()): string {
+  return new Date(nowMs + 3 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+/**
  * Session windows in EAT. These mirror the generator's labels
  * (asian / london / ny) so both sides of the pipeline agree.
  */

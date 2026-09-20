@@ -13,6 +13,7 @@ import {
   cooldown,
   MAX_RATE_LIMIT_RETRIES,
   removeRepeatedFlatlineArtifacts,
+  selectChartCandles,
 } from "@/lib/ohlc-generator";
 import { Link } from "@tanstack/react-router";
 import { setAnalysisSnapshot } from "@/lib/analysis-store";
@@ -42,6 +43,7 @@ import {
 } from "@/components/ui/command";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { todayEat } from "@/lib/analyzer/time";
 
 /**
  * A chart candle: a provider row (`ProviderCandle`, prices as strings) parsed
@@ -77,10 +79,15 @@ export default function Home() {
 
   const [symbol, setSymbol] = useState("XAU/USD");
   const [openSymbolSearch, setOpenSymbolSearch] = useState(false);
-  const [chartStartDate, setChartStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [chartEndDate, setChartEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [ohlcStartDate, setOhlcStartDate] = useState(format(new Date(), "yyyy-MM-dd"));
-  const [ohlcEndDate, setOhlcEndDate] = useState(format(new Date(), "yyyy-MM-dd"));
+  // Defaults are the current EAT date, not the browser's local date: the page
+  // displays an EAT clock, the export writes EAT timestamps and the provider is
+  // queried in Africa/Nairobi. On a client west of EAT the local date is still
+  // yesterday for the first hours of the EAT day, which would default the
+  // requested window to a series ending one day before the newest bar.
+  const [chartStartDate, setChartStartDate] = useState(() => todayEat());
+  const [chartEndDate, setChartEndDate] = useState(() => todayEat());
+  const [ohlcStartDate, setOhlcStartDate] = useState(() => todayEat());
+  const [ohlcEndDate, setOhlcEndDate] = useState(() => todayEat());
   const [useCustomEndTime, setUseCustomEndTime] = useState(false);
   const [endTime, setEndTime] = useState("11:45");
   const [includeCharts, setIncludeCharts] = useState(true);
@@ -174,20 +181,12 @@ export default function Home() {
 
   // Generate TradingView-style SVG chart with real API data
   const createSvgContent = (timeframe: string, candleData: ChartCandle[]): string => {
-    // Filter out weekend dates (Saturday = 6, Sunday = 0)
-    const processedCandles = candleData.filter((c) => {
-      // Explicit weekend filter based on date
-      try {
-        const dateOnly = String(c.time).replace("T", " ").substring(0, 10);
-        const dateObj = new Date(`${dateOnly}T00:00:00Z`);
-        const dayOfWeek = dateObj.getUTCDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) return false;
-      } catch (e) {
-        // Ignore date parsing errors
-      }
-
-      return true;
-    });
+    // The chart is packaged beside the CSV and read as a picture of the same
+    // series, so it draws exactly the exported rows: the shared weekly-closure
+    // rule, not a drop-Saturday/Sunday-by-date approximation. That old filter
+    // erased the first hour of the FX week (EAT Saturday 00:00-00:59 is Friday
+    // 21:00-21:59 UTC, live New York afternoon) which the CSV does contain.
+    const processedCandles = selectChartCandles(candleData);
 
     // Handle empty data
     if (!processedCandles || processedCandles.length === 0) {
@@ -457,14 +456,14 @@ export default function Home() {
   };
 
   // Persist the freshly generated CSV for the Analysis tab. Chart PNGs are NOT
-  // snapshotted: no page or verifier call reads snapshot images, and
-  // rasterizing three 1920x1080 PNGs into sessionStorage on every run used to
-  // burn time and overflow the quota, silently dropping the whole snapshot.
+  // snapshotted: no page reads snapshot images, and rasterizing three 1920x1080
+  // PNGs into sessionStorage on every run used to burn time and overflow the
+  // quota, silently dropping the whole snapshot.
   const saveAnalysisSnapshot = (csvOverride?: string | null) => {
     const csv = csvOverride !== undefined ? csvOverride : ohlcCsvData;
     setAnalysisSnapshot({
       symbol,
-      createdAt: `${format(new Date(), "yyyy-MM-dd")} ${formatEATTime()}`,
+      createdAt: `${todayEat()} ${formatEATTime()}`,
       range: `${ohlcStartDate} → ${ohlcEndDate}`,
       csvName: csv ? ohlcCsvFileName() : null,
       ohlcCsv: csv ?? null,
@@ -964,13 +963,22 @@ export default function Home() {
           }
 
           setResumeTimer(null);
-          addLog(`\n🎉 All done! Starting download...`);
-          toast.success(`Complete! Packaging download...`);
-
-          if (filesAdded > 0 || fetchedCsv) {
-            saveAnalysisSnapshot(fetchedCsv);
-            void handleDownload(fetchedCsv);
+          // A run that requested OHLC but produced no CSV is a failure, not a
+          // success, and it must not touch the snapshot the live analyzer reads.
+          // Both used to be wrong: the success toast fired unconditionally, and
+          // `saveAnalysisSnapshot(null)` overwrote the previous CSV (with its
+          // symbol/range) — so a chart-only run or a failed OHLC fetch silently
+          // cleared the Analysis tab, i.e. the product's own input.
+          if (includeOhlc && !fetchedCsv) {
+            addLog("❌ OHLC fetch produced no CSV — the previous analysis was left untouched.");
+            toast.error("OHLC fetch failed — no CSV was generated");
+          } else {
+            addLog(`\n🎉 All done! Starting download...`);
+            toast.success(`Complete! Packaging download...`);
           }
+
+          if (fetchedCsv) saveAnalysisSnapshot(fetchedCsv);
+          if (filesAdded > 0 || fetchedCsv) void handleDownload(fetchedCsv);
         } catch (error) {
           if (controller.signal.aborted) {
             addLog(`🛑 Generation stopped.`);

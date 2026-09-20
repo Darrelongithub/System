@@ -25,6 +25,40 @@ function touched(candle: Candle, level: number): boolean {
 }
 
 /**
+ * Gap-through fill: a bar that OPENS beyond a tracked level and never trades it
+ * inside the bar has still filled every order resting at that level — at the
+ * bar's OPEN, not at the level. Without this, a position whose stop was jumped
+ * by a weekend/holiday reopen stays alive in the results even though the market
+ * took it out, and the eventual re-touch is booked at the level (full planned R)
+ * instead of the real fill.
+ *
+ * Returns the open price when the bar opened beyond the level, undefined when it
+ * did not (the level itself is then the fill) or when OHLC is incomplete. The
+ * open is the first tick of the bar, so it decides even when the bar later
+ * trades back through the level: the resting order was triggered at the open.
+ * This mirrors the entry-side `gapFill` (spec-strategies.ts) and `fillPrice`
+ * (turtle.ts) rules.
+ *
+ * `kind` mirrors the barrier's meaning: "stop" is a level the trade must not
+ * cross (a long is invalidated below it), "target" is the level the trade wants
+ * to reach (a long is filled above it).
+ */
+function gapFillPrice(
+  candle: Candle,
+  level: number,
+  side: "long" | "short",
+  kind: "stop" | "target",
+): number | undefined {
+  const { open, high, low } = candle;
+  if (open === undefined || high === undefined || low === undefined) return undefined;
+  const long = side === "long";
+  const opensBeyond =
+    kind === "stop" ? (long ? open < level : open > level) : long ? open > level : open < level;
+  if (!opensBeyond) return undefined;
+  return open;
+}
+
+/**
  * Parse a candle timestamp to epoch ms. Source timestamps are EAT (+03:00)
  * when no explicit offset is supplied — regardless of whether the date/time
  * separator is a space or a `T`. Mirrors `structure.ts#parseDatetimeMs`.
@@ -171,6 +205,26 @@ function evaluateCrabelOrbStatus(row: ResultRow, candles: Candle[]): StatusEvalu
     const effectiveStop = crabelOrbEffectiveStop(row.entry, row.sl, elapsedMinutes);
     breakevenActive = effectiveStop === row.entry;
 
+    // A post-fill bar that opens beyond the protective stop has already taken
+    // the trade out at its open; the stop level itself was never traded. The
+    // fill bar keeps its own ambiguity policy below (entry and stop inside one
+    // bar say nothing about their order).
+    const stopGap =
+      row.side && candle.index !== fillCandle.index
+        ? gapFillPrice(candle, effectiveStop, row.side, "stop")
+        : undefined;
+    if (stopGap !== undefined) {
+      return {
+        setupStatus: "RESOLVED",
+        candlesSinceTrigger,
+        statusNote: `Crabel ORB ${breakevenActive ? "breakeven" : "initial protective"} stop hit at ${candle.datetime} at ${stopGap} (gap through ${effectiveStop}: the bar opened beyond the stop and never traded it, so the fill is the bar's open)`,
+        fillCandle,
+        resolutionCandle: candle,
+        resolutionPrice: stopGap,
+        resolutionLevel: "SL",
+      };
+    }
+
     if (touched(candle, effectiveStop)) {
       // A stop-entry candle that also touches the initial protective stop is
       // intrabar ambiguous with OHLC data; do not manufacture a fill/exit.
@@ -226,6 +280,19 @@ function evaluateDonchianStatus(row: ResultRow, candles: Candle[]): StatusEvalua
     if (ds.length < 5) continue;
     const exit =
       row.side === "long" ? Math.min(...ds.map((d) => d.low)) : Math.max(...ds.map((d) => d.high));
+    // The 5-day channel exit is a trailing stop: a bar that opens beyond it
+    // (weekend/holiday reopen gap) exits at the bar's open, not at the channel.
+    const exitGap = gapFillPrice(candle, exit, row.side, "stop");
+    if (exitGap !== undefined) {
+      return {
+        setupStatus: "RESOLVED",
+        candlesSinceTrigger,
+        statusNote: `Donchian 5-day trailing exit hit at ${candle.datetime} at ${exitGap} (gap through ${exit}: the bar opened beyond the channel and never traded it, so the fill is the bar's open)`,
+        resolutionCandle: candle,
+        resolutionPrice: exitGap,
+        resolutionLevel: "TP",
+      };
+    }
     if (row.side === "long" && candle.low !== undefined && candle.low <= exit) {
       return {
         setupStatus: "RESOLVED",
@@ -317,10 +384,12 @@ export function evaluateSetupStatus(
       }
       if (candle.index > row.index) {
         barsWaiting++;
-        const brokeStop =
-          row.side === "short"
-            ? (candle.high ?? -Infinity) >= row.sl
-            : (candle.low ?? Infinity) <= row.sl;
+        const brokeStop = row.side
+          ? (row.side === "short"
+              ? (candle.high ?? -Infinity) >= row.sl
+              : (candle.low ?? Infinity) <= row.sl) ||
+            gapFillPrice(candle, row.sl, row.side, "stop") !== undefined
+          : (candle.low ?? Infinity) <= row.sl;
         if (brokeStop) {
           return {
             setupStatus: "EXPIRED",
@@ -343,6 +412,36 @@ export function evaluateSetupStatus(
     // touched on this post-fill candle, TP is checked first. This is not a
     // claim about true tick order; changing it requires a golden re-baseline
     // (pinned by tests/causality.test.mjs and the golden trades).
+    //
+    // Gap-through is decided BEFORE any in-bar touch, and it is not ambiguous:
+    // a bar that opens beyond a level was already beyond it at the first tick,
+    // so the open is the fill. A single open can never be beyond both levels.
+    if (row.side) {
+      const slGap = gapFillPrice(candle, row.sl, row.side, "stop");
+      if (slGap !== undefined) {
+        return {
+          setupStatus: "RESOLVED",
+          candlesSinceTrigger,
+          statusNote: `SL hit at ${candle.datetime} at ${slGap} (gap through ${row.sl}: the bar opened beyond the stop and never traded it, so the fill is the bar's open)`,
+          fillCandle,
+          resolutionCandle: candle,
+          resolutionPrice: slGap,
+          resolutionLevel: "SL",
+        };
+      }
+      const tpGap = gapFillPrice(candle, row.tp, row.side, "target");
+      if (tpGap !== undefined) {
+        return {
+          setupStatus: "RESOLVED",
+          candlesSinceTrigger,
+          statusNote: `TP hit at ${candle.datetime} at ${tpGap} (gap past ${row.tp}: the bar opened beyond the target and never traded it, so the fill is the bar's open)`,
+          fillCandle,
+          resolutionCandle: candle,
+          resolutionPrice: tpGap,
+          resolutionLevel: "TP",
+        };
+      }
+    }
     if (touched(candle, row.tp)) {
       return {
         setupStatus: "RESOLVED",

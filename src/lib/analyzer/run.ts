@@ -13,7 +13,9 @@ import {
   computeMarketStructure,
   htfAllowsDirection,
 } from "./structure";
-import { rejectFilterC, FILTER_C_REASON } from "./regime-filters";
+import { rejectFilterC, FILTER_C_REASON, rejectFilterF, FILTER_F_REASON } from "./regime-filters";
+import { ANALYZER_LIVE_OPTIONS } from "./config";
+import { inspectSeriesContract } from "./series-contract";
 import {
   formatContextChannel,
   isContextStrategy,
@@ -62,6 +64,13 @@ export interface RunOptions {
    * (v1.3 product decision). Pass enableFilterC: false to disable for experiments.
    */
   enableFilterC?: boolean;
+  /**
+   * Global Filter F: reject PASS candidates that fade the local structure on a
+   * strong momentum bar closing on its high (body ≥80% of range, upper wick
+   * ≤2%). Default true (v1.8 product decision). Pass enableFilterF: false to
+   * disable for experiments.
+   */
+  enableFilterF?: boolean;
 }
 
 /** Steps 1-5: validation gate, structure, strategies, math, aggregation. */
@@ -239,6 +248,14 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
                 // Global regime reject (Filter C). Do not consume — slot stays free.
                 row.result = "FAIL";
                 row.reason = FILTER_C_REASON;
+              } else if (
+                (options.enableFilterF ?? true) &&
+                outcome.side &&
+                rejectFilterF(ctx, candle.index, candle.trend, outcome.side)
+              ) {
+                // Global regime reject (Filter F). Do not consume — slot stays free.
+                row.result = "FAIL";
+                row.reason = FILTER_F_REASON;
               } else if (outcome.consumeKey) {
                 // A2 fix: commit de-dupe slot only after spread/RR validation succeeds.
                 consume(ctx, strategy.id, outcome.consumeKey);
@@ -373,6 +390,7 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
     perStrategy,
     overlaps,
     lastRowDatetime: lastSignalCandle?.datetime ?? candles[candles.length - 1]?.datetime ?? "",
+    contract: inspectSeriesContract(candles),
   };
 
   return { ok: true, analysis };
@@ -479,7 +497,7 @@ function resolvedWinRate(rows: ResultRow[]) {
  * restored here.
  */
 export function compareHtfDirectionFilter(csv: string): HtfFilterComparison[] {
-  const run = runAnalysis(csv, { enableHtfDirectionFilter: true });
+  const run = runAnalysis(csv, ANALYZER_LIVE_OPTIONS);
   if (!run.ok) throw new Error(run.error);
   const rows = run.analysis.passing;
 

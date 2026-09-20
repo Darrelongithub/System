@@ -117,11 +117,7 @@ test("market-data route: Twelve Data keys only — collector layouts + Finnhub n
 
 test("edge-safe: no static node:* imports may re-enter the env loader or its route callers", async () => {
   const { readFileSync } = await import("node:fs");
-  for (const f of [
-    "src/lib/server-env.ts",
-    "src/routes/api/market-data.ts",
-    "src/lib/verifier.server.ts",
-  ]) {
+  for (const f of ["src/lib/server-env.ts", "src/routes/api/market-data.ts"]) {
     const src = readFileSync(f, "utf8");
     const staticNode = /\nimport\s+[^"']*["']node:(fs|path|url)["']/.exec("\n" + src);
     assert(

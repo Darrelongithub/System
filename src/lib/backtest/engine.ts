@@ -310,9 +310,7 @@ export function buildDayReport(input: DayReportInput): string {
       `forward_resolution_window: ${day} -> ${input.resolutionEnd} (used only to resolve TP/SL of triggers dated ${day}; no signal is generated from it)`,
     );
   }
-  lines.push(
-    `analysis_mode: local structure engine (AI verifier/debate sections, when run, are appended below)`,
-  );
+  lines.push(`analysis_mode: local structure engine (deterministic; no AI stage)`);
   lines.push(`generated_at: ${new Date().toISOString()}`);
   lines.push("");
 
@@ -335,8 +333,15 @@ export function buildDayReport(input: DayReportInput): string {
       lines.push("none — no strategy triggered on this day up to the checkpoint");
     }
     triggers.forEach((trigger, index) => {
+      const outcomeField = `outcome ${trigger.outcome}`;
+      const exitField = !trigger.exitDatetime
+        ? ""
+        : ` @ ${trigger.exitDatetime} (${num(trigger.exitPrice)})`;
+      const realisedField =
+        typeof trigger.rMultiple !== "number" ? "" : ` | realised ${trigger.rMultiple.toFixed(2)}R`;
+      const statusField = ` | status ${trigger.setupStatus}`;
       lines.push(
-        `${index + 1}. ${trigger.strategy} @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | SL ${num(trigger.sl)} | TP ${num(trigger.tp)} | RR ${trigger.rr === undefined ? "-" : trigger.rr.toFixed(2)} | outcome ${trigger.outcome}${trigger.exitDatetime ? ` @ ${trigger.exitDatetime} (${num(trigger.exitPrice)})` : ""}${typeof trigger.rMultiple === "number" ? ` | realised ${trigger.rMultiple.toFixed(2)}R` : ""} | status ${trigger.setupStatus}`,
+        `${index + 1}. ${trigger.strategy} @ ${trigger.datetime} | ${trigger.side} | H1 ${trigger.htfTrend.h1} / H4 ${trigger.htfTrend.h4} / D1 ${trigger.htfTrend.d1} | entry ${num(trigger.entry)} | SL ${num(trigger.sl)} | TP ${num(trigger.tp)} | RR ${trigger.rr === undefined ? "-" : trigger.rr.toFixed(2)} | ${outcomeField}${exitField}${realisedField}${statusField}`,
       );
       lines.push(`    reason: ${trigger.reason}`);
       if (trigger.detail?.length) {

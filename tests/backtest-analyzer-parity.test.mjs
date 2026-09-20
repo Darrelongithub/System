@@ -20,11 +20,14 @@
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { runAnalysis, compareHtfDirectionFilter } from "../src/lib/analyzer/run.ts";
 import { analyseContinuous } from "../src/lib/pipeline/continuous.ts";
+import { ANALYZER_CERTIFIED_OPTIONS, ANALYZER_LIVE_OPTIONS } from "../src/lib/analyzer/config.ts";
 import { applyTriggers, dayReportSkipReason, rangeDays } from "../src/lib/backtest/engine.ts";
 import { loadBaselineCsv, loadGoldenTrades, loadGoldenSummary } from "./fixtures.mjs";
 
-const REF_OPTS = { enableHtfDirectionFilter: true, seriesEndsComplete: true };
-const UI_OPTS = { enableHtfDirectionFilter: true, seriesEndsComplete: false };
+// The two shipped configurations, imported rather than re-typed: this file is
+// the parity proof, so it must test the objects the product actually runs.
+const REF_OPTS = ANALYZER_CERTIFIED_OPTIONS;
+const UI_OPTS = ANALYZER_LIVE_OPTIONS;
 const keyOf = (t) => `${t.strategyId}|${t.datetime}|${t.index}|${t.side}`;
 const num = (v) => (typeof v === "number" ? v : undefined);
 const nearly = (a, b) =>
@@ -81,7 +84,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
   const g = aggregatesOf(golden),
     r = aggregatesOf(ref.analysis.tradePasses);
   assertEqual(ref.analysis.tradePasses.length, golden.length, "row count");
-  assertEqual(summary.totals.triggers, 2323, "locked trigger count");
+  assertEqual(summary.totals.triggers, 2286, "locked trigger count");
   assert(
     Math.abs(g.r - summary.totals.rSum) / Math.max(1, Math.abs(summary.totals.rSum)) < 1e-12,
     "golden R internal precision",
@@ -94,7 +97,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
     for (const f of TRADE_FIELDS) assert(nearly(t[f], norm(g0[f])), `${keyOf(t)} field ${f}`);
     exact += 1;
   }
-  assertEqual(exact, 2323, "all fields row-for-row");
+  assertEqual(exact, 2286, "all fields row-for-row");
   assert(Math.abs(r.r - g.r) / Math.max(1, Math.abs(g.r)) < 1e-12, "aggregate R");
 });
 
@@ -140,9 +143,9 @@ test("parity: Backtest day-supplied accounting equals golden and per-strategy re
     totals.open += s.open;
     totals.noFill += s.noFill;
   }
-  assertEqual(totals.triggers, 2323, "bt triggers");
-  assertEqual(totals.tp, 756, "bt tp");
-  assertEqual(totals.sl, 1563, "bt sl");
+  assertEqual(totals.triggers, 2286, "bt triggers");
+  assertEqual(totals.tp, 750, "bt tp");
+  assertEqual(totals.sl, 1532, "bt sl");
   assertEqual(totals.open, 4, "bt open");
   assertEqual(totals.noFill, 0, "bt noFill");
   assert(skippedDays > 0, "genuinely empty days still skipped");

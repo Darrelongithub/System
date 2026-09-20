@@ -5,6 +5,7 @@ import {
   requestMarketData,
   type ProviderCandle,
 } from "./market-data";
+import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 
 export type LogFn = (msg: string) => void;
 export type CooldownSetter = (seconds: number | null) => void;
@@ -333,25 +334,44 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
     row.localAvgRange = average(rangeWindow) || 0;
   });
 
-  // Build the average open/previous-close gap independently for each UTC
-  // session. Gaps across missing candles/weekends are excluded from the
-  // baseline, so a market reopening does not make the threshold unusable.
-  const sessionGaps: Record<"asian" | "london" | "ny", number[]> = {
-    asian: [],
-    london: [],
-    ny: [],
+  // Per-session baseline of adjacent-candle open/previous-close gaps.
+  //
+  // The baseline is an expanding mean of the gaps seen BEFORE each row, never
+  // of the whole file. A row's reliability has to be a function of the bars at
+  // or before it: with a file-global average, the same calendar bar described
+  // itself differently in two exports of identical market data simply because
+  // one of them extended further (measured on the locked baseline: 216 of 4,812
+  // overlapping rows flipped `is_reliable`, and because reliability drives the
+  // ATR chain, `atr_30m` — the input behind every SL/TP — differed for 2,189 of
+  // them, mean 6.6%, max 61%; 82 PASS/FAIL decisions flipped inside one shared
+  // date range). Gaps across missing candles/weekends are still excluded from
+  // the baseline, so a market reopening does not make the threshold unusable.
+  const gapBaselines: number[] = new Array(workingRows.length).fill(0);
+  const sessionGapStats: Record<"asian" | "london" | "ny", { sum: number; count: number }> = {
+    asian: { sum: 0, count: 0 },
+    london: { sum: 0, count: 0 },
+    ny: { sum: 0, count: 0 },
   };
+  let overallGapSum = 0;
+  let overallGapCount = 0;
   workingRows.forEach((row, index) => {
+    const stats = sessionGapStats[row.session as "asian" | "london" | "ny"];
+    // Prior rows only: the baseline is read before this row's own gap is added.
+    gapBaselines[index] =
+      stats.count > 0
+        ? stats.sum / stats.count
+        : overallGapCount > 0
+          ? overallGapSum / overallGapCount
+          : 0;
     const previous = workingRows[index - 1];
     if (previous && isAdjacent(previous, row) && isSameSession(previous, row)) {
-      const session = row.session as "asian" | "london" | "ny";
-      sessionGaps[session].push(Math.abs(row.open - previous.close));
+      const gap = Math.abs(row.open - previous.close);
+      stats.sum += gap;
+      stats.count += 1;
+      overallGapSum += gap;
+      overallGapCount += 1;
     }
   });
-  const allGaps = Object.values(sessionGaps).flat();
-  const overallGapAverage = average(allGaps) || 0;
-  const sessionGapAverage = (session: "asian" | "london" | "ny") =>
-    average(sessionGaps[session]) || overallGapAverage;
 
   workingRows.forEach((row, index) => {
     const previous = workingRows[index - 1];
@@ -359,7 +379,7 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
       previous && isAdjacent(previous, row) && isSameSession(previous, row)
         ? Math.abs(row.open - previous.close)
         : 0;
-    const gapAverage = sessionGapAverage(row.session);
+    const gapAverage = gapBaselines[index] ?? 0;
     const rangeTooSmall = row.localAvgRange > 0 && row.range < 0.1 * row.localAvgRange;
     const previousIsNearZero =
       previous &&
@@ -609,6 +629,106 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   return workingRows;
 };
 
+/**
+ * The weekly market closure, in UTC — the single source of truth for "was the
+ * market shut at this instant?".
+ *
+ * The FX/metals week closes at 17:00 New York and reopens Sunday 18:00 New
+ * York. In UTC that is a 21:00/22:00 close and a 22:00/23:00 reopen depending
+ * on US daylight saving, and brokers differ by an hour either way, so a fixed
+ * UTC window can only be an approximation. This one is deliberately the
+ * CONSERVATIVE SUPERSET of the real closure: it starts at the latest possible
+ * close (Friday 22:00 UTC) and ends at the earliest possible open (Sunday
+ * 21:00 UTC). That can never delete an instant that might be live trading time;
+ * it can at worst retain an hour of closed-market filler.
+ *
+ * This replaces the previous rule, which skipped whole UTC Saturday/Sunday
+ * calendar days. Because every row is EAT wall clock (UTC+3), that rule deleted
+ * the weekly open — EAT Monday 00:00–02:30 = UTC Sunday 21:00–23:30 — from every
+ * exported file: all 41 EAT Mondays in the locked baseline start at 03:00, and
+ * the 3,039 dangling swing references pointed exactly at those dropped rows.
+ *
+ * Unparseable timestamps are NOT treated as closure: silently dropping a row
+ * because its datetime could not be read would be worse than keeping it.
+ */
+const CLOSURE_START_MINUTES_OF_WEEK = 4 * 1440 + 22 * 60; // Friday 22:00 UTC
+const CLOSURE_END_MINUTES_OF_WEEK = 6 * 1440 + 21 * 60; // Sunday 21:00 UTC
+
+export const isInsideWeekendClosure = (datetimeEAT: string): boolean => {
+  const parsed = new Date(`${String(datetimeEAT).replace(" ", "T")}+03:00`);
+  if (!Number.isFinite(parsed.getTime())) return false;
+  const minutesOfWeek =
+    ((parsed.getUTCDay() + 6) % 7) * 1440 + parsed.getUTCHours() * 60 + parsed.getUTCMinutes();
+  return (
+    minutesOfWeek >= CLOSURE_START_MINUTES_OF_WEEK && minutesOfWeek < CLOSURE_END_MINUTES_OF_WEEK
+  );
+};
+
+/**
+ * Rows a chart artifact may draw — the same closure rule as the export.
+ *
+ * The chart is generated from the provider response (EAT wall clock, like the
+ * CSV) and packaged next to it, so it has to be a picture of the same series.
+ * The old chart filter dropped every EAT Saturday and Sunday by calendar date,
+ * which deleted EAT Saturday 00:00–00:59 — Friday 21:00–21:59 UTC, live New York
+ * afternoon trading that the CSV carries and the analyzer trades on.
+ */
+export const selectChartCandles = <T extends { time: string }>(candles: T[]): T[] =>
+  candles.filter((candle) => !isInsideWeekendClosure(candle.time));
+
+/**
+ * Rows the export will actually write — everything except the weekly closure,
+ * in the input's (chronological) order. The export day loop, the
+ * `exportedDatetimes` set handed to `pruneSwingRefsToExport`, the export
+ * validator and `metadata.data_age` all consume this one list, so the closure
+ * rule cannot drift between "what is dropped" and "what must resolve".
+ */
+export const selectExportedOhlcRows = <T extends { datetimeEAT: string }>(rows: T[]): T[] =>
+  rows.filter((row) => !isInsideWeekendClosure(row.datetimeEAT));
+
+/**
+ * Drop swing refs that do not resolve inside the exported file.
+ *
+ * Refs are computed on the enriched working set, but the export omits whole UTC
+ * weekend days, so a ref can be left pointing at a row the analyzer will never
+ * see. The analyzer drops such refs anyway (fail-closed), so pruning changes no
+ * engine decision — it makes the file self-describing instead of silently
+ * degraded. When a row loses every ref, its derived columns are cleared too, so
+ * the export invariant `refs.length > 0 === retrace !== null` still holds.
+ *
+ * Exported for tests: the invariant it enforces is asserted by
+ * `validateOhlcExport` ("Swing references resolve in-file").
+ */
+export const pruneSwingRefsToExport = (
+  rows: EnrichedCandle[],
+  exportedDatetimes: Set<string>,
+): { prunedRefs: number; rowsLeftWithoutRefs: number } => {
+  let prunedRefs = 0;
+  let rowsLeftWithoutRefs = 0;
+  for (const row of rows) {
+    if (row.similarSwingRefs.length === 0) continue;
+    const kept = row.similarSwingRefs.filter((ref) => exportedDatetimes.has(ref));
+    if (kept.length === row.similarSwingRefs.length) continue;
+    prunedRefs += row.similarSwingRefs.length - kept.length;
+    row.similarSwingRefs = kept;
+    if (kept.length === 0) {
+      row.similarSwingRetracePct = null;
+      row.similarSwingContinuedPct = null;
+      row.swingContextSource = null;
+      rowsLeftWithoutRefs += 1;
+    }
+  }
+  return { prunedRefs, rowsLeftWithoutRefs };
+};
+
+/**
+ * Export gate. Two row sets are intentional and must not be conflated:
+ *   - `rows` is the enriched working set — every fetched row — that the derived
+ *     columns were computed on; the independent ATR re-derivation replays it;
+ *   - `exportedRows` is exactly what the CSV will contain — schema columns, ref
+ *     resolution, reliability canary, streaks, history depth and long gaps are
+ *     all judged on the file, never on rows the analyzer will never see.
+ */
 const validateOhlcExport = ({
   log,
   rows,
@@ -753,6 +873,25 @@ const validateOhlcExport = ({
       row.reliableStreakLength >= 0 &&
       (row.isReliable ? row.reliableStreakLength >= 1 : row.reliableStreakLength === 0),
   );
+  // Swing references must resolve INSIDE the exported file. Refs are computed on
+  // the enriched working set; the export drops whole UTC weekend days, so this
+  // asserts the invariant that survived the pruning step in buildOhlcCsv
+  // (`exportedDatetimes`). A ref that dangles means a row the analyzer needs was
+  // dropped by something other than the documented weekend policy — a hole in the
+  // series, which silently degrades (or kills) every trend-derived decision.
+  const exportedDatetimes = new Set(exportedRows.map((row) => row.datetimeEAT));
+  let swingRefsTotal = 0;
+  let swingRefsDangling = 0;
+  for (const row of exportedRows) {
+    const refs = Array.isArray(row.similarSwingRefs) ? row.similarSwingRefs : [];
+    for (const ref of refs) {
+      swingRefsTotal += 1;
+      if (!exportedDatetimes.has(ref)) swingRefsDangling += 1;
+    }
+  }
+  const swingRefResolutionPassed = swingRefsDangling === 0;
+  const historyDepthPassed = exportedRows.length >= MIN_PRODUCTION_BARS;
+
   const maxSwingRefs = exportedRows.reduce(
     (max, row) =>
       Math.max(max, Array.isArray(row.similarSwingRefs) ? row.similarSwingRefs.length : 0),
@@ -771,9 +910,13 @@ const validateOhlcExport = ({
     previousTimestamp: string;
     currentTimestamp: string;
   }
-  const longGapDetails = rows.reduce<LongGapDetail[]>((details, row, index) => {
+  // Gaps are judged on the EXPORTED timeline: the point of this check is that
+  // the shipped file's weekly closure is recognised as expected while any other
+  // >24h hole fails. (The independent ATR re-derivation above still walks `rows`,
+  // the working set the exported values were computed on.)
+  const longGapDetails = exportedRows.reduce<LongGapDetail[]>((details, row, index) => {
     if (index === 0) return details;
-    const previous = rows[index - 1];
+    const previous = exportedRows[index - 1];
     const previousTime = getDate(previous.datetimeEAT).getTime();
     const currentTime = getDate(row.datetimeEAT).getTime();
     const deltaMinutes = (currentTime - previousTime) / (60 * 1000);
@@ -841,6 +984,8 @@ const validateOhlcExport = ({
     `Continuity: PASS (max gap ${maxContinuityGap.toFixed(5)}, 95th pct ${p95ContinuityGap.toFixed(5)})`,
     `ATR spot-check: ${atrPassed ? "PASS" : "FAIL"} (avg diff ${atrAverageDifference.toFixed(5)}, tolerance ${atrTolerance.toFixed(5)})`,
     `similar_swing_refs: ${swingStructurePassed ? "PASS" : "FAIL"} (max ${maxSwingRefs}, structure consistent)`,
+    `Swing references resolve in-file: ${swingRefResolutionPassed ? "PASS" : "FAIL"} (${swingRefsTotal - swingRefsDangling}/${swingRefsTotal} resolve; dangling refs would silently cost trend information)`,
+    `History depth: ${historyDepthPassed ? "PASS" : "WARN"} (${exportedRows.length} rows vs production floor ${MIN_PRODUCTION_BARS}; the analyzer refuses shorter series)`,
     `similar_swing_continued_pct: ${continuedPctPassed ? "PASS" : "FAIL"}`,
     `reliable_streak_length: ${streakPassed ? "PASS" : "FAIL"}`,
     `Weekend gaps: ${weekendPassed ? "PASS" : "FAIL"} (${expectedWeekendGaps} weekend closures + ${expectedHolidayGaps} holiday closures accepted, ${unexpectedLargeGaps} unexpected long gaps; ${actualLargeGaps} total${unexpectedGapSummary ? `; unexpected: ${unexpectedGapSummary}` : ""})`,
@@ -856,6 +1001,7 @@ const validateOhlcExport = ({
     !continuedPctPassed && "similar_swing_continued_pct range",
     !streakPassed && "reliable_streak_length consistency",
     !weekendPassed && "Weekend gaps",
+    !swingRefResolutionPassed && "swing reference resolution",
   ].filter(Boolean) as string[];
 
   return {
@@ -874,6 +1020,9 @@ const validateOhlcExport = ({
       atrAverageDifference,
       atrTolerance,
       maxSwingRefs,
+      swingRefsTotal,
+      swingRefsDangling,
+      historyDepthPassed,
       actualLargeGaps,
       expectedWeekendGaps,
     },
@@ -1015,6 +1164,11 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       // contiguous, non-overlapping calendar windows, so duplicates are not
       // expected in normal operation — this is a defensive guarantee, not a
       // correction of provider data.
+      //
+      // Policy (pinned by tests/ohlc-chunking.test.mjs): chunks are fetched in
+      // ascending order and appended, so when a provider re-sends a bar — an
+      // overlapping boundary row, or a retry after a rate limit — the copy in
+      // the LATER response wins, i.e. the freshest revision of that timestamp.
       const byDatetime = new Map<string, ProviderCandle>();
       for (const row of merged) {
         const key = String(row?.datetime ?? "");
@@ -1137,8 +1291,12 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       }
     }
 
+    // Rows the export will write. Grouped once here; the day loop, the prune set,
+    // the validator and the reported data age all read this same list.
+    const exportedEnrichedRows = selectExportedOhlcRows(enrichedRows);
+
     const rowsByUtcDay = new Map<string, EnrichedCandle[]>();
-    enrichedRows.forEach((row) => {
+    exportedEnrichedRows.forEach((row) => {
       const utcDayKey = toUtcDayKey(row.datetimeEAT);
       const rows = rowsByUtcDay.get(utcDayKey) || [];
       rows.push(row);
@@ -1179,6 +1337,31 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       "swing_invalidated",
       "reliable_streak_length",
     ];
+    // ---- export consistency: swing refs must resolve inside the exported file ----
+    // Swing refs are computed on the enriched working set, but the export omits
+    // the weekly market closure, so a ref can be left pointing at a row the
+    // analyzer will never see. The prune set is built from the exact rows the day
+    // loop below writes (`exportedEnrichedRows`) rather than from a second
+    // re-derivation of the closure rule. A ref pointing at a dropped row is
+    // unusable to the analyzer, which resolves refs strictly by datetime: it
+    // silently costs trend information, and on an edited/spliced file the same
+    // mechanism collapses every row to "ranging". Prune here (fail-closed: a
+    // removed ref can only reduce trend information, never fabricate it) and null
+    // the derived columns when a row is left with no refs. The analyzer's result
+    // is unchanged — it already ignores unresolvable refs — but the file becomes
+    // self-describing.
+    const exportedDatetimes = new Set(exportedEnrichedRows.map((row) => row.datetimeEAT));
+    const { prunedRefs: prunedSwingRefs, rowsLeftWithoutRefs } = pruneSwingRefsToExport(
+      enrichedRows,
+      exportedDatetimes,
+    );
+    if (prunedSwingRefs > 0) {
+      addLog(
+        `🧷 Pruned ${prunedSwingRefs} swing reference(s) that pointed at rows outside the exported file ` +
+          `(${rowsLeftWithoutRefs} row(s) left with no swing context).`,
+      );
+    }
+
     const dataRows: string[][] = [];
     const csvEscape = (value: unknown) => {
       if (value === null || value === undefined) return "";
@@ -1189,14 +1372,23 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     for (let day = new Date(exportStartDay); day <= exportEndDay; day = addUtcDay(day)) {
       const dayKey = day.toISOString().slice(0, 10);
       const utcWeekday = day.getUTCDay();
+      const dayRows = rowsByUtcDay.get(dayKey) || [];
 
-      if (utcWeekday === 0 || utcWeekday === 6) {
-        exportRows.push("=== WEEKEND / SKIPPED ===");
+      // Membership was decided by the closure predicate, not by the calendar
+      // weekday, so a day with no exported rows is the only thing left to label:
+      // weekend days carry the skip marker, empty weekdays keep their header
+      // (unchanged behaviour for provider holes). A Sunday that reopens at
+      // 21:00 UTC has rows here and is written normally.
+      if (dayRows.length === 0) {
+        exportRows.push(
+          utcWeekday === 0 || utcWeekday === 6
+            ? "=== WEEKEND / SKIPPED ==="
+            : formatUtcDayHeader(dayKey),
+        );
         continue;
       }
 
       exportRows.push(formatUtcDayHeader(dayKey));
-      const dayRows = rowsByUtcDay.get(dayKey) || [];
       dayRows.forEach((row) => {
         // Build by column name first, then project through headerColumns.
         // This prevents a missing field from silently shifting later values.
@@ -1289,8 +1481,13 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
     // labeled VALIDATED. This supersedes the lighter inline checks above.
     const validation = validateOhlcExport({
       log: addLog,
+      // `rows` is the enriched working set the derived columns were computed on
+      // (the independent ATR re-derivation replays that exact chain), while
+      // `exportedRows` is what the CSV actually contains — every file-level
+      // assertion (ref resolution, reliability, streak, history depth, gaps) is
+      // judged on the file, not on rows the analyzer will never see.
       rows: enrichedRows,
-      exportedRows: enrichedRows,
+      exportedRows: exportedEnrichedRows,
       headerColumns,
       dataRows,
     });
@@ -1301,7 +1498,10 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       addLog(`✅ Validation PASSED: all hard checks green`);
     }
 
-    const reliableRows = enrichedRows.filter((row) => row.isReliable === true);
+    // Coverage is a property of the file being shipped: count exported rows only,
+    // so the logged/metadata percentages cannot describe rows the CSV does not
+    // contain.
+    const reliableRows = exportedEnrichedRows.filter((row) => row.isReliable === true);
     // swing_coverage_pct is defined on similar_swing_retrace_pct specifically.
     const reliableWithRetrace = reliableRows.filter(
       (row) => row.similarSwingRetracePct !== null && row.similarSwingRetracePct !== undefined,
@@ -1326,9 +1526,16 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
       );
     }
 
+    // The newest row the analyzer will actually see. Taking `enrichedRows.at(-1)`
+    // instead is how a Monday-early series could report a data age (and a
+    // freshness banner) for a bar the CSV does not contain.
+    const newestExportedRow = exportedEnrichedRows.reduce<EnrichedCandle | null>(
+      (newest, row) => (newest === null || row.datetimeEAT > newest.datetimeEAT ? row : newest),
+      null,
+    );
+
     const metadata = {
-      data_age:
-        enrichedRows.length > 0 ? `${enrichedRows[enrichedRows.length - 1].datetimeEAT} EAT` : null,
+      data_age: newestExportedRow ? `${newestExportedRow.datetimeEAT} EAT` : null,
       generated_at: new Date().toISOString(),
       spread_convention: spreadConvention,
       turtle_tick_size: turtleTickSizeForSymbol(symbol),

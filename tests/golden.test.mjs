@@ -5,7 +5,13 @@
  * golden just to make a change pass.
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
-import { baselineAnalysis, loadGoldenSummary, loadGoldenTrades } from "./fixtures.mjs";
+import {
+  baselineAnalysis,
+  loadBaselineCsv,
+  loadGoldenSummary,
+  loadGoldenTrades,
+} from "./fixtures.mjs";
+import { createHash } from "node:crypto";
 
 const TRADE_FIELDS = [
   "strategyId",
@@ -117,4 +123,26 @@ test("golden: baseline reproduces locked trades row-for-row and aggregate-for-ag
     }
     assertEqual(per.size, Object.keys(summary.perStrategy).length, "strategy count");
   }
+});
+
+/**
+ * Provenance: the lock describes a specific (data, rules, options) triple. The
+ * golden summary records the hash of the baseline CSV and of the rule sources so
+ * that "which code state does this lock describe?" is answerable — and so a
+ * silent edit to the locked baseline (which would move every number in it, and
+ * quietly re-point every research conclusion at different data) fails here.
+ */
+test("golden: records which baseline data and rule sources it was generated from", () => {
+  const summary = loadGoldenSummary();
+  assert(summary.inputs, "golden summary must record its inputs");
+  assertEqual(
+    createHash("sha256").update(loadBaselineCsv(), "utf8").digest("hex"),
+    summary.inputs.baselineCsv,
+    "baseline CSV hash",
+  );
+  assertEqual(summary.options.seriesEndsComplete, true, "certified run treats every row as closed");
+  assert(
+    !("enableFilterC" in summary.options) && !("enableFilterF" in summary.options),
+    "the golden must be produced by the shipped defaults, not by pinned filter flags",
+  );
 });
