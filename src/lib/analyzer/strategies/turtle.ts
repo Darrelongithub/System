@@ -191,13 +191,27 @@ function resolveHypotheticals(ctx: AnalysisContext, state: TurtleState, candle: 
       if (signal.resolved) continue;
       const exit = signal.exitLookback === 10 ? dLow(ctx, day, 10) : dLow(ctx, day, 20);
       const exitShort = signal.exitLookback === 10 ? dHigh(ctx, day, 10) : dHigh(ctx, day, 20);
+      // Same ordering as a real position: the stop is tested before the exit,
+      // and a gap-through of either level resolves on that bar's open.
+      const stopSkipped = gapBeyond(candle, signal.stop, side, "stop") !== undefined;
+      const exitLevel = side === "long" ? exit : exitShort;
+      const exitSkipped =
+        exitLevel === undefined ? false : gapBeyond(candle, exitLevel, side, "stop") !== undefined;
       if (side === "long") {
-        if (candle.low !== undefined && candle.low <= signal.stop) signal.resolved = "LOSS";
-        else if (exit !== undefined && candle.low !== undefined && candle.low <= exit)
+        if (stopSkipped || (candle.low !== undefined && candle.low <= signal.stop))
+          signal.resolved = "LOSS";
+        else if (
+          exitSkipped ||
+          (exit !== undefined && candle.low !== undefined && candle.low <= exit)
+        )
           signal.resolved = "WIN";
       } else {
-        if (candle.high !== undefined && candle.high >= signal.stop) signal.resolved = "LOSS";
-        else if (exitShort !== undefined && candle.high !== undefined && candle.high >= exitShort)
+        if (stopSkipped || (candle.high !== undefined && candle.high >= signal.stop))
+          signal.resolved = "LOSS";
+        else if (
+          exitSkipped ||
+          (exitShort !== undefined && candle.high !== undefined && candle.high >= exitShort)
+        )
           signal.resolved = "WIN";
       }
       if (signal.resolved) state.lastS1Outcome[side] = signal.resolved;
@@ -231,6 +245,27 @@ function positionKey(system: TurtleSystem, side: TurtleSide): string {
   return `${system}:${side}`;
 }
 
+/**
+ * Gap-through test for a resting exit order: the bar opened beyond the level, so
+ * the order was triggered at that open and fills there. Returns the open, or
+ * undefined when the bar did not open beyond the level (the level or the
+ * touched-check then decides). Mirrors the entry-side `fillPrice` rule above.
+ */
+function gapBeyond(
+  candle: Candle,
+  level: number,
+  side: TurtleSide,
+  kind: "stop" | "target",
+): number | undefined {
+  const { open, high, low } = candle;
+  if (open === undefined || high === undefined || low === undefined) return undefined;
+  const long = side === "long";
+  const opensBeyond =
+    kind === "stop" ? (long ? open < level : open > level) : long ? open > level : open < level;
+  if (!opensBeyond) return undefined;
+  return open;
+}
+
 function processPosition(
   ctx: AnalysisContext,
   state: TurtleState,
@@ -241,6 +276,36 @@ function processPosition(
   const day = eatDay(candle.datetime);
   const trailing = position.exitLookback === 10 ? dLow(ctx, day, 10) : dLow(ctx, day, 20);
   const trailingShort = position.exitLookback === 10 ? dHigh(ctx, day, 10) : dHigh(ctx, day, 20);
+
+  // Gap-through exits: a bar that opens beyond the stop/channel and never
+  // trades it exits at the bar's open. This mirrors the entry-side fillPrice
+  // rule above and the exit rule in analyzer/status.ts; without it a weekend
+  // gap that took the position out would leave it running to a later touch.
+  const stopGap = gapBeyond(candle, position.stop, position.side, "stop");
+  if (stopGap !== undefined) {
+    resolvePosition(
+      state,
+      position,
+      "LOSS",
+      candle.index,
+      stopGap,
+      `2N unified stop skipped by a gap; filled at the bar's open ${stopGap} (stop was ${position.stop})`,
+    );
+    return true;
+  }
+  const trailingGap =
+    trailing === undefined ? undefined : gapBeyond(candle, trailing, position.side, "stop");
+  if (trailingGap !== undefined) {
+    resolvePosition(
+      state,
+      position,
+      "WIN",
+      candle.index,
+      trailingGap,
+      `${position.exitLookback}-day trailing exit skipped by a gap; filled at the bar's open ${trailingGap}`,
+    );
+    return true;
+  }
 
   if (position.side === "long") {
     if (candle.low !== undefined && candle.low <= position.stop) {

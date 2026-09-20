@@ -53,6 +53,9 @@ const RULE_SOURCES = [
   "src/lib/analyzer/regime-filters.ts",
   "src/lib/analyzer/run.ts",
   "src/lib/analyzer/strategies/final-survivors.ts",
+  // Added v1.8.2: status.ts decides how (and at what price) a setup resolves,
+  // so it shapes the locked rows exactly like the entry rules do.
+  "src/lib/analyzer/status.ts",
 ];
 const inputHashes = {
   baselineCsv: sha256(CSV),
@@ -135,10 +138,12 @@ const summary = {
   // regression lock would be replaying a series the live product refuses.
   seriesContract: analysis.contract,
   note:
-    "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped " +
-    "product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) " +
-    "was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend " +
-    "momentum bars that close on their high (+17.7 R net after slot refills).",
+    "v1.8.2 re-baseline: gap-fill exit correction (see logs/v1.8.2-gap-fill-resolution.md). " +
+    "A bar that opens beyond a tracked stop/target and never trades it now resolves at that " +
+    "bar's open instead of leaving the position alive to a later touch; 52 of 2286 rows were " +
+    "priced that way (one booked as a +2.41R winner was a ~-2.0R loss). Trade count, entries, " +
+    "stops and targets are unchanged. Previous lock v1.8: 2286 / R 541.3570458970024 " +
+    "(Filter C + Filter F, 751 TP / 1531 SL).",
 };
 
 // ---- golden-regression-report.json (self-consistent: current == golden) ----

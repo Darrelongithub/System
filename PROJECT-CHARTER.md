@@ -58,7 +58,7 @@ Order of precedence, applied to every change:
 ## Current state
 
 - **Shipped:** Filter C (v1.3, counter-trend under extreme ATR percentile) + Filter F (v1.8, provisional loss filter).
-- **Development fixture:** golden baseline = 2,286 trades / R 541.3570458970024 (the laboratory's regression lock, not a goal).
+- **Development fixture:** golden baseline = 2,286 trades / R 527.6272857378555 (the laboratory's regression lock, not a goal). Re-baselined once by the v1.8.2 gap-fill fix (`logs/v1.8.2-gap-fill-resolution.md`) — a fill-model correction, not a rule change; the rule sources themselves are still frozen (v1.8.1), with `status.ts` re-frozen for the exit-fill rule.
 - **Validation:** none yet. Filter F has in-sample support only, with the gain concentrated in macd-cross/dual-thrust and the Asian session; it costs money in London and New York (`AUDIT-V1.8-LIVE-FIDELITY.md` §3.1).
 - **Rules:** frozen as of v1.8.1 (`tests/ruleset-freeze.test.mjs`). Any change is a product decision with its own evaluation window.
 - **Next:** collect post-2026-08-20 data and run `scripts/research/validate-on-new-data.mjs`.

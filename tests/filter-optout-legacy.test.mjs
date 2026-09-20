@@ -15,15 +15,24 @@ import { loadBaselineCsv } from "./fixtures.mjs";
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
 import { ANALYZER_CERTIFIED_OPTIONS } from "../src/lib/analyzer/config.ts";
 
-/** sha256 of the 2,323-row book as it stood in the pre-Filter-F golden. */
-const LEGACY_ROW_HASH = "42b3d546621a1b273d6e8d254de9bd942aa4948c00fae063aece9fcd78114697";
+/**
+ * sha256 of the 2,323-row pre-Filter-F book.
+ *
+ * Re-baselined once, by the v1.8.2 gap-fill fix (logs/v1.8.2-gap-fill-resolution.md):
+ * the row SET is still exactly the pre-Filter-F row set — same 2,323 triggers,
+ * same order, same entries/stops/targets — but trades whose stop or target was
+ * skipped by a weekend gap now exit at that bar's open instead of waiting for a
+ * later in-bar touch. Previous value (gap-blind engine):
+ *   42b3d546621a1b273d6e8d254de9bd942aa4948c00fae063aece9fcd78114697
+ */
+const LEGACY_ROW_HASH = "2ab878d1568750ab09ee6b5e13feb1fce477553608d879f992a5dbc8697d8f32";
 const LEGACY_TOTALS = {
   triggers: 2323,
-  tp: 756,
-  sl: 1563,
+  tp: 755,
+  sl: 1564,
   open: 4,
   noFill: 0,
-  rSum: 523.6813503963194,
+  rSum: 507.93925691611344,
 };
 
 const FIELDS = [

@@ -618,9 +618,9 @@
     "rr": 3.9637948709944055,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-01-27 00:30:00",
-    "exitPrice": 5000.791583959507,
-    "rMultiple": 3.9637948709944055,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": 5.351118067031744,
     "reason": "D55 L"
   },
   {
@@ -811,8 +811,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "TP",
     "exitDatetime": "2026-03-02 03:00:00",
-    "exitPrice": 5381.389882700726,
-    "rMultiple": 3.961371274445989,
+    "exitPrice": 5387.25,
+    "rMultiple": 4.187740137314162,
     "reason": "D55 L"
   },
   {
@@ -1338,9 +1338,9 @@
     "rr": 3.9538956636713376,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-20 16:00:00",
-    "exitPrice": 4822.670066262088,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-20 03:00:00",
+    "exitPrice": 4753.69,
+    "rMultiple": -4.180280174923636,
     "reason": "D55 L"
   },
   {
@@ -2235,8 +2235,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-08-03 03:00:00",
-    "exitPrice": 4066.676514611228,
-    "rMultiple": -1,
+    "exitPrice": 4072.62,
+    "rMultiple": -1.352174932187585,
     "reason": "D55 S"
   },
   {
@@ -3114,9 +3114,9 @@
     "rr": 2.9863632489559486,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-06 04:00:00",
-    "exitPrice": 4629.735,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-06 03:00:00",
+    "exitPrice": 4611.28,
+    "rMultiple": -1.3145828006477447,
     "reason": "Ichi L"
   },
   {
@@ -3498,9 +3498,9 @@
     "rr": 2.9826839826839984,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-03-30 05:30:00",
-    "exitPrice": 4478.83,
-    "rMultiple": -1,
+    "exitDatetime": "2026-03-30 03:00:00",
+    "exitPrice": 4446.7,
+    "rMultiple": -1.6954545454545507,
     "reason": "Ichi L"
   },
   {
@@ -4650,9 +4650,9 @@
     "rr": 2.974854628319998,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-03-02 04:00:00",
-    "exitPrice": 5328.9050000000025,
-    "rMultiple": 2.974854628319998,
+    "exitDatetime": "2026-03-02 03:00:00",
+    "exitPrice": 5387.25,
+    "rMultiple": 4.808738016658725,
     "reason": "Ichi L"
   },
   {
@@ -5546,9 +5546,9 @@
     "rr": 2.970138111235563,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-27 03:30:00",
-    "exitPrice": 4687.09,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-27 03:00:00",
+    "exitPrice": 4681.71,
+    "rMultiple": -1.2008212019410271,
     "reason": "Ichi L"
   },
   {
@@ -5819,8 +5819,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "TP",
     "exitDatetime": "2026-02-09 03:00:00",
-    "exitPrice": 5040.311927190926,
-    "rMultiple": 2.9693415825833678,
+    "exitPrice": 5045.93,
+    "rMultiple": 3.1846431091555907,
     "reason": "MS"
   },
   {
@@ -6010,9 +6010,9 @@
     "rr": 2.9682459670772054,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-06-17 21:30:00",
-    "exitPrice": 4280.990950798694,
-    "rMultiple": 2.9682459670772054,
+    "exitDatetime": "2026-06-15 03:00:00",
+    "exitPrice": 4294.7,
+    "rMultiple": 3.5123929666757925,
     "reason": "MS"
   },
   {
@@ -6554,9 +6554,9 @@
     "rr": 2.9661108578659117,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-06-17 22:00:00",
-    "exitPrice": 4252.119142913143,
-    "rMultiple": 2.9661108578659117,
+    "exitDatetime": "2026-06-15 03:00:00",
+    "exitPrice": 4294.7,
+    "rMultiple": 4.769896755377288,
     "reason": "WR L"
   },
   {
@@ -6635,8 +6635,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-03-23 03:00:00",
-    "exitPrice": 4472.717175950688,
-    "rMultiple": -1,
+    "exitPrice": 4466.96,
+    "rMultiple": -1.2479102428913633,
     "reason": "S1"
   },
   {
@@ -7098,9 +7098,9 @@
     "rr": 2.963935358891543,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-01-27 00:30:00",
-    "exitPrice": 4999.827175466971,
-    "rMultiple": 2.963935358891543,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": 4.734836569530855,
     "reason": "MS"
   },
   {
@@ -7290,9 +7290,9 @@
     "rr": 2.9631722181576725,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-01-27 00:30:00",
-    "exitPrice": 5010.118193139437,
-    "rMultiple": 2.9631722181576725,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": 4.297802141003523,
     "reason": "Ichi L"
   },
   {
@@ -7914,9 +7914,9 @@
     "rr": 2.960457796684016,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-02-09 05:00:00",
-    "exitPrice": 4973.611548394166,
-    "rMultiple": -1,
+    "exitDatetime": "2026-02-09 03:00:00",
+    "exitPrice": 5045.93,
+    "rMultiple": -4.574538646122094,
     "reason": "R1"
   },
   {
@@ -7962,9 +7962,9 @@
     "rr": 2.9599496179150924,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-02-02 04:00:00",
-    "exitPrice": 4652.284521941134,
-    "rMultiple": 2.9599496179150924,
+    "exitDatetime": "2026-01-19 03:00:00",
+    "exitPrice": 4673.68,
+    "rMultiple": 4.031070956849644,
     "reason": "S1"
   },
   {
@@ -8346,9 +8346,9 @@
     "rr": 2.9588476295638038,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-03-10 01:00:00",
-    "exitPrice": 5149.390050574982,
-    "rMultiple": -1,
+    "exitDatetime": "2026-03-09 03:00:00",
+    "exitPrice": 5074.94,
+    "rMultiple": -4.829745075322483,
     "reason": "MS"
   },
   {
@@ -8490,9 +8490,9 @@
     "rr": 2.958276869640386,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-01-27 00:30:00",
-    "exitPrice": 5001.404016740931,
-    "rMultiple": -1,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": -2.966514568571209,
     "reason": "WR S"
   },
   {
@@ -8922,9 +8922,9 @@
     "rr": 2.9567801188547107,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-04-13 03:30:00",
-    "exitPrice": 4690.670000000002,
-    "rMultiple": 2.9567801188547107,
+    "exitDatetime": "2026-04-13 03:00:00",
+    "exitPrice": 4669.24,
+    "rMultiple": 4.114532685035311,
     "reason": "Ichi S"
   },
   {
@@ -9834,9 +9834,9 @@
     "rr": 2.953807782708228,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-13 10:00:00",
-    "exitPrice": 4733.381065190136,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-13 03:00:00",
+    "exitPrice": 4669.24,
+    "rMultiple": -4.703522525738966,
     "reason": "WR L"
   },
   {
@@ -10283,8 +10283,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "TP",
     "exitDatetime": "2026-04-06 03:00:00",
-    "exitPrice": 4627.163317768904,
-    "rMultiple": 2.9519583788832175,
+    "exitPrice": 4611.28,
+    "rMultiple": 3.9057837967980076,
     "reason": "WR S"
   },
   {
@@ -11306,9 +11306,9 @@
     "rr": 2.948499557698557,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-05-26 03:30:00",
-    "exitPrice": 4541.483847171966,
-    "rMultiple": -1,
+    "exitDatetime": "2026-05-25 03:00:00",
+    "exitPrice": 4571.57,
+    "rMultiple": -2.936812722242457,
     "reason": "WR S"
   },
   {
@@ -12427,8 +12427,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-08-03 03:00:00",
-    "exitPrice": 4065.050793918626,
-    "rMultiple": -1,
+    "exitPrice": 4072.62,
+    "rMultiple": -1.5237917116524697,
     "reason": "WR S"
   },
   {
@@ -13466,9 +13466,9 @@
     "rr": 2.94163530337957,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-05-26 04:30:00",
-    "exitPrice": 4529.716916103788,
-    "rMultiple": -1,
+    "exitDatetime": "2026-05-25 03:00:00",
+    "exitPrice": 4571.57,
+    "rMultiple": -4.053428180292513,
     "reason": "ES"
   },
   {
@@ -14138,9 +14138,9 @@
     "rr": 2.939074297519116,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-05-26 12:30:00",
-    "exitPrice": 4518.690747244979,
-    "rMultiple": -1,
+    "exitDatetime": "2026-05-25 03:00:00",
+    "exitPrice": 4571.57,
+    "rMultiple": -5.0271320259584575,
     "reason": "Ichi S"
   },
   {
@@ -14939,8 +14939,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "TP",
     "exitDatetime": "2026-07-27 03:00:00",
-    "exitPrice": 4092.165262602319,
-    "rMultiple": 2.9348980630929544,
+    "exitPrice": 4094.65,
+    "rMultiple": 3.1370995847111347,
     "reason": "WR L"
   },
   {
@@ -17098,9 +17098,9 @@
     "rr": 2.913235399706338,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-05-26 07:30:00",
-    "exitPrice": 4528.971050611365,
-    "rMultiple": 2.913235399706338,
+    "exitDatetime": "2026-05-25 03:00:00",
+    "exitPrice": 4571.57,
+    "rMultiple": 7.533336420504052,
     "reason": "S1"
   },
   {
@@ -18859,8 +18859,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-07-06 03:00:00",
-    "exitPrice": 4180.771372712885,
-    "rMultiple": -1,
+    "exitPrice": 4184.25,
+    "rMultiple": -1.58060605704499,
     "reason": "WR S"
   },
   {
@@ -19130,9 +19130,9 @@
     "rr": 2.8510714451960966,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-06 08:00:00",
-    "exitPrice": 4671.36829676248,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-06 03:00:00",
+    "exitPrice": 4611.28,
+    "rMultiple": -12.186078996840488,
     "reason": "Ichi L"
   },
   {
@@ -19915,8 +19915,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-02-02 03:00:00",
-    "exitPrice": 4757.733818300983,
-    "rMultiple": -1,
+    "exitPrice": 4745.31,
+    "rMultiple": -1.1057200644316618,
     "reason": "MACD long"
   },
   {
@@ -20186,9 +20186,9 @@
     "rr": 2.4895428742157217,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-06-17 21:30:00",
-    "exitPrice": 4272.6900000000005,
-    "rMultiple": 2.4895428742157217,
+    "exitDatetime": "2026-06-15 03:00:00",
+    "exitPrice": 4294.7,
+    "rMultiple": 2.8183447863758544,
     "reason": "3S"
   },
   {
@@ -20954,9 +20954,9 @@
     "rr": 2.4823008849557566,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-02-09 04:30:00",
-    "exitPrice": 4991.114999999998,
-    "rMultiple": 2.4823008849557566,
+    "exitDatetime": "2026-02-09 03:00:00",
+    "exitPrice": 5045.93,
+    "rMultiple": 3.8682680151707585,
     "reason": "3S"
   },
   {
@@ -21018,9 +21018,9 @@
     "rr": 2.481961908450421,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-02-09 04:30:00",
-    "exitPrice": 4997.006766119097,
-    "rMultiple": -1,
+    "exitDatetime": "2026-02-09 03:00:00",
+    "exitPrice": 5045.93,
+    "rMultiple": -2.260688245208555,
     "reason": "MACD short"
   },
   {
@@ -21291,8 +21291,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-05-25 03:00:00",
-    "exitPrice": 4571.01,
-    "rMultiple": -1,
+    "exitPrice": 4571.57,
+    "rMultiple": -1.0158865248226805,
     "reason": "3C"
   },
   {
@@ -21770,9 +21770,9 @@
     "rr": 2.4771255508110945,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-03-09 05:00:00",
-    "exitPrice": 5088.628170237063,
-    "rMultiple": -1,
+    "exitDatetime": "2026-03-09 03:00:00",
+    "exitPrice": 5074.94,
+    "rMultiple": -1.4472990779669783,
     "reason": "MACD long"
   },
   {
@@ -22555,8 +22555,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2026-03-16 03:00:00",
-    "exitPrice": 4993.535060357321,
-    "rMultiple": -1,
+    "exitPrice": 4993.2,
+    "rMultiple": -1.0127327047627874,
     "reason": "MACD long"
   },
   {
@@ -23578,9 +23578,9 @@
     "rr": 2.469729157900847,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-04-13 04:00:00",
-    "exitPrice": 4717.028592102348,
-    "rMultiple": 2.469729157900847,
+    "exitDatetime": "2026-04-13 03:00:00",
+    "exitPrice": 4669.24,
+    "rMultiple": 4.53630190885995,
     "reason": "MACD short"
   },
   {
@@ -24186,9 +24186,9 @@
     "rr": 2.4672727168974555,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-01-30 12:30:00",
-    "exitPrice": 4991.032205270299,
-    "rMultiple": 2.4672727168974555,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": 4.715066429849428,
     "reason": "MACD long"
   },
   {
@@ -24682,9 +24682,9 @@
     "rr": 2.4659795577094963,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-01-27 00:30:00",
-    "exitPrice": 5002.85586418254,
-    "rMultiple": -1,
+    "exitDatetime": "2026-01-26 03:00:00",
+    "exitPrice": 5039.11,
+    "rMultiple": -2.761973907672982,
     "reason": "MACD short"
   },
   {
@@ -25082,9 +25082,9 @@
     "rr": 2.464831942354267,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-07-14 15:30:00",
-    "exitPrice": 4092.3955740276983,
-    "rMultiple": -1,
+    "exitDatetime": "2026-07-13 03:00:00",
+    "exitPrice": 4083.77,
+    "rMultiple": -1.4333495494771529,
     "reason": "MACD long"
   },
   {
@@ -25818,9 +25818,9 @@
     "rr": 2.4629237288135934,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-02-16 04:00:00",
-    "exitPrice": 5023.95,
-    "rMultiple": -1,
+    "exitDatetime": "2026-02-16 03:00:00",
+    "exitPrice": 5020.82,
+    "rMultiple": -1.1657838983050897,
     "reason": "3S"
   },
   {
@@ -27338,9 +27338,9 @@
     "rr": 2.4579635815228156,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-04-06 04:00:00",
-    "exitPrice": 4635.389431474086,
-    "rMultiple": 2.4579635815228156,
+    "exitDatetime": "2026-04-06 03:00:00",
+    "exitPrice": 4611.28,
+    "rMultiple": 3.9057837967980076,
     "reason": "MACD short"
   },
   {
@@ -28282,9 +28282,9 @@
     "rr": 2.4560669771818966,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-03-23 03:30:00",
-    "exitPrice": 4367.763361962028,
-    "rMultiple": 2.4560669771818966,
+    "exitDatetime": "2026-01-05 03:00:00",
+    "exitPrice": 4372.89,
+    "rMultiple": 2.7778222713282408,
     "reason": "MACD long"
   },
   {
@@ -28939,8 +28939,8 @@
     "setupStatus": "RESOLVED",
     "outcome": "SL",
     "exitDatetime": "2025-11-17 03:00:00",
-    "exitPrice": 4095.679773174747,
-    "rMultiple": -1,
+    "exitPrice": 4097.41,
+    "rMultiple": -1.112062969168669,
     "reason": "3C"
   },
   {
@@ -29482,9 +29482,9 @@
     "rr": 2.4530648568359585,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-05-11 08:30:00",
-    "exitPrice": 4655.345494024828,
-    "rMultiple": 2.4530648568359585,
+    "exitDatetime": "2026-05-11 03:00:00",
+    "exitPrice": 4693.54,
+    "rMultiple": 5.014014294017823,
     "reason": "PDH retest long"
   },
   {
@@ -32762,9 +32762,9 @@
     "rr": 2.4414012780535272,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-02-02 08:30:00",
-    "exitPrice": 4521.535653023607,
-    "rMultiple": -1,
+    "exitDatetime": "2026-01-12 03:00:00",
+    "exitPrice": 4539.56,
+    "rMultiple": -2.5088624239105655,
     "reason": "MACD short"
   },
   {
@@ -33114,9 +33114,9 @@
     "rr": 2.4397207687231766,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-04-13 10:30:00",
-    "exitPrice": 4739.087376793424,
-    "rMultiple": -1,
+    "exitDatetime": "2026-04-13 03:00:00",
+    "exitPrice": 4669.24,
+    "rMultiple": -7.014780256873324,
     "reason": "3S"
   },
   {
@@ -34394,9 +34394,9 @@
     "rr": 2.4321705426357436,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-08-03 04:00:00",
-    "exitPrice": 4052.86,
-    "rMultiple": -1,
+    "exitDatetime": "2026-08-03 03:00:00",
+    "exitPrice": 4072.62,
+    "rMultiple": -2.914728682170489,
     "reason": "3C"
   },
   {
@@ -35130,9 +35130,9 @@
     "rr": 2.4249589589124687,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2026-05-26 12:30:00",
-    "exitPrice": 4514.798228791267,
-    "rMultiple": -1,
+    "exitDatetime": "2026-05-25 03:00:00",
+    "exitPrice": 4571.57,
+    "rMultiple": -7.0860183084146895,
     "reason": "3C"
   },
   {
@@ -35514,9 +35514,9 @@
     "rr": 2.4185684801055665,
     "setupStatus": "RESOLVED",
     "outcome": "SL",
-    "exitDatetime": "2025-11-18 10:30:00",
-    "exitPrice": 4003.136179967006,
-    "rMultiple": -1,
+    "exitDatetime": "2025-11-10 03:00:00",
+    "exitPrice": 4004.79,
+    "rMultiple": -1.192390112741002,
     "reason": "3C"
   },
   {
@@ -35689,10 +35689,10 @@
     "tp": 4318.264999999999,
     "rr": 2.4138991389914692,
     "setupStatus": "RESOLVED",
-    "outcome": "TP",
-    "exitDatetime": "2025-12-29 18:00:00",
-    "exitPrice": 4318.264999999999,
-    "rMultiple": 2.4138991389914692,
+    "outcome": "SL",
+    "exitDatetime": "2025-12-22 03:00:00",
+    "exitPrice": 4354.28,
+    "rMultiple": -2.0159901599015004,
     "reason": "3C"
   },
   {
@@ -36538,9 +36538,9 @@
     "rr": 2.3227671767232323,
     "setupStatus": "RESOLVED",
     "outcome": "TP",
-    "exitDatetime": "2026-02-02 08:30:00",
-    "exitPrice": 4512.833832958931,
-    "rMultiple": 2.3227671767232323,
+    "exitDatetime": "2026-01-12 03:00:00",
+    "exitPrice": 4539.56,
+    "rMultiple": 24.947564127480828,
     "reason": "MS"
   },
   {

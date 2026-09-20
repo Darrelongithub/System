@@ -215,16 +215,17 @@ test("filter F: opt-out restores the Filter-C-only book exactly", () => {
       .filter((t) => isTradeStrategy(t.strategyId))
       .reduce((s, t) => s + (t.rMultiple ?? 0), 0);
 
-  // Locked v1.8 numbers: default (C+F) 2,286 trades / R 541.357045897;
-  // Filter-C-only 2,323 trades / R 523.6813503963194.
+  // Locked v1.8.2 numbers: default (C+F) 2,286 trades / R 527.6272857378555;
+  // Filter-C-only 2,323 trades / R 507.93925691611344. (Both re-baselined by the
+  // v1.8.2 gap-fill fix; the trade SET is unchanged, only gap-skipped exits move.)
   assertEqual(cOnly.analysis.tradePasses.length, 2323, "C-only trade count");
   assert(
-    Math.abs(rSum(cOnly.analysis) - 523.6813503963194) < 1e-6,
+    Math.abs(rSum(cOnly.analysis) - 507.93925691611344) < 1e-6,
     `C-only rSum drift: ${rSum(cOnly.analysis)}`,
   );
   assertEqual(filtered.analysis.tradePasses.length, 2286, "default (C+F) trade count");
   assert(
-    Math.abs(rSum(filtered.analysis) - 541.357045897) < 1e-6,
+    Math.abs(rSum(filtered.analysis) - 527.6272857378555) < 1e-6,
     `default (C+F) rSum drift: ${rSum(filtered.analysis)}`,
   );
   assert(

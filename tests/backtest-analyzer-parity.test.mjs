@@ -144,8 +144,8 @@ test("parity: Backtest day-supplied accounting equals golden and per-strategy re
     totals.noFill += s.noFill;
   }
   assertEqual(totals.triggers, 2286, "bt triggers");
-  assertEqual(totals.tp, 751, "bt tp");
-  assertEqual(totals.sl, 1531, "bt sl");
+  assertEqual(totals.tp, 750, "bt tp");
+  assertEqual(totals.sl, 1532, "bt sl");
   assertEqual(totals.open, 4, "bt open");
   assertEqual(totals.noFill, 0, "bt noFill");
   assert(skippedDays > 0, "genuinely empty days still skipped");

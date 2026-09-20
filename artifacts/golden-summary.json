@@ -18,7 +18,7 @@
       "sl": 246,
       "open": 1,
       "noFill": 0,
-      "rSum": 90.55585499450498
+      "rSum": 91.10917099440691
     },
     "pdh-retest": {
       "triggers": 119,
@@ -26,7 +26,7 @@
       "sl": 79,
       "open": 0,
       "noFill": 0,
-      "rSum": 18.221774356873503
+      "rSum": 20.782723794055364
     },
     "williams-r-fade": {
       "triggers": 384,
@@ -34,15 +34,15 @@
       "sl": 256,
       "open": 0,
       "noFill": 0,
-      "rSum": 120.92659930757252
+      "rSum": 115.17516455936675
     },
     "three-soldiers": {
       "triggers": 393,
-      "tp": 131,
-      "sl": 261,
+      "tp": 130,
+      "sl": 262,
       "open": 1,
       "noFill": 0,
-      "rSum": 61.07472095885842
+      "rSum": 43.85794994984468
     },
     "morning-star": {
       "triggers": 361,
@@ -50,7 +50,7 @@
       "sl": 250,
       "open": 0,
       "noFill": 0,
-      "rSum": 73.77232370303635
+      "rSum": 92.04429713498907
     },
     "classic-pivot": {
       "triggers": 135,
@@ -58,7 +58,7 @@
       "sl": 91,
       "open": 0,
       "noFill": 0,
-      "rSum": 37.11782239574696
+      "rSum": 38.98659586646577
     },
     "ichimoku-tk": {
       "triggers": 189,
@@ -66,7 +66,7 @@
       "sl": 130,
       "open": 1,
       "noFill": 0,
-      "rSum": 41.63673974303377
+      "rSum": 29.538936049556682
     },
     "donchian-55": {
       "triggers": 173,
@@ -74,19 +74,19 @@
       "sl": 128,
       "open": 0,
       "noFill": 0,
-      "rSum": 48.45600171010932
+      "rSum": 46.537238661903615
     }
   },
   "totals": {
     "triggers": 2286,
-    "tp": 751,
-    "sl": 1531,
+    "tp": 750,
+    "sl": 1532,
     "open": 4,
     "noFill": 0,
-    "rSum": 541.3570458970024
+    "rSum": 527.6272857378555
   },
-  "generatedAt": "2026-09-16T16:40:36.032Z",
-  "runAnalysisMs": 1468,
+  "generatedAt": "2026-09-20T06:52:43.866Z",
+  "runAnalysisMs": 2475,
   "options": {
     "enableHtfDirectionFilter": true,
     "seriesEndsComplete": true
@@ -96,7 +96,8 @@
     "rules": {
       "src/lib/analyzer/regime-filters.ts": "026d7aab56226b97a7988407ba31832d1f11952847bad954dfefdeb49ef30905",
       "src/lib/analyzer/run.ts": "d9f4265e1e6797078a61a6e0909fd53d2af71e966dabca0f0db230037ec88fb4",
-      "src/lib/analyzer/strategies/final-survivors.ts": "e0ffc30b6a5fe726d7fe4348491d0e98120733ed50c24e658489762ab2e04dcd"
+      "src/lib/analyzer/strategies/final-survivors.ts": "e0ffc30b6a5fe726d7fe4348491d0e98120733ed50c24e658489762ab2e04dcd",
+      "src/lib/analyzer/status.ts": "bc1c858d02fc0d32020f7cdf542081a1e4e40f579a8f0afc94c87c9b7df573fc"
     }
   },
   "seriesContract": {
@@ -121,5 +122,5 @@
     "failures": [],
     "warnings": []
   },
-  "note": "v1.8 re-baseline: production default now runs Filter C + Filter F (a shipped product decision, not a rule change). Prior golden (2323 / R 523.6813503963194) was the v1.4 Filter-C-only default; Filter F removes 37 more counter-trend momentum bars that close on their high (+17.7 R net after slot refills)."
+  "note": "v1.8.2 re-baseline: gap-fill exit correction (see logs/v1.8.2-gap-fill-resolution.md). A bar that opens beyond a tracked stop/target and never trades it now resolves at that bar's open instead of leaving the position alive to a later touch; 52 of 2286 rows were priced that way (one booked as a +2.41R winner was a ~-2.0R loss). Trade count, entries, stops and targets are unchanged. Previous lock v1.8: 2286 / R 541.3570458970024 (Filter C + Filter F, 751 TP / 1531 SL)."
 }

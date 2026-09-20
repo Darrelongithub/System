@@ -16,6 +16,7 @@ await import("./session-window-agreement.test.mjs");
 await import("./swing-ref-causality.test.mjs");
 await import("./accounting.test.mjs");
 await import("./trade-accounting-boundaries.test.mjs");
+await import("./gap-fill-resolution.test.mjs");
 await import("./determinism.test.mjs");
 await import("./causality.test.mjs");
 await import("./weekend-tail-accounting.test.mjs");

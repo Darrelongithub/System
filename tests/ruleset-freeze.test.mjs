@@ -53,7 +53,9 @@ const FROZEN_RULES = {
   "src/lib/analyzer/run.ts": "a88ebbd06e0e9b72",
   "src/lib/analyzer/strategies/final-survivors.ts": "2931d36e9a0a29a9",
   "src/lib/analyzer/structure.ts": "b6ebd6d6d6ac780a",
-  "src/lib/analyzer/status.ts": "e64e252c3b9beb58",
+  // v1.8.2 re-freeze: status.ts gained gap-aware resolution (a bar that opens
+  // beyond a tracked level and never trades it fills at that bar's open).
+  "src/lib/analyzer/status.ts": "d96e7accbb5a0c76",
 };
 
 /** Comments out, whitespace collapsed — formatting must not trip the freeze. */
@@ -110,10 +112,10 @@ test("freeze: the shipped configuration, filters and golden lock are pinned", ()
 
   const summary = loadGoldenSummary();
   assertEqual(summary.totals.triggers, 2286, "golden triggers");
-  assertEqual(summary.totals.tp, 751, "golden TP");
-  assertEqual(summary.totals.sl, 1531, "golden SL");
+  assertEqual(summary.totals.tp, 750, "golden TP");
+  assertEqual(summary.totals.sl, 1532, "golden SL");
   assertEqual(summary.totals.open, 4, "golden OPEN");
-  assert(Math.abs(summary.totals.rSum - 541.3570458970024) < 1e-9, "golden R");
+  assert(Math.abs(summary.totals.rSum - 527.6272857378555) < 1e-9, "golden R");
 
   // The shipped book must be the one the lock describes, and the opt-out must
   // still reproduce the previous book (the two guarantees the freeze protects).
