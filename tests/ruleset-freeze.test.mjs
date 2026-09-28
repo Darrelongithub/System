@@ -45,12 +45,19 @@ const RULE_FILES = [
  * filter). The v1.8.1 hardening pass changed no rule — only guards, provenance and
  * tooling — so the hashes below are unchanged by it.
  *
+ * Re-frozen 2026-09-28 (v1.9: the four forward-validation candidates — D, H1214,
+ * Doji+highVol, doji+compressed — were added to `regime-filters.ts` and wired into
+ * `run.ts`, all default OFF). No shipped rule changed: the golden lock still reads
+ * 2,286 trades / R 527.6272857378555 and the opt-out book is untouched, which the
+ * second test below pins. The two rule *sources* moved, so their hashes are
+ * re-recorded here with `logs/v1.9-research-filters.md` as the record.
+ *
  * These are 16 hex chars of sha256(normalised source). If this test fails, the
  * rules moved: decide, document (`logs/`), then update the value.
  */
 const FROZEN_RULES = {
-  "src/lib/analyzer/regime-filters.ts": "96faff42add653d5",
-  "src/lib/analyzer/run.ts": "a88ebbd06e0e9b72",
+  "src/lib/analyzer/regime-filters.ts": "5ec77ddeaf6a7293",
+  "src/lib/analyzer/run.ts": "efdcfff62556a542",
   "src/lib/analyzer/strategies/final-survivors.ts": "2931d36e9a0a29a9",
   "src/lib/analyzer/structure.ts": "b6ebd6d6d6ac780a",
   // v1.8.2 re-freeze: status.ts gained gap-aware resolution (a bar that opens
