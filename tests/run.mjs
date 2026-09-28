@@ -40,6 +40,7 @@ await import("./generator-ref-integrity.test.mjs");
 await import("./generator-weekend-boundary.test.mjs");
 await import("./generator-window-stability.test.mjs");
 await import("./regime-filter-f.test.mjs");
+await import("./research-filters.test.mjs");
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

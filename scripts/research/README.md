@@ -22,6 +22,7 @@ node --experimental-strip-types --import ./tests/register.mjs scripts/research/<
 | `report-filter-families.mjs`    | Finalist families against the A2-only book: standalone strength, recurrence, breadth, incremental value over the shipped Filter C, and the resulting book when a family is added on top of C.                                                                                                                          |
 
 | `audit-filter-f-robustness.mjs` | Frozen-rule robustness audit of the shipped Filter F: per month (with a warm-up prefix), per strategy, per side, per session — engine-level ΔR = R(F on) − R(F off). Not a search; no thresholds, no candidates. |
+| `evaluate-forward-candidates.mjs` | Engine-level evaluation of the four frozen forward-validation candidates (`D_conflict_nearPDL`, `H1214`, `Doji+highVol`, `doji+compressed`), one at a time against the C+F baseline: ΔR, removed trades and their own R, refills, per-month/per-side/per-strategy, and the pre-registered criteria from `FORWARD-VALIDATION.md` §3. Refuses windows below 1,000 bars and series failing the production contract; labels the discovery baseline as in-sample on every line it prints. Appends to `artifacts/validation/candidate-ledger.jsonl`. |
 | `validate-on-new-data.mjs` | **The only sanctioned way to add evidence about a shipped rule.** Evaluates the shipped rules (no knobs) on data outside the discovery window; refuses the baseline, overlapping windows, windows below 1,000 bars and any series failing the production contract (unresolved swing refs / collapsed trend); applies the pre-registered criteria from `FORWARD-VALIDATION.md`; appends to `artifacts/validation/ledger.jsonl`. |
 
 ## Discovery tools are gated
@@ -56,3 +57,13 @@ the protocol in `FORWARD-VALIDATION.md` instead.
   example (offline +16.0 R, engine −3.63 R).
 - Research family labels (`B_fadeStrongBar`, `D_conflict_nearPDL`, `E2_ny_weakRange_ct`,
   `F_london_weak`, …) are labels of searched candidates, **not** production filter names.
+
+## The frozen candidates (v1.9)
+
+Four candidates from the freeze document are implemented and **dormant** in the
+engine — `enableFilterD`, `enableFilterH1214`, `enableFilterDojiHighVol`,
+`enableFilterDojiCompressed`, all default `false` (see
+`logs/v1.9-research-filters.md`). They are wired after Filters C and F and
+before `consume()`, so a rejection never burns the de-dupe slot. Nothing in this
+directory may enable one; a candidate is promoted only by a HOLDS verdict on
+out-of-sample data, once, under the pre-registered criteria.

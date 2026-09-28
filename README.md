@@ -75,6 +75,11 @@ is the development/regression laboratory. See `PROJECT-CHARTER.md` and `FORWARD-
   CSV has been removed — analysis is fully local and deterministic.
 - The rule set is frozen (`tests/ruleset-freeze.test.mjs`); changing it is a product decision
   that starts a new forward-validation window
+- Four further loss-reduction candidates (`D_conflict_nearPDL`, `H1214`, `Doji+highVol`,
+  `doji+compressed`) are implemented and **dormant** — `enableFilterD` /
+  `enableFilterH1214` / `enableFilterDojiHighVol` / `enableFilterDojiCompressed`, all
+  default `false`, evaluated one at a time on post-2026-08-20 data before any production
+  decision (`logs/v1.9-research-filters.md`, `scripts/research/evaluate-forward-candidates.mjs`)
 
 ## Run
 

@@ -13,7 +13,20 @@ import {
   computeMarketStructure,
   htfAllowsDirection,
 } from "./structure";
-import { rejectFilterC, FILTER_C_REASON, rejectFilterF, FILTER_F_REASON } from "./regime-filters";
+import {
+  rejectFilterC,
+  FILTER_C_REASON,
+  rejectFilterD,
+  FILTER_D_REASON,
+  rejectFilterDojiCompressed,
+  FILTER_DOJI_COMPRESSED_REASON,
+  rejectFilterDojiHighVol,
+  FILTER_DOJI_HIGHVOL_REASON,
+  rejectFilterF,
+  FILTER_F_REASON,
+  rejectFilterH1214,
+  FILTER_H1214_REASON,
+} from "./regime-filters";
 import { ANALYZER_LIVE_OPTIONS } from "./config";
 import { inspectSeriesContract } from "./series-contract";
 import {
@@ -71,6 +84,38 @@ export interface RunOptions {
    * disable for experiments.
    */
   enableFilterF?: boolean;
+  /**
+   * RESEARCH / forward-validation candidate D (`D_conflict_nearPDL`): reject
+   * trend-aligned candidates whose EMA20/50/200 stack is conflicted and whose
+   * entry sits at pos ≤ 0.26 of the prior EAT day's range.
+   *
+   * Default false. Frozen from the discovery vocabulary; must be evaluated once
+   * on post-2026-08-20 data under the pre-registered criteria
+   * (FORWARD-VALIDATION.md) before any production decision. Rejected
+   * candidates do not consume the strategy's de-dupe slot.
+   */
+  enableFilterD?: boolean;
+  /**
+   * RESEARCH / forward-validation candidate H1214: reject candidates whose
+   * signal bar falls in hours 12–14 EAT (inclusive).
+   *
+   * Default false; same freeze and evaluation protocol as enableFilterD.
+   */
+  enableFilterH1214?: boolean;
+  /**
+   * RESEARCH / forward-validation candidate Doji+highVol: reject doji signal
+   * bars (body < 15% of range) with ATR percentile ≥ 0.80 (prior 50 bars).
+   *
+   * Default false; same freeze and evaluation protocol as enableFilterD.
+   */
+  enableFilterDojiHighVol?: boolean;
+  /**
+   * RESEARCH / forward-validation candidate doji+compressed: reject doji signal
+   * bars (body < 15% of range) with range/ATR ≤ 0.66.
+   *
+   * Default false; same freeze and evaluation protocol as enableFilterD.
+   */
+  enableFilterDojiCompressed?: boolean;
 }
 
 /** Steps 1-5: validation gate, structure, strategies, math, aggregation. */
@@ -256,6 +301,42 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
                 // Global regime reject (Filter F). Do not consume — slot stays free.
                 row.result = "FAIL";
                 row.reason = FILTER_F_REASON;
+              } else if (
+                // Research candidates (forward-validation freeze, default OFF).
+                // Ordered after C and F so a candidate only sees setups that
+                // already passed both shipped filters and RR validation, and
+                // before consume() so a rejection leaves the slot free for a
+                // later refill. One at a time — never stacked before OOS.
+                (options.enableFilterD ?? false) &&
+                outcome.side &&
+                rejectFilterD(
+                  ctx,
+                  candle.index,
+                  candle.trend,
+                  outcome.side,
+                  outcome.entry ?? row.entry,
+                )
+              ) {
+                row.result = "FAIL";
+                row.reason = FILTER_D_REASON;
+              } else if (
+                (options.enableFilterH1214 ?? false) &&
+                rejectFilterH1214(ctx, candle.index)
+              ) {
+                row.result = "FAIL";
+                row.reason = FILTER_H1214_REASON;
+              } else if (
+                (options.enableFilterDojiHighVol ?? false) &&
+                rejectFilterDojiHighVol(ctx, candle.index)
+              ) {
+                row.result = "FAIL";
+                row.reason = FILTER_DOJI_HIGHVOL_REASON;
+              } else if (
+                (options.enableFilterDojiCompressed ?? false) &&
+                rejectFilterDojiCompressed(ctx, candle.index)
+              ) {
+                row.result = "FAIL";
+                row.reason = FILTER_DOJI_COMPRESSED_REASON;
               } else if (outcome.consumeKey) {
                 // A2 fix: commit de-dupe slot only after spread/RR validation succeeds.
                 consume(ctx, strategy.id, outcome.consumeKey);

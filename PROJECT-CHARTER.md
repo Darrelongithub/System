@@ -62,3 +62,8 @@ Order of precedence, applied to every change:
 - **Validation:** none yet. Filter F has in-sample support only, with the gain concentrated in macd-cross/dual-thrust and the Asian session; it costs money in London and New York (`AUDIT-V1.8-LIVE-FIDELITY.md` §3.1).
 - **Rules:** frozen as of v1.8.1 (`tests/ruleset-freeze.test.mjs`). Any change is a product decision with its own evaluation window.
 - **Next:** collect post-2026-08-20 data and run `scripts/research/validate-on-new-data.mjs`.
+- **Research candidates (v1.9):** four further loss-reduction hypotheses (`D_conflict_nearPDL`,
+  `H1214`, `Doji+highVol`, `doji+compressed`) are implemented and dormant — default OFF,
+  wired after C and F, before `consume()`. They are a forward-validation freeze, not a
+  product decision; each is evaluated once on unseen data under the same pre-registered
+  criteria before it can be promoted (`logs/v1.9-research-filters.md`).
