@@ -13,6 +13,8 @@ import { ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
+import { MT5AutomationPanel } from "@/components/MT5AutomationPanel";
+import { feedLiveSignalsToMT5 } from "@/lib/mt5/mt5-store";
 
 type Status = "idle" | "working" | "ready" | "error";
 
@@ -54,6 +56,7 @@ export default function AnalysisV2() {
   const [resultFilter, setResultFilter] = useState<"all" | "PASS" | "FAIL">("all");
   const [bundle, setBundle] = useState<BundleOutcome | null>(null);
   const csv = snapshot?.ohlcCsv ?? null;
+  const currentSymbol = snapshot?.symbol || "XAU/USD";
   const csvName = snapshot?.csvName ?? (snapshot ? `${snapshot.symbol}.csv` : null);
   const bundledFor = useRef<string | null>(null);
 
@@ -92,6 +95,12 @@ export default function AnalysisV2() {
     }
     for (const warning of contract.warnings) console.warn(`[series contract] ${warning}`);
     setAnalysis(outcome.analysis);
+
+    // Feed actionable live signals directly into MT5 Auto-Trader Engine
+    if (outcome.analysis.live.length > 0) {
+      feedLiveSignalsToMT5(outcome.analysis.live, currentSymbol);
+    }
+
     // Cleared here, filled by the deferred effect below — never left showing
     // the previous CSV's numbers.
     setHtfComparison([]);
@@ -109,7 +118,7 @@ export default function AnalysisV2() {
         if (result && bundledFor.current === expectedKey) setBundle(result);
       });
     }
-  }, [csv, csvName]);
+  }, [csv, csvName, currentSymbol]);
 
   // The HTF alignment table is secondary. It used to be computed synchronously
   // inside the callback above, which blocked the main thread for a full extra
@@ -156,11 +165,16 @@ export default function AnalysisV2() {
               <ArrowLeft size={12} /> Main menu
             </Link>
           </div>
-          <p className="num text-xs uppercase tracking-[0.35em] text-primary">Live Analyser</p>
+          <p className="num text-xs uppercase tracking-[0.35em] text-primary">
+            Live Analyser & Auto-Trader
+          </p>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-            Trading strategy analyzer
+            Live Strategy & MT5 Automation Control
           </h1>
         </header>
+
+        {/* ─── MT5 LIVE AUTOMATION & EXECUTION PANEL ─── */}
+        <MT5AutomationPanel currentSymbol={currentSymbol} liveSignals={analysis?.live || []} />
 
         <section className="panel flex flex-col gap-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -241,7 +255,7 @@ export default function AnalysisV2() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
                 {[
                   ["Total candles", analysis.totalRows],
                   ["Trade PASS", analysis.tradePasses?.length ?? 0],
