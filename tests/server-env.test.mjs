@@ -39,7 +39,7 @@ test("server-env: applyEnvDefaults never clobbers existing process.env", () => {
 test("server-env: ensureServerEnv loads a project .env once, non-clobbering, from any CWD", async () => {
   // A dedicated subprocess so the module's one-shot guard starts fresh.
   const dir = mkdtempSync(join(tmpdir(), "server-env-"));
-  writeFileSync(join(dir, "package.json"), "{}");
+  writeFileSync(join(dir, "package.json"), JSON.stringify({ type: "module" }));
   writeFileSync(join(dir, ".env"), "ENSURE_LOADED_MARK=77\nENSURE_PRESET_MARK=file-value\n");
   // The probe imports a module COPIED under the temp root, so resolveServerEnv
   // walks up to dir/.env (closest package.json) — mirroring a real project.

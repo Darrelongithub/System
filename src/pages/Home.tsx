@@ -4,7 +4,12 @@ import { Activity, Database, History } from "lucide-react";
 const sections = [
   { title: "Data Generator", to: "/generator", icon: Database, hint: "Generate market data" },
   { title: "Backtester", to: "/backtest", icon: History, hint: "Replay strategy performance" },
-  { title: "Live Analyser", to: "/analysis", icon: Activity, hint: "Open the strategy analyser" },
+  {
+    title: "Live Analyser & Auto-Trader",
+    to: "/analysis",
+    icon: Activity,
+    hint: "Live strategy analyser & MT5 automation",
+  },
 ];
 
 export default function Home() {

@@ -15,7 +15,10 @@ import { Route as BacktestRouteImport } from './routes/backtest'
 import { Route as GeneratorRouteImport } from './routes/generator'
 import { Route as AnalysisIndexRouteImport } from './routes/analysis.index'
 import { Route as ApiMarketDataRouteImport } from './routes/api/market-data'
+import { Route as ApiMt5RouteImport } from './routes/api/mt5'
 import { Route as ApiMarketDataHealthRouteImport } from './routes/api/market-data.health'
+import { Route as ApiMt5BridgeRouteImport } from './routes/api/mt5.bridge'
+import { Route as ApiMt5EaRouteImport } from './routes/api/mt5.ea'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -47,10 +50,25 @@ const ApiMarketDataRoute = ApiMarketDataRouteImport.update({
   path: '/api/market-data',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMt5Route = ApiMt5RouteImport.update({
+  id: '/api/mt5',
+  path: '/api/mt5',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiMarketDataHealthRoute = ApiMarketDataHealthRouteImport.update({
   id: '/health',
   path: '/health',
   getParentRoute: () => ApiMarketDataRoute,
+} as any)
+const ApiMt5BridgeRoute = ApiMt5BridgeRouteImport.update({
+  id: '/bridge',
+  path: '/bridge',
+  getParentRoute: () => ApiMt5Route,
+} as any)
+const ApiMt5EaRoute = ApiMt5EaRouteImport.update({
+  id: '/ea',
+  path: '/ea',
+  getParentRoute: () => ApiMt5Route,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -59,16 +77,22 @@ export interface FileRoutesByFullPath {
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
+  '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
+  '/api/mt5/bridge': typeof ApiMt5BridgeRoute
+  '/api/mt5/ea': typeof ApiMt5EaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
+  '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis': typeof AnalysisIndexRoute
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
+  '/api/mt5/bridge': typeof ApiMt5BridgeRoute
+  '/api/mt5/ea': typeof ApiMt5EaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,8 +101,11 @@ export interface FileRoutesById {
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
+  '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
+  '/api/mt5/bridge': typeof ApiMt5BridgeRoute
+  '/api/mt5/ea': typeof ApiMt5EaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -88,16 +115,22 @@ export interface FileRouteTypes {
     | '/backtest'
     | '/generator'
     | '/api/market-data'
+    | '/api/mt5'
     | '/analysis/'
     | '/api/market-data/health'
+    | '/api/mt5/bridge'
+    | '/api/mt5/ea'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/backtest'
     | '/generator'
     | '/api/market-data'
+    | '/api/mt5'
     | '/analysis'
     | '/api/market-data/health'
+    | '/api/mt5/bridge'
+    | '/api/mt5/ea'
   id:
     | '__root__'
     | '/'
@@ -105,8 +138,11 @@ export interface FileRouteTypes {
     | '/backtest'
     | '/generator'
     | '/api/market-data'
+    | '/api/mt5'
     | '/analysis/'
     | '/api/market-data/health'
+    | '/api/mt5/bridge'
+    | '/api/mt5/ea'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -115,6 +151,7 @@ export interface RootRouteChildren {
   BacktestRoute: typeof BacktestRoute
   GeneratorRoute: typeof GeneratorRoute
   ApiMarketDataRoute: typeof ApiMarketDataRouteWithChildren
+  ApiMt5Route: typeof ApiMt5RouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -161,12 +198,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMarketDataRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mt5': {
+      id: '/api/mt5'
+      path: '/api/mt5'
+      fullPath: '/api/mt5'
+      preLoaderRoute: typeof ApiMt5RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/market-data/health': {
       id: '/api/market-data/health'
       path: '/health'
       fullPath: '/api/market-data/health'
       preLoaderRoute: typeof ApiMarketDataHealthRouteImport
       parentRoute: typeof ApiMarketDataRoute
+    }
+    '/api/mt5/bridge': {
+      id: '/api/mt5/bridge'
+      path: '/bridge'
+      fullPath: '/api/mt5/bridge'
+      preLoaderRoute: typeof ApiMt5BridgeRouteImport
+      parentRoute: typeof ApiMt5Route
+    }
+    '/api/mt5/ea': {
+      id: '/api/mt5/ea'
+      path: '/ea'
+      fullPath: '/api/mt5/ea'
+      preLoaderRoute: typeof ApiMt5EaRouteImport
+      parentRoute: typeof ApiMt5Route
     }
   }
 }
@@ -195,12 +253,26 @@ const ApiMarketDataRouteWithChildren = ApiMarketDataRoute._addFileChildren(
   ApiMarketDataRouteChildren,
 )
 
+interface ApiMt5RouteChildren {
+  ApiMt5BridgeRoute: typeof ApiMt5BridgeRoute
+  ApiMt5EaRoute: typeof ApiMt5EaRoute
+}
+
+const ApiMt5RouteChildren: ApiMt5RouteChildren = {
+  ApiMt5BridgeRoute: ApiMt5BridgeRoute,
+  ApiMt5EaRoute: ApiMt5EaRoute,
+}
+
+const ApiMt5RouteWithChildren =
+  ApiMt5Route._addFileChildren(ApiMt5RouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnalysisRoute: AnalysisRouteWithChildren,
   BacktestRoute: BacktestRoute,
   GeneratorRoute: GeneratorRoute,
   ApiMarketDataRoute: ApiMarketDataRouteWithChildren,
+  ApiMt5Route: ApiMt5RouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
