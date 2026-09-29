@@ -185,6 +185,151 @@ export function isProviderNoData(data: MarketDataJson): boolean {
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// SERVER-SIDE provider access.
+//
+// Everything below talks to Twelve Data directly and reads provider keys from
+// the process environment. It is used by the API route (thin validated proxy)
+// and by the MT5 server daemon (real-candle feed). Keys never enter the
+// client bundle: the functions read `process.env` at call time and are only
+// ever invoked from server code paths.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Twelve Data keys are the ONLY candle providers. Supports all layouts:
+ * TWELVE_DATA_API_KEYS (CSV list), TWELVE_DATA_API_KEY, and suffixed singles
+ * TWELVE_DATA_API_KEY_1..N. Order is stable and deduped.
+ */
+export function collectTwelveDataKeys(env: NodeJS.ProcessEnv = process.env): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const push = (v: string | undefined) => {
+    for (const part of (v ?? "").split(",")) {
+      const k = part.trim();
+      if (k && !seen.has(k)) {
+        seen.add(k);
+        out.push(k);
+      }
+    }
+  };
+  push(env["TWELVE_DATA_API_KEYS"]);
+  push(env["TWELVE_DATA_API_KEY"]);
+  for (let i = 1; i <= 20; i++) push(env[`TWELVE_DATA_API_KEY_${i}`]);
+  return out;
+}
+
+/**
+ * Twelve Data has no documented upstream timeout; a stalled TCP connection
+ * (not a clean error, not a 429) would otherwise hang this request — and
+ * every retry loop above it in ohlc-generator.ts — indefinitely, with no log
+ * line and no way for the UI's Stop button to intervene. 20s is generous for
+ * a JSON candle response but still bounded.
+ */
+export const UPSTREAM_TIMEOUT_MS = 20_000;
+
+/**
+ * Direct server-side candle fetch against `https://api.twelvedata.com`,
+ * shared by the `/api/market-data` proxy route and the MT5 daemon so both
+ * run the exact same key rotation / rate-limit / redaction policy.
+ *
+ * Contract:
+ *   - No keys configured        → synthetic 500 "No candle provider configured".
+ *   - Key rotation on failure    → every configured key is tried in order.
+ *   - Transport errors           → message is redacted of secrets, next key.
+ *   - Every key rate-limited     → 429 + Retry-After (and ONLY then).
+ *   - Otherwise                  → the provider response passed through.
+ */
+export async function fetchTwelveDataCandles(
+  request: MarketDataRequest,
+  keys?: string[],
+): Promise<{ response: Response; data: MarketDataJson }> {
+  const allKeys = keys ?? collectTwelveDataKeys();
+  if (allKeys.length === 0) {
+    return {
+      response: new Response(null, { status: 500 }),
+      data: {
+        status: "error",
+        message:
+          "No candle provider is configured on the server (set TWELVE_DATA_API_KEYS, TWELVE_DATA_API_KEY, or TWELVE_DATA_API_KEY_1..N).",
+      },
+    };
+  }
+
+  const { signal: callerSignal, ...body } = request;
+  const timeoutSignal = AbortSignal.timeout(UPSTREAM_TIMEOUT_MS);
+  const fetchSignal = callerSignal ? AbortSignal.any([timeoutSignal, callerSignal]) : timeoutSignal;
+
+  // Last upstream body (or our own error envelope) — used only when every key fails.
+  let lastData: MarketDataJson | undefined = undefined;
+  let lastWasRateLimit = false;
+
+  for (const key of allKeys) {
+    const params = new URLSearchParams({
+      apikey: key,
+      symbol: body.symbol,
+      interval: body.interval,
+      start_date: body.start_date,
+      timezone: body.timezone,
+      outputsize: body.outputsize,
+    });
+    if (body.end_date) params.set("end_date", body.end_date);
+
+    let response: Response;
+    try {
+      response = await fetch(`https://api.twelvedata.com/time_series?${params.toString()}`, {
+        signal: fetchSignal,
+      });
+    } catch (error) {
+      const timedOut = error instanceof Error && error.name === "TimeoutError";
+      const detail = error instanceof Error ? error.message : String(error);
+      lastData = {
+        status: "error",
+        // Redact before the envelope is returned: a URL-bearing transport
+        // error must not echo the ?apikey= query parameter.
+        message: timedOut
+          ? `Twelve Data did not respond within ${UPSTREAM_TIMEOUT_MS / 1000}s`
+          : `Twelve Data request failed: ${redactSecrets(detail, allKeys)}`,
+      };
+      lastWasRateLimit = false;
+      continue; // try the next configured key, same as a rate-limit fallthrough
+    }
+
+    const data: MarketDataJson = await response.json().catch(() => ({}));
+    lastData = data;
+    const rateLimited = isProviderRateLimit(response, data);
+    lastWasRateLimit = rateLimited;
+    if (!rateLimited) {
+      return { response, data };
+    }
+  }
+
+  // Only report 429/Retry-After when every key was genuinely rate-limited.
+  // A network error or upstream timeout on the last key isn't a rate limit —
+  // reporting it as one made the client's rate-limit cooldown retry (up to 5x,
+  // 60s each) kick in for a problem that retrying identically won't fix,
+  // which read to the user as the backtest "just hanging".
+  if (lastWasRateLimit) {
+    return {
+      response: new Response(JSON.stringify(lastData), {
+        status: 429,
+        headers: { "Content-Type": "application/json", "Retry-After": "60" },
+      }),
+      data: lastData ?? {
+        status: "error",
+        message: "Rate limited on all configured Twelve Data keys",
+      },
+    };
+  }
+
+  return {
+    response: new Response(null, { status: 502 }),
+    data: lastData ?? {
+      status: "error",
+      message: "Twelve Data unreachable on every configured key",
+    },
+  };
+}
+
 /** Proxy market-data requests through the server so provider credentials never enter the client bundle. */
 export async function requestMarketData(
   request: MarketDataRequest,
