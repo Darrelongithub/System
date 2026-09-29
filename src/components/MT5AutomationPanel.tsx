@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
   Activity,
   Cloud,
@@ -20,7 +20,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   type MT5AccountCredentials,
+  type MT5AccountInfo,
   type MT5AutoTradeConfig,
+  type MT5Position,
   type SizingMode,
 } from "@/lib/mt5/types";
 import {
@@ -42,12 +44,124 @@ interface MT5AutomationPanelProps {
   currentPrice?: number;
 }
 
+/* ─── Server snapshot shape (GET /api/mt5, polled every 5s) ─────────────── */
+
+interface ServerDaemonFeedEntry {
+  symbol: string;
+  lastRealClose: number | null;
+  barTime: string | null;
+  lastFetchAt: string | null;
+  status: "idle" | "ok" | "no-data" | "error" | string;
+  detail?: string | null;
+}
+
+interface ServerDaemonStatus {
+  isRunning: boolean;
+  startedAt: string | null;
+  lastTickAt: string | null;
+  tickCount: number;
+  signalsDetectedCount: number;
+  tradesExecutedCount: number;
+  monitoredSymbols: string[];
+  activeStrategies: string[];
+  lastError: string | null;
+  hasProviderKey: boolean;
+  feed: ServerDaemonFeedEntry[];
+}
+
+interface ServerSnapshot {
+  account: MT5AccountInfo | null;
+  positions: MT5Position[];
+  daemon: ServerDaemonStatus | null;
+  fetchedAt: number;
+}
+
+/** Coerce a server account payload to the client shape (defensive: JSON over the wire is untyped). */
+function normalizeServerAccount(raw: unknown): MT5AccountInfo | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  return {
+    login: String(r["login"] ?? ""),
+    name: String(r["name"] ?? ""),
+    server: String(r["server"] ?? ""),
+    currency: String(r["currency"] ?? "USD"),
+    balance: Number(r["balance"]) || 0,
+    equity: Number(r["equity"]) || 0,
+    margin: Number(r["margin"]) || 0,
+    freeMargin: Number(r["freeMargin"]) || 0,
+    marginLevel: Number(r["marginLevel"]) || 0,
+    leverage: Number(r["leverage"]) || 100,
+    connected: Boolean(r["connected"]),
+    tradeAllowed: Boolean(r["tradeAllowed"]),
+    lastUpdated: String(r["lastUpdated"] ?? ""),
+    pingMs: typeof r["pingMs"] === "number" ? r["pingMs"] : undefined,
+  };
+}
+
+function normalizeServerPositions(raw: unknown): MT5Position[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((p): p is Record<string, unknown> => Boolean(p) && typeof p === "object")
+    .map((p) => ({
+      id: String(p["id"] ?? p["ticket"] ?? ""),
+      ticket: Number(p["ticket"]) || 0,
+      symbol: String(p["symbol"] ?? ""),
+      strategyId: String(p["strategyId"] ?? ""),
+      strategyName: String(p["strategyName"] ?? ""),
+      type: p["type"] === "SELL" ? "SELL" : "BUY",
+      volume: Number(p["volume"]) || 0,
+      openPrice: Number(p["openPrice"]) || 0,
+      currentPrice: Number(p["currentPrice"]) || 0,
+      sl: Number(p["sl"]) || 0,
+      tp: Number(p["tp"]) || 0,
+      profit: Number(p["profit"]) || 0,
+      swap: Number(p["swap"]) || 0,
+      commission: Number(p["commission"]) || 0,
+      comment: String(p["comment"] ?? ""),
+      magic: Number(p["magic"]) || 0,
+      openTime: String(p["openTime"] ?? ""),
+    }));
+}
+
+const fmtMoney = (value: number | undefined | null) =>
+  (value ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
 export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5AutomationPanelProps) {
   const mt5 = useMT5State();
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "news" | "rules" | "login" | "standalone_ea" | "cloud_daemon"
+    "dashboard" | "news" | "rules" | "bridge" | "standalone_ea" | "cloud_daemon"
   >("dashboard");
   const [isConnecting, setIsConnecting] = useState(false);
+  const [serverSnap, setServerSnap] = useState<ServerSnapshot | null>(null);
+
+  // Poll the SERVER engine state every 5s: account/positions as reported by
+  // the EA bridge, plus the real-candle daemon feed. The panel shows THIS
+  // state in bridge mode instead of the browser-local simulation.
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const res = await fetch("/api/mt5");
+        if (!res.ok) return;
+        const json = (await res.json()) as Record<string, unknown>;
+        if (cancelled) return;
+        setServerSnap({
+          account: normalizeServerAccount(json["account"]),
+          positions: normalizeServerPositions(json["positions"]),
+          daemon: (json["daemon"] as ServerDaemonStatus | null) ?? null,
+          fetchedAt: Date.now(),
+        });
+      } catch {
+        // Server unreachable — the panel keeps working off local state.
+      }
+    };
+    void load();
+    const id = setInterval(() => void load(), 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+    };
+  }, []);
 
   // Local form state for login
   const [loginForm, setLoginForm] = useState<MT5AccountCredentials>({
@@ -114,7 +228,23 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
     toast.success(`Copied ${label} to clipboard!`);
   };
 
-  const totalFloating = mt5.positions.reduce((acc, p) => acc + p.profit, 0);
+  /* ─── Mode & data-source resolution ───────────────────────────────────── */
+
+  const isBridgeMode = mt5.credentials.bridgeMode === "mql5_ea";
+  const daemon = serverSnap?.daemon ?? null;
+  const serverAccount = serverSnap?.account ?? null;
+
+  // In bridge mode the truth lives on the server (fed by the EA); in
+  // simulation mode the browser-local engine is the truth.
+  const account = isBridgeMode && serverAccount ? serverAccount : mt5.account;
+  const positions = isBridgeMode && serverSnap ? serverSnap.positions : mt5.positions;
+
+  const eaSyncAgeMs = account?.lastUpdated
+    ? Date.now() - new Date(account.lastUpdated).getTime()
+    : Infinity;
+  const eaSyncing = isBridgeMode && Number.isFinite(eaSyncAgeMs) && eaSyncAgeMs < 30_000;
+
+  const totalFloating = positions.reduce((acc, p) => acc + p.profit, 0);
 
   // Check current news blackout status for this symbol
   const newsBlackout = checkNewsBlackout({
@@ -143,23 +273,39 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
               <h2 className="text-base font-bold tracking-tight text-foreground sm:text-lg">
                 MT5 Live 24/7 Automation & Red Folder Guard
               </h2>
+              {/* REAL sync state — reflects what the server/EA actually reports */}
               <span
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-semibold tracking-wide",
-                  mt5.account?.connected
+                  isBridgeMode && eaSyncing
                     ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
-                    : "bg-destructive/15 text-destructive border border-destructive/30",
+                    : isBridgeMode
+                      ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                      : "bg-yellow-500/15 text-yellow-400 border border-yellow-500/30",
                 )}
+                title={
+                  isBridgeMode
+                    ? eaSyncing
+                      ? "Server account state refreshed within the last 30 seconds"
+                      : "No fresh account telemetry from the EA yet"
+                    : "Simulation mode — no real broker connection"
+                }
               >
                 <span
                   className={cn(
                     "size-2 rounded-full",
-                    mt5.account?.connected ? "bg-emerald-400 animate-pulse" : "bg-destructive",
+                    isBridgeMode && eaSyncing
+                      ? "bg-emerald-400 animate-pulse"
+                      : isBridgeMode
+                        ? "bg-amber-400"
+                        : "bg-yellow-400",
                   )}
                 />
-                {mt5.account?.connected
-                  ? `${mt5.credentials.server} (#${mt5.account.login})`
-                  : "Disconnected"}
+                {isBridgeMode
+                  ? eaSyncing
+                    ? `EA syncing · ${account?.server || mt5.credentials.server} (#${account?.login || mt5.credentials.login})`
+                    : "Bridge armed · waiting for EA telemetry"
+                  : "Simulation mode · no broker connection"}
               </span>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -188,6 +334,59 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
         </div>
       </div>
 
+      {/* ─── MODE BANNER: honest simulation vs bridge state ─── */}
+      {isBridgeMode ? (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-emerald-500/40 bg-emerald-950/30 px-4 py-3 text-xs">
+          <span className="rounded bg-emerald-500 text-black px-2 py-0.5 text-[10px] font-black uppercase">
+            🟢 Bridge Mode
+          </span>
+          <span className="text-emerald-200">
+            Orders queue on this server and execute on your real MT5 terminal via the
+            SignalFinderBridge EA.
+          </span>
+          {daemon && (
+            <span
+              className={cn(
+                "rounded border px-2 py-0.5 font-mono text-[10px] font-bold",
+                daemon.isRunning
+                  ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
+                  : "border-border bg-secondary text-muted-foreground",
+              )}
+            >
+              {daemon.isRunning ? "Server daemon running" : "Server daemon stopped"}
+            </span>
+          )}
+          {daemon && !daemon.hasProviderKey && (
+            <span className="rounded border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 font-mono text-[10px] font-bold text-amber-300">
+              ⚠️ No candle API key on server — daemon cannot fetch real data
+            </span>
+          )}
+          {eaSyncing && (
+            <span className="rounded border border-emerald-500/40 bg-emerald-500/15 px-2 py-0.5 font-mono text-[10px] font-bold text-emerald-300 animate-pulse">
+              EA is syncing
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-yellow-500/40 bg-yellow-950/20 px-4 py-3 text-xs">
+          <span className="rounded bg-yellow-500 text-black px-2 py-0.5 text-[10px] font-black uppercase">
+            🟡 Simulation Mode
+          </span>
+          <span className="text-yellow-200/90">
+            Signals are generated from real analysis, but execution is simulated in the browser — no
+            orders reach a broker. Switch to the{" "}
+            <button
+              type="button"
+              className="font-bold underline underline-offset-2 text-yellow-100"
+              onClick={() => setActiveTab("bridge")}
+            >
+              Real-Trade Bridge tab
+            </button>{" "}
+            to connect your MT5 account.
+          </span>
+        </div>
+      )}
+
       {/* ─── LIVE RED FOLDER LOCKOUT BANNER (WHEN ACTIVE) ─── */}
       {newsBlackout.isBlocked && (
         <div className="flex items-center gap-3 rounded-xl border border-red-500/50 bg-red-950/40 px-4 py-3 text-red-300 animate-in fade-in zoom-in-95">
@@ -211,11 +410,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             Account Balance
           </span>
           <p className="num mt-0.5 text-lg font-bold text-foreground">
-            $
-            {mt5.account?.balance.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            ${fmtMoney(account?.balance)}
           </p>
         </div>
 
@@ -226,16 +421,12 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           <p
             className={cn(
               "num mt-0.5 text-lg font-bold",
-              (mt5.account?.equity ?? 0) >= (mt5.account?.balance ?? 0)
+              (account?.equity ?? 0) >= (account?.balance ?? 0)
                 ? "text-emerald-400"
                 : "text-amber-400",
             )}
           >
-            $
-            {mt5.account?.equity.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            ${fmtMoney(account?.equity)}
           </p>
         </div>
 
@@ -263,11 +454,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             Free Margin
           </span>
           <p className="num mt-0.5 text-lg font-bold text-foreground">
-            $
-            {mt5.account?.freeMargin.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            ${fmtMoney(account?.freeMargin)}
           </p>
         </div>
 
@@ -276,7 +463,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             Open Positions
           </span>
           <p className="num mt-0.5 text-lg font-bold text-primary">
-            {mt5.positions.length} / {mt5.config.maxOpenPositions}
+            {positions.length} / {mt5.config.maxOpenPositions}
           </p>
         </div>
       </div>
@@ -288,7 +475,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             id: "dashboard",
             label: "Live Dashboard & Positions",
             icon: Activity,
-            count: mt5.positions.length,
+            count: positions.length,
           },
           {
             id: "news",
@@ -297,14 +484,18 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             badge: mt5.config.newsFilterEnabled ? "Active Guard" : "Off",
           },
           { id: "rules", label: "Automation Rules", icon: Settings2 },
-          { id: "login", label: "MT5 Account Login", icon: Lock },
+          {
+            id: "bridge",
+            label: "MT5 Login & Real-Trade Bridge",
+            icon: Lock,
+            badge: "Recommended",
+          },
           {
             id: "standalone_ea",
             label: "24/7 Standalone MT5 EA (Offline)",
             icon: Cpu,
-            badge: "Recommended",
           },
-          { id: "cloud_daemon", label: "24/7 Cloud Background Bot", icon: Cloud },
+          { id: "cloud_daemon", label: "24/7 Server Daemon", icon: Cloud },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -351,14 +542,19 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           <div className="flex flex-col gap-2.5">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Active MT5 Positions ({mt5.positions.length})
+                Active MT5 Positions ({positions.length})
+                {isBridgeMode && (
+                  <span className="ml-2 rounded bg-emerald-500/15 px-1.5 py-0.5 text-[9px] font-black uppercase text-emerald-400">
+                    Server state
+                  </span>
+                )}
               </h3>
               <span className="text-[11px] text-muted-foreground font-mono">
                 Magic: #{mt5.config.magicNumber}
               </span>
             </div>
 
-            {mt5.positions.length === 0 ? (
+            {positions.length === 0 ? (
               <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border/70 p-8 text-center bg-secondary/10">
                 <Activity className="size-8 text-muted-foreground/40 mb-2" />
                 <p className="text-sm font-semibold text-foreground">No active open positions</p>
@@ -385,7 +581,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60 font-mono">
-                    {mt5.positions.map((pos) => (
+                    {positions.map((pos) => (
                       <tr key={pos.id} className="hover:bg-secondary/20 transition-colors">
                         <td className="p-3 text-foreground font-bold">#{pos.ticket}</td>
                         <td className="p-3 text-foreground">{pos.symbol}</td>
@@ -417,14 +613,26 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                           {pos.profit >= 0 ? "+" : ""}${pos.profit.toFixed(2)}
                         </td>
                         <td className="p-3 text-right">
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => closePosition(pos.ticket)}
-                            className="h-7 px-2.5 text-[11px] font-bold"
-                          >
-                            Close
-                          </Button>
+                          {isBridgeMode ? (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled
+                              title="In bridge mode this position lives on your MT5 terminal — close it there (or let SL/TP run)."
+                              className="h-7 px-2.5 text-[11px] font-bold"
+                            >
+                              In MT5
+                            </Button>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => closePosition(pos.ticket)}
+                              className="h-7 px-2.5 text-[11px] font-bold"
+                            >
+                              Close
+                            </Button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -869,45 +1077,200 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
         </form>
       )}
 
-      {/* ─── TAB 4: MT5 ACCOUNT LOGIN ─── */}
-      {activeTab === "login" && (
-        <form onSubmit={handleSaveLogin} className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="mt5-login" className="text-xs font-bold uppercase tracking-wider">
-                MT5 Account Login Number
-              </Label>
-              <Input
-                id="mt5-login"
-                value={loginForm.login}
-                onChange={(e) => setLoginForm({ ...loginForm, login: e.target.value })}
-                placeholder="e.g. 50198421"
-                className="font-mono text-sm"
-                required
-              />
-            </div>
-
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="mt5-server" className="text-xs font-bold uppercase tracking-wider">
-                MT5 Broker Server
-              </Label>
-              <Input
-                id="mt5-server"
-                value={loginForm.server}
-                onChange={(e) => setLoginForm({ ...loginForm, server: e.target.value })}
-                placeholder="e.g. MetaQuotes-Demo or ICMarketsSC-Live"
-                className="font-mono text-sm"
-                required
-              />
+      {/* ─── TAB 4: MT5 LOGIN & REAL-TRADE BRIDGE (RECOMMENDED) ─── */}
+      {activeTab === "bridge" && (
+        <div className="flex flex-col gap-5">
+          {/* Mode switch */}
+          <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-secondary/20 p-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground">
+              Execution Mode
+            </h4>
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (mt5.credentials.bridgeMode !== "simulated") {
+                    saveMT5Credentials({ bridgeMode: "simulated" });
+                  }
+                }}
+                className={cn(
+                  "rounded-xl border p-3 text-left transition-all",
+                  !isBridgeMode
+                    ? "border-yellow-500/60 bg-yellow-500/10"
+                    : "border-border/60 bg-card hover:bg-secondary/40",
+                )}
+              >
+                <span className="text-xs font-black uppercase text-yellow-400">
+                  🟡 Simulation Mode
+                </span>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Strategy signals run for real; execution is simulated in the browser. Safe way to
+                  watch the system without a broker connection.
+                </p>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (mt5.credentials.bridgeMode !== "mql5_ea") {
+                    saveMT5Credentials({ bridgeMode: "mql5_ea" });
+                  }
+                }}
+                className={cn(
+                  "rounded-xl border p-3 text-left transition-all",
+                  isBridgeMode
+                    ? "border-emerald-500/60 bg-emerald-500/10"
+                    : "border-border/60 bg-card hover:bg-secondary/40",
+                )}
+              >
+                <span className="text-xs font-black uppercase text-emerald-400">
+                  🟢 Real-Trade Bridge Mode
+                </span>
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Orders queue on this server and execute on your real MT5 terminal through the
+                  SignalFinderBridge EA. Requires the 4-step setup below.
+                </p>
+              </button>
             </div>
           </div>
 
-          <div className="flex justify-end border-t border-border/60 pt-4">
-            <Button type="submit" disabled={isConnecting} className="font-bold">
-              {isConnecting ? "Connecting..." : "Save MT5 Account Credentials"}
+          {/* MT5 account identity (login happens inside the MT5 app itself) */}
+          <form onSubmit={handleSaveLogin} className="flex flex-col gap-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="mt5-login" className="text-xs font-bold uppercase tracking-wider">
+                  MT5 Account Login Number
+                </Label>
+                <Input
+                  id="mt5-login"
+                  value={loginForm.login}
+                  onChange={(e) => setLoginForm({ ...loginForm, login: e.target.value })}
+                  placeholder="e.g. 50198421"
+                  className="font-mono text-sm"
+                  required
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <Label htmlFor="mt5-server" className="text-xs font-bold uppercase tracking-wider">
+                  MT5 Broker Server
+                </Label>
+                <Input
+                  id="mt5-server"
+                  value={loginForm.server}
+                  onChange={(e) => setLoginForm({ ...loginForm, server: e.target.value })}
+                  placeholder="e.g. MetaQuotes-Demo or ICMarketsSC-Live"
+                  className="font-mono text-sm"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isConnecting} className="font-bold">
+                {isConnecting ? "Saving..." : "Save MT5 Account Details"}
+              </Button>
+            </div>
+          </form>
+
+          {/* Bridge EA download + endpoints */}
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-5">
+            <div>
+              <h3 className="text-base font-bold text-foreground">SignalFinderBridge.mq5</h3>
+              <p className="mt-1 text-xs text-muted-foreground max-w-xl">
+                The bridge EA polls this server with your account token, sends live account
+                telemetry, and executes the queued orders (Auto Entry, SL, TP) on your terminal.
+              </p>
+            </div>
+            <Button
+              asChild
+              className="font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"
+            >
+              <a href="/api/mt5/ea?type=bridge" download="SignalFinderBridge.mq5">
+                <Download className="mr-2 size-4" /> Download Bridge EA
+              </a>
             </Button>
           </div>
-        </form>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-secondary/30 p-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Bridge Webhook URL
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                <Input readOnly value={bridgeUrl} className="font-mono text-xs bg-card" />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(bridgeUrl, "Bridge URL")}
+                >
+                  <Copy className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-secondary/30 p-4">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Authorization Token
+              </span>
+              <div className="flex items-center gap-2 mt-1">
+                <Input
+                  readOnly
+                  value={mt5.credentials.apiToken || "sfp-default-token"}
+                  className="font-mono text-xs bg-card"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => copyToClipboard(mt5.credentials.apiToken || "", "Auth Token")}
+                >
+                  <Copy className="size-3.5" />
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-amber-500/40 bg-amber-950/20 px-4 py-3 text-xs text-amber-200/90">
+            <strong className="text-amber-200 uppercase tracking-wide text-[10px] mr-2">
+              Token rotation
+            </strong>
+            The bridge token changes when the server restarts. If the EA journal shows{" "}
+            <code className="font-mono">HTTP 401</code>, re-download the EA above and attach it
+            again — the fresh file always embeds the current token.
+          </div>
+
+          {/* 4-step setup */}
+          <div className="flex flex-col gap-2 rounded-xl border border-border/60 bg-secondary/30 p-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
+              <Zap className="size-4 text-emerald-400" /> Real-Trade Setup in 4 Steps
+            </h4>
+            <ol className="flex flex-col gap-2 text-xs text-muted-foreground list-decimal pl-4">
+              <li>
+                <strong className="text-foreground">Log in inside the MT5 app itself</strong> (File
+                → Login to Trade Account). Your password stays in MT5 — this web app never asks for
+                it or stores it.
+              </li>
+              <li>
+                Download <code className="text-primary font-mono">SignalFinderBridge.mq5</code> and
+                place it in{" "}
+                <code className="font-mono text-foreground">
+                  File → Open Data Folder → MQL5 → Experts
+                </code>
+                , then refresh Expert Advisors in MT5.
+              </li>
+              <li>
+                Whitelist the bridge URL:{" "}
+                <code className="font-mono text-foreground">Tools → Options → Expert Advisors</code>{" "}
+                → check <em>"Allow WebRequest for listed URL"</em> and add{" "}
+                <code className="font-mono text-primary">{bridgeUrl}</code>.
+              </li>
+              <li>
+                Drag the EA onto your <strong>XAUUSD M30</strong> chart, enable{" "}
+                <strong>Algo Trading</strong>, and the dashboard switches to 🟢 Bridge Mode with
+                your live account state.
+              </li>
+            </ol>
+          </div>
+        </div>
       )}
 
       {/* ─── TAB 5: 24/7 STANDALONE MT5 EA (OFFLINE CAPABLE) ─── */}
@@ -944,6 +1307,24 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                 <Download className="mr-2 size-4" /> Download 24/7 Standalone EA
               </a>
             </Button>
+          </div>
+
+          {/* Honest port disclosure */}
+          <div className="rounded-xl border border-amber-500/40 bg-amber-950/20 px-4 py-3 text-xs text-amber-200/90">
+            <strong className="text-amber-200 uppercase tracking-wide text-[10px] mr-2">
+              Honest note
+            </strong>
+            This standalone file is a native MQL5 re-implementation of the strategies — it is NOT
+            the exact TypeScript engine that produces signals in this web app, so small drift is
+            possible. For exact parity with the signals you see here, use the{" "}
+            <button
+              type="button"
+              className="font-bold underline underline-offset-2 text-amber-100"
+              onClick={() => setActiveTab("bridge")}
+            >
+              Real-Trade Bridge
+            </button>{" "}
+            instead.
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -1000,7 +1381,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
         </div>
       )}
 
-      {/* ─── TAB 6: 24/7 CLOUD BACKGROUND BOT ─── */}
+      {/* ─── TAB 6: 24/7 SERVER DAEMON (REAL FEED) ─── */}
       {activeTab === "cloud_daemon" && (
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/10 p-5">
@@ -1010,60 +1391,163 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                   Server Daemon
                 </span>
                 <h3 className="text-base font-bold text-foreground">
-                  24/7 Autonomous Cloud Background Worker
+                  24/7 Real-Candle Background Engine
                 </h3>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Our backend server process runs continuously in the cloud, evaluates live candles
-                24/7, respects Red Folder News Blackouts, and triggers Auto Entry, Auto SL, and Auto
-                TP directly on your connected MT5 account even if you never open this website.
+              <p className="mt-1 text-xs text-muted-foreground max-w-2xl">
+                Runs inside this app's server process (not the browser). On every closed 30-minute
+                bar it fetches real candles from the configured provider, runs the exact 9
+                production strategies, and dispatches signals to the engine — respecting Red Folder
+                news blackouts. With no provider key configured it fetches nothing and says so.
               </p>
             </div>
             <div className="flex items-center gap-2">
               <span className="flex size-3 relative">
-                <span className="animate-ping absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full size-3 bg-emerald-500"></span>
+                {daemon?.isRunning && (
+                  <span className="animate-ping absolute inline-flex size-full rounded-full bg-emerald-400 opacity-75"></span>
+                )}
+                <span
+                  className={cn(
+                    "relative inline-flex rounded-full size-3",
+                    daemon?.isRunning ? "bg-emerald-500" : "bg-muted-foreground/50",
+                  )}
+                ></span>
               </span>
-              <span className="text-xs font-bold text-emerald-400">Daemon Active (24/7)</span>
+              <span
+                className={cn(
+                  "text-xs font-bold",
+                  daemon?.isRunning ? "text-emerald-400" : "text-muted-foreground",
+                )}
+              >
+                {daemon
+                  ? daemon.isRunning
+                    ? "Daemon running"
+                    : "Daemon stopped"
+                  : "Server unreachable"}
+              </span>
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-secondary/30 p-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Bridge Webhook URL
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <Input readOnly value={bridgeUrl} className="font-mono text-xs bg-card" />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(bridgeUrl, "Bridge URL")}
-                >
-                  <Copy className="size-3.5" />
-                </Button>
-              </div>
+          {/* No-key warning — honest instead of a fake "always active" card */}
+          {daemon && !daemon.hasProviderKey && (
+            <div className="rounded-xl border border-amber-500/50 bg-amber-950/30 px-4 py-3 text-xs text-amber-200">
+              <strong className="uppercase tracking-wide text-[10px] mr-2">
+                ⚠️ No candle provider key
+              </strong>
+              The server has no Twelve Data key configured, so the daemon cannot fetch real candles.
+              Set <code className="font-mono">TWELVE_DATA_API_KEY</code> (or{" "}
+              <code className="font-mono">TWELVE_DATA_API_KEYS</code>) in the server's{" "}
+              <code className="font-mono">.env</code> and restart. Until then, positions keep their
+              last real price and the daemon retries every 15 minutes.
+            </div>
+          )}
+
+          {/* Real feed table */}
+          <div className="flex flex-col gap-2.5">
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Real Candle Feed ({daemon?.feed?.length ?? 0} symbol
+                {(daemon?.feed?.length ?? 0) === 1 ? "" : "s"})
+              </h4>
+              {daemon?.lastTickAt && (
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  Last check: {new Date(daemon.lastTickAt).toLocaleTimeString()}
+                </span>
+              )}
             </div>
 
-            <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-secondary/30 p-4">
-              <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Authorization Token
-              </span>
-              <div className="flex items-center gap-2 mt-1">
-                <Input
-                  readOnly
-                  value={mt5.credentials.apiToken || "sfp-default-token"}
-                  className="font-mono text-xs bg-card"
-                />
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => copyToClipboard(mt5.credentials.apiToken || "", "Auth Token")}
-                >
-                  <Copy className="size-3.5" />
-                </Button>
+            {!daemon || !daemon.feed || daemon.feed.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border/70 bg-secondary/10 p-6 text-center text-xs text-muted-foreground">
+                No feed data yet — the daemon reports its first real close after the next closed
+                30-minute bar (or immediately after a restart once a provider key is configured).
               </div>
-            </div>
+            ) : (
+              <div className="overflow-x-auto rounded-xl border border-border/70 bg-card">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-secondary/50 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    <tr>
+                      <th className="p-3">Symbol</th>
+                      <th className="p-3">Last Real Close</th>
+                      <th className="p-3">Bar Time</th>
+                      <th className="p-3">Last Fetch</th>
+                      <th className="p-3">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60 font-mono">
+                    {daemon.feed.map((row) => (
+                      <tr key={row.symbol} className="hover:bg-secondary/20 transition-colors">
+                        <td className="p-3 font-bold text-foreground">{row.symbol}</td>
+                        <td className="p-3 text-foreground">
+                          {row.lastRealClose !== null ? row.lastRealClose.toFixed(2) : "—"}
+                        </td>
+                        <td className="p-3 text-muted-foreground">
+                          {row.barTime ? new Date(row.barTime).toLocaleTimeString() : "—"}
+                        </td>
+                        <td className="p-3 text-muted-foreground">
+                          {row.lastFetchAt ? new Date(row.lastFetchAt).toLocaleTimeString() : "—"}
+                        </td>
+                        <td className="p-3">
+                          <span
+                            className={cn(
+                              "rounded px-2 py-0.5 text-[10px] font-bold uppercase",
+                              row.status === "ok"
+                                ? "bg-emerald-500/20 text-emerald-400"
+                                : row.status === "idle"
+                                  ? "bg-secondary text-muted-foreground"
+                                  : "bg-destructive/20 text-destructive",
+                            )}
+                            title={row.detail ?? undefined}
+                          >
+                            {row.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {daemon && (
+              <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4 text-center">
+                <div className="rounded-xl border border-border/60 bg-secondary/40 p-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Bar Checks
+                  </span>
+                  <p className="num mt-0.5 text-lg font-bold text-foreground">{daemon.tickCount}</p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-secondary/40 p-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Signals Detected
+                  </span>
+                  <p className="num mt-0.5 text-lg font-bold text-primary">
+                    {daemon.signalsDetectedCount}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-secondary/40 p-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Trades Executed
+                  </span>
+                  <p className="num mt-0.5 text-lg font-bold text-emerald-400">
+                    {daemon.tradesExecutedCount}
+                  </p>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-secondary/40 p-3">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Started
+                  </span>
+                  <p className="num mt-0.5 text-sm font-bold text-foreground">
+                    {daemon.startedAt ? new Date(daemon.startedAt).toLocaleTimeString() : "—"}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {daemon?.lastError && (
+              <div className="rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-2.5 text-xs text-destructive font-mono">
+                Last error: {daemon.lastError}
+              </div>
+            )}
           </div>
         </div>
       )}

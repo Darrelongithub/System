@@ -18,6 +18,30 @@ import { toast } from "sonner";
 const STORAGE_KEY_CREDS = "forexlens.mt5.credentials";
 const STORAGE_KEY_CONFIG = "forexlens.mt5.config";
 
+/**
+ * Fire-and-forget mirror of panel mutations to the SERVER engine (POST /api/mt5).
+ *
+ * localStorage keeps the client engine hydrated across reloads, but the daemon
+ * and the bridge command queue live in the server process — without this sync
+ * the panel toggles a different engine than the one that actually runs 24/7.
+ * Never awaited, never throws: the panel keeps working off local state even
+ * if the server is unreachable.
+ */
+function syncToServer(payload: Record<string, unknown>) {
+  if (typeof window === "undefined" || typeof fetch !== "function") return;
+  try {
+    fetch("/api/mt5", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => {
+      /* fire-and-forget: local state already applied */
+    });
+  } catch {
+    /* network unavailable — the localStorage copy still holds */
+  }
+}
+
 let state: MT5State = {
   account: mt5Engine.getAccountInfo(),
   credentials: { ...DEFAULT_MT5_CREDENTIALS },
@@ -128,6 +152,11 @@ export function saveMT5Credentials(creds: Partial<MT5AccountCredentials>) {
       console.warn("Storage save skipped:", e);
     }
   }
+  // Mirror to the SERVER engine so the daemon + bridge see the same account.
+  // The password never travels: only login/server/mode/endpoint/token matter
+  // to the bridge (you log in inside the MT5 app itself).
+  const { password: _neverSynced, ...serverCreds } = mt5Engine.getCredentials();
+  syncToServer({ action: "update_credentials", credentials: serverCreds });
   notify();
   toast.success("MT5 Account credentials updated");
 }
@@ -141,6 +170,7 @@ export function saveMT5Config(config: Partial<MT5AutoTradeConfig>) {
       console.warn("Config save skipped:", e);
     }
   }
+  syncToServer({ action: "update_config", config: mt5Engine.getConfig() });
   notify();
   toast.success("Automation rules updated");
 }
@@ -154,6 +184,7 @@ export function toggleAutoTrading(enabled: boolean) {
       console.warn("Config save skipped:", e);
     }
   }
+  syncToServer({ action: "update_config", config: mt5Engine.getConfig() });
   notify();
   if (enabled) {
     playSoundAlert("signal");

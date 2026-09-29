@@ -40,6 +40,14 @@ export function generateStandalone247EaSource(options: {
 #property description "Auto Entry, Auto SL & Auto TP + Red Folder News Filter"
 #property strict
 
+// NOTE (honest port disclosure): this file is a NATIVE MQL5 re-implementation
+// of the 9 strategies (plus the Red Folder news guard) for fully-offline 24/7
+// operation. It is NOT the TypeScript golden engine that produces signals in
+// the web app — small drift between the two ports is possible. For EXACT
+// parity with this system's signals, use the bridge EA instead
+// (SignalFinderBridge.mq5): it executes orders produced by the real analyzer
+// over the /api/mt5/bridge endpoint.
+
 #include <Trade\\Trade.mqh>
 #include <Trade\\PositionInfo.mqh>
 #include <Trade\\AccountInfo.mqh>

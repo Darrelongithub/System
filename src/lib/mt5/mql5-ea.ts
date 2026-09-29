@@ -81,6 +81,11 @@ int OnInit()
       Print("⚠️ [SignalFinderBridge] WebRequest failed (error: ", err, ")");
       Print("👉 Please enable WebRequest in MT5: Tools -> Options -> Expert Advisors -> check 'Allow WebRequest for listed URL' and add '", InpServerUrl, "'");
    }
+   else if(res == 401)
+   {
+      Print("⛔ [SignalFinderBridge] Server rejected the auth token (HTTP 401).");
+      Print("👉 The bridge token rotates when the server restarts. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
+   }
    else
    {
       Print("✅ [SignalFinderBridge] Successfully connected to Web Bridge!");
@@ -152,6 +157,11 @@ void PollBridgeAndExecute()
    {
       string jsonResp = CharArrayToString(resultData, 0, WHOLE_ARRAY, CP_UTF8);
       ProcessBridgeResponse(jsonResp);
+   }
+   else if(res == 401)
+   {
+      Print("⛔ [SignalFinderBridge] Server rejected the auth token (HTTP 401).");
+      Print("👉 The bridge token rotates when the server restarts. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
    }
    else if(InpVerboseLogs && res == -1)
    {

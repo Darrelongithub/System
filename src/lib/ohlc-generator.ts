@@ -3,6 +3,8 @@ import {
   isProviderNoData,
   isProviderRateLimit,
   requestMarketData,
+  type MarketDataJson,
+  type MarketDataRequest,
   type ProviderCandle,
 } from "./market-data";
 import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
@@ -108,6 +110,16 @@ export interface OhlcCsvOptions {
   rateLimitRetries?: number;
   /** User cancellation (Stop button). Aborts in-flight fetches and cooldown waits. */
   signal?: AbortSignal;
+  /**
+   * Candle transport override. Defaults to `requestMarketData` (the browser
+   * path: POST /api/market-data, same-origin proxy). Server-side callers
+   * (the MT5 daemon) inject `fetchTwelveDataCandles` so the exact same
+   * golden-series pipeline runs without the browser round-trip. Either way
+   * the parsing/enrichment/export steps below are identical.
+   */
+  fetchCandles?: (
+    request: MarketDataRequest,
+  ) => Promise<{ response: Response; data: MarketDataJson }>;
 }
 
 /** Hard cap on consecutive 60s rate-limit waits per OHLC fetch. */
@@ -1042,6 +1054,9 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
   } = options;
   try {
     addLog(`\n📋 Fetching OHLC 30M data for ${symbol}...`);
+    // Browser default: the same-origin proxy. Server-side callers (MT5 daemon)
+    // inject the direct provider fetch — same pipeline, no browser round-trip.
+    const fetchCandles = options.fetchCandles ?? requestMarketData;
     const fetchStart = format(subDays(new Date(ohlcStartDate), 1), "yyyy-MM-dd");
     const fetchEnd = format(addDays(new Date(ohlcEndDate), 2), "yyyy-MM-dd");
     const apiSpanDays = daysBetween(fetchStart, fetchEnd);
@@ -1050,7 +1065,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
 
     if (apiSpanDays <= CHUNK_SPAN_DAYS) {
       // Single request covers the whole window — unchanged from the original path.
-      const { response, data } = await requestMarketData({
+      const { response, data } = await fetchCandles({
         symbol,
         interval: "30min",
         start_date: fetchStart + " 00:00:00",
@@ -1117,7 +1132,7 @@ export const buildOhlcCsv = async (options: OhlcCsvOptions): Promise<string | nu
         addLog(`📋 Fetching chunk ${i + 1}/${ranges.length}: ${start} → ${end}...`);
 
         for (;;) {
-          const { response, data } = await requestMarketData({
+          const { response, data } = await fetchCandles({
             symbol,
             interval: "30min",
             start_date: start + " 00:00:00",
