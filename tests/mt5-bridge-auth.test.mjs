@@ -9,10 +9,7 @@ import {
 
 test("bridge-auth: the current engine token is accepted", () => {
   mt5Engine.setCredentials({ apiToken: "sfp-test-token-abc" });
-  assert(
-    verifyBridgeToken(`Bearer ${expectedBridgeToken()}`),
-    "exact current token accepted",
-  );
+  assert(verifyBridgeToken(`Bearer ${expectedBridgeToken()}`), "exact current token accepted");
   assert(verifyBridgeToken("Bearer sfp-test-token-abc"), "literal token accepted");
   assert(
     verifyBridgeToken("  bearer   sfp-test-token-abc  "),
