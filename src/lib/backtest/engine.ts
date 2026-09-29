@@ -172,9 +172,62 @@ export interface StrategyDayBreakdown {
   topFailReasons: { reason: string; count: number }[];
 }
 
+/**
+ * YYYY-MM-DD key of a candle datetime.
+ *
+ * For every calendar day `rangeDays` produces (exactly 10 characters),
+ * `datetime.startsWith(day)` is the same predicate as `dayKeyOf(datetime) === day`.
+ * The backtest day loop used to re-run the startsWith scan once per day; the
+ * index below does it once.
+ */
+export function dayKeyOf(datetime: string): string {
+  return datetime.slice(0, 10);
+}
+
+/**
+ * One-pass partition of rows by `dayKeyOf(datetime)`. Order inside each day
+ * matches the input order, and the buckets hold the same object references.
+ * Callers must not mutate the returned arrays — they are the index.
+ */
+export function indexRowsByDay<T extends { datetime: string }>(
+  rows: readonly T[],
+): Map<string, T[]> {
+  const index = new Map<string, T[]>();
+  for (const row of rows) {
+    const day = dayKeyOf(row.datetime);
+    const bucket = index.get(day);
+    if (bucket) bucket.push(row);
+    else index.set(day, [row]);
+  }
+  return index;
+}
+
+/**
+ * Rows whose datetime falls on `day`.
+ *
+ * A 10-character calendar day is an O(1) index hit (equivalent to
+ * `rows.filter(r => r.datetime.startsWith(day))`). Any other prefix keeps the
+ * historical full scan so a non-canonical lookup cannot silently drop rows.
+ */
+export function rowsOnDay<T extends { datetime: string }>(
+  index: ReadonlyMap<string, T[]>,
+  rows: readonly T[],
+  day: string,
+): T[] {
+  if (day.length === 10) return index.get(day) ?? [];
+  return rows.filter((row) => row.datetime.startsWith(day));
+}
+
 /** Per-strategy view of a single day, built from every evaluated row (PASS + FAIL). */
-export function buildStrategyBreakdown(results: ResultRow[], day: string): StrategyDayBreakdown[] {
-  const dayRows = results.filter((row) => row.datetime.startsWith(day));
+export function buildStrategyBreakdown(
+  results: ResultRow[],
+  day: string,
+  rowsForDay?: readonly ResultRow[],
+): StrategyDayBreakdown[] {
+  // Prefer the caller's already-partitioned day slice. Falling back to a
+  // full-array filter is correct but O(rows) per call — that scan, repeated
+  // once per calendar day, is what made long backtests unresponsive.
+  const dayRows = rowsForDay ?? results.filter((row) => row.datetime.startsWith(day));
 
   const byStrategy = new Map<string, ResultRow[]>();
   for (const row of dayRows) {
@@ -208,7 +261,7 @@ export function buildStrategyBreakdown(results: ResultRow[], day: string): Strat
 }
 
 /** Fold a day's triggers into the rolling per-strategy totals. */
-export function applyTriggers(state: BacktestState, triggers: DayTrigger[]) {
+export function applyTriggers(state: BacktestState, triggers: readonly DayTrigger[]) {
   for (const trigger of triggers) {
     if (trigger.kind === "context" || !isTradeStrategy(trigger.strategyId)) continue;
     const existing =
@@ -286,7 +339,7 @@ export interface DayReportInput {
   checkpoint: string;
   windowStart: string;
   state: BacktestState;
-  triggers: DayTrigger[];
+  triggers: readonly DayTrigger[];
   skipReason?: string | undefined;
   analyzedRows?: number | undefined;
   invalidRows?: number | undefined;

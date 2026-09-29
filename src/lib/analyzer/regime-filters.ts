@@ -34,6 +34,7 @@
  * changing one starts a new hypothesis with a new evaluation window.
  */
 import { dailyAggregates, type DayAggregate } from "./daily";
+import { indexOfDay } from "./day-lookup";
 import { ema } from "./indicators";
 import { eatParts } from "./time";
 import type { AnalysisContext } from "./types";
@@ -225,7 +226,7 @@ export function priorDayPos(ctx: AnalysisContext, i: number, entry: number): num
   const parts = eatParts(candle.datetime);
   if (!parts) return null;
   const daily = dailyAggregatesFor(ctx);
-  const idx = daily.findIndex((d) => d.day === parts.day);
+  const idx = indexOfDay(daily, parts.day);
   if (idx <= 0) return null;
   const prior = daily[idx - 1]!;
   if (!(prior.high > prior.low)) return null;

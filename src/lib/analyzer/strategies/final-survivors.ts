@@ -5,6 +5,7 @@
 import type { AnalysisContext, Outcome, StrategyCheck } from "../types";
 import { eatDay } from "../time";
 import { isConsumed } from "./util";
+import { lastDayBefore } from "../day-lookup";
 
 const FINAL_PARAMS = {
   dualThrustN: 20,
@@ -250,7 +251,7 @@ const pdhRetestSpec: StrategyCheck = {
     const P = FINAL_PARAMS;
     const x = c(ctx, i);
     const day = eatDay(x.datetime);
-    const prior = ctx.daily.filter((d) => d.day < day).at(-1);
+    const prior = lastDayBefore(ctx.daily, day);
     if (!prior || x.close === undefined || x.low === undefined || x.high === undefined)
       return fail("p");
     const atr = atr14(ctx, i - 1);
@@ -478,7 +479,7 @@ const classicPivotSpec: StrategyCheck = {
     const P = FINAL_PARAMS;
     const x = c(ctx, i);
     const day = eatDay(x.datetime);
-    const prior = ctx.daily.filter((d) => d.day < day).at(-1);
+    const prior = lastDayBefore(ctx.daily, day);
     if (!prior || x.close === undefined || x.low === undefined || x.high === undefined)
       return fail("p");
     const pp = (prior.high + prior.low + prior.close) / 3,

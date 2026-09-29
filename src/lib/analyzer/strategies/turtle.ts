@@ -1,4 +1,5 @@
 import type { AnalysisContext, Candle, Outcome } from "../types";
+import { daysBefore, daysBeforeTail } from "../day-lookup";
 import { eatDay } from "../time";
 
 export type TurtleSide = "long" | "short";
@@ -73,7 +74,7 @@ function getState(ctx: AnalysisContext): TurtleState {
 }
 
 function priorDays(ctx: AnalysisContext, day: string): typeof ctx.daily {
-  return ctx.daily.filter((d) => d.day < day);
+  return daysBefore(ctx.daily, day);
 }
 
 const atrNCache = new WeakMap<AnalysisContext, Map<string, number | undefined>>();
@@ -106,12 +107,12 @@ function atrN(ctx: AnalysisContext, day: string): number | undefined {
 }
 
 function dHigh(ctx: AnalysisContext, day: string, n: number): number | undefined {
-  const ds = priorDays(ctx, day).slice(-n);
+  const ds = daysBeforeTail(ctx.daily, day, n);
   return ds.length === n ? Math.max(...ds.map((d) => d.high)) : undefined;
 }
 
 function dLow(ctx: AnalysisContext, day: string, n: number): number | undefined {
-  const ds = priorDays(ctx, day).slice(-n);
+  const ds = daysBeforeTail(ctx.daily, day, n);
   return ds.length === n ? Math.min(...ds.map((d) => d.low)) : undefined;
 }
 

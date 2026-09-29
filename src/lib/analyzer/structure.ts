@@ -78,7 +78,7 @@ export function computeMarketStructure(candles: Candle[], byDatetime: Map<string
   }
 }
 
-interface AggregateBar {
+export interface AggregateBar {
   startMs: number;
   endMs: number;
   open: number;
@@ -112,7 +112,7 @@ function bucketStartMs(ms: number, key: HtfKey): number {
   );
 }
 
-function aggregate30m(candles: Candle[], key: HtfKey): AggregateBar[] {
+export function aggregate30m(candles: Candle[], key: HtfKey): AggregateBar[] {
   const map = new Map<number, AggregateBar>();
   for (const c of candles) {
     if (
@@ -144,56 +144,63 @@ function aggregate30m(candles: Candle[], key: HtfKey): AggregateBar[] {
 }
 
 /**
- * Trend from a prefix of HTF bars (indices 0..count-1), same rules as the
- * former per-asOfMs filter + pivot pass. Pure function of the completed prefix.
- */
-function trendFromCompletedPrefix(bars: AggregateBar[], count: number): Trend {
-  if (count < 7) return "ranging";
-
-  // Lightweight OHLC views — only fields the pivot pass reads.
-  const highsArr = new Array<number>(count);
-  const lowsArr = new Array<number>(count);
-  for (let i = 0; i < count; i++) {
-    highsArr[i] = bars[i]!.high;
-    lowsArr[i] = bars[i]!.low;
-  }
-
-  const k = 2;
-  const pivotHighs: number[] = [];
-  const pivotLows: number[] = [];
-  for (let i = k; i < count - k; i++) {
-    const h = highsArr[i]!;
-    const l = lowsArr[i]!;
-    let isHigh = true;
-    let isLow = true;
-    for (let j = i - k; j <= i + k; j++) {
-      if (j === i) continue;
-      if (highsArr[j]! >= h) isHigh = false;
-      if (lowsArr[j]! <= l) isLow = false;
-      if (!isHigh && !isLow) break;
-    }
-    // confirmedAt = i + k; require confirmedAt < count ⇔ i < count - k
-    // Loop already enforces i < count - k, so every pivot here is confirmed.
-    if (isHigh) pivotHighs.push(h);
-    if (isLow) pivotLows.push(l);
-  }
-
-  const highs = pivotHighs.slice(-5);
-  const lows = pivotLows.slice(-5);
-  return trendFrom({ candles: [], highs, lows, unresolved: [] });
-}
-
-/**
  * Precompute the trend that applies once each HTF bar has fully closed.
  * trends[j] = trend using bars[0..j] inclusive (j+1 completed bars), valid for
  * asOfMs in [bars[j].endMs, bars[j+1].endMs) (or to +∞ after the last bar).
+ *
+ * The pivot window is a fixed ±2 bars, so a pivot at index i is fully decided
+ * by bars[i-2..i+2] and can never change once those bars exist: adding later
+ * bars cannot un-confirm it. The previous implementation rebuilt the entire
+ * prefix pivot list (and two O(count) scratch arrays) for every completed bar,
+ * which is O(bars²) — for a multi-year 30m series that alone was seconds of
+ * main-thread work and the single largest cost of a long backtest. This walks
+ * the bars once, keeping only the confirmed pivots, so the pass is O(bars).
+ *
+ * Per-completion trend output is identical to the prefix scan it replaces:
+ * at completion j the pivot set is { i : i >= 2, i + 2 <= j }, and the trend
+ * reads the last five of each side.
  */
-function precomputeTrendsAtCompletions(bars: AggregateBar[]): { endMs: number; trend: Trend }[] {
+export function precomputeTrendsAtCompletions(
+  bars: AggregateBar[],
+): { endMs: number; trend: Trend }[] {
   const out: { endMs: number; trend: Trend }[] = new Array(bars.length);
+  const k = 2;
+  const pivotHighs: number[] = [];
+  const pivotLows: number[] = [];
+
   for (let j = 0; j < bars.length; j++) {
+    // Exactly one index can newly become a confirmed pivot at this completion:
+    // i = j - k, confirmed because i + k = j (and i - k >= 0 requires i >= k).
+    const i = j - k;
+    if (i >= k) {
+      const h = bars[i]!.high;
+      const l = bars[i]!.low;
+      let isHigh = true;
+      let isLow = true;
+      for (let x = i - k; x <= i + k; x++) {
+        if (x === i) continue;
+        if (bars[x]!.high >= h) isHigh = false;
+        if (bars[x]!.low <= l) isLow = false;
+        if (!isHigh && !isLow) break;
+      }
+      if (isHigh) pivotHighs.push(h);
+      if (isLow) pivotLows.push(l);
+    }
+
+    // Fewer than 7 completed bars never had enough pivots to read a trend —
+    // the old prefix scan short-circuited to "ranging" there, and so does this.
+    const count = j + 1;
     out[j] = {
       endMs: bars[j]!.endMs,
-      trend: trendFromCompletedPrefix(bars, j + 1),
+      trend:
+        count < 7
+          ? "ranging"
+          : trendFrom({
+              candles: [],
+              highs: pivotHighs.slice(-5),
+              lows: pivotLows.slice(-5),
+              unresolved: [],
+            }),
     };
   }
   return out;

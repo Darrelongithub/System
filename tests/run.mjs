@@ -22,6 +22,8 @@ await import("./determinism.test.mjs");
 await import("./causality.test.mjs");
 await import("./weekend-tail-accounting.test.mjs");
 await import("./backtest-analyzer-parity.test.mjs");
+await import("./backtest-day-index.test.mjs");
+await import("./perf-equivalence.test.mjs");
 await import("./server-env.test.mjs");
 await import("./repo-hygiene.test.mjs");
 await import("./analyzer-htf-inert.test.mjs");
