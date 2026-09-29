@@ -49,11 +49,17 @@ export const Route = createFileRoute("/api/mt5")({
           }
 
           if (action === "update_credentials") {
-            mt5Engine.setCredentials(body.credentials || {});
-            return new Response(
-              JSON.stringify({ status: "ok", credentials: mt5Engine.getCredentials() }),
-              { headers: { "Content-Type": "application/json" } },
-            );
+            const incoming =
+              body.credentials && typeof body.credentials === "object"
+                ? { ...body.credentials }
+                : {};
+            // Never accept or echo a broker password. The terminal owns the login.
+            delete incoming.password;
+            mt5Engine.setCredentials(incoming);
+            const { password: _neverReturned, ...credentials } = mt5Engine.getCredentials();
+            return new Response(JSON.stringify({ status: "ok", credentials }), {
+              headers: { "Content-Type": "application/json" },
+            });
           }
 
           if (action === "start_daemon") {

@@ -102,7 +102,12 @@ class MT5TradingEngine {
   }
 
   public setCredentials(creds: Partial<MT5AccountCredentials>) {
-    this.credentials = { ...this.credentials, ...creds };
+    // The broker password is never retained. Login happens inside the MT5
+    // terminal; a payload that still carries `password` (old localStorage, a
+    // direct POST) must not land in memory, logs, or a later sync.
+    const { password: _neverStored, ...rest } = creds;
+    this.credentials = { ...this.credentials, ...rest };
+    delete this.credentials.password;
     this.account.login = this.credentials.login || "50198421";
     this.account.server = this.credentials.server || "MetaQuotes-Demo";
     this.account.lastUpdated = new Date().toISOString();
