@@ -43,7 +43,9 @@ import {
 } from "@/components/ui/command";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
-import { todayEat } from "@/lib/analyzer/time";
+import { addCalendarDays, todayEat } from "@/lib/analyzer/time";
+import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
+import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 
 /**
  * A chart candle: a provider row (`ProviderCandle`, prices as strings) parsed
@@ -86,7 +88,14 @@ export default function Home() {
   // requested window to a series ending one day before the newest bar.
   const [chartStartDate, setChartStartDate] = useState(() => todayEat());
   const [chartEndDate, setChartEndDate] = useState(() => todayEat());
-  const [ohlcStartDate, setOhlcStartDate] = useState(() => todayEat());
+  // The OHLC CSV is the input the live analyzer reads, and the analyzer refuses
+  // any series below the production bar floor (see `pipeline/policy.ts`). A
+  // single-day default used to produce a ~48-row file that was rejected the
+  // moment it reached the analysis page, so the default window is the one the
+  // floor actually requires. Charts stay a separate, user-chosen range.
+  const [ohlcStartDate, setOhlcStartDate] = useState(() =>
+    addCalendarDays(todayEat(), -STANDARD_LOOKBACK_CALENDAR_DAYS),
+  );
   const [ohlcEndDate, setOhlcEndDate] = useState(() => todayEat());
   const [useCustomEndTime, setUseCustomEndTime] = useState(false);
   const [endTime, setEndTime] = useState("11:45");
@@ -178,6 +187,22 @@ export default function Home() {
   /** Single source of truth for the OHLC CSV's name inside the ZIP/snapshot. */
   const ohlcCsvFileName = () =>
     `${symbol.replace("/", "")}_30min_${ohlcStartDate}_to_${ohlcEndDate}.csv`;
+
+  /**
+   * Whether the requested OHLC window can produce a series the analyzer will
+   * accept at all. The analyzer refuses anything under the production bar
+   * floor, and a 30-minute session day is ~48 bars, so a window shorter than
+   * the standard warm-up is guaranteed to be rejected on the analysis page.
+   * Warned here rather than silently shipped as a file that cannot be used.
+   */
+  const ohlcWindowDays = (() => {
+    const start = parseLocalDate(ohlcStartDate).getTime();
+    const end = parseLocalDate(ohlcEndDate).getTime();
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return Number.NaN;
+    return Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  })();
+  const ohlcWindowTooShallow =
+    Number.isFinite(ohlcWindowDays) && ohlcWindowDays < STANDARD_LOOKBACK_CALENDAR_DAYS;
 
   // Generate TradingView-style SVG chart with real API data
   const createSvgContent = (timeframe: string, candleData: ChartCandle[]): string => {
@@ -1239,6 +1264,13 @@ export default function Home() {
                     />
                   </div>
                 </div>
+                {ohlcWindowTooShallow ? (
+                  <p className="font-mono text-[10px] leading-relaxed text-warning">
+                    ⚠ {ohlcWindowDays} day(s) is under the {STANDARD_LOOKBACK_CALENDAR_DAYS}-day
+                    minimum — the analyzer needs {MIN_PRODUCTION_BARS} bars of history and will
+                    reject the CSV.
+                  </p>
+                ) : null}
               </div>
 
               {/* OHLC time range */}

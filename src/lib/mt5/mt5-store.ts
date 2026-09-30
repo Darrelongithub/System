@@ -78,9 +78,15 @@ if (typeof window !== "undefined") {
   try {
     const savedCreds = window.localStorage.getItem(STORAGE_KEY_CREDS);
     if (savedCreds) {
-      const parsed = JSON.parse(savedCreds);
+      const parsed = JSON.parse(savedCreds) as MT5AccountCredentials;
+      const hadPassword = typeof parsed === "object" && parsed !== null && "password" in parsed;
       mt5Engine.setCredentials(parsed);
       state.credentials = mt5Engine.getCredentials();
+      // Migrate any previously stored password out of localStorage. The engine
+      // already drops it; rewrite so the secret does not sit on disk.
+      if (hadPassword) {
+        window.localStorage.setItem(STORAGE_KEY_CREDS, JSON.stringify(state.credentials));
+      }
     }
     const savedConfig = window.localStorage.getItem(STORAGE_KEY_CONFIG);
     if (savedConfig) {

@@ -166,7 +166,6 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
   // Local form state for login
   const [loginForm, setLoginForm] = useState<MT5AccountCredentials>({
     login: mt5.credentials.login || "50198421",
-    password: mt5.credentials.password || "",
     server: mt5.credentials.server || "MetaQuotes-Demo",
     bridgeMode: mt5.credentials.bridgeMode || "simulated",
     isDemo: mt5.credentials.isDemo ?? true,

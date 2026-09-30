@@ -60,6 +60,14 @@ test("mt5: MT5TradingEngine manages credentials, config, and state transitions",
   assertEqual(creds.server, "ICMarketsSC-Live", "Broker server updated");
   assertEqual(creds.bridgeMode, "mql5_ea", "Bridge mode updated");
 
+  mt5Engine.setCredentials({ password: "broker-secret-must-not-stick" });
+  assertEqual(
+    mt5Engine.getCredentials().password,
+    undefined,
+    "broker password is never retained on the engine",
+  );
+  assertEqual(mt5Engine.getCredentials().login, "12345678", "stripping password keeps the login");
+
   mt5Engine.setConfig({
     enabled: true,
     fixedLot: 0.25,

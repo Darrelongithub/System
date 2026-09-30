@@ -1,6 +1,7 @@
 import type { AnalysisContext, Outcome, StrategyCheck } from "../types";
 import { openingRangeFor } from "../daily";
 import { eatDay } from "../time";
+import { daysBeforeTail, lastDayBefore } from "../day-lookup";
 import { turtleRun } from "./turtle";
 import { isConsumed, consume } from "./util";
 import { FINAL_TRADE_STRATEGIES } from "./final-survivors";
@@ -16,8 +17,10 @@ const pass = (
 ): Outcome => ({ result: "PASS", reason, entry, sl, tp, side, orderType });
 const fail = (reason: string): Outcome => ({ result: "FAIL", reason });
 const sma = (xs: number[]) => xs.reduce((a, b) => a + b, 0) / xs.length;
+// Binary search over the day keys: `filter(d => d.day < day).slice(-n)` rebuilt
+// the whole prior-day list (and a fresh array) for every candle.
 const priorDays = (ctx: AnalysisContext, day: string, n: number) =>
-  ctx.daily.filter((d) => d.day < day).slice(-n);
+  daysBeforeTail(ctx.daily, day, n);
 const dHigh = (ds: { high: number }[]) => Math.max(...ds.map((d) => d.high));
 const dLow = (ds: { low: number }[]) => Math.min(...ds.map((d) => d.low));
 const bb = (ctx: AnalysisContext, i: number) => {
@@ -205,7 +208,7 @@ const pdhSpec: StrategyCheck = {
   run(ctx, i) {
     const x = c(ctx, i),
       day = eatDay(x.datetime),
-      p = ctx.daily.filter((d) => d.day < day).at(-1);
+      p = lastDayBefore(ctx.daily, day);
     if (!p || x.close === undefined) return fail("prior day/OHLC unavailable");
     // BUGFIX: previously fired on every bar close stayed beyond the level; now
     // fires once per prior-day level per direction (dedup key = that prior

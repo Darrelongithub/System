@@ -8,32 +8,78 @@ export interface ParseResult {
   totalRows: number;
 }
 
+/**
+ * Split one CSV record into trimmed fields.
+ *
+ * Every row of every analysed file goes through this, and the old version built
+ * each field one character at a time. The overwhelmingly common case is a plain
+ * record with no quoting at all, so that path is a `split` over slices; the
+ * quoted path walks by index and copies the gaps between quotes in one go. Both
+ * produce exactly the same fields (see `tests/csv-round-trip.test.mjs`).
+ */
 function splitCsvLine(line: string): string[] {
+  if (line.indexOf('"') === -1) {
+    const fields = line.split(",");
+    for (let i = 0; i < fields.length; i++) fields[i] = fields[i]!.trim();
+    return fields;
+  }
+
   const out: string[] = [];
   let field = "";
   let quoted = false;
-  for (let i = 0; i < line.length; i++) {
+  let segmentStart = 0;
+  let i = 0;
+  while (i < line.length) {
     const ch = line[i];
     if (quoted) {
       if (ch === '"') {
         if (line[i + 1] === '"') {
-          field += '"';
-          i++;
-        } else quoted = false;
-      } else field += ch;
-    } else if (ch === '"') {
+          field += line.slice(segmentStart, i + 1);
+          i += 2;
+          segmentStart = i;
+          continue;
+        }
+        field += line.slice(segmentStart, i);
+        quoted = false;
+        i += 1;
+        segmentStart = i;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+    if (ch === '"') {
+      field += line.slice(segmentStart, i);
       quoted = true;
-    } else if (ch === ",") {
-      out.push(field);
+      i += 1;
+      segmentStart = i;
+      continue;
+    }
+    if (ch === ",") {
+      field += line.slice(segmentStart, i);
+      out.push(field.trim());
       field = "";
-    } else field += ch;
+      i += 1;
+      segmentStart = i;
+      continue;
+    }
+    i += 1;
   }
-  out.push(field);
-  return out.map((f) => f.trim());
+  field += line.slice(segmentStart);
+  out.push(field.trim());
+  return out;
 }
 
 function num(value: string | undefined): number | undefined {
-  if (value === undefined) return undefined;
+  if (value === undefined || value === "") return undefined;
+  // Fast path: the generator writes plain numerals for most columns, and
+  // `Number` already tolerates surrounding whitespace. Only a value it cannot
+  // read (a trailing "%", a stray unit) pays for the sanitising regex.
+  const direct = Number(value);
+  if (Number.isFinite(direct)) {
+    // A whitespace-only cell must not read as 0.
+    return direct === 0 && value.trim() === "" ? undefined : direct;
+  }
   const cleaned = value.replace(/[%\s]/g, "");
   if (cleaned === "") return undefined;
   const parsed = Number(cleaned);

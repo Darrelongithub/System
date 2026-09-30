@@ -266,7 +266,10 @@ export const removeRepeatedFlatlineArtifacts = <T extends OhlcLike>(
   return { candles: cleaned, removedCount };
 };
 
-const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
+// Exported for `tests/enrich-equivalence.test.mjs`, which re-implements the
+// quadratic scans this used to run and pins that the linear replacements
+// produce the same swing magnitudes, invalidation flags and similar-swing sets.
+export const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
   const RANGE_LOOKBACK = 20;
   const ATR_PERIODS = 14;
   // Swing detection width. This is the real driver of swing coverage: with a
@@ -461,6 +464,27 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
     previousReliableClose = row.close;
   });
 
+  // `swingInvalidated` asks "did any LATER row close past this swing price?",
+  // which the old code answered by copying every row after the swing and
+  // scanning the copy — one full suffix allocation per swing, quadratic in
+  // series length. The question is a suffix extreme, so answer it once for the
+  // whole series. `-Infinity`/`Infinity` sentinels reproduce `some()` on an
+  // empty range (false) at the end of the series.
+  const suffixMaxClose: number[] = new Array(workingRows.length + 1).fill(-Infinity);
+  const suffixMinClose: number[] = new Array(workingRows.length + 1).fill(Infinity);
+  for (let index = workingRows.length - 1; index >= 0; index--) {
+    const close = workingRows[index]!.close;
+    suffixMaxClose[index] = Math.max(suffixMaxClose[index + 1]!, close);
+    suffixMinClose[index] = Math.min(suffixMinClose[index + 1]!, close);
+  }
+
+  // Most recent prior swing of each type. "Nearest prior opposite swing" is
+  // exactly the last one seen so far, so the running pair replaces the old
+  // `[...workingRows.slice(0, index)].reverse().find(...)` — which copied and
+  // reversed the whole prefix for every single swing.
+  let lastHighSwingIndex = -1;
+  let lastLowSwingIndex = -1;
+
   // A swing point is a reliable local high/low with SWING_LOOKBACK (= 3) candles on each side.
   // Its magnitude is measured from the nearest prior opposite swing. Its
   // observed retrace is the largest counter-move during the next 20 candles,
@@ -491,11 +515,10 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
     // isn't one yet, fall back to the opposite extreme of the preceding
     // window so the swing is still comparable instead of being dropped
     // silently (dropped swings were the main source of missing refs).
-    const priorOpposite = [...workingRows.slice(0, index)]
-      .reverse()
-      .find(
-        (item) => item.swingType === (isSwingHigh ? "low" : "high") && item.swingPrice !== null,
-      );
+    if (isSwingHigh) lastHighSwingIndex = index;
+    else lastLowSwingIndex = index;
+    const priorOppositeIndex = isSwingHigh ? lastLowSwingIndex : lastHighSwingIndex;
+    const priorOpposite = priorOppositeIndex >= 0 ? workingRows[priorOppositeIndex] : undefined;
     const fallbackWindow = workingRows.slice(
       Math.max(0, index - SWING_RANGE_FALLBACK_WINDOW),
       index,
@@ -533,15 +556,23 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
 
     // Invalidated: has any later row in the dataset closed past this swing
     // price at all (not limited to the retrace horizon)?
-    const allLaterRows = workingRows.slice(index + 1);
-    row.swingInvalidated = allLaterRows.some((item) =>
-      isSwingHigh ? item.close > swingPrice : item.close < swingPrice,
-    );
+    row.swingInvalidated = isSwingHigh
+      ? suffixMaxClose[index + 1]! > swingPrice
+      : suffixMinClose[index + 1]! < swingPrice;
   }
+
+  // Prior swings that can serve as comparison candidates, bucketed by swing
+  // type. The old code re-filtered the ENTIRE row table for every swing row
+  // (and allocated a second array for the session split, then sorted the whole
+  // candidate list before taking five) — quadratic in series length, and the
+  // single largest cost of a long OHLC export. Only swings can ever be
+  // candidates, so the buckets hold just the swings seen so far, in index
+  // order, which is the order `filter` produced them in.
+  const priorSwingsByType: Record<"high" | "low", EnrichedCandle[]> = { high: [], low: [] };
 
   workingRows.forEach((row) => {
     if (!row.swingType || row.swingRange === null) return;
-    // Guarded above; captured so the sort comparator keeps the narrowing.
+    // Guarded above; captured so the comparator keeps the narrowing.
     const rowSwingRange = row.swingRange;
 
     // Tolerance is symmetric: comparing against the larger of the two
@@ -558,54 +589,66 @@ const enrichOhlcRows = (rows: FilteredCandle[]): EnrichedCandle[] => {
         0.5
       );
     };
-    const baseCandidates = workingRows.filter(
-      (
-        candidate,
-      ): candidate is EnrichedCandle & { swingRange: number; observedRetracePct: number } =>
-        candidate.index < row.index &&
-        candidate.swingType === row.swingType &&
-        candidate.swingRange !== null &&
-        candidate.observedRetracePct !== null &&
-        withinTolerance(candidate),
-    );
+    // Same comparator as the old `sort(...)`, kept as a predicate so the five
+    // best can be selected in one pass instead of sorting the whole pool.
+    const ranksBefore = (left: EnrichedCandle, right: EnrichedCandle): boolean => {
+      const leftDistance = Math.abs(left.swingRange! - rowSwingRange);
+      const rightDistance = Math.abs(right.swingRange! - rowSwingRange);
+      if (leftDistance !== rightDistance) return leftDistance < rightDistance;
+      return left.index > right.index;
+    };
+    /** Insertion of the best five, in rank order — same result as sort+slice. */
+    const keepTop5 = (best: EnrichedCandle[], candidate: EnrichedCandle): void => {
+      if (best.length === 5 && !ranksBefore(candidate, best[4]!)) return;
+      let at = best.length;
+      while (at > 0 && ranksBefore(candidate, best[at - 1]!)) at -= 1;
+      best.splice(at, 0, candidate);
+      if (best.length > 5) best.length = 5;
+    };
+
+    const candidates = priorSwingsByType[row.swingType];
     // Same session is preferred; if the session pool is empty we fall back to
     // any session rather than dropping the row.
-    const sameSession = baseCandidates.filter((candidate) => candidate.session === row.session);
-    const pool = sameSession.length > 0 ? sameSession : baseCandidates;
-    const comparableSwings = pool
-      .sort((left, right) => {
-        const leftDistance = Math.abs(left.swingRange - rowSwingRange);
-        const rightDistance = Math.abs(right.swingRange - rowSwingRange);
-        if (leftDistance !== rightDistance) return leftDistance - rightDistance;
-        return right.index - left.index;
-      })
-      .slice(0, 5);
+    const sameSession: EnrichedCandle[] = [];
+    const anySession: EnrichedCandle[] = [];
+    for (const candidate of candidates) {
+      if (!withinTolerance(candidate)) continue;
+      keepTop5(anySession, candidate);
+      if (candidate.session === row.session) keepTop5(sameSession, candidate);
+    }
+    const pool = sameSession.length > 0 ? sameSession : anySession;
+    const comparableSwings = pool;
 
     // A single qualifying prior swing is enough to populate swing data.
-    if (comparableSwings.length < 1) return;
+    if (comparableSwings.length >= 1) {
+      // Retrace must be computable before refs are published: the two fields
+      // are only ever written together, so `refs` can never be populated with
+      // an empty `retrace_pct` (that mismatch was the coverage bug).
+      const retraceValues = comparableSwings
+        .map((candidate) => Number(candidate.observedRetracePct))
+        .filter((value) => Number.isFinite(value));
+      const retracePct = average(retraceValues);
+      if (retracePct !== null && Number.isFinite(retracePct)) {
+        // Selection is closest in swing size first; if sizes tie, most recent
+        // prior swing wins. This is deliberately explicit for auditability.
+        row.similarSwingRefs = comparableSwings.map((candidate) => candidate.datetimeEAT);
+        row.similarSwingRetracePct = retracePct;
+        const resolvedSwings = comparableSwings.filter(
+          (candidate) => candidate.swingOutcome !== "unresolved",
+        );
+        row.similarSwingContinuedPct =
+          resolvedSwings.length > 0
+            ? (resolvedSwings.filter((c) => c.swingOutcome === "continued").length /
+                resolvedSwings.length) *
+              100
+            : null;
+      }
+    }
 
-    // Retrace must be computable before refs are published: the two fields
-    // are only ever written together, so `refs` can never be populated with
-    // an empty `retrace_pct` (that mismatch was the coverage bug).
-    const retraceValues = comparableSwings
-      .map((candidate) => Number(candidate.observedRetracePct))
-      .filter((value) => Number.isFinite(value));
-    const retracePct = average(retraceValues);
-    if (retracePct === null || !Number.isFinite(retracePct)) return;
-
-    // Selection is closest in swing size first; if sizes tie, most recent
-    // prior swing wins. This is deliberately explicit for auditability.
-    row.similarSwingRefs = comparableSwings.map((candidate) => candidate.datetimeEAT);
-    row.similarSwingRetracePct = retracePct;
-    const resolvedSwings = comparableSwings.filter(
-      (candidate) => candidate.swingOutcome !== "unresolved",
-    );
-    row.similarSwingContinuedPct =
-      resolvedSwings.length > 0
-        ? (resolvedSwings.filter((c) => c.swingOutcome === "continued").length /
-            resolvedSwings.length) *
-          100
-        : null;
+    // Register AFTER comparing, so a row is never its own candidate. The old
+    // `workingRows.filter(candidate => candidate.index < row.index)` made the
+    // same guarantee by construction.
+    priorSwingsByType[row.swingType].push(row);
   });
 
   // Only swing candles can carry swing statistics, so per-row coverage was

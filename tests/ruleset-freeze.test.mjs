@@ -52,17 +52,29 @@ const RULE_FILES = [
  * second test below pins. The two rule *sources* moved, so their hashes are
  * re-recorded here with `logs/v1.9-research-filters.md` as the record.
  *
+ * Re-frozen 2026-09-29 (v1.10: backtest performance). Three superlinear scans in
+ * the engine pass were replaced by indexed lookups — the per-completion prefix
+ * pivot scan in `structure.ts` (O(bars²) → O(bars)), the per-candle
+ * `ctx.daily.filter(...)` prior-day lookups in `final-survivors.ts` and
+ * `regime-filters.ts` (O(candles × days) → binary search), and the walk to the
+ * end of the series in `status.ts#countForwardValid` (→ suffix counts). No
+ * threshold, filter order, predicate or resolution rule was edited: the golden
+ * lock is unchanged (2,286 trades / R 527.6272857378555) and the new
+ * `tests/perf-equivalence.test.mjs` runs the replaced algorithms verbatim next
+ * to the shipped ones. `logs/v1.10-backtest-performance.md` is the record.
+ *
  * These are 16 hex chars of sha256(normalised source). If this test fails, the
  * rules moved: decide, document (`logs/`), then update the value.
  */
 const FROZEN_RULES = {
-  "src/lib/analyzer/regime-filters.ts": "5ec77ddeaf6a7293",
+  "src/lib/analyzer/regime-filters.ts": "e0f91c13e8afde69",
   "src/lib/analyzer/run.ts": "efdcfff62556a542",
-  "src/lib/analyzer/strategies/final-survivors.ts": "2931d36e9a0a29a9",
-  "src/lib/analyzer/structure.ts": "b6ebd6d6d6ac780a",
+  "src/lib/analyzer/strategies/final-survivors.ts": "602dddeefc7c4ba0",
+  "src/lib/analyzer/structure.ts": "83670a1bf9fa24bf",
   // v1.8.2 re-freeze: status.ts gained gap-aware resolution (a bar that opens
   // beyond a tracked level and never trades it fills at that bar's open).
-  "src/lib/analyzer/status.ts": "d96e7accbb5a0c76",
+  // v1.10 re-freeze: status.ts#countForwardValid now uses suffix counts.
+  "src/lib/analyzer/status.ts": "cb6917b5b34ec356",
 };
 
 /** Comments out, whitespace collapsed — formatting must not trip the freeze. */

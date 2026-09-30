@@ -70,13 +70,36 @@ function parseTime(value: string): number | undefined {
   return Number.isFinite(ms) ? ms : undefined;
 }
 
+/**
+ * Valid-candle counts from each index to the end, built once per candle array.
+ *
+ * `countForwardValid` is asked once per PASS row, and the old loop walked every
+ * candle after the trigger to the end of the file — O(rows × candles) work over
+ * a run, which is quadratic in range length and grew into a visible freeze on a
+ * multi-year backtest. The cardinality is identical: suffix[i] counts valid
+ * candles in [i, length).
+ */
+const forwardValidCache = new WeakMap<Candle[], number[]>();
+
+function forwardValidSuffix(candles: Candle[]): number[] {
+  let suffix = forwardValidCache.get(candles);
+  if (!suffix) {
+    suffix = new Array<number>(candles.length + 1).fill(0);
+    for (let i = candles.length - 1; i >= 0; i--) {
+      suffix[i] = suffix[i + 1]! + (candles[i]!.invalid ? 0 : 1);
+    }
+    forwardValidCache.set(candles, suffix);
+  }
+  return suffix;
+}
+
 /** Count valid candles strictly after `fromIndex` — same cardinality as the old filter. */
 function countForwardValid(candles: Candle[], fromIndex: number): number {
-  let n = 0;
-  for (let i = fromIndex + 1; i < candles.length; i++) {
-    if (!candles[i]!.invalid) n++;
-  }
-  return n;
+  const suffix = forwardValidSuffix(candles);
+  const start = fromIndex + 1;
+  if (start <= 0) return suffix[0]!;
+  if (start >= candles.length) return 0;
+  return suffix[start]!;
 }
 
 /**
