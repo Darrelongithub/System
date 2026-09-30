@@ -44,6 +44,7 @@ await import("./generator-weekend-boundary.test.mjs");
 await import("./generator-window-stability.test.mjs");
 await import("./regime-filter-f.test.mjs");
 await import("./research-filters.test.mjs");
+await import("./ohlc-export-gate.test.mjs");
 await import("./mt5-automation.test.mjs");
 await import("./mt5-bridge-auth.test.mjs");
 await import("./mt5-daemon-feed.test.mjs");
