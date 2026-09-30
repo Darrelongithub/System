@@ -20,6 +20,7 @@ import {
   buildDayReport,
   buildStrategyBreakdown,
   batchBacktestReports,
+  dayKeyOf,
   dayReportSkipReason,
   emptyState,
   addUtcDays,
@@ -31,7 +32,8 @@ import {
   type BacktestState,
   type DayTrigger,
 } from "@/lib/backtest/engine";
-import { analyseContinuous, contextLogForDay } from "@/lib/pipeline/continuous";
+import { analyseContinuous } from "@/lib/pipeline/continuous";
+import type { ResultRow } from "@/lib/analyzer/types";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 import { todayEat } from "@/lib/analyzer/time";
@@ -241,12 +243,23 @@ export default function Backtest() {
         for (const line of continuous.contextLog.split("\n").slice(0, 40)) addLog(line);
       }
 
-      // Day-level candle stats derived from the continuous result table (one row per strategy per bar).
+      // One pass over the result table: candle stats AND the day→rows index the
+      // strategy breakdown reads. Re-filtering `results` / triggers / context
+      // once per calendar day was O(days × rows) — about a second on the
+      // 293-day golden window, and quadratic as the range grows — and it ran
+      // on the UI thread, which is what made long backtests unresponsive.
+      const rowsByDay = new Map<string, ResultRow[]>();
       const dayCandleMeta = (() => {
         const map = new Map<string, { analyzed: number; invalid: number; lastDatetime: string }>();
         const seenBars = new Map<string, Set<string>>();
         for (const row of continuous.analysis.results) {
-          const dayKey = row.datetime.slice(0, 10);
+          const dayKey = dayKeyOf(row.datetime);
+          let bucket = rowsByDay.get(dayKey);
+          if (!bucket) {
+            bucket = [];
+            rowsByDay.set(dayKey, bucket);
+          }
+          bucket.push(row);
           let meta = map.get(dayKey);
           if (!meta) {
             meta = { analyzed: 0, invalid: 0, lastDatetime: row.datetime };
@@ -261,7 +274,7 @@ export default function Backtest() {
           }
         }
         for (const inv of continuous.analysis.invalidRowList) {
-          const dayKey = inv.datetime.slice(0, 10);
+          const dayKey = dayKeyOf(inv.datetime);
           let meta = map.get(dayKey);
           if (!meta) {
             meta = { analyzed: 0, invalid: 0, lastDatetime: inv.datetime };
@@ -278,15 +291,19 @@ export default function Backtest() {
           addLog("Run halted by user.");
           break;
         }
+        // Hand the event loop back periodically. The loop is synchronous, so
+        // without this a Stop click (and the progress bar / current-day readout)
+        // is only honoured once the whole range has been replayed. Yielding
+        // changes nothing about the output: no step in this loop reads the
+        // clock, and the day index is already built.
+        if (i > 0 && i % 64 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
 
         const day = days[i]!;
         setCurrentDay(day);
         const windowStart = dataStart;
         const triggers = continuous.tradesOnDay(day);
         const dayContext = continuous.contextOnDay(day);
-        const contextLog = contextLogForDay(continuous.contextEvents, day);
         const meta = dayCandleMeta.get(day);
-        const strategyBreakdown = buildStrategyBreakdown(continuous.analysis.results, day);
 
         // One skip predicate, pinned by tests/weekend-tail-accounting.test.mjs:
         // a Saturday EAT carrying the Friday NY session tail (00:00–01:00 EAT)
@@ -318,6 +335,16 @@ export default function Backtest() {
           collected.push({ day, content: report, triggers: [] });
           continue;
         }
+
+        // Breakdown and the context log are report-only; skipped days don't use
+        // them, so they stay off the skip path. `rowsForDay` is the slice from
+        // the one-pass index — never a fresh filter of the full result table.
+        const contextLog = continuous.contextLogOnDay(day);
+        const strategyBreakdown = buildStrategyBreakdown(
+          continuous.analysis.results,
+          day,
+          rowsByDay.get(day) ?? [],
+        );
 
         // Cumulative stats grow strictly with completed trading days (chronological).
         applyTriggers(working, triggers);

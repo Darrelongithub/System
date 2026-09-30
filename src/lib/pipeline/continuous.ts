@@ -12,7 +12,12 @@ import {
   type ContextEvent,
 } from "@/lib/analyzer/strategy-kind";
 import type { ResultRow } from "@/lib/analyzer/types";
-import type { DayTrigger, TriggerOutcome } from "@/lib/backtest/engine";
+import {
+  indexRowsByDay,
+  rowsOnDay,
+  type DayTrigger,
+  type TriggerOutcome,
+} from "@/lib/backtest/engine";
 
 function outcomeOf(row: ResultRow): TriggerOutcome {
   if (row.outcome) return row.outcome;
@@ -57,8 +62,12 @@ export interface ContinuousAnalysis {
   tradeTriggers: DayTrigger[];
   contextEvents: ContextEvent[];
   contextLog: string;
+  /** O(1) for a YYYY-MM-DD day. Same rows, same order, as a startsWith filter. Do not mutate. */
   tradesOnDay: (day: string) => DayTrigger[];
+  /** O(1) for a YYYY-MM-DD day. Same rows, same order, as a startsWith filter. Do not mutate. */
   contextOnDay: (day: string) => ContextEvent[];
+  /** Context channel for `day`, formatted from the same index as `contextOnDay`. */
+  contextLogOnDay: (day: string) => string;
 }
 
 export interface ContinuousFailure {
@@ -78,6 +87,10 @@ export function analyseContinuous(
 
   const tradeTriggers = outcome.analysis.tradePasses.map(toTrigger);
   const contextEvents = outcome.analysis.contextEvents;
+  // Built once. The backtest day loop asks for every calendar day; filtering
+  // the full arrays on each ask was O(days × rows) and froze the UI thread.
+  const tradesByDay = indexRowsByDay(tradeTriggers);
+  const contextByDay = indexRowsByDay(contextEvents);
 
   return {
     ok: true,
@@ -85,8 +98,9 @@ export function analyseContinuous(
     tradeTriggers,
     contextEvents,
     contextLog: outcome.analysis.contextLog,
-    tradesOnDay: (day) => tradeTriggers.filter((t) => t.datetime.startsWith(day)),
-    contextOnDay: (day) => contextEvents.filter((e) => e.datetime.startsWith(day)),
+    tradesOnDay: (day) => rowsOnDay(tradesByDay, tradeTriggers, day),
+    contextOnDay: (day) => rowsOnDay(contextByDay, contextEvents, day),
+    contextLogOnDay: (day) => formatContextChannel(rowsOnDay(contextByDay, contextEvents, day)),
   };
 }
 
