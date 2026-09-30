@@ -9,6 +9,7 @@
  */
 import { STRATEGIES } from "@/lib/analyzer/strategies";
 import { isTradeStrategy } from "@/lib/analyzer/strategy-kind";
+import { addCalendarDays } from "@/lib/analyzer/time";
 import type { HtfTrendContext, ResultRow } from "@/lib/analyzer/types";
 
 export type TriggerOutcome = "TP" | "SL" | "OPEN" | "NO_FILL";
@@ -94,19 +95,13 @@ export function emptyState(symbol: string): BacktestState {
   };
 }
 
-/** yyyy-MM-dd helpers that never touch local timezone drift. */
-function toDayKey(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}
-
 function dayDate(dayKey: string): Date {
   return new Date(`${dayKey}T00:00:00Z`);
 }
 
+/** Single source of truth: `src/lib/analyzer/time.ts#addCalendarDays`. */
 export function addUtcDays(dayKey: string, days: number): string {
-  const date = dayDate(dayKey);
-  date.setUTCDate(date.getUTCDate() + days);
-  return toDayKey(date);
+  return addCalendarDays(dayKey, days);
 }
 
 export function isWeekend(dayKey: string): boolean {

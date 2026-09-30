@@ -33,6 +33,21 @@ export function eatDay(datetime: string): string {
 }
 
 /**
+ * Calendar-day arithmetic on a `yyyy-mm-dd` key, in pure UTC.
+ *
+ * Deliberately not `new Date(day)` + local `setDate`: on a browser (or server)
+ * whose local zone is not UTC, that pair can land on the previous or next day
+ * around midnight, which silently moves a fetch window by a whole bar.
+ * Every caller here treats the key as a plain calendar date, so adding days to
+ * the UTC midnight of that date is both correct and timezone-proof.
+ */
+export function addCalendarDays(dayKey: string, days: number): string {
+  const date = new Date(`${dayKey}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+/**
  * Today's date in EAT (`yyyy-mm-dd`) at a given instant — the page defaults and
  * stored timestamps must describe the same day the EAT clock shows.
  *

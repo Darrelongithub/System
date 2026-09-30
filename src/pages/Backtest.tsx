@@ -35,6 +35,7 @@ import {
 import { analyseContinuous } from "@/lib/pipeline/continuous";
 import type { ResultRow } from "@/lib/analyzer/types";
 import { formatSeriesContract } from "@/lib/analyzer/series-contract";
+import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 import { todayEat } from "@/lib/analyzer/time";
 
@@ -44,6 +45,24 @@ function inIframe(): boolean {
   } catch {
     return true;
   }
+}
+
+/**
+ * Hand the main thread back to the browser so queued React updates paint and a
+ * pending Stop click is delivered.
+ *
+ * Everything in a backtest run after the data fetch is synchronous CPU work
+ * (engine pass, per-day reports, ZIP). A synchronous block cannot be
+ * interrupted, so without an explicit yield the progress bar, the current-day
+ * readout and the Stop button only come alive once the whole run is over —
+ * which reads as "the app froze". `setTimeout` (a macrotask) is used rather
+ * than a microtask because a microtask drains before the browser can paint or
+ * process input.
+ */
+function yieldToBrowser(): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 0);
+  });
 }
 
 function downloadBlob(blob: Blob, fileName: string) {
@@ -182,6 +201,11 @@ export default function Backtest() {
 
       let continuousCsv: string | null = null;
       let continuousError: string | undefined;
+      // The generator reports its own reason through `log` (provider error,
+      // export-validation failure, empty window…) but signals failure only by
+      // returning null. Keep its failure lines so the toast names the real
+      // cause instead of a generic "no usable OHLC data".
+      const fetchProblems: string[] = [];
       try {
         continuousCsv = await buildOhlcCsv({
           symbol,
@@ -190,11 +214,21 @@ export default function Backtest() {
           specifyTime: false,
           startTime: "00:00",
           endTime: "23:59",
-          log: addLog,
+          log: (message) => {
+            addLog(message);
+            if (message.includes("\u274c") || message.includes("\u26a0")) {
+              fetchProblems.push(message.replace(/^\W+/u, "").trim());
+            }
+          },
           setCooldown: setCooldownSeconds,
           signal: abortController.signal,
         });
-        if (!continuousCsv) continuousError = "no usable OHLC data for continuous window";
+        if (!continuousCsv) {
+          continuousError =
+            fetchProblems.length > 0
+              ? fetchProblems[fetchProblems.length - 1]!
+              : "no usable OHLC data for continuous window";
+        }
       } catch (error) {
         continuousError = `data pull failed: ${String(error)}`;
       }
@@ -214,6 +248,13 @@ export default function Backtest() {
       }
 
       addLog("Running analyseContinuous (single shared analyzer pass)…");
+      // The engine pass is synchronous and can hold the main thread for
+      // seconds on a long range. Nothing repaints (and Stop cannot be
+      // serviced) until it returns, so hand the event loop back FIRST:
+      // the log line and the running state reach the screen before the
+      // block starts.
+      await yieldToBrowser();
+      if (!isCurrent()) return;
       const continuous = analyseContinuous(continuousCsv, { seriesEndsComplete: true });
       if (!isCurrent()) return;
       if (!continuous.ok) {
@@ -231,6 +272,15 @@ export default function Backtest() {
         const message = `Series rejected: ${contract.failures.join("; ")}`;
         addLog(message);
         addLog(formatSeriesContract(contract));
+        // A shallow series is almost always a coverage problem, not a data
+        // problem: say what would fix it instead of only naming the gate.
+        if (contract.bars < MIN_PRODUCTION_BARS) {
+          addLog(
+            `Only ${contract.bars} bar(s) came back for ${dataStart} → ${resolutionEnd} ` +
+              `(the analyzer needs ${MIN_PRODUCTION_BARS}). The provider row cap drops the ` +
+              `oldest rows first, so split the range into smaller windows.`,
+          );
+        }
         toast.error(message);
         return;
       }
@@ -296,7 +346,7 @@ export default function Backtest() {
         // is only honoured once the whole range has been replayed. Yielding
         // changes nothing about the output: no step in this loop reads the
         // clock, and the day index is already built.
-        if (i > 0 && i % 64 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
+        if (i > 0 && i % 64 === 0) await yieldToBrowser();
 
         const day = days[i]!;
         setCurrentDay(day);
