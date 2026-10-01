@@ -1,8 +1,14 @@
 import { Link } from "@tanstack/react-router";
-import { Activity, Database, History } from "lucide-react";
+import { Activity, Database, History, Map as MapIcon } from "lucide-react";
 
 const sections = [
-  { title: "Data Generator", to: "/generator", icon: Database, hint: "Generate market data" },
+  { title: "Data Generator", to: "/generator", icon: Database, hint: "Fetch real market data" },
+  {
+    title: "Map Generator",
+    to: "/map-generator",
+    icon: MapIcon,
+    hint: "Generate seeded synthetic regimes",
+  },
   { title: "Backtester", to: "/backtest", icon: History, hint: "Replay strategy performance" },
   {
     title: "Live Analyser & Auto-Trader",
@@ -27,7 +33,10 @@ export default function Home() {
           </div>
         </header>
 
-        <nav aria-label="Primary application sections" className="grid gap-3 sm:grid-cols-3">
+        <nav
+          aria-label="Primary application sections"
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {sections.map(({ title, to, icon: Icon, hint }) => (
             <Link
               key={to}

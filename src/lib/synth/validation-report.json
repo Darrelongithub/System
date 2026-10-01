@@ -1,0 +1,766 @@
+{
+  "generatedAt": "2026-10-01",
+  "scope": "D1 normal-cell market-statistics check only; no strategy engine calls or strategy results.",
+  "input": {
+    "sourcePath": "XAUUSD_30min_2020-01-24_to_2026-10-01.csv",
+    "rawFileSha256": "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3",
+    "profilePath": "src/lib/synth/profile.json",
+    "profileFileSha256": "0d5cc8402b34b986c7602380116a54c84d804364534f8d855e8f32393993b2de",
+    "profileCanonicalCandlesSha256": "a3b9f2d0bdfa3e578f94189256d191e1b0c45445c25ce206891bb24a471f3229",
+    "profileSourceFiles": [
+      {
+        "path": "XAUUSD_30min_2020-01-24_to_2026-10-01.csv",
+        "sha256": "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3",
+        "bars": 79586,
+        "start": "2020-01-24 05:00:00",
+        "end": "2026-10-01 15:00:00"
+      }
+    ],
+    "sourceMatchesCalibrationProfile": true,
+    "span": {
+      "start": "2020-01-24 05:00:00",
+      "end": "2026-10-01 15:00:00"
+    },
+    "bars": 79586,
+    "requestedArchiveCoveragePresent": true,
+    "coverageWarning": "Observed timestamps reach the registered archive window 2020-01-24 through 2026-10-01; missing dates and intraday gaps remain recorded and were not filled."
+  },
+  "preRegisteredTolerance": "For each statistic, the allowed interval is the wider of the 95% moving-week block-bootstrap CI and real value ±20%; no tolerance was changed.",
+  "bootstrap": {
+    "replicates": 200,
+    "resamplingUnit": "one complete 230-bar modal calendar-week block, sampled with replacement",
+    "sampledBlocksPerReplicate": 24,
+    "seed": 209
+  },
+  "normalCell": {
+    "config": {
+      "scenario": "normal_chop",
+      "pathLengthTradingDays": 120
+    },
+    "seed": 20261001,
+    "candles": 5520,
+    "labels": 5520,
+    "outputJsonSha256": "6969634591b795b5098f2e944ecf5686c00d6f54a53739353de204b402ed23c3",
+    "realMetrics": {
+      "returnKurtosisExcess": 151.18975020472834,
+      "volatilityClusteringLag1": 0.13179070964533884,
+      "meanRangeAtr": 0.9822298820892648,
+      "meanWickShare": 0.5395330808398552,
+      "weekendGapFrequencyPerWeek": 0.9786374133949193,
+      "meanWeekendGapSizeAtr": 0.7138277826206891,
+      "varianceRatio8": 0.9518739269190778,
+      "varianceRatio16": 0.9210570832885787,
+      "hourlyVolatility": [
+        0.25047673560618955,
+        0.3922018819778448,
+        0.3934994530224277,
+        0.4488674022439899,
+        0.6478895540318598,
+        0.45432032406472483,
+        0.387403648052426,
+        0.33503150444609403,
+        0.5003733498227844,
+        0.5615533933547695,
+        0.5938406034063611,
+        0.5842428338703161,
+        0.488914704534358,
+        0.4875680143306707,
+        0.5239667488672254,
+        0.7986733833202797,
+        0.9091614434525219,
+        0.7926277631163884,
+        0.6095201408180982,
+        0.44008497704797167,
+        0.3888359700536489,
+        0.3979881969318673,
+        0.37055494684535195,
+        0.30531922369497605
+      ]
+    },
+    "syntheticMetrics": {
+      "returnKurtosisExcess": 13.09157780110192,
+      "volatilityClusteringLag1": 0.186193996547124,
+      "meanRangeAtr": 0.9850164282108279,
+      "meanWickShare": 0.5046587245812559,
+      "weekendGapFrequencyPerWeek": 0.8333333333333334,
+      "meanWeekendGapSizeAtr": 0.3299321684083142,
+      "varianceRatio8": 0.9448317281885472,
+      "varianceRatio16": 0.9073482362270954,
+      "hourlyVolatility": [
+        0,
+        0.3331841127633877,
+        0.3294040574042922,
+        0.5115437252190593,
+        0.7777663386860438,
+        0.47126526287188686,
+        0.4554108061544731,
+        0.32968117077993225,
+        0.6112395570780418,
+        0.8182052282099541,
+        0.8716389946073391,
+        0.6921968347442202,
+        0.5257856772982276,
+        0.43623432469822193,
+        0.5614956022847714,
+        1.1469619946933336,
+        0.9329333329835579,
+        0.844787941114658,
+        0.6013911237965149,
+        0.33545834666666197,
+        0.34035216580649563,
+        0.351917526028304,
+        0.3517017234409023,
+        0.2624655905159901
+      ]
+    },
+    "comparisons": [
+      {
+        "statistic": "excess return kurtosis",
+        "real": 151.18975020472834,
+        "synthetic": 13.09157780110192,
+        "bootstrap95Ci": [
+          5.585195352223125,
+          23.068612015722138
+        ],
+        "plusMinus20Percent": [
+          120.95180016378268,
+          181.427700245674
+        ],
+        "allowedInterval": [
+          5.585195352223125,
+          181.427700245674
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -91.3409620801844
+      },
+      {
+        "statistic": "absolute-return autocorrelation lag 1",
+        "real": 0.13179070964533884,
+        "synthetic": 0.186193996547124,
+        "bootstrap95Ci": [
+          0.12500149999341895,
+          0.19443449023793702
+        ],
+        "plusMinus20Percent": [
+          0.10543256771627108,
+          0.1581488515744066
+        ],
+        "allowedInterval": [
+          0.10543256771627108,
+          0.19443449023793702
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 41.28006218965625
+      },
+      {
+        "statistic": "mean range / Wilder ATR",
+        "real": 0.9822298820892648,
+        "synthetic": 0.9850164282108279,
+        "bootstrap95Ci": [
+          0.9770935472533999,
+          0.990204903163887
+        ],
+        "plusMinus20Percent": [
+          0.7857839056714118,
+          1.1786758585071178
+        ],
+        "allowedInterval": [
+          0.7857839056714118,
+          1.1786758585071178
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 0.2836959221436015
+      },
+      {
+        "statistic": "combined wick share",
+        "real": 0.5395330808398552,
+        "synthetic": 0.5046587245812559,
+        "bootstrap95Ci": [
+          0.5356315446163491,
+          0.5497974313335539
+        ],
+        "plusMinus20Percent": [
+          0.43162646467188415,
+          0.6474396970078262
+        ],
+        "allowedInterval": [
+          0.43162646467188415,
+          0.6474396970078262
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -6.463803147030885
+      },
+      {
+        "statistic": "weekend gaps per five trading days",
+        "real": 0.9786374133949193,
+        "synthetic": 0.8333333333333334,
+        "bootstrap95Ci": [
+          1,
+          1
+        ],
+        "plusMinus20Percent": [
+          0.7829099307159354,
+          1.1743648960739033
+        ],
+        "allowedInterval": [
+          0.7829099307159354,
+          1.1743648960739033
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -14.84759095378565
+      },
+      {
+        "statistic": "mean absolute weekend open gap / prior ATR",
+        "real": 0.7138277826206891,
+        "synthetic": 0.3299321684083142,
+        "bootstrap95Ci": [
+          0.28620356033878247,
+          0.8545143032001464
+        ],
+        "plusMinus20Percent": [
+          0.5710622260965513,
+          0.8565933391448269
+        ],
+        "allowedInterval": [
+          0.28620356033878247,
+          0.8565933391448269
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -53.77986449378195
+      },
+      {
+        "statistic": "variance ratio q=8 (mean 240-bar windows)",
+        "real": 0.9518739269190778,
+        "synthetic": 0.9448317281885472,
+        "bootstrap95Ci": [
+          0.8316057981775675,
+          0.98916970075785
+        ],
+        "plusMinus20Percent": [
+          0.7614991415352622,
+          1.1422487123028935
+        ],
+        "allowedInterval": [
+          0.7614991415352622,
+          1.1422487123028935
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -0.7398247321810782
+      },
+      {
+        "statistic": "variance ratio q=16 (mean 240-bar windows)",
+        "real": 0.9210570832885787,
+        "synthetic": 0.9073482362270954,
+        "bootstrap95Ci": [
+          0.7734793382815216,
+          0.9779818804724077
+        ],
+        "plusMinus20Percent": [
+          0.7368456666308629,
+          1.1052684999462945
+        ],
+        "allowedInterval": [
+          0.7368456666308629,
+          1.1052684999462945
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -1.4883819157588727
+      }
+    ],
+    "hourlyComparisons": [
+      {
+        "statistic": "EAT 00:00 mean |return| / ATR",
+        "real": 0.25047673560618955,
+        "synthetic": 0,
+        "bootstrap95Ci": [
+          0,
+          0
+        ],
+        "plusMinus20Percent": [
+          0.20038138848495163,
+          0.30057208272742747
+        ],
+        "allowedInterval": [
+          0,
+          0.30057208272742747
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -100
+      },
+      {
+        "statistic": "EAT 01:00 mean |return| / ATR",
+        "real": 0.3922018819778448,
+        "synthetic": 0.3331841127633877,
+        "bootstrap95Ci": [
+          0.25719785622261615,
+          0.3461160656698183
+        ],
+        "plusMinus20Percent": [
+          0.31376150558227583,
+          0.4706422583734137
+        ],
+        "allowedInterval": [
+          0.25719785622261615,
+          0.4706422583734137
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -15.047803676217683
+      },
+      {
+        "statistic": "EAT 02:00 mean |return| / ATR",
+        "real": 0.3934994530224277,
+        "synthetic": 0.3294040574042922,
+        "bootstrap95Ci": [
+          0.24006005411536085,
+          0.30462026568877465
+        ],
+        "plusMinus20Percent": [
+          0.31479956241794216,
+          0.4721993436269133
+        ],
+        "allowedInterval": [
+          0.24006005411536085,
+          0.4721993436269133
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -16.288560282822655
+      },
+      {
+        "statistic": "EAT 03:00 mean |return| / ATR",
+        "real": 0.4488674022439899,
+        "synthetic": 0.5115437252190593,
+        "bootstrap95Ci": [
+          0.37001138691097624,
+          0.4605001287031851
+        ],
+        "plusMinus20Percent": [
+          0.35909392179519195,
+          0.5386408826927879
+        ],
+        "allowedInterval": [
+          0.35909392179519195,
+          0.5386408826927879
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 13.963215564716055
+      },
+      {
+        "statistic": "EAT 04:00 mean |return| / ATR",
+        "real": 0.6478895540318598,
+        "synthetic": 0.7777663386860438,
+        "bootstrap95Ci": [
+          0.5460013920219174,
+          0.6782699618474115
+        ],
+        "plusMinus20Percent": [
+          0.5183116432254878,
+          0.7774674648382317
+        ],
+        "allowedInterval": [
+          0.5183116432254878,
+          0.7774674648382317
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 20.046130369899036
+      },
+      {
+        "statistic": "EAT 05:00 mean |return| / ATR",
+        "real": 0.45432032406472483,
+        "synthetic": 0.47126526287188686,
+        "bootstrap95Ci": [
+          0.3762822260297368,
+          0.4822347870984424
+        ],
+        "plusMinus20Percent": [
+          0.3634562592517799,
+          0.5451843888776698
+        ],
+        "allowedInterval": [
+          0.3634562592517799,
+          0.5451843888776698
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 3.729733826468208
+      },
+      {
+        "statistic": "EAT 06:00 mean |return| / ATR",
+        "real": 0.387403648052426,
+        "synthetic": 0.4554108061544731,
+        "bootstrap95Ci": [
+          0.3382325551197647,
+          0.4220029462482458
+        ],
+        "plusMinus20Percent": [
+          0.3099229184419408,
+          0.4648843776629112
+        ],
+        "allowedInterval": [
+          0.3099229184419408,
+          0.4648843776629112
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 17.554599303319915
+      },
+      {
+        "statistic": "EAT 07:00 mean |return| / ATR",
+        "real": 0.33503150444609403,
+        "synthetic": 0.32968117077993225,
+        "bootstrap95Ci": [
+          0.3048344798693073,
+          0.3743849717733621
+        ],
+        "plusMinus20Percent": [
+          0.2680252035568752,
+          0.40203780533531286
+        ],
+        "allowedInterval": [
+          0.2680252035568752,
+          0.40203780533531286
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -1.5969643436987986
+      },
+      {
+        "statistic": "EAT 08:00 mean |return| / ATR",
+        "real": 0.5003733498227844,
+        "synthetic": 0.6112395570780418,
+        "bootstrap95Ci": [
+          0.4651368398799725,
+          0.5779269689531943
+        ],
+        "plusMinus20Percent": [
+          0.4002986798582275,
+          0.6004480197873412
+        ],
+        "allowedInterval": [
+          0.4002986798582275,
+          0.6004480197873412
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 22.156697053214874
+      },
+      {
+        "statistic": "EAT 09:00 mean |return| / ATR",
+        "real": 0.5615533933547695,
+        "synthetic": 0.8182052282099541,
+        "bootstrap95Ci": [
+          0.5399470928978584,
+          0.686389075236739
+        ],
+        "plusMinus20Percent": [
+          0.4492427146838156,
+          0.6738640720257234
+        ],
+        "allowedInterval": [
+          0.4492427146838156,
+          0.686389075236739
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 45.70390596732466
+      },
+      {
+        "statistic": "EAT 10:00 mean |return| / ATR",
+        "real": 0.5938406034063611,
+        "synthetic": 0.8716389946073391,
+        "bootstrap95Ci": [
+          0.5577421758205919,
+          0.6724160400538931
+        ],
+        "plusMinus20Percent": [
+          0.4750724827250889,
+          0.7126087240876333
+        ],
+        "allowedInterval": [
+          0.4750724827250889,
+          0.7126087240876333
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 46.77995906771676
+      },
+      {
+        "statistic": "EAT 11:00 mean |return| / ATR",
+        "real": 0.5842428338703161,
+        "synthetic": 0.6921968347442202,
+        "bootstrap95Ci": [
+          0.4936790719514561,
+          0.6190556087843205
+        ],
+        "plusMinus20Percent": [
+          0.46739426709625287,
+          0.7010914006443792
+        ],
+        "allowedInterval": [
+          0.46739426709625287,
+          0.7010914006443792
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 18.477590928888763
+      },
+      {
+        "statistic": "EAT 12:00 mean |return| / ATR",
+        "real": 0.488914704534358,
+        "synthetic": 0.5257856772982276,
+        "bootstrap95Ci": [
+          0.4239191589391334,
+          0.5255330261022828
+        ],
+        "plusMinus20Percent": [
+          0.39113176362748636,
+          0.5866976454412296
+        ],
+        "allowedInterval": [
+          0.39113176362748636,
+          0.5866976454412296
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 7.541391662372984
+      },
+      {
+        "statistic": "EAT 13:00 mean |return| / ATR",
+        "real": 0.4875680143306707,
+        "synthetic": 0.43623432469822193,
+        "bootstrap95Ci": [
+          0.4504795179161108,
+          0.5638235219289129
+        ],
+        "plusMinus20Percent": [
+          0.39005441146453657,
+          0.5850816171968048
+        ],
+        "allowedInterval": [
+          0.39005441146453657,
+          0.5850816171968048
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -10.528518714034028
+      },
+      {
+        "statistic": "EAT 14:00 mean |return| / ATR",
+        "real": 0.5239667488672254,
+        "synthetic": 0.5614956022847714,
+        "bootstrap95Ci": [
+          0.4898542459492604,
+          0.6020836294703633
+        ],
+        "plusMinus20Percent": [
+          0.4191733990937803,
+          0.6287600986406705
+        ],
+        "allowedInterval": [
+          0.4191733990937803,
+          0.6287600986406705
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 7.162449429983941
+      },
+      {
+        "statistic": "EAT 15:00 mean |return| / ATR",
+        "real": 0.7986733833202797,
+        "synthetic": 1.1469619946933336,
+        "bootstrap95Ci": [
+          0.8167145586721901,
+          1.1007079585939754
+        ],
+        "plusMinus20Percent": [
+          0.6389387066562238,
+          0.9584080599843356
+        ],
+        "allowedInterval": [
+          0.6389387066562238,
+          1.1007079585939754
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 43.60839094513621
+      },
+      {
+        "statistic": "EAT 16:00 mean |return| / ATR",
+        "real": 0.9091614434525219,
+        "synthetic": 0.9329333329835579,
+        "bootstrap95Ci": [
+          0.820583451404796,
+          1.0397184006602929
+        ],
+        "plusMinus20Percent": [
+          0.7273291547620175,
+          1.0909937321430263
+        ],
+        "allowedInterval": [
+          0.7273291547620175,
+          1.0909937321430263
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 2.6147049792127857
+      },
+      {
+        "statistic": "EAT 17:00 mean |return| / ATR",
+        "real": 0.7926277631163884,
+        "synthetic": 0.844787941114658,
+        "bootstrap95Ci": [
+          0.6923163888968025,
+          0.8935520527292778
+        ],
+        "plusMinus20Percent": [
+          0.6341022104931107,
+          0.9511533157396661
+        ],
+        "allowedInterval": [
+          0.6341022104931107,
+          0.9511533157396661
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 6.580665026568157
+      },
+      {
+        "statistic": "EAT 18:00 mean |return| / ATR",
+        "real": 0.6095201408180982,
+        "synthetic": 0.6013911237965149,
+        "bootstrap95Ci": [
+          0.4741718625148159,
+          0.5970264687951453
+        ],
+        "plusMinus20Percent": [
+          0.4876161126544786,
+          0.7314241689817179
+        ],
+        "allowedInterval": [
+          0.4741718625148159,
+          0.7314241689817179
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -1.3336748824530287
+      },
+      {
+        "statistic": "EAT 19:00 mean |return| / ATR",
+        "real": 0.44008497704797167,
+        "synthetic": 0.33545834666666197,
+        "bootstrap95Ci": [
+          0.3534463010794474,
+          0.4329109276631274
+        ],
+        "plusMinus20Percent": [
+          0.3520679816383773,
+          0.528101972457566
+        ],
+        "allowedInterval": [
+          0.3520679816383773,
+          0.528101972457566
+        ],
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": -23.774188131376462
+      },
+      {
+        "statistic": "EAT 20:00 mean |return| / ATR",
+        "real": 0.3888359700536489,
+        "synthetic": 0.34035216580649563,
+        "bootstrap95Ci": [
+          0.33125004872542646,
+          0.4231933866999603
+        ],
+        "plusMinus20Percent": [
+          0.3110687760429191,
+          0.4666031640643787
+        ],
+        "allowedInterval": [
+          0.3110687760429191,
+          0.4666031640643787
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -12.468960688092668
+      },
+      {
+        "statistic": "EAT 21:00 mean |return| / ATR",
+        "real": 0.3979881969318673,
+        "synthetic": 0.351917526028304,
+        "bootstrap95Ci": [
+          0.33479894957650724,
+          0.47156770471223014
+        ],
+        "plusMinus20Percent": [
+          0.31839055754549384,
+          0.4775858363182408
+        ],
+        "allowedInterval": [
+          0.31839055754549384,
+          0.4775858363182408
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -11.575888747135453
+      },
+      {
+        "statistic": "EAT 22:00 mean |return| / ATR",
+        "real": 0.37055494684535195,
+        "synthetic": 0.3517017234409023,
+        "bootstrap95Ci": [
+          0.308000781107096,
+          0.40371171787183646
+        ],
+        "plusMinus20Percent": [
+          0.29644395747628155,
+          0.44466593621442235
+        ],
+        "allowedInterval": [
+          0.29644395747628155,
+          0.44466593621442235
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -5.087834763765253
+      },
+      {
+        "statistic": "EAT 23:00 mean |return| / ATR",
+        "real": 0.30531922369497605,
+        "synthetic": 0.2624655905159901,
+        "bootstrap95Ci": [
+          0.2296758590310332,
+          0.2908135114003941
+        ],
+        "plusMinus20Percent": [
+          0.24425537895598085,
+          0.3663830684339713
+        ],
+        "allowedInterval": [
+          0.2296758590310332,
+          0.3663830684339713
+        ],
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -14.035681297879274
+      }
+    ],
+    "availableSampleMetricChecksPass": false
+  },
+  "gates": {
+    "D1": {
+      "result": "FAIL",
+      "fullPeriodCoverage": "PASS",
+      "sourceProfileMatch": "PASS",
+      "availableSampleMetrics": "FAIL",
+      "reason": "one or more available-sample realism measures exceed the registered interval"
+    },
+    "D2": {
+      "result": "NOT RUN",
+      "reason": "stopped at D1 per the fixed gate rule"
+    },
+    "D3": {
+      "result": "NOT RUN",
+      "reason": "stopped at D1; no engine behaviour results were computed"
+    },
+    "D4": {
+      "result": "NOT RUN",
+      "reason": "stopped at D1"
+    },
+    "D5": {
+      "result": "TESTED IN UNIT SUITE",
+      "outputJsonSha256": "6969634591b795b5098f2e944ecf5686c00d6f54a53739353de204b402ed23c3",
+      "profileFileSha256": "0d5cc8402b34b986c7602380116a54c84d804364534f8d855e8f32393993b2de"
+    },
+    "D6": {
+      "result": "TESTED IN UNIT SUITE",
+      "testFile": "tests/synth.test.mjs"
+    },
+    "D7": {
+      "result": "NOT RUN",
+      "reason": "stopped at D1; no 200-seed scenario checks were started"
+    }
+  },
+  "stopAfter": "D1",
+  "strategyResultsComputed": false
+}
