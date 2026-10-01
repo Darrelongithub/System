@@ -47,6 +47,7 @@ await import("./research-filters.test.mjs");
 await import("./mt5-automation.test.mjs");
 await import("./mt5-bridge-auth.test.mjs");
 await import("./mt5-daemon-feed.test.mjs");
+await import("./synth.test.mjs");
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AnalysisRouteImport } from './routes/analysis'
 import { Route as BacktestRouteImport } from './routes/backtest'
 import { Route as GeneratorRouteImport } from './routes/generator'
+import { Route as MapGeneratorRouteImport } from './routes/map-generator'
 import { Route as AnalysisIndexRouteImport } from './routes/analysis.index'
 import { Route as ApiMarketDataRouteImport } from './routes/api/market-data'
 import { Route as ApiMt5RouteImport } from './routes/api/mt5'
@@ -38,6 +39,11 @@ const BacktestRoute = BacktestRouteImport.update({
 const GeneratorRoute = GeneratorRouteImport.update({
   id: '/generator',
   path: '/generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapGeneratorRoute = MapGeneratorRouteImport.update({
+  id: '/map-generator',
+  path: '/map-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AnalysisIndexRoute = AnalysisIndexRouteImport.update({
@@ -76,6 +82,7 @@ export interface FileRoutesByFullPath {
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
+  '/map-generator': typeof MapGeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
@@ -87,6 +94,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
+  '/map-generator': typeof MapGeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis': typeof AnalysisIndexRoute
@@ -100,6 +108,7 @@ export interface FileRoutesById {
   '/analysis': typeof AnalysisRouteWithChildren
   '/backtest': typeof BacktestRoute
   '/generator': typeof GeneratorRoute
+  '/map-generator': typeof MapGeneratorRoute
   '/api/market-data': typeof ApiMarketDataRouteWithChildren
   '/api/mt5': typeof ApiMt5RouteWithChildren
   '/analysis/': typeof AnalysisIndexRoute
@@ -114,6 +123,7 @@ export interface FileRouteTypes {
     | '/analysis'
     | '/backtest'
     | '/generator'
+    | '/map-generator'
     | '/api/market-data'
     | '/api/mt5'
     | '/analysis/'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
     | '/'
     | '/backtest'
     | '/generator'
+    | '/map-generator'
     | '/api/market-data'
     | '/api/mt5'
     | '/analysis'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '/analysis'
     | '/backtest'
     | '/generator'
+    | '/map-generator'
     | '/api/market-data'
     | '/api/mt5'
     | '/analysis/'
@@ -150,6 +162,7 @@ export interface RootRouteChildren {
   AnalysisRoute: typeof AnalysisRouteWithChildren
   BacktestRoute: typeof BacktestRoute
   GeneratorRoute: typeof GeneratorRoute
+  MapGeneratorRoute: typeof MapGeneratorRoute
   ApiMarketDataRoute: typeof ApiMarketDataRouteWithChildren
   ApiMt5Route: typeof ApiMt5RouteWithChildren
 }
@@ -182,6 +195,13 @@ declare module '@tanstack/react-router' {
       path: '/generator'
       fullPath: '/generator'
       preLoaderRoute: typeof GeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map-generator': {
+      id: '/map-generator'
+      path: '/map-generator'
+      fullPath: '/map-generator'
+      preLoaderRoute: typeof MapGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/analysis/': {
@@ -271,6 +291,7 @@ const rootRouteChildren: RootRouteChildren = {
   AnalysisRoute: AnalysisRouteWithChildren,
   BacktestRoute: BacktestRoute,
   GeneratorRoute: GeneratorRoute,
+  MapGeneratorRoute: MapGeneratorRoute,
   ApiMarketDataRoute: ApiMarketDataRouteWithChildren,
   ApiMt5Route: ApiMt5RouteWithChildren,
 }
