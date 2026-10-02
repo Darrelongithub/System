@@ -8,7 +8,9 @@ The bundled profile now uses the archive `XAUUSD_30min_2020-01-24_to_2026-10-01.
 
 The archive contains 79,586 valid OHLC bars from **2020-01-24 05:00:00 to 2026-10-01 15:00:00**. Parsing found no invalid OHLC, duplicate timestamps, non-increasing pairs, or file seams. It does contain missing calendar dates and long timestamp intervals; these are reported, not filled. See [`REPORT.md`](./REPORT.md) for the gap, timezone, ATR, and schedule findings.
 
-**D1 failed.** The registered archive-coverage and profile-source-hash checks passed, but only **26 of 32** market-statistic checks were within their fixed intervals. EAT hourly cells 04:00, 08:00, 09:00, 10:00, 15:00, and 19:00 failed. No threshold was loosened. D2–D4 and D7 were not run; no strategy results, engine comparisons, or scenario-seed grids were computed. The generator is not realism-certified by this D1 result.
+**D1 failed after the third and final authorized repair attempt.** Archive coverage and source/profile identity passed, but only **28 of 32** market-statistic checks were within their fixed intervals. The four remaining misses are EAT hours 05:00, 16:00, 17:00, and 19:00. No threshold was loosened. D2–D7 were not run as sequential gates, and Phase 4 was not started; no strategy results, engine comparisons, or scenario-seed grids were computed. The generator is not realism-certified. See [`REPORT.md`](./REPORT.md) for the DST diagnosis, three repair attempts, prior D1 results, assumptions, and hashes.
+
+The profile uses IANA `Europe/London` / `America/New_York` local clocks, full-source conditional scheduled-return pools, and a weekday-DST-share-matched default 120-day start. Attempt 3 replaced hard nearest-20% donor selection with full-library trend-distance weighting without replacement and calibrated scheduled-event rates per local window. D1 still failed, so no further tuning was performed.
 
 ## Product mode
 
@@ -34,7 +36,7 @@ const csv = toCsv(path.candles);
 
 `generateSynthetic(config, seed)` uses the static `DEFAULT_PROFILE`; an optional third `CalibrationProfile` argument supplies another profile without file I/O. Results contain `{ candles, labels, meta }`. Labels include regime IDs, active numeric dial values, event/gap flags, and `EXTRAPOLATION` flags. Identical config, seed, and profile produce byte-identical output.
 
-`calibrate(realCandles)` validates caller order and OHLC geometry without sorting, deduplicating, filling, or repairing. It recomputes Wilder ATR(14) from OHLC and ignores any supplied `atr_30m` column. Descriptive statistics use all 79,586 valid source candles. The compact embedded donor library contains 104 complete weeks matching the primary observed week template (23,920 standardized bars); weeks with unclassified closures or incompatible slot patterns are not donor blocks.
+`calibrate(realCandles)` validates caller order and OHLC geometry without sorting, deduplicating, filling, or repairing. It recomputes Wilder ATR(14) from OHLC and ignores any supplied `atr_30m` column. Descriptive statistics use all 79,586 valid source candles. Intraday summaries carry a selected IANA local activity clock (New York 08:00–16:00 first, then London 08:00–13:00, otherwise EAT); source/output row timestamps remain EAT. The compact embedded donor library contains 104 complete weeks matching the primary observed week template (23,920 standardized bars); weeks with unclassified closures or incompatible slot patterns are not donor blocks.
 
 ## Calendar and gap interpretation
 
@@ -47,9 +49,9 @@ const csv = toCsv(path.candles);
 
 1. **Calendar-preserving weekly bootstrap.** Compatible empirical blocks preserve the primary profile's EAT weekday/half-hour slots, return clustering, wick shares, candle range, and ordinary open gaps. Sunday remains closed. The current primary template is Monday–Friday only.
 2. **Volatility.** `low / normal / high` use observed Wilder ATR(14)/close p10 / p50 / p90. A calibrated mean true-range/Wilder-ATR normalizer scales selected donor bars. `stable`, `expanding`, and `contracting` control the path shape; price level remains a separate USD/oz anchor.
-3. **Trendiness.** `mean-reverting`, `random`, and `trending` target observed p10/p50/p90 summaries of rolling 240-bar variance-ratio-8, variance-ratio-16, and lag-1 return-autocorrelation. The generator selects among nearby empirical weeks in joint metric space; it does not add an AR overlay or tune against strategies.
+3. **Trendiness.** `mean-reverting`, `random`, and `trending` target observed p10/p50/p90 summaries of rolling 240-bar variance-ratio-8, variance-ratio-16, and lag-1 return-autocorrelation. The generator soft-weights all empirical weeks by a Laplace kernel over joint metric distance (each metric normalized by its observed p90–p10 span) and samples a weighted permutation without replacement per target. It does not add an AR overlay or tune against strategies.
 4. **Drift.** `down / flat / up` map to observed p10/p50/p90 of rolling 60-calendar-day log return. `flat` means the observed median, not necessarily zero. Numeric values use that same 60-day log-return unit. Values outside the observed min/max are marked `EXTRAPOLATION`.
-5. **Gaps and news.** Normal gaps use donor bars and the observed calendar. Heavy gaps add top-quartile real intraday open-gap samples at the profile's p90 weekly rate. Scheduled-news candidate slots exceed the median slot mean absolute return/ATR by a fixed 25%. Unscheduled shocks come from observed moves above 4 prior Wilder ATR.
+5. **Gaps and news.** Normal gaps use donor bars and the observed calendar. Heavy gaps add top-quartile real intraday open-gap samples at the profile's p90 weekly rate. Scheduled-spike candidates are local-clock slots exceeding the median slot mean absolute return/ATR by a fixed 25%; the event flag uses each window's full-source empirical rate, scaled by the existing light/normal/heavy aggregate rate for non-normal modes, and the signed event or non-event return is drawn from that window's full-source conditional pool. These are statistical windows, not a verified news calendar. Unscheduled shocks come from observed moves above 4 prior Wilder ATR.
 6. **Follow-through and regimes.** Mixed shock follow-through uses the empirical tail-bar continuation share. Sequence presets use seeded 20–60 trading-day windows (the short reversal segment is capped at 30 days) and 48–200-bar transitions. These are scenario definitions, not inferred real-regime labels.
 7. **Determinism and exports.** A local 32-bit seeded PRNG is used; wall-clock time, network calls, and ambient randomness are not used. CSV values retain round-trip-safe JavaScript precision. Synthetic CSV timestamps are unzoned EAT wall-clock text and omit `atr_30m`, allowing the analyzer's Wilder fallback if a separate caller later chooses to analyze them.
 
@@ -60,7 +62,7 @@ const csv = toCsv(path.candles);
 | Volatility           | Wilder ATR(14)/close p10 / p50 / p90; `p5` is the observed p5. Numeric values use ATR/price.                           |
 | Volatility shape     | Stable at target; expanding/contracting blend toward observed p10/p90 endpoints.                                       |
 | Drift                | Rolling 60-calendar-day log-return p10 / p50 / p90; `flat` is p50. Numeric values use the same units.                  |
-| Trendiness           | Nearest empirical weekly block to joint VR(8), VR(16), and lag-1 autocorrelation targets.                              |
+| Trendiness           | Full-library weighted weekly blocks using joint VR(8), VR(16), and lag-1 autocorrelation distance.                     |
 | Gaps                 | Normal uses empirical block/calendar gaps; heavy adds top-quartile intraday gaps at the data-derived weekly frequency. |
 | News                 | Observed scheduled-slot and >4-ATR tail rates; light/normal/heavy use empirical p10 / observed / p90 rates.            |
 | Shock follow-through | `continue`, `revert`, or `mixed`; mixed uses observed post-tail direction proportions.                                 |
@@ -92,4 +94,4 @@ node --experimental-strip-types --import ./tests/register.mjs scripts/synth-cali
 node --experimental-strip-types --import ./tests/register.mjs scripts/synth-validate.ts /tmp/XAUUSD_30min_2020-01-24_to_2026-10-01.csv
 ```
 
-Calibration does not fetch data. `synth-validate.ts` stops at D1; if a gate fails, do not start D2–D4, D7, an engine comparison, or a scenario-seed grid. The raw archive is not included in this branch.
+Calibration does not fetch data. `synth-validate.ts` runs D1 and records the stop status. If any sequential gate fails, do not start later gates, an engine comparison, or a scenario-seed grid. The current attempt-2 D1 failed, so all later sequential gates and Phase 4 are not run. The raw archive is not included in this branch.

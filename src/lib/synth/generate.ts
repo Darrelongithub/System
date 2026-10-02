@@ -1,12 +1,23 @@
 import { DEFAULT_PROFILE } from "./profile-default";
 import { SeededRandom } from "./random";
-import { addCalendarDays, formatEatDatetime, parseEatDatetime, weekdayOfDate } from "./math";
+import {
+  addCalendarDays,
+  exchangeClockParts,
+  formatEatDatetime,
+  intradayClockSlot,
+  LONDON_TIME_ZONE,
+  parseEatDatetime,
+  NEW_YORK_TIME_ZONE,
+  weekdayOfDate,
+} from "./math";
 import { SCENARIOS } from "./scenarios";
 import type {
   ActiveDialValues,
   CalibrationProfile,
   Candle,
   EventFlag,
+  IntradayClock,
+  IntradayClockSlot,
   RegimeLabel,
   ResampleBlock,
   ScenarioName,
@@ -69,6 +80,7 @@ interface CalendarSlot {
   tradingDayIndex: number;
   calendarGapBefore: boolean;
   calendarGapKind: "none" | "weekend" | "scheduled-session-break" | "unclassified-closure";
+  activityClock: IntradayClockSlot;
 }
 
 interface DonorWeek {
@@ -199,6 +211,28 @@ function makeTimestamp(date: string, minuteOfDay: number): { datetime: string; e
   return { datetime: formatEatDatetime(epochMs), epochMs };
 }
 
+function makeCalendarSlot(
+  date: string,
+  minuteOfDay: number,
+  tradingDayIndex: number,
+): CalendarSlot {
+  const timestamp = makeTimestamp(date, minuteOfDay);
+  const weekday = weekdayOfDate(date);
+  const london = exchangeClockParts(timestamp.epochMs, LONDON_TIME_ZONE);
+  const newYork = exchangeClockParts(timestamp.epochMs, NEW_YORK_TIME_ZONE);
+  return {
+    ...timestamp,
+    date,
+    weekday,
+    minuteOfDay,
+    weekId: weekIdFor(date),
+    tradingDayIndex,
+    calendarGapBefore: false,
+    calendarGapKind: "none",
+    activityClock: intradayClockSlot(weekday, minuteOfDay, london, newYork),
+  };
+}
+
 function calendarGapKey(
   previousWeekday: number,
   previousMinuteOfDay: number,
@@ -270,17 +304,7 @@ function buildCalendar(
         const dayIndex = activeTradingDays;
         const daySlots = slotsByWeekday.get(weekday) ?? defaultSlotsForWeekday(weekday);
         for (const minuteOfDay of daySlots) {
-          const timestamp = makeTimestamp(currentDate, minuteOfDay);
-          slots.push({
-            ...timestamp,
-            date: currentDate,
-            weekday,
-            minuteOfDay,
-            weekId: weekIdFor(currentDate),
-            tradingDayIndex: dayIndex,
-            calendarGapBefore: false,
-            calendarGapKind: "none",
-          });
+          slots.push(makeCalendarSlot(currentDate, minuteOfDay, dayIndex));
         }
         activeTradingDays++;
         lastOpenTradingDay = dayIndex;
@@ -290,17 +314,7 @@ function buildCalendar(
     } else if (weekday === 6 && previousWasOpenFriday && !isClosed && lastOpenTradingDay >= 0) {
       const daySlots = slotsByWeekday.get(weekday) ?? defaultSlotsForWeekday(weekday);
       for (const minuteOfDay of daySlots) {
-        const timestamp = makeTimestamp(currentDate, minuteOfDay);
-        slots.push({
-          ...timestamp,
-          date: currentDate,
-          weekday,
-          minuteOfDay,
-          weekId: weekIdFor(currentDate),
-          tradingDayIndex: lastOpenTradingDay,
-          calendarGapBefore: false,
-          calendarGapKind: "none",
-        });
+        slots.push(makeCalendarSlot(currentDate, minuteOfDay, lastOpenTradingDay));
       }
       previousWasOpenFriday = false;
       if (completedOnFriday) break;
@@ -345,12 +359,43 @@ function buildCalendar(
   return { slots, sampledClosures };
 }
 
+function slotKey(clock: IntradayClock, weekday: number, minuteOfDay: number): string {
+  return `${clock}:${weekday}:${minuteOfDay}`;
+}
+
+function standardizedBarClockSlot(bar: StandardizedBar, clock: IntradayClock): IntradayClockSlot {
+  if (clock === LONDON_TIME_ZONE) {
+    return {
+      clock,
+      weekday: bar.londonWeekday,
+      minuteOfDay: bar.londonMinuteOfDay,
+    };
+  }
+  if (clock === NEW_YORK_TIME_ZONE) {
+    return {
+      clock,
+      weekday: bar.newYorkWeekday,
+      minuteOfDay: bar.newYorkMinuteOfDay,
+    };
+  }
+  return { clock: "EAT", weekday: bar.weekday, minuteOfDay: bar.minuteOfDay };
+}
+
 function completeWeekDonors(profile: CalibrationProfile): DonorWeek[] {
   const standardBars = profile.resampling.standardBars;
   return profile.resampling.completeWeeks.map((block) => {
     const bars = standardBars.slice(block.startBar, block.endBarExclusive);
     const barsBySlot = new Map<string, StandardizedBar>();
-    for (const bar of bars) barsBySlot.set(`${bar.weekday}:${bar.minuteOfDay}`, bar);
+    for (const bar of bars) {
+      for (const clock of ["EAT", LONDON_TIME_ZONE, NEW_YORK_TIME_ZONE] as const) {
+        const localSlot = standardizedBarClockSlot(bar, clock);
+        const key = slotKey(clock, localSlot.weekday, localSlot.minuteOfDay);
+        if (barsBySlot.has(key)) {
+          throw new Error(`profile week ${block.weekId} has duplicate ${key} donor slots`);
+        }
+        barsBySlot.set(key, bar);
+      }
+    }
     return { block, barsBySlot, bars };
   });
 }
@@ -360,6 +405,7 @@ function selectDonorWeek(
   profile: CalibrationProfile,
   target: ResolvedDials,
   random: SeededRandom,
+  donorQueues: Map<string, DonorWeek[]>,
 ): DonorWeek {
   if (donors.length === 0)
     throw new Error("profile has no complete, standard calendar weeks to resample");
@@ -387,8 +433,33 @@ function selectDonorWeek(
     .sort(
       (a, b) => a.distance - b.distance || a.donor.block.weekId.localeCompare(b.donor.block.weekId),
     );
-  const candidateCount = Math.max(1, Math.min(ranked.length, Math.ceil(ranked.length * 0.2)));
-  return random.pick(ranked.slice(0, candidateCount).map((entry) => entry.donor));
+  const targetKey = [
+    target.trendiness,
+    target.targetVarianceRatio8,
+    target.targetVarianceRatio16,
+    target.targetLag1Autocorrelation,
+  ].join(":");
+  let queue = donorQueues.get(targetKey);
+  if (!queue || queue.length === 0) {
+    // A soft Laplace kernel over the full donor library avoids the hourly
+    // selection bias from a hard nearest-20% cutoff. Exponential-race keys
+    // produce a weighted permutation without replacement for each target.
+    queue = ranked
+      .map((entry) => {
+        const weight = Math.max(Number.MIN_VALUE, Math.exp(-entry.distance));
+        const uniform = Math.max(Number.EPSILON, random.next());
+        return {
+          donor: entry.donor,
+          key: -Math.log(uniform) / weight,
+        };
+      })
+      .sort((a, b) => a.key - b.key || a.donor.block.weekId.localeCompare(b.donor.block.weekId))
+      .map((entry) => entry.donor);
+    donorQueues.set(targetKey, queue);
+  }
+  const donor = queue.shift();
+  if (!donor) throw new Error("trend-weighted donor queue is unexpectedly empty");
+  return donor;
 }
 
 function setDialsForWindow(
@@ -741,22 +812,29 @@ function chooseTailSample(profile: CalibrationProfile, random: SeededRandom, hea
   return random.pick(candidates);
 }
 
+function scheduledEventProbability(
+  profile: CalibrationProfile,
+  window: CalibrationProfile["sample"]["scheduledSpikeWindows"][number],
+  newsKey: "light" | "normal" | "heavy",
+): number {
+  const rates = profile.sample.newsIntensity.scheduledEventRatePerEligibleBar;
+  if (rates.normal <= 0) return 0;
+  return Math.min(1, window.eventProbability * (rates[newsKey] / rates.normal));
+}
+
 function chooseScheduledSample(
   profile: CalibrationProfile,
+  clock: IntradayClock,
   minuteOfDay: number,
   random: SeededRandom,
-) {
-  const sourceBars = profile.resampling.standardBars.filter(
-    (bar) =>
-      bar.minuteOfDay === minuteOfDay &&
-      Math.abs(bar.closeReturnAtr) > profile.sample.scheduledSpikeThresholdAbsReturnAtr,
+  event: boolean,
+): number | undefined {
+  const window = profile.sample.scheduledSpikeWindows.find(
+    (candidate) => candidate.clock === clock && candidate.minuteOfDay === minuteOfDay,
   );
-  const fallbackBars = profile.resampling.standardBars.filter(
-    (bar) => bar.minuteOfDay === minuteOfDay,
-  );
-  const candidates = sourceBars.length ? sourceBars : fallbackBars;
-  if (candidates.length === 0) return undefined;
-  return random.pick(candidates).closeReturnAtr;
+  if (!window) return undefined;
+  const candidates = event ? window.eventReturnAtrSamples : window.nonEventReturnAtrSamples;
+  return candidates.length > 0 ? random.pick(candidates) : undefined;
 }
 
 function chooseHorizon(
@@ -856,6 +934,7 @@ export function generateSynthetic(
     );
   const donors = completeWeekDonors(profile);
   const donorByWeek = new Map<string, DonorWeek>();
+  const donorQueues = new Map<string, DonorWeek[]>();
   const candles: Candle[] = [];
   const labels: RegimeLabel[] = [];
   const wobbleState: WobbleState = {
@@ -899,17 +978,19 @@ export function generateSynthetic(
 
     let donor = donorByWeek.get(slot.weekId);
     if (!donor) {
-      donor = selectDonorWeek(donors, profile, resolved, random);
+      donor = selectDonorWeek(donors, profile, resolved, random, donorQueues);
       donorByWeek.set(slot.weekId, donor);
       if (priorDonorWeek !== donor) {
         currentDonorMeanReturnAtr = donor.block.meanCloseReturnAtr;
         priorDonorWeek = donor;
       }
     }
-    const donorBar = donor.barsBySlot.get(`${slot.weekday}:${slot.minuteOfDay}`);
+    const donorBar = donor.barsBySlot.get(
+      slotKey(slot.activityClock.clock, slot.activityClock.weekday, slot.activityClock.minuteOfDay),
+    );
     if (!donorBar) {
       throw new Error(
-        `profile has no donor bar for observed EAT calendar slot ${WEEKDAY_TO_NAME[slot.weekday]} ${slot.datetime.slice(11, 16)}`,
+        `profile has no donor bar for ${slot.activityClock.clock} slot ${slot.activityClock.weekday} ${slot.activityClock.minuteOfDay} at EAT ${WEEKDAY_TO_NAME[slot.weekday]} ${slot.datetime.slice(11, 16)}`,
       );
     }
 
@@ -970,16 +1051,26 @@ export function generateSynthetic(
           pendingFollowThrough[index + step]! += direction * amountPerBar;
         }
       }
-    } else if (
-      profile.sample.scheduledSpikeWindows.some(
-        (window) => window.minuteOfDay === slot.minuteOfDay,
-      ) &&
-      random.next() < profile.sample.newsIntensity.scheduledEventRatePerEligibleBar[newsKey]
-    ) {
-      const scheduledReturn = chooseScheduledSample(profile, slot.minuteOfDay, random);
-      if (scheduledReturn !== undefined) {
-        closeReturnAtr = scheduledReturn + driftInAtrUnits;
-        eventFlag = "scheduled-news";
+    } else {
+      const scheduledWindow = profile.sample.scheduledSpikeWindows.find(
+        (window) =>
+          window.clock === slot.activityClock.clock &&
+          window.minuteOfDay === slot.activityClock.minuteOfDay,
+      );
+      if (scheduledWindow) {
+        const isScheduledEvent =
+          random.next() < scheduledEventProbability(profile, scheduledWindow, newsKey);
+        const scheduledReturn = chooseScheduledSample(
+          profile,
+          slot.activityClock.clock,
+          slot.activityClock.minuteOfDay,
+          random,
+          isScheduledEvent,
+        );
+        if (scheduledReturn !== undefined) {
+          closeReturnAtr = scheduledReturn + driftInAtrUnits;
+          if (isScheduledEvent) eventFlag = "scheduled-news";
+        }
       }
     }
 

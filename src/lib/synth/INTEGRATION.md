@@ -4,7 +4,7 @@ The module is deliberately standalone. It does not patch `src/lib/analyzer`, reg
 
 ## Product mode
 
-The user-facing **Map Generator** is registered at `/map-generator` by `src/routes/map-generator.tsx` and linked from the home control panel. Its page exposes the 17 registered scenarios, seed/path/calendar controls, volatility/drift/trendiness/shape/gap/news/shock dials, a price/regime-map preview, and two downloads: engine-ready OHLC CSV and a datetime-aligned regime-label JSON sidecar. It calls `generateSynthetic()` and `toCsv()` only; it does not call `runThroughEngine()` or report strategy outcomes. The page reports that the registered 2020-01-24–2026-10-01 archive span is present, while the fixed D1 realism gate failed on six hourly market-statistic cells. Generated maps are therefore not described as realism-certified.
+The user-facing **Map Generator** is registered at `/map-generator` by `src/routes/map-generator.tsx` and linked from the home control panel. Its page exposes the 17 registered scenarios, seed/path/calendar controls, volatility/drift/trendiness/shape/gap/news/shock dials, a price/regime-map preview, and two downloads: engine-ready OHLC CSV and a datetime-aligned regime-label JSON sidecar. It calls `generateSynthetic()` and `toCsv()` only; it does not call `runThroughEngine()` or report strategy outcomes. The UI source still contains the pre-repair summary (26/32 and six old hourly misses); the latest attempt-3 report is 28/32 with EAT 05:00, 16:00, 17:00, and 19:00 outside tolerance. UI files were left untouched because they are outside this task's permitted scope. Generated maps are not described as realism-certified.
 
 ## Types and public entry points
 

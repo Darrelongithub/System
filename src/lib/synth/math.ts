@@ -1,4 +1,112 @@
-import type { DistributionSummary, Quantiles } from "./types";
+import type { DistributionSummary, IntradayClock, IntradayClockSlot, Quantiles } from "./types";
+
+export const LONDON_TIME_ZONE = "Europe/London";
+export const NEW_YORK_TIME_ZONE = "America/New_York";
+
+const ZONED_CLOCK_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+export interface ZonedClockParts {
+  weekday: number;
+  minuteOfDay: number;
+}
+
+interface ZonedDateTimeParts extends ZonedClockParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}
+
+function zonedDateTimeParts(epochMs: number, timeZone: string): ZonedDateTimeParts {
+  if (!Number.isFinite(epochMs)) throw new Error("exchange-clock timestamp must be finite");
+  let formatter = ZONED_CLOCK_FORMATTERS.get(timeZone);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US-u-ca-gregory-nu-latn", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    });
+    ZONED_CLOCK_FORMATTERS.set(timeZone, formatter);
+  }
+  const parts = new Map(
+    formatter
+      .formatToParts(new Date(epochMs))
+      .filter((part) => part.type !== "literal")
+      .map((part) => [part.type, Number(part.value)]),
+  );
+  const year = parts.get("year");
+  const month = parts.get("month");
+  const day = parts.get("day");
+  const hour = parts.get("hour");
+  const minute = parts.get("minute");
+  if ([year, month, day, hour, minute].some((value) => value === undefined)) {
+    throw new Error(`could not resolve exchange-local clock in ${timeZone}`);
+  }
+  return {
+    year: year!,
+    month: month!,
+    day: day!,
+    hour: hour!,
+    minute: minute!,
+    weekday: new Date(Date.UTC(year!, month! - 1, day!)).getUTCDay(),
+    minuteOfDay: hour! * 60 + minute!,
+  };
+}
+
+/** Convert an absolute instant to an IANA-zone weekday and minute-of-day. */
+export function exchangeClockParts(epochMs: number, timeZone: string): ZonedClockParts {
+  const { weekday, minuteOfDay } = zonedDateTimeParts(epochMs, timeZone);
+  return { weekday, minuteOfDay };
+}
+
+function exchangeUtcOffsetMinutes(epochMs: number, timeZone: string): number {
+  const parts = zonedDateTimeParts(epochMs, timeZone);
+  const localAsUtc = Date.UTC(parts.year, parts.month - 1, parts.day, parts.hour, parts.minute);
+  return (localAsUtc - Math.floor(epochMs / 60_000) * 60_000) / 60_000;
+}
+
+/** Resolve daylight-saving state from the zone's IANA rules, not a fixed calendar flag. */
+export function isDaylightSavingTime(epochMs: number, timeZone: string): boolean {
+  const localYear = zonedDateTimeParts(epochMs, timeZone).year;
+  const JanuaryStandardInstant = Date.UTC(localYear, 0, 15, 12);
+  return (
+    exchangeUtcOffsetMinutes(epochMs, timeZone) !==
+    exchangeUtcOffsetMinutes(JanuaryStandardInstant, timeZone)
+  );
+}
+
+/**
+ * Use New York's 08:00-16:00 clock for its session, then London's 08:00-13:00
+ * clock, and EAT outside those local windows. The NY-first precedence preserves
+ * the London/NY overlap during the weeks their DST calendars are offset.
+ */
+export function intradayClockSlot(
+  eatWeekday: number,
+  eatMinuteOfDay: number,
+  london: ZonedClockParts,
+  newYork: ZonedClockParts,
+): IntradayClockSlot {
+  if (newYork.minuteOfDay >= 8 * 60 && newYork.minuteOfDay < 16 * 60) {
+    return {
+      clock: NEW_YORK_TIME_ZONE as IntradayClock,
+      weekday: newYork.weekday,
+      minuteOfDay: newYork.minuteOfDay,
+    };
+  }
+  if (london.minuteOfDay >= 8 * 60 && london.minuteOfDay < 13 * 60) {
+    return {
+      clock: LONDON_TIME_ZONE as IntradayClock,
+      weekday: london.weekday,
+      minuteOfDay: london.minuteOfDay,
+    };
+  }
+  return { clock: "EAT", weekday: eatWeekday, minuteOfDay: eatMinuteOfDay };
+}
 
 export function mean(values: readonly number[]): number {
   if (values.length === 0) return 0;
