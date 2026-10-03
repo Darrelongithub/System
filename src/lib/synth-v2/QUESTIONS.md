@@ -68,3 +68,18 @@
 - The real source has a contradictory `(UTC)` section marker; no source-owner metadata beyond the supplied EAT decision was available.
 - The Stage 1b profile's timezone/runtime tzdata version is not pinned. Stage 2b itself uses its fixed EAT parser and existing IANA exchange-slot seasonality only for source-standardized news-tail normalization.
 - The older Stage 2 cohort, especially its LOCKED TEST, is superseded/abandoned and will remain unopened.
+
+## Current-workspace blocker and follow-up notes (retained)
+
+## Q1 — Stage 1 prompt was not included
+
+- **Options:** (A) paste the actual Stage 1 prompt; (B) authorize a provisional generator design without its acceptance criteria.
+- **Recommendation:** A. The message ends with the literal placeholder `[PASTE THE STAGE 1 PROMPT HERE]`; implementing a market generator without the promised requirements would be speculative and potentially unsafe.
+- **What I did meanwhile:** did not create generator code, infer a design, or modify anything under `src/lib/synth/`. At the time this note was written, the new directory contained only this blocker note.
+- **How to change it:** provide the Stage 1 prompt; implementation can then proceed in `src/lib/synth-v2/` independently of the retired generator and spec.
+
+## Q2 — How to target realized W=20 ATR% with the unchanged Stage 1b volatility dial
+
+- **Options:** (A) retain the W=20 realized ATR% estimand and preregister a market-statistics-only mapping from Stage 1b `volatilityLevel` to achieved W=20 ATR% using disjoint calibration/validation data; (B) redefine the Stage 2b volatility target as Stage 1b's daily standard deviation of 30-minute returns, changing the requested estimand; (C) accept the present DEGRADED result and do not run a follow-up.
+- **Recommendation:** A if the W=20 ATR% target is still required. The report-only diagnosis finds the control and target are different quantities; the completed cohorts must not be repaired or reused as validation.
+- **What I did meanwhile:** made no generator/config/seed/path changes and generated no new paths. The current DESIGN/NULL results remain DEGRADED, LOCKED TEST remains incomplete and unopened, and the approximately 2.517 NULL scale ratio is descriptive only—not a correction factor.
