@@ -1,0 +1,47 @@
+ M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/lib/synth/ASSUMPTIONS.md
+ M src/lib/synth/INTEGRATION.md
+ M src/lib/synth/README.md
+ M src/lib/synth/REPORT.md
+ M src/lib/synth/SHA256SUMS.txt
+ M src/lib/synth/calibrate.ts
+ M src/lib/synth/generate.ts
+ M src/lib/synth/math.ts
+ M src/lib/synth/profile-default.ts
+ M src/lib/synth/profile.json
+ M src/lib/synth/types.ts
+ M src/lib/synth/validation-report.json
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+ M tests/synth.test.mjs
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? src/lib/synth/QUESTIONS.md
+?? src/lib/synth/backups/phase0-synth-no-dayblock-catalog.tar.gz
+?? src/lib/synth/profile-summary.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs

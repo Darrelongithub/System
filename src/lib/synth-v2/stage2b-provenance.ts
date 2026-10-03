@@ -1,0 +1,30 @@
+export const STAGE2B_EXECUTION_CODE_PATHS = [
+  "package.json",
+  "scripts/synth-v2-stage2b-calibrate.mjs",
+  "scripts/synth-v2-stage2b.mjs",
+  "src/lib/analyzer/parse.ts",
+  "src/lib/analyzer/types.ts",
+  "src/lib/synth-v2/csv.ts",
+  "src/lib/synth-v2/generate.ts",
+  "src/lib/synth-v2/random.ts",
+  "src/lib/synth-v2/regimes.ts",
+  "src/lib/synth-v2/stage2-artifacts.ts",
+  "src/lib/synth-v2/stage2b-math.ts",
+  "src/lib/synth-v2/stage2b-provenance.ts",
+  "src/lib/synth-v2/stage2b-regimes.ts",
+  "src/lib/synth-v2/stage2b-types.ts",
+  "src/lib/synth-v2/stage2b-validation.ts",
+  "src/lib/synth-v2/time.ts",
+  "src/lib/synth-v2/types.ts",
+  "tests/hooks.mjs",
+  "tests/register.mjs",
+] as const;
+
+export const STAGE2B_FROZEN_INPUT_PATHS = [
+  "src/lib/synth-v2/SPEC-2b.md",
+  "src/lib/synth-v2/SPEC-2b.sha256",
+  "src/lib/synth-v2/stage2b-data/.gitignore",
+  "src/lib/synth-v2/STAGE2B-SEEDS.json",
+  "src/lib/synth-v2/profile.json",
+  "XAUUSD_30min_2020-01-24_to_2026-10-01.csv",
+] as const;
