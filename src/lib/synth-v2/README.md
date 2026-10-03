@@ -18,4 +18,4 @@ node --experimental-strip-types --import ./tests/register.mjs scripts/synth-v2-r
 
 The script verifies the frozen source hash, writes `profile.json`, runs the 20-seed × 120-weekday realism comparison and real-data moving-window bootstrap, checks D1, validates engine-parser CSV round-trips, and writes a seed-1 example plus hashes. Exit code 2 means one or more fixed realism gates, D1 movement checks, or the reported trend-endpoint variance-ratio bound remain failed; it does not relax any tolerance.
 
-Source timestamps are currently interpreted as EAT wall-clock because the engine CSV contract is unzoned EAT; this is documented as provisional in `QUESTIONS.md` and `REPORT.md`.
+Source timestamps are interpreted as fixed EAT wall-clock based on the Stage 0 weekend-reopen and daylight-shift audit in `REPORT.md`; this conflicts with a UTC section marker, so provenance caveat and options remain in `QUESTIONS.md`.

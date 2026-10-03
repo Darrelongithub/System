@@ -7,13 +7,13 @@ fbb51ab398841ff67955e9ee3015a2b50ed7d8e432a2056a0c116beb57c6f153  src/lib/synth-
 2a234773d55124b77e9955b9d43c83d38cde50003c60e15c466d6b2aebac9e42  src/lib/synth-v2/generate.ts
 c8c5c7689b2e058e47c31d513edbf76e2f44829b1657bf40e539043fb20848e5  src/lib/synth-v2/validation.ts
 edd46247f694fa7445618349ef57eaf56120ae66c7b349beb28a3c1120b60167  src/lib/synth-v2/index.ts
-86fcfc070b2efcacac49882053974e65bab2f8dfb0af1753884f31a8620e4eac  src/lib/synth-v2/README.md
-1a4dc07660b85e5266bd7fff2a3ef9c2cee1e4fbe2295173ffaf604c16e811cc  src/lib/synth-v2/QUESTIONS.md
+2b6c31410ec3f295c68e9f4c2fd75d16a3195d49578a80870356fcfff6d0d11b  src/lib/synth-v2/README.md
+cff52c81b5abce69da2754fc23556f8007eaa32fb51d3692aa1199bf09557cd3  src/lib/synth-v2/QUESTIONS.md
 1aa6033bc948be19092fff71f6af1526d7460387915f43a4d26fefacb6179fd0  src/lib/synth-v2/profile.json
 91c25b2c79cedd972c0e18b903fe82ca2031fcf97bed4d44ffd489f9797d067a  src/lib/synth-v2/gate-results.json
 f39cafe8c765e76ecdc0790db382b9601cd13873c304d2be4802ef88d9741a95  src/lib/synth-v2/normal-seed-1.csv
 e06885c4e504418098a0c193eaf4c366768f680c01d2f0ce1b177e45bca17279  src/lib/synth-v2/normal-seed-1.candles.json
 1b2ce5e5beae799d36b4149c92b782258c4366261a39c4e2a1d7d2b398dff6a5  src/lib/synth-v2/normal-seed-1.labels.json
-9430b2b0036e47914a9488a822730624140927d0518b83c84072f99f992ef5b0  src/lib/synth-v2/REPORT.md
+696811657d80263c702194750ee2194c8fe1519575d2d28848106129c0940750  src/lib/synth-v2/REPORT.md
 1181b197c61a3f2cfc679c3397faf2a2d439f44e8347ee40a9c06d1239849ac6  tests/synth-v2.test.mjs
 55d905b2ba3f7cbd8a6dfa9cceab726500c6c35d81b07ba6bc7bce26c6b30a50  scripts/synth-v2-run.mjs

@@ -1,17 +1,19 @@
-# Questions / provisional assumptions
+# Open questions and provisional decisions
 
-## Q1 — Source timestamp interpretation
+## Q1 — Source clock versus contradictory section marker
 
-- **Options:** (A) treat the unzoned row timestamps as EAT wall-clock time, matching the engine CSV contract and the file's `data_age` metadata; (B) treat them as UTC, as suggested by some section-marker text, then convert to EAT.
-- **Recommendation:** A, because the source rows themselves have no offset and the generated CSV must follow the engine's unzoned EAT contract. This is the least disruptive interpretation for a parser-ready output.
-- **What I did meanwhile:** used EAT for calibration and for mapping source instants to London/New York local time; the ambiguity is disclosed in `REPORT.md`. I did not shift or repair source timestamps.
-- **How to change it:** if the source owner confirms UTC, revise the input epoch conversion in `time.ts`, recalibrate, rerun G1–G8 and D1, regenerate all artifacts, then commit/push a stage update.
+- **Options:** (A) use the empirical fixed-EAT interpretation; (B) trust the source section marker `(UTC)` and treat the rows as UTC.
+- **Recommendation:** A. The Monday reopen moves from 01:00 (US DST) to 02:00 (US standard), while the 08:30 New York activity proxy moves from 15:30 to 16:30 in the stamp clock. This matches EAT (UTC+3) around New York's DST cycle; the CSV `data_age` and `generated_at` metadata also align.
+- **What I did meanwhile:** retained EAT timestamps and did not shift bars or recalibrate the profile. The UTC section-marker conflict is recorded in `REPORT.md`. If the source owner establishes that the marker is authoritative, the profile must be rebuilt from a UTC-to-EAT conversion and all gates rerun.
 
-## Q2 — Trend-dial variance-ratio endpoint
+## Q2 — Overlay incidence for Stage 2
 
-- **Options:** (A) constrain the trendiness dial endpoints so VR(8) and VR(16) remain inside the real-data bootstrap range; (B) keep the empirical p10/p50/p90 lag-1-ACF endpoints and treat the normal-setting G6 gate as the only variance-ratio pass/fail check.
-- **Recommendation:** A for any future certified release, because the suggested method explicitly says the trend dial is bounded by the observed variance-ratio range.
-- **What I did meanwhile:** kept the p10/p50/p90 lag-1-ACF dial values, recorded the endpoint check in `REPORT.md`, and did not clamp or remap it. At p10, VR(8) and VR(16) fall below their real 120-weekday bootstrap intervals. The normal-setting G6 checks pass. Both permitted structural repair attempts were already used, and G2 lag-1 remains a fixed-gate failure, so I stopped without another model change.
-- **How to change it:** in a separately authorized follow-up, choose the empirical VR range/bound definition, recalibrate the trend-dial mapping, and rerun all realism and D1 checks. Do not widen the current gates.
+- **Options:** (A) let each overlay cover an entire segment when selected; (B) place a short internal episode of each selected overlay within a segment.
+- **Recommendation:** B, so overlays can be observed both on and off within a base regime without changing the base regime labels.
+- **What I did meanwhile:** unless stronger task details are supplied, the deterministic interim is an independent 25% chance per segment for each overlay, with one contiguous 2–5 trading-day window chosen uniformly inside the segment. The news overlay sets news intensity high; the gap overlay sets gap size high. This is a coverage convention, not a calibrated event frequency, and will be disclosed.
 
-The earlier missing Stage 1 prompt is resolved: the full prompt was provided before implementation began. No other open user decisions were required for this stage.
+## Q3 — Stage 2 meaning of a “real-data band”
+
+- **Options:** (A) use empirical 10th–90th percentiles of the applicable source daily or rolling-window statistic; (B) use the wider bootstrap 95% interval already used by the Stage 1 gates.
+- **Recommendation:** A, because the Stage 2 check explicitly says “real-data band” and the generator's dials are calibrated at p10/p50/p90.
+- **What I did meanwhile:** use source-data p10–p90 bands for daily ATR%, daily drift, and 120-weekday moving-window VR8/VR16. Check (a) will count segment-days outside those bands after excluding blend bars; any regime below 90% will be marked DEGRADED and left unchanged.

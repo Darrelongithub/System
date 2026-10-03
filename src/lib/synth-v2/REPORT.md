@@ -1,15 +1,25 @@
 # Synth V2 — Stage 1 report
 
-Generated for Stage 1 on **2026-10-02**. This is a new, OHLC-only market-statistics generator. It does not plant regimes, run a detector, or evaluate strategies.
+Updated on **2026-10-03** for the Stage 0 timestamp audit and Stage 1b/Stage 2 continuation. This is a new, OHLC-only market-statistics generator. It does not use strategy outcomes. Stage 2 will add planted labelled regimes only; no detector or strategy evaluation is in scope.
 
 ## Data and protocol
 
 - Input: `XAUUSD_30min_2020-01-24_to_2026-10-01.csv`; SHA-256 verified before calibration: `cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3`.
 - All syntactically valid source OHLC rows are used, including both values of the source `is_reliable` flag; market returns are not filtered by a strategy or outcome column. Weekday schedule/metric paths use source EAT weekdays with at least 24 rows.
-- Source timestamps are unzoned wall-clock strings. **PROVISIONAL interpretation:** parse them as EAT (+03:00), consistent with the engine's CSV contract, then resolve London and New York local times with IANA DST rules. This source-clock interpretation could not be independently established from the file's section-marker text.
+- Source timestamps are unzoned wall-clock strings. The Stage 0 empirical audit below identifies them as fixed EAT (+03:00); no UTC-to-EAT conversion or recalibration was needed. London and New York local times are then resolved with IANA DST rules. This inference conflicts with a source section marker labelled UTC, which remains a provenance caveat.
 - Normal realism run: 20 seeds × 120 weekdays, fixed start date 2026-01-05. Each path samples a real weekday schedule template for the same weekday; weekend/session time gaps remain on the output calendar and their price gaps are bootstrapped from the real gap pools.
 - Real-data bootstrap: 300 moving windows, each 120 observed weekdays. For G1–G5 and G7, tolerance is the wider of ±20% around the full real estimate or the moving-window bootstrap 95% CI. G6 keeps its specified absolute ±0.05 tolerance.
 - No strategy trades, R, P&L, or strategy configuration were read or used.
+
+## Stage 0 — timestamp clock audit
+
+The raw CSV hash was rechecked as `cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3`. It contains 79,586 parseable OHLC rows from 2020-01-24 05:00:00 through 2026-10-01 15:00:00. The unzoned timestamps were tested as recorded; the source's `is_reliable` flag was not used to select timestamps or infer a clock.
+
+**Weekend reopen evidence.** Among 203 Friday-to-Sunday/Monday transitions with a gap of at least 12 hours, the main first-bar time was Monday 01:00 during US daylight time (151/167 such daylight-time reopens) and Monday 02:00 during US standard time (36/36). This one-hour shift is what a fixed EAT clock predicts for XAU's 18:00 New York weekly reopen: 18:00 EDT is 01:00 EAT next day; 18:00 EST is 02:00 EAT. A broker clock tracking New York DST would keep the local reopen hour fixed.
+
+**08:30 New York activity proxy.** For each weekday half-hour, I averaged `|log(close_t / close_(t-1))| / (prior source ATR_30m / close_(t-1))`, splitting dates by the US daylight-saving state after the EAT-to-UTC conversion. In the requested strict 12:00–16:00 stamp-clock window, the highest mean was 15:30 in US daylight time (1.068507, n=1,159); in standard time the 16:30 release slot falls outside that window, whose highest in-window mean was 12:00 (0.585957, n=567). The boundary check including 16:30 showed 16:30 mean 0.934628 in daylight time and 1.103242 in standard time; the event-associated high shifts from 15:30 in daylight time to 16:30 in standard time, as expected for a fixed UTC+3 clock. These are volatility timing proxies, not a news-event identification model.
+
+**Conclusion:** the stamps are empirically consistent with fixed **EAT (UTC+3)**, not UTC and not a New-York-following broker clock. The CSV's `data_age` of 2026-10-01 15:00 EAT also agrees with `generated_at` 12:14Z and the newest row 15:00. A section marker says `(UTC)`, so source metadata are internally inconsistent, but weekly-open and daylight-shift evidence support EAT. Stage 1b retained the existing EAT interpretation; no timestamp conversion or profile rebuild was required.
 
 ## Realism gate table
 
