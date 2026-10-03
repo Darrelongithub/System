@@ -256,7 +256,7 @@ The news_storm/gap_shocks overlay high settings and their per-segment incidence 
 - Each DESIGN/LOCKED TEST path has 3–6 randomly selected segments. Segment lengths are rounded log-uniform draws of 10–60 trading weekdays. Adjacent segments never repeat the same regime.
 - Each boundary gets a 48–200-bar linear dial blend, split across the adjacent segments and capped at half either segment to avoid overlap.
 - Within-segment dial wobble uses deterministic interpolated daily knots bounded by ±10% of the empirical p10–p90 dial-band width. This interpretation is recorded in \`QUESTIONS.md\`.
-- The optional overlays are independently selected with a provisional 25% probability per segment. Each selected overlay occupies one contiguous 2–5 weekday episode. This is a coverage convention, not a market event-frequency estimate.
+- The optional overlays are independently selected with a provisional 25% probability per segment. Each selected overlay occupies one contiguous 2–5 weekday episode whose whole bars lie outside adjacent transition-blend windows; a segment without enough safe weekdays receives no episode. This is a coverage convention, not a market event-frequency estimate.
 - NULL paths contain one 140-weekday segment for a single regime, no transition, and no overlays.
 - Every saved bar has a compact label aligned with its candle: regime id, segment, blend flag, active dial values, overlay flags, specific and generic EXTRAPOLATION flags, gap class, and sampled news-tail flag.
 

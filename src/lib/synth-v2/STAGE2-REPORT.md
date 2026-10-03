@@ -31,7 +31,7 @@ The news_storm/gap_shocks overlay high settings and their per-segment incidence 
 - Each DESIGN/LOCKED TEST path has 3–6 randomly selected segments. Segment lengths are rounded log-uniform draws of 10–60 trading weekdays. Adjacent segments never repeat the same regime.
 - Each boundary gets a 48–200-bar linear dial blend, split across the adjacent segments and capped at half either segment to avoid overlap.
 - Within-segment dial wobble uses deterministic interpolated daily knots bounded by ±10% of the empirical p10–p90 dial-band width. This interpretation is recorded in `QUESTIONS.md`.
-- The optional overlays are independently selected with a provisional 25% probability per segment. Each selected overlay occupies one contiguous 2–5 weekday episode. This is a coverage convention, not a market event-frequency estimate.
+- The optional overlays are independently selected with a provisional 25% probability per segment. Each selected overlay occupies one contiguous 2–5 weekday episode whose whole bars lie outside adjacent transition-blend windows; a segment without enough safe weekdays receives no episode. This is a coverage convention, not a market event-frequency estimate.
 - NULL paths contain one 140-weekday segment for a single regime, no transition, and no overlays.
 - Every saved bar has a compact label aligned with its candle: regime id, segment, blend flag, active dial values, overlay flags, specific and generic EXTRAPOLATION flags, gap class, and sampled news-tail flag.
 
@@ -160,8 +160,8 @@ Seeds 1001–1200 were generated from the frozen regime rules, deterministically
 | src/lib/synth-v2/types.ts | 98239ee1b11be2535fd772c9584c21c701d79ba0b8f3b625882930b6aea52d41 |
 | src/lib/synth-v2/index.ts | 402aaf397c8fc41f97ed680a783bf2c890ad32859d36b0ab1523984d7a064a02 |
 | src/lib/synth-v2/README.md | 41501f25df29eaf25d4756ee65c21a7cf374d58d5e6b57b7a61f281a3350a0bb |
-| src/lib/synth-v2/QUESTIONS.md | 3b117fb07ad01583ff9a5653a2c6bd8a74eb7b0c983a90b5ad96dbbb61d7868c |
-| src/lib/synth-v2/SHA256SUMS.txt | f67349b4b06fbd81dea987cc72204fb3861dc7d07821c7080c41809323315bd9 |
+| src/lib/synth-v2/QUESTIONS.md | 404cff8fa4607619766b4b063c1793240c73049cd4779da56871dbe98ea316e5 |
+| src/lib/synth-v2/SHA256SUMS.txt | 010ffd430e35fa80b33da9d8efef0782f1807ce40bba948bc02cb829a21a7c20 |
 | src/lib/synth-v2/random.ts | d9b8415703b0a293841955e2bdbcf9de6c1260191794218e187055b65ab5534d |
 | src/lib/synth-v2/time.ts | b1131f1f3156d1c57457cd90897888f8158d625cc2fae5227be063e5a1980b05 |
 | src/lib/synth-v2/csv.ts | 0ac4507a2438fa04391248e9ae66b91366b601d662a954f196392ee495bf5aa8 |
@@ -169,7 +169,7 @@ Seeds 1001–1200 were generated from the frozen regime rules, deterministically
 | src/lib/synth-v2/validation.ts | ae988460658a0619e1c70c9fab5493b1a7547ad06af9d3aa05ef2943add488d5 |
 | src/lib/synth-v2/profile.json | 6a5a387c00929697fda3ffdd3c32e866ca0c275a18e175a3969965ee60df2203 |
 | src/lib/synth-v2/gate-results.json | af6084881afba94bc1f916ddc2c87e1fb7d9d51c3b789457ac4ffe8a6ed0470a |
-| scripts/synth-v2-stage2.mjs | 9d308ea7050d0fa2bd0b9b4a9cad40b77bff192d276fe1fdacc7ea166f59e5f3 |
+| scripts/synth-v2-stage2.mjs | a53d4387942b95ce9c6de0d2d90923796d080a00f9aad11b79071bd169e6aa3d |
 | tests/synth-v2.test.mjs | d1cc8807cef509698bc0437858ba71657bc33a8edc859d5f2e727efd50e36d02 |
 
 ## Assumptions and unverified items

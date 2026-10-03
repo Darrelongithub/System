@@ -10,7 +10,7 @@
 
 - **Options:** (A) selected overlays persist for a whole segment; (B) selected overlays occupy one short internal episode, allowing on/off examples within each regime.
 - **Recommendation:** B for label coverage without changing the base regime.
-- **What I did meanwhile:** independently selected each overlay with 25% probability per segment and placed one contiguous 2–5 weekday episode uniformly inside that segment. This is a deterministic coverage convention, not a calibrated event-frequency estimate. `news_storm` sets news intensity to source p90 and `gap_shocks` sets gap size to source p90.
+- **What I did meanwhile:** independently selected each overlay with 25% probability per segment and placed one contiguous 2–5 weekday episode uniformly among eligible whole weekdays whose bars lie outside adjacent transition-blend windows. A segment without at least two safe weekdays gets no episode. This is a deterministic coverage convention, not a calibrated event-frequency estimate. `news_storm` sets news intensity to source p90 and `gap_shocks` sets gap size to source p90.
 
 ## Q3 — Stage 2 variance-ratio band horizon
 
