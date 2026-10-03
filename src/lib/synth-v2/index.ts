@@ -1,5 +1,17 @@
 export { calibrateSourceCsv } from "./calibrate";
-export { generatePath } from "./generate";
+export { createPathSchedule, generatePath, generatePathWithSchedule } from "./generate";
+export { generateStage2Path, getRegimeBaseDials, REGIME_IDS, OVERLAY_IDS } from "./regimes";
+export {
+  addDesignPathToPairwiseAuc,
+  computeCausalFeatures,
+  createPairwiseAucAccumulator,
+  deriveStage2Bands,
+  finishPairwiseAuc,
+  summarizePairwiseAuc,
+  summarizeStage2Attainment,
+  summarizeStage2Realism,
+} from "./stage2-validation";
+export { decodeStage2Artifact, encodeStage2Artifact } from "./stage2-artifacts";
 export { computeMetricSet, metricRecord } from "./metrics";
 export {
   assertPathInvariants,
@@ -25,4 +37,16 @@ export type {
   MetricSet,
   RawCandle,
   SyntheticPath,
+  ScenarioBarLabel,
+  PathSchedule,
 } from "./types";
+export type { GenerateStage2Options, OverlayEpisode, OverlayId, PlantedSegment, Stage2Path, Stage2RegimeId, Stage2Set } from "./regimes";
+export type {
+  CausalFeatureVector,
+  PairwiseAucAccumulator,
+  PairwiseAucRow,
+  RegimeAttainment,
+  SegmentAttainment,
+  Stage2RealBands,
+} from "./stage2-validation";
+export type { DecodedStage2Artifact, DecodedStage2Label } from "./stage2-artifacts";
