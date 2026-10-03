@@ -13,7 +13,7 @@ import { generatePath } from "./generate";
 
 export interface BootstrapIntervals {
   replicates: number;
-  byStatistic: Record<string, { low: number; high: number }>;
+  byStatistic: Record<string, { low: number; high: number; p10: number; p90: number }>;
 }
 
 export interface DialCheck {
@@ -103,7 +103,15 @@ export function bootstrapRealIntervals(
   return {
     replicates,
     byStatistic: Object.fromEntries(
-      [...series].map(([key, values]) => [key, { low: quantile(values, 0.025), high: quantile(values, 0.975) }]),
+      [...series].map(([key, values]) => [
+        key,
+        {
+          low: quantile(values, 0.025),
+          high: quantile(values, 0.975),
+          p10: quantile(values, 0.1),
+          p90: quantile(values, 0.9),
+        },
+      ]),
     ),
   };
 }
@@ -187,7 +195,11 @@ export function checkDials(
   ];
   const checks: DialCheck[] = [];
   for (const dial of dialNames) {
-    const band = profile.dialBands[dial];
+    const observedBand = profile.dialBands[dial];
+    const band =
+      dial === "trendiness" && profile.trendinessBounds
+        ? { ...observedBand, p10: profile.trendinessBounds.p10, p90: profile.trendinessBounds.p90 }
+        : observedBand;
     const lowDials: DialValues = { ...profile.defaultDials, [dial]: band.p10 };
     const highDials: DialValues = { ...profile.defaultDials, [dial]: band.p90 };
     const lowGenerated = seeds.map((seed) => generatePath(profile, { seed, weekdays, dials: lowDials }));
@@ -201,7 +213,7 @@ export function checkDials(
     const observedLow = dial === "newsSpikeIntensity" ? labelRate(lowGenerated) : metricTarget(lowMetrics, dial);
     const observedHigh = dial === "newsSpikeIntensity" ? labelRate(highGenerated) : metricTarget(highMetrics, dial);
     const move = observedHigh - observedLow;
-    const requiredMove = Math.abs(band.p90 - band.p10) * 0.5;
+    const requiredMove = Math.abs(observedBand.p90 - observedBand.p10) * 0.5;
     const nonTargetChanges = otherStatisticChanges(lowMetrics, highMetrics);
     const nonTargetLow = metricRecord(lowMetrics);
     const nonTargetHigh = metricRecord(highMetrics);

@@ -58,3 +58,18 @@ test("synth-v2: London and New York session slots shift independently with DST",
   assert.equal(summer.london, winter.london + 2);
   assert.equal(summer.newYork, winter.newYork + 2);
 });
+
+test("synth-v2: trend settings outside constrained variance-ratio endpoints are labelled", () => {
+  const value = profile.trendinessBounds.p10 - 0.001;
+  const path = generatePath(profile, {
+    seed: "trend-extrapolation",
+    weekdays: 2,
+    startDate: "2026-01-05",
+    dials: { trendiness: value },
+  });
+  assert.equal(path.labels.every((label) => label.flags.includes("EXTRAPOLATION")), true);
+  assert.equal(
+    path.labels.every((label) => label.flags.includes("EXTRAPOLATION:trendinessVarianceRatio")),
+    true,
+  );
+});

@@ -21,7 +21,7 @@ const EXPECTED_SOURCE_SHA = "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c
 const SEED_COUNT = 20;
 const WEEKDAYS_PER_PATH = 120;
 const BOOTSTRAP_REPLICATES = 300;
-const STRUCTURAL_REPAIR_ATTEMPTS = 2;
+const STRUCTURAL_REPAIR_ATTEMPTS = 1;
 const D1_SEEDS = Array.from({ length: 20 }, (_, index) => `synth-v2-d1-${index + 1}`);
 
 function sha256(value) {
@@ -70,6 +70,160 @@ function verifyEngineParser(path) {
   return parsed.candles.length;
 }
 
+const G2_KEYS = [
+  ["G2_abs_return_ACF_lag1", "absReturnAcf1"],
+  ["G2_abs_return_ACF_lag6", "absReturnAcf6"],
+  ["G2_abs_return_ACF_lag48", "absReturnAcf48"],
+];
+
+function fitJointVolatility(profile, realMetrics, bootstrap) {
+  const base = profile.volatilityModel;
+  const baseStationaryVariance = base.innovationSd ** 2 / Math.max(1e-9, 1 - base.persistence ** 2);
+  const fitSeeds = Array.from({ length: 20 }, (_, index) => `synth-v2-vol-fit-${index + 1}`);
+  const candidates = { slowPersistence: [0.8, 0.85, 0.9, 0.95], slowScale: [1.1, 1.2, 1.3, 1.4], fastVariance: [0.01, 0.02, 0.04, 0.08] };
+  const target = Object.fromEntries(G2_KEYS.map(([id, key]) => [id, realMetrics[key]]));
+  const intervals = Object.fromEntries(G2_KEYS.map(([id, key]) => {
+    const realValue = realMetrics[key];
+    const ci = bootstrap.byStatistic[id];
+    const delta = Math.abs(realValue) * 0.2;
+    return [id, { low: Math.min(realValue - delta, ci.low), high: Math.max(realValue + delta, ci.high) }];
+  }));
+  let bestFeasible;
+  let bestAny;
+  let candidateCount = 0;
+  for (const persistence of candidates.slowPersistence) {
+    for (const slowScale of candidates.slowScale) {
+      for (const fastVariance of candidates.fastVariance) {
+        candidateCount++;
+        const candidate = structuredClone(profile);
+        const fastPersistence = candidate.volatilityModel.fastPersistence;
+        candidate.volatilityModel.persistence = persistence;
+        candidate.volatilityModel.innovationSd = Math.sqrt(
+          baseStationaryVariance * slowScale ** 2 * (1 - persistence ** 2),
+        );
+        candidate.volatilityModel.fastStationaryVariance = fastVariance;
+        candidate.volatilityModel.fastInnovationSd = Math.sqrt(
+          fastVariance * (1 - fastPersistence ** 2),
+        );
+        const paths = fitSeeds.map((seed) =>
+          generatePath(candidate, { seed, weekdays: WEEKDAYS_PER_PATH, startDate: "2026-01-05" }),
+        );
+        const metrics = computeMetricSet(paths.map((path) => path.candles), candidate);
+        const record = Object.fromEntries(G2_KEYS.map(([id, key]) => [id, metrics[key]]));
+        const pass = G2_KEYS.every(([id]) => record[id] >= intervals[id].low && record[id] <= intervals[id].high);
+        const score = G2_KEYS.reduce((sum, [id]) => {
+          const width = Math.max(1e-6, intervals[id].high - intervals[id].low);
+          return sum + ((record[id] - target[id]) / width) ** 2;
+        }, 0);
+        const result = { candidate, record, pass, score, persistence, slowScale, fastVariance };
+        if (!bestAny || score < bestAny.score) bestAny = result;
+        if (pass && (!bestFeasible || score < bestFeasible.score)) bestFeasible = result;
+      }
+    }
+  }
+  const chosen = bestFeasible ?? bestAny;
+  Object.assign(profile.volatilityModel, chosen.candidate.volatilityModel);
+  const fastVariance = profile.volatilityModel.fastStationaryVariance;
+  const fastPersistence = profile.volatilityModel.fastPersistence;
+  const momentRatio = profile.volatilityModel.fastAbsMomentRatio;
+  const fastPrediction = (lag) => {
+    const scale = momentRatio * Math.exp(-fastVariance);
+    return (scale * (Math.exp(fastVariance * fastPersistence ** lag) - 1)) / (1 - scale);
+  };
+  const fastTarget = profile.volatilityModel.fastTargetAbsReturnAcf;
+  const fastResidualFitLossAtSelectedVariance = [1, 6, 48].reduce((sum, lag) => {
+    const key = `lag${lag}`;
+    return sum + (fastPrediction(lag) - fastTarget[key]) ** 2;
+  }, 0);
+  profile.volatilityModel.fastFitLoss = fastResidualFitLossAtSelectedVariance;
+  return {
+    method: "deterministic 20-seed market-statistic grid fit; one slow daily log-volatility state plus a fast per-bar AR(1) log-volatility state",
+    candidateCount,
+    fitSeeds,
+    targetAbsReturnAcf: target,
+    allowedG2Intervals: intervals,
+    fittedAbsReturnAcf: chosen.record,
+    normalizedSquaredError: chosen.score,
+    allG2FitIntervalsPassed: chosen.pass,
+    selectedSlowPersistence: chosen.persistence,
+    selectedSlowInnovationScale: chosen.slowScale,
+    selectedFastStationaryVariance: chosen.fastVariance,
+    selectedFastPersistence: chosen.candidate.volatilityModel.fastPersistence,
+    fastResidualFitTarget: profile.volatilityModel.fastTargetAbsReturnAcf,
+    fastResidualFitLossAtSelectedVariance,
+  };
+}
+
+function constrainTrendiness(profile, bootstrap, seeds) {
+  const band8 = bootstrap.byStatistic.G6_variance_ratio_8;
+  const band16 = bootstrap.byStatistic.G6_variance_ratio_16;
+  const raw = profile.dialBands.trendiness;
+  const cache = new Map();
+  const measure = (setting) => {
+    if (cache.has(setting)) return cache.get(setting);
+    const dials = { ...profile.defaultDials, trendiness: setting };
+    const paths = seeds.map((seed) => generatePath(profile, {
+      seed,
+      weekdays: WEEKDAYS_PER_PATH,
+      startDate: "2026-01-05",
+      dials,
+    }));
+    const metrics = computeMetricSet(paths.map((path) => path.candles), profile);
+    const result = { varianceRatio8: metrics.varianceRatio8, varianceRatio16: metrics.varianceRatio16 };
+    cache.set(setting, result);
+    return result;
+  };
+  const within = (metrics) =>
+    metrics.varianceRatio8 >= band8.p10 && metrics.varianceRatio8 <= band8.p90 &&
+    metrics.varianceRatio16 >= band16.p10 && metrics.varianceRatio16 <= band16.p90;
+  const rawLow = measure(raw.p10);
+  const rawHigh = measure(raw.p90);
+  const center = measure(raw.p50);
+  let lowSetting = raw.p10;
+  let highSetting = raw.p90;
+  let lowMetrics = rawLow;
+  let highMetrics = rawHigh;
+  let p50Within = within(center);
+  if (p50Within && !within(rawLow)) {
+    let fail = raw.p10;
+    let pass = raw.p50;
+    for (let iteration = 0; iteration < 12; iteration++) {
+      const middle = (fail + pass) / 2;
+      if (within(measure(middle))) pass = middle;
+      else fail = middle;
+    }
+    lowSetting = pass;
+    lowMetrics = measure(pass);
+  }
+  if (p50Within && !within(rawHigh)) {
+    let pass = raw.p50;
+    let fail = raw.p90;
+    for (let iteration = 0; iteration < 12; iteration++) {
+      const middle = (pass + fail) / 2;
+      if (within(measure(middle))) pass = middle;
+      else fail = middle;
+    }
+    highSetting = pass;
+    highMetrics = measure(pass);
+  }
+  profile.trendinessBounds = {
+    p10: lowSetting,
+    p90: highSetting,
+    varianceRatio8: { p10: band8.p10, p90: band8.p90 },
+    varianceRatio16: { p10: band16.p10, p90: band16.p90 },
+    endpointMetrics: { p10: lowMetrics, p90: highMetrics },
+  };
+  return {
+    rawSettings: { p10: raw.p10, p50: raw.p50, p90: raw.p90 },
+    constrainedSettings: { p10: lowSetting, p50: raw.p50, p90: highSetting },
+    realVarianceRatioBands: { vr8: { p10: band8.p10, p90: band8.p90 }, vr16: { p10: band16.p10, p90: band16.p90 } },
+    rawEndpointMetrics: { p10: rawLow, p50: center, p90: rawHigh },
+    constrainedEndpointMetrics: { p10: lowMetrics, p90: highMetrics },
+    endpointsWithinBand: p50Within && within(lowMetrics) && within(highMetrics),
+    calibrationEvaluations: cache.size,
+  };
+}
+
 const sourceText = readFileSync(SOURCE_PATH, "utf8");
 const sourceSha = sha256(sourceText);
 if (sourceSha !== EXPECTED_SOURCE_SHA) {
@@ -83,6 +237,9 @@ const realDays = realWeekdayGroups(rawCandles);
 if (realDays.length < WEEKDAYS_PER_PATH) throw new Error("real source has too few weekday blocks");
 const realCandles = realDays.flat();
 const realMetrics = computeMetricSet([realCandles], profile);
+const bootstrap = bootstrapRealIntervals(realDays, profile, BOOTSTRAP_REPLICATES, WEEKDAYS_PER_PATH);
+const jointVolatilityFit = fitJointVolatility(profile, realMetrics, bootstrap);
+const trendinessBoundFit = constrainTrendiness(profile, bootstrap, D1_SEEDS);
 
 const gateSeeds = Array.from({ length: SEED_COUNT }, (_, index) => index + 1);
 const syntheticPaths = [];
@@ -114,27 +271,39 @@ for (const seed of gateSeeds) {
   }
 }
 const syntheticMetrics = computeMetricSet(syntheticPaths, profile);
-const bootstrap = bootstrapRealIntervals(realDays, profile, BOOTSTRAP_REPLICATES, WEEKDAYS_PER_PATH);
 const gateRows = compareGateMetrics(realMetrics, syntheticMetrics, bootstrap);
 const d1 = checkDials(profile, D1_SEEDS, WEEKDAYS_PER_PATH);
 const trendD1 = d1.find((row) => row.dial === "trendiness");
 if (!trendD1) throw new Error("trendiness D1 result is missing");
-const trendVarianceBounds = ["G6_variance_ratio_8", "G6_variance_ratio_16"].map((statistic) => {
+const trendVarianceBounds = [
+  ["G6_variance_ratio_8", "varianceRatio8"],
+  ["G6_variance_ratio_16", "varianceRatio16"],
+].map(([statistic, key]) => {
   const interval = bootstrap.byStatistic[statistic];
   if (!interval) throw new Error(`missing real-data interval for ${statistic}`);
+  const rawLow = trendinessBoundFit.rawEndpointMetrics.p10[key];
+  const rawHigh = trendinessBoundFit.rawEndpointMetrics.p90[key];
   const low = trendD1.nonTargetLow[statistic];
   const high = trendD1.nonTargetHigh[statistic];
   return {
     statistic,
-    lowDialValue: low,
-    highDialValue: high,
-    realBootstrapLow: interval.low,
-    realBootstrapHigh: interval.high,
-    lowInside: low >= interval.low && low <= interval.high,
-    highInside: high >= interval.low && high <= interval.high,
+    rawP10Setting: trendinessBoundFit.rawSettings.p10,
+    rawP90Setting: trendinessBoundFit.rawSettings.p90,
+    constrainedP10Setting: profile.trendinessBounds.p10,
+    constrainedP90Setting: profile.trendinessBounds.p90,
+    rawP10Value: rawLow,
+    rawP90Value: rawHigh,
+    constrainedP10Value: low,
+    constrainedP90Value: high,
+    realP10: interval.p10,
+    realP90: interval.p90,
+    rawP10Inside: rawLow >= interval.p10 && rawLow <= interval.p90,
+    rawP90Inside: rawHigh >= interval.p10 && rawHigh <= interval.p90,
+    constrainedP10Inside: low >= interval.p10 && low <= interval.p90,
+    constrainedP90Inside: high >= interval.p10 && high <= interval.p90,
   };
 });
-const trendVarianceBoundPass = trendVarianceBounds.every((row) => row.lowInside && row.highInside);
+const trendVarianceBoundPass = trendinessBoundFit.endpointsWithinBand;
 const g8 = {
   invariants: { checkedBars: invariantCount, pass: invariantCount === syntheticPaths.reduce((sum, path) => sum + path.length, 0) },
   determinism: { checkedSeeds: seedHashes.length, pass: seedHashes.length === SEED_COUNT, seedHashes },
@@ -148,15 +317,15 @@ const failedGateSummary = failedRows.map((row) => {
   return `${row.id}: synthetic ${finite(row.synthetic, 8)} vs allowed [${finite(row.allowedLow, 8)}, ${finite(row.allowedHigh, 8)}], outside by ${finite(miss, 8)}`;
 });
 const failureDiagnosis = failedRows.map((row) => {
-  if (row.id === "G2_abs_return_ACF_lag1" && row.synthetic < row.allowedLow) {
-    return "the generator under-reproduces one-bar volatility clustering; IID standardized intraday innovations plus a slow daily volatility state do not create enough short-lag persistence. A short-memory residual/volatility structure would be needed, but the two-repair budget is exhausted.";
+  if (row.id.startsWith("G2_abs_return_ACF_")) {
+    return `the one fitted slow-plus-fast volatility structure still leaves ${row.id} outside its unchanged fixed interval; the Stage 1b one-change budget is exhausted.`;
   }
-  return `${row.id} remains outside its fixed statistical tolerance after the two permitted structural attempts.`;
+  return `${row.id} remains outside its fixed statistical tolerance after the single Stage 1b structural fit.`;
 });
 
 writeFileSync(resolve(OUTPUT, "profile.json"), json(profile));
 const resultPayload = {
-  generatedDate: "2026-10-02",
+  generatedDate: "2026-10-03",
   sourceSha256: sourceSha,
   pathConfig: { seeds: gateSeeds, weekdays: WEEKDAYS_PER_PATH, startDate: "2026-01-05" },
   bootstrap: { method: "120-weekday moving-window bootstrap", replicates: BOOTSTRAP_REPLICATES },
@@ -164,14 +333,12 @@ const resultPayload = {
   repairHistory: [
     {
       attempt: 1,
-      change: "Coupled bootstrapped body/wick proportions to generated body size; sampled conditional shape by estimated range/ATR and removed the independent range floor.",
-    },
-    {
-      attempt: 2,
-      change: "Applied one uniform 0.88 multiplier to fitted daily log-volatility innovations after an exploratory clustering diagnostic; no time-bin or one-off multiplier.",
+      change: "Replaced iid intraday volatility scaling with one two-timescale log-volatility structure: slow daily AR(1) plus a fast per-bar AR(1). A deterministic market-statistic grid jointly fit slow persistence/scale and fast variance to raw absolute-return ACF at lags 1, 6, and 48; fast persistence was initialized from standardized residual absolute-return ACF.",
     },
   ],
-  gateMetricAudit: "Final G2 uses raw absolute close-to-close log returns as specified; earlier exploratory diagnostics incorrectly ATR-standardized G2. The report does not attribute the final G2 effect to those preliminary numbers. No structural adjustment followed the metric audit.",
+  jointVolatilityFit,
+  trendinessBoundFit,
+  gateMetricAudit: "Final G2 remains the ACF of absolute raw close-to-close log returns. All fixed gate thresholds and interval construction are unchanged.",
   failureDiagnosis,
   d1NewsTargetDefinition: "fraction of bars labeled as routed to the real standardized-return tail pool; this directly measures the per-bar intensity dial rather than a separately renormalized realized-tail count.",
   trendVarianceBounds,
@@ -187,6 +354,7 @@ const resultPayload = {
     g8Pass: Object.values(g8).every((row) => row.pass),
     d1Pass: d1Passed,
     trendVarianceBoundPass,
+    stage1Status: gateRows.every((row) => row.pass) && Object.values(g8).every((row) => row.pass) && d1Passed && trendVarianceBoundPass ? "PASSED" : "FAIL",
   },
 };
 writeFileSync(resolve(OUTPUT, "gate-results.json"), json(resultPayload));
@@ -226,15 +394,20 @@ const d1Table = mdTable(
   d1Rows,
 );
 const trendBoundTable = mdTable(
-  ["Trend dial endpoint", "Variance ratio", "Endpoint value", "Real moving-window 95% CI", "Within range"],
-  trendVarianceBounds.flatMap((row) => [
-    ["p10", row.statistic, finite(row.lowDialValue, 6), `${finite(row.realBootstrapLow, 6)}–${finite(row.realBootstrapHigh, 6)}`, row.lowInside ? "YES" : "NO"],
-    ["p90", row.statistic, finite(row.highDialValue, 6), `${finite(row.realBootstrapLow, 6)}–${finite(row.realBootstrapHigh, 6)}`, row.highInside ? "YES" : "NO"],
+  ["Variance ratio", "Real 120-weekday p10–p90", "Raw p10 setting → value", "Raw p90 setting → value", "Constrained p10 setting → value", "Constrained p90 setting → value", "Constrained endpoints"],
+  trendVarianceBounds.map((row) => [
+    row.statistic,
+    `${finite(row.realP10, 6)}–${finite(row.realP90, 6)}`,
+    `${finite(row.rawP10Setting, 6)} → ${finite(row.rawP10Value, 6)}`,
+    `${finite(row.rawP90Setting, 6)} → ${finite(row.rawP90Value, 6)}`,
+    `${finite(row.constrainedP10Setting, 6)} → ${finite(row.constrainedP10Value, 6)}`,
+    `${finite(row.constrainedP90Setting, 6)} → ${finite(row.constrainedP90Value, 6)}`,
+    row.constrainedP10Inside && row.constrainedP90Inside ? "PASS" : "FAIL",
   ]),
 );
 const trendBoundDiagnosis = trendVarianceBoundPass
-  ? "both p10 and p90 trend dial endpoints keep VR8 and VR16 inside the real-data moving-window bootstrap intervals."
-  : "the trendiness p10 endpoint pushes VR8 and/or VR16 below the real-data moving-window bootstrap 95% interval; the normal-setting G6 gate still passes, but the suggested endpoint bound is not met. No further change was made after the two-repair budget.";
+  ? `the raw mean-reverting endpoint was constrained from ${finite(trendVarianceBounds[0].rawP10Setting, 6)} to ${finite(profile.trendinessBounds.p10, 6)}; both bounded endpoints keep VR8 and VR16 within the real moving-window p10–p90 bands.`
+  : "one or more constrained trend endpoints remain outside the real-data p10–p90 variance-ratio bands; the failure is reported without relaxing the band.";
 const nonTargetText = d1
   .map((row) => {
     const changes = Object.entries(row.nonTargetChanges)
@@ -260,18 +433,124 @@ const preliminaryHashes = Object.fromEntries(
   preliminaryFiles.map((name) => [name, sha256(readFileSync(resolve(OUTPUT, name)))]),
 );
 
-const report = `# Synth V2 — Stage 1 report
+const stage1Status = gateRows.every((row) => row.pass) && Object.values(g8).every((row) => row.pass) && d1Passed && trendVarianceBoundPass ? "PASSED" : "FAIL";
+const jointFitTable = mdTable(
+  ["Fit item", "Value"],
+  [
+    ["Grid candidates", jointVolatilityFit.candidateCount],
+    ["Slow daily persistence", finite(jointVolatilityFit.selectedSlowPersistence, 4)],
+    ["Slow log-vol stationary-scale multiplier", finite(jointVolatilityFit.selectedSlowInnovationScale, 4)],
+    ["Fast per-bar persistence", finite(jointVolatilityFit.selectedFastPersistence, 4)],
+    ["Fast log-vol stationary variance", finite(jointVolatilityFit.selectedFastStationaryVariance, 4)],
+    ["Fit-seed G2 ACF(1/6/48)", Object.values(jointVolatilityFit.fittedAbsReturnAcf).map((value) => finite(value, 6)).join(" / ")],
+  ],
+);
+const outOfScopeEntryStatus = ` M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/lib/synth/ASSUMPTIONS.md
+ M src/lib/synth/INTEGRATION.md
+ M src/lib/synth/README.md
+ M src/lib/synth/REPORT.md
+ M src/lib/synth/SHA256SUMS.txt
+ M src/lib/synth/calibrate.ts
+ M src/lib/synth/generate.ts
+ M src/lib/synth/math.ts
+ M src/lib/synth/profile-default.ts
+ M src/lib/synth/profile.json
+ M src/lib/synth/types.ts
+ M src/lib/synth/validation-report.json
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+ M tests/synth.test.mjs
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? src/lib/synth/QUESTIONS.md
+?? src/lib/synth/backups/phase0-synth-no-dayblock-catalog.tar.gz
+?? src/lib/synth/profile-summary.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs`;
+const outOfScopeCurrentStatus = ` M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs`;
+const report = `# Synth V2 — Stage 0 and Stage 1b report
 
-Generated for Stage 1 on **2026-10-02**. This is a new, OHLC-only market-statistics generator. It does not plant regimes, run a detector, or evaluate strategies.
+Updated **2026-10-03**. Stage 1b result: **${stage1Status}**. This is an OHLC-only market-statistics generator; no planted regime paths, detector, or strategy evaluation are included.
 
 ## Data and protocol
 
 - Input: \`${profile.sourceFile}\`; SHA-256 verified before calibration: \`${sourceSha}\`.
 - All syntactically valid source OHLC rows are used, including both values of the source \`is_reliable\` flag; market returns are not filtered by a strategy or outcome column. Weekday schedule/metric paths use source EAT weekdays with at least 24 rows.
-- Source timestamps are unzoned wall-clock strings. **PROVISIONAL interpretation:** parse them as EAT (+03:00), consistent with the engine's CSV contract, then resolve London and New York local times with IANA DST rules. This source-clock interpretation could not be independently established from the file's section-marker text.
+- Source timestamps are unzoned wall-clock strings. Stage 0 empirically supports fixed EAT (+03:00); bars were not shifted and the source profile was not rebuilt. The source also contains a contradictory section marker labelled UTC; see the evidence below and \`QUESTIONS.md\`.
 - Normal realism run: ${SEED_COUNT} seeds × ${WEEKDAYS_PER_PATH} weekdays, fixed start date 2026-01-05. Each path samples a real weekday schedule template for the same weekday; weekend/session time gaps remain on the output calendar and their price gaps are bootstrapped from the real gap pools.
 - Real-data bootstrap: ${BOOTSTRAP_REPLICATES} moving windows, each ${WEEKDAYS_PER_PATH} observed weekdays. For G1–G5 and G7, tolerance is the wider of ±20% around the full real estimate or the moving-window bootstrap 95% CI. G6 keeps its specified absolute ±0.05 tolerance.
 - No strategy trades, R, P&L, or strategy configuration were read or used.
+
+## Stage 0 — timestamp clock audit
+
+The verified source has 79,586 parseable OHLC rows from 2020-01-24 05:00:00 to 2026-10-01 15:00:00. Among 203 Friday-to-Sunday/Monday gaps of at least 12 hours, the principal reopen was Monday 01:00 during US daylight time (151/167 reopens) and Monday 02:00 during US standard time (36/36). This is the fixed EAT pattern for the 18:00 New York weekly reopen. A broker clock tracking New York DST would keep its local reopen time constant.
+
+For the requested weekday 12:00–16:00 stamp-clock test, mean \`|log(close_t/close_(t-1))| / (prior source ATR_30m / close_(t-1))\` peaked at 15:30 in US daylight time (1.068507, n=1,159). In standard time the 16:30 08:30-New-York release slot lies outside that strict window; the highest in-window slot was 12:00 (0.585957, n=567). The explicit boundary check found 16:30 means 0.934628 (DST) and 1.103242 (standard), showing the activity peak shift from 15:30 to 16:30 as New York changes clocks. This is an activity-timing proxy, not event attribution.
+
+**Conclusion:** the rows are consistent with fixed EAT (UTC+3), not UTC or a New-York-following broker clock. The CSV \`data_age\` says 2026-10-01 15:00 EAT and \`generated_at\` is 12:14Z, consistent with the final 15:00 row. A section marker says \`(UTC)\`, so the source metadata conflict remains disclosed in \`QUESTIONS.md\`. No row was shifted; no profile recalibration was needed.
+
+## Stage 1b — G2 lag-1 repair and full gates
+
+The previous Stage 1 (\`f455643\`) had G1–G7 at 20/21, with only raw absolute-return G2 lag-1 failing at 0.163927 vs [0.179604, 0.359461]. Its trend p10 endpoint also fell below the real VR range. Stage 1b used exactly one structural change: a two-timescale volatility process, with a slow daily log-volatility AR(1) and a fast per-bar AR(1) log-volatility component. The fast persistence starts from real standardized-residual absolute-return ACF; slow persistence/scale and fast variance were jointly fit to raw G2 ACF(1/6/48) using 64 deterministic candidates and 20 separate market-statistic calibration seeds. The previous 0.88 slow-innovation shrink was not retained as a patch; the final slow parameters were refit within the same composite model.
+
+${jointFitTable}
+
+The real residual absolute-return ACF used to initialize the fast component was 1/6/48 = ${Object.values(profile.volatilityModel.fastTargetAbsReturnAcf).map((value) => finite(value, 6)).join(" / ")}. The grid's fitted raw G2 vector is compared with the real target in \`gate-results.json\`. No gate tolerance changed. The trend dial p10/p90 endpoints were separately constrained to the real 120-weekday VR p10–p90 bands; raw observed trend percentiles remain in \`profile.json\`, and inputs outside the constraint are labelled \`EXTRAPOLATION\`.
 
 ## Realism gate table
 
@@ -283,12 +562,11 @@ G6 uses the fixed absolute tolerance in the prompt. All other numeric tolerances
 
 ### Structural repair log and stop point
 
-- **Attempt 1/2:** coupled empirical body/wick proportions to each generated body and selected shape samples by estimated range/ATR, rather than imposing an independent wick range floor.
-- **Attempt 2/2:** applied one uniform 0.88 multiplier to fitted daily log-volatility innovations after exploratory clustering diagnostics; no time-bin-specific multiplier was introduced.
-- **G2 metric audit:** the final G2 rows below use raw absolute close-to-close log returns, as stated in the task; G1 alone uses ATR-standardized returns. Earlier exploratory clustering diagnostics had incorrectly ATR-standardized G2. The final gate table is authoritative, and no structural change followed this metric audit.
-- **Stop point:** ${failedGateSummary.length ? `after the second attempt, remaining failure(s): ${failedGateSummary.join("; ")}. No third repair or tolerance change was made.` : "the final numeric gate table has no failures; both allowed structural attempts were still the maximum budget used."}
-- **Diagnosis:** ${failureDiagnosis.length ? failureDiagnosis.join("; ") : "no remaining numeric gate failure."}
-- D1 news-spike intensity is checked using the fraction of per-bar labels routed to the empirical tail pool. That directly measures the dial; the first diagnostic used a separately re-standardized realized-tail rate and understated the dial response. This was a D1 measurement-definition correction, not a generator repair.
+- **Historical Stage 1:** two earlier repairs addressed candle-shape coupling and a uniform daily-volatility innovation shrink; the f455 report preserves those details and the raw-G2 metric audit.
+- **Stage 1b, attempt 1/1:** installed the single two-timescale slow-plus-fast log-volatility structure and fit its shared parameters jointly to real raw absolute-return ACF lags 1, 6, and 48. No per-lag multipliers, per-bin patches, or tolerance changes were used.
+- **Stage 1b result:** **${stage1Status}**. ${failedGateSummary.length ? `Remaining fixed-gate failure(s): ${failedGateSummary.join("; ")}. No second repair was made.` : "All 21 G1–G7 statistics, G8, the five primary D1 checks, and the constrained trend endpoints pass."}
+- **Diagnosis:** ${failureDiagnosis.length ? failureDiagnosis.join("; ") : "the two-timescale volatility fit brings raw G2 into the unchanged allowed ranges; no remaining numeric gate failure."}
+- D1 news-spike intensity remains measured as the fraction of bars whose labels route them to the empirical tail pool; no strategy or outcome statistic is used.
 
 ### G8 invariant, determinism, and parser checks
 
@@ -296,7 +574,7 @@ ${g8Table}
 
 ## Calibration profile summary
 
-The profile is based on ${profile.sourceMetrics.weekdayBars.toLocaleString()} weekday OHLC rows across ${profile.sourceMetrics.weekdayDates.toLocaleString()} source weekdays; ${profile.sourceMetrics.donorDays.toLocaleString()} days with at least 24 bars can donate a schedule. Within-day return residuals are sampled from the centered, volatility- and session-standardized real return pool; tail observations above the real |z| 97.5th percentile are separated so the news-spike-intensity dial controls their frequency. A daily log-volatility AR(1) is fitted to real daily return standard deviations; the second structural attempt applied a single uniform 0.88 multiplier to fitted innovation standard deviation after exploratory clustering diagnostics. Bar range and upper/lower wick proportions are bootstrapped together from real candles conditional on estimated range/ATR thirds, so the generated close/open body is not overwhelmed by an independent range floor. Continuous, session, and multi-day gaps use separate empirical pools.
+The profile is based on ${profile.sourceMetrics.weekdayBars.toLocaleString()} weekday OHLC rows across ${profile.sourceMetrics.weekdayDates.toLocaleString()} source weekdays; ${profile.sourceMetrics.donorDays.toLocaleString()} days with at least 24 bars can donate a schedule. Within-day return residuals are sampled from the centered, volatility- and session-standardized real return pool; tail observations above the real |z| 97.5th percentile are separated so the news-spike-intensity dial controls their frequency. Volatility is the sum of a slow daily log-volatility AR(1) and a fast per-bar AR(1) log-volatility component. The slow component's baseline is fitted to real daily volatility; the final slow persistence/scale and fast variance are jointly fit against raw absolute-return ACF at lags 1, 6, and 48. The fast component's initial persistence is fitted to within-day standardized-residual absolute-return ACF. Bar range and upper/lower wick proportions are bootstrapped together from real candles conditional on estimated range/ATR thirds. Continuous, session, and multi-day gaps use separate empirical pools.
 
 London and New York each have a 48-slot local half-hour seasonality profile. Their exchange-local factors are combined and normalized, so the same EAT timestamp can map to different local session slots across the independent DST transitions.
 
@@ -308,17 +586,17 @@ The source has negative within-session daily log returns on ${(profile.sourceMet
 
 ## D1 dial checks
 
-Each dial was varied alone from its real p10 to p90 while the other dials and the 20 matched seeds were held fixed. A passing check is monotone in the intended direction and moves by at least half the real p10–p90 span of its target statistic.
+Each dial was varied alone while the other dials and the 20 matched seeds were held fixed. The four non-trend dials use the source p10/p90 settings. Trendiness uses the constrained endpoints; its required D1 movement remains at least half the original observed real trend p10–p90 target span.
 
 ${d1Table}
 
 ### Suggested trend-dial variance-ratio bound
 
-The prompt suggests bounding the trend dial by the observed variance-ratio range. I checked both trendiness p10/p90 endpoints against the real-data 120-weekday moving-window bootstrap 95% intervals; this is an additional endpoint diagnostic, separate from the fixed normal-setting G6 gate and the five D1 target-movement checks.
+Both trendiness endpoints are constrained so their 20-seed VR8/VR16 readings remain within the empirical real 120-weekday moving-window p10–p90 bands. Raw observed trend percentiles are preserved in the profile; out-of-bound user settings are allowed only with explicit \`EXTRAPOLATION\` labels. This is separate from the fixed normal-setting G6 gate.
 
 ${trendBoundTable}
 
-**Endpoint bound:** ${trendVarianceBoundPass ? "PASS" : "FAIL — see the open item in QUESTIONS.md; the two structural repair attempts were already used."} ${trendBoundDiagnosis}
+**Endpoint bound:** ${trendVarianceBoundPass ? "PASS" : "FAIL"}. ${trendBoundDiagnosis}
 
 Non-target changes (high setting minus low setting) across every reported G1–G7 statistic:
 
@@ -326,7 +604,7 @@ ${nonTargetText}
 
 ## Assumptions and unverified items
 
-- The calibration interprets raw datetimes as EAT wall-clock time; source section-marker descriptions do not unambiguously prove this. The generated file follows the engine's unzoned EAT parser contract.
+- Stage 0 evidence supports fixed EAT timestamps; the \`(UTC)\` section-marker conflict remains a source-provenance uncertainty. The generated file follows the engine's unzoned EAT parser contract.
 - Only weekday dates with at least 24 source rows provide schedule templates and daily-volatility/daily-drift observations. Incomplete/shorter weekdays and weekends are not emitted as target weekdays. Multi-day price gaps are labeled as weekend gaps; the empirical pool can include other multi-day closures.
 - “News spike” is a statistical tail proxy (absolute standardized return above the real 97.5th percentile), not an economic-news calendar or event attribution.
 - The trendiness band is derived from rolling 20-weekday lag-1 autocorrelation of standardized returns. This is a bounded AR(1) dial, not a statement about a strategy edge.
@@ -334,6 +612,20 @@ ${nonTargetText}
 - Synthetic prices are rounded to $0.01. CSV metadata carries the parser-compatible static $0.20 spread string but no spread is applied to prices.
 - Time-zone behavior uses the runtime's IANA/Intl database; the tzdata version is not pinned.
 - The round-trip gate calls the engine CSV parser only. No analyzer strategy evaluation or strategy result is part of this stage.
+
+## Out-of-scope working-tree edits
+
+These paths were already present in \`git status --short\` at task entry; they were not edited or staged for Stage 0, Stage 1b, or Stage 2. The initial local checkout was at 5b5 while the session branch's already-pushed Stage 1 commit was f455. To continue from the requested base without overwriting worktree content, local \`HEAD\`/index was aligned to the existing remote f455 history. The legacy \`src/lib/synth/**\` and \`tests/synth.test.mjs\` changes listed at entry match the pre-existing 9748 parent of f455; no new commit in this task stages them. Remaining out-of-scope edits after aligning to f455 were:
+
+\`\`\`text
+${outOfScopeCurrentStatus}
+\`\`\`
+
+The complete pre-alignment \`git status --short\` snapshot, including the legacy paths that now match existing f455 history, was:
+
+\`\`\`text
+${outOfScopeEntryStatus}
+\`\`\`
 
 ## Output hashes
 
@@ -346,8 +638,8 @@ ${mdTable(["Output", "SHA-256"], Object.entries(preliminaryHashes).map(([name, d
 - G1–G7 numeric gates: **${gateRows.filter((row) => row.pass).length}/${gateRows.length} PASS**.
 - G8 checks: **${Object.values(g8).every((row) => row.pass) ? "PASS" : "FAIL"}**.
 - D1 primary dial-movement checks: **${d1.filter((row) => row.pass).length}/${d1.length} PASS**; suggested trend-endpoint variance-ratio bound: **${trendVarianceBoundPass ? "PASS" : "FAIL"}**.
-- Structural repair attempts after the initial design: **${STRUCTURAL_REPAIR_ATTEMPTS}/2**.
-- No planted regimes, detector tests, or strategy results were run.
+- Stage 1b structural changes: **${STRUCTURAL_REPAIR_ATTEMPTS}/1**.
+- No regime plant, detector, or strategy result is reported in this Stage 1b artifact. Stage 2 is documented separately in \`STAGE2-REPORT.md\`.
 `;
 writeFileSync(resolve(OUTPUT, "REPORT.md"), report);
 

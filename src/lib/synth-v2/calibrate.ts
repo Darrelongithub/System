@@ -14,8 +14,6 @@ const ATR_PERIOD = 14;
 const MIN_DONOR_BARS = 24;
 const ROLLING_WINDOW_DAYS = 20;
 const NEWS_TAIL_PROBABILITY = 0.025;
-// Uniform model-level shrinkage: the raw daily fit slightly over-clustered abs(ATR) returns at 6 bars.
-const LOG_VOL_INNOVATION_SHRINK = 0.88;
 const HALF_HOUR_MS = 30 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -71,6 +69,74 @@ function autocorrelation(values: readonly number[], lag: number): number {
   for (const value of values) denominator += (value - average) ** 2;
   for (let i = lag; i < values.length; i++) {
     numerator += (values[i]! - average) * (values[i - lag]! - average);
+  }
+  return denominator > 0 ? numerator / denominator : 0;
+}
+
+function pooledAbsoluteAutocorrelation(segments: readonly number[][], lag: number): number {
+  const absolute = segments.map((segment) => segment.map(Math.abs));
+  const total = absolute.reduce((sum, segment) => sum + segment.length, 0);
+  if (total <= lag + 1) return 0;
+  const center = absolute.flat().reduce((sum, value) => sum + value, 0) / total;
+  let numerator = 0;
+  let denominator = 0;
+  for (const segment of absolute) {
+    for (const value of segment) denominator += (value - center) ** 2;
+    for (let index = lag; index < segment.length; index++) {
+      numerator += (segment[index]! - center) * (segment[index - lag]! - center);
+    }
+  }
+  return denominator > 0 ? numerator / denominator : 0;
+}
+
+function fitFastVolatility(segments: readonly number[][]) {
+  const values = segments.flat();
+  if (values.length < 100) throw new Error("not enough standardized source returns to fit fast volatility");
+  const target = {
+    lag1: pooledAbsoluteAutocorrelation(segments, 1),
+    lag6: pooledAbsoluteAutocorrelation(segments, 6),
+    lag48: pooledAbsoluteAutocorrelation(segments, 48),
+  };
+  const absoluteMean = mean(values.map(Math.abs));
+  const secondMoment = mean(values.map((value) => value * value));
+  const q = Math.min(0.999, Math.max(0.001, (absoluteMean * absoluteMean) / secondMoment));
+  let best = { persistence: 0, variance: 0, loss: Number.POSITIVE_INFINITY };
+  for (let persistence = 0.05; persistence <= 0.950001; persistence += 0.0025) {
+    for (let variance = 0.002; variance <= 1.500001; variance += 0.0025) {
+      const predicted = (lag: number) => {
+        const scale = q * Math.exp(-variance);
+        return (scale * (Math.exp(variance * persistence ** lag) - 1)) / (1 - scale);
+      };
+      const loss =
+        (predicted(1) - target.lag1) ** 2 +
+        (predicted(6) - target.lag6) ** 2 +
+        (predicted(48) - target.lag48) ** 2;
+      if (loss < best.loss) best = { persistence, variance, loss };
+    }
+  }
+  return {
+    persistence: best.persistence,
+    stationaryVariance: best.variance,
+    innovationSd: Math.sqrt(best.variance * (1 - best.persistence * best.persistence)),
+    targetAbsReturnAcf: target,
+    absoluteMomentRatio: q,
+    fitLoss: best.loss,
+  };
+}
+
+function rawAbsoluteReturnAutocorrelation(daily: readonly DailyWork[], lag: number): number {
+  const closes = daily.flatMap((day) => day.candles.map((candle) => candle.close));
+  const segments = [
+    closes.slice(1).map((close, index) => Math.abs(Math.log(close / closes[index]!))),
+  ];
+  const total = segments[0]!.length;
+  if (total <= lag + 1) return 0;
+  const center = mean(segments[0]!);
+  let numerator = 0;
+  let denominator = 0;
+  for (const value of segments[0]!) denominator += (value - center) ** 2;
+  for (let index = lag; index < total; index++) {
+    numerator += (segments[0]![index]! - center) * (segments[0]![index - lag]! - center);
   }
   return denominator > 0 ? numerator / denominator : 0;
 }
@@ -209,7 +275,12 @@ function makeShapeBins(
   return { bins, nonDojiBins, edges, medianBodyShare: quantile(nonDojiBodyShares, 0.5) };
 }
 
-function fitVolatilityModel(daily: readonly DailyWork[], atr: readonly (number | undefined)[], candles: readonly RawCandle[]) {
+function fitVolatilityModel(
+  daily: readonly DailyWork[],
+  atr: readonly (number | undefined)[],
+  candles: readonly RawCandle[],
+  fastFit: ReturnType<typeof fitFastVolatility>,
+) {
   const logs = daily.map((day) => day.logVolatility);
   const meanLogVolatility = mean(logs);
   let numerator = 0;
@@ -230,8 +301,14 @@ function fitVolatilityModel(daily: readonly DailyWork[], atr: readonly (number |
   return {
     meanLogVolatility,
     persistence,
-    innovationSd: innovationSd * LOG_VOL_INNOVATION_SHRINK,
+    innovationSd,
     medianAtrPct: quantile(atrPercentages, 0.5),
+    fastPersistence: fastFit.persistence,
+    fastInnovationSd: fastFit.innovationSd,
+    fastStationaryVariance: fastFit.stationaryVariance,
+    fastTargetAbsReturnAcf: fastFit.targetAbsReturnAcf,
+    fastAbsMomentRatio: fastFit.absoluteMomentRatio,
+    fastFitLoss: fastFit.fitLoss,
   };
 }
 
@@ -359,7 +436,13 @@ export function calibrateSourceCsv(text: string, sourceSha256: string): Calibrat
     edges: shapeBinEdges,
     medianBodyShare,
   } = makeShapeBins(candles, atr);
-  const volatilityModel = fitVolatilityModel(daily, atr, candles);
+  const fastFit = fitFastVolatility([...standardizedByDateFinal.values()]);
+  const rawAbsReturnAcf = {
+    lag1: rawAbsoluteReturnAutocorrelation(daily, 1),
+    lag6: rawAbsoluteReturnAutocorrelation(daily, 6),
+    lag48: rawAbsoluteReturnAutocorrelation(daily, 48),
+  };
+  const volatilityModel = fitVolatilityModel(daily, atr, candles, fastFit);
   const templates = makeTemplates(daily);
   const dailySigma = daily.map((day) => day.volatility * Math.sqrt(day.barCount));
   const nearFlatDriftThreshold = quantile(dailySigma, 0.5) * 0.1;
@@ -382,6 +465,8 @@ export function calibrateSourceCsv(text: string, sourceSha256: string): Calibrat
     dailyNearFlatDriftShare,
     nearFlatDriftThreshold,
     medianPrice: quantile(weekdayCandles.map((candle) => candle.close), 0.5),
+    rawAbsReturnAcf,
+    standardizedResidualAbsReturnAcf: fastFit.targetAbsReturnAcf,
   };
   const defaultDials = {
     volatilityLevel: dialBands.volatilityLevel.p50,
@@ -396,7 +481,7 @@ export function calibrateSourceCsv(text: string, sourceSha256: string): Calibrat
     throw new Error("calibration profile has an invalid scale");
   }
   return {
-    schemaVersion: 2,
+    schemaVersion: 3,
     sourceSha256,
     sourceFile: "XAUUSD_30min_2020-01-24_to_2026-10-01.csv",
     sourceMetrics,

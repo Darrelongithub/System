@@ -5,6 +5,7 @@ import type {
   DialName,
   DialValues,
   GenerateConfig,
+  PathSchedule,
   ShapeSample,
   SyntheticPath,
 } from "./types";
@@ -48,11 +49,22 @@ function resolveDials(profile: CalibrationProfile, supplied: Partial<DialValues>
 }
 
 function extrapolationFlags(profile: CalibrationProfile, dials: DialValues): string[] {
-  const outside = DIAL_NAMES.filter((name) => {
-    const band = profile.dialBands[name];
-    return dials[name] < band.p10 || dials[name] > band.p90;
-  });
-  return outside.length ? ["EXTRAPOLATION", ...outside.map((name) => `EXTRAPOLATION:${name}`)] : [];
+  const outside = new Set<string>(
+    DIAL_NAMES.filter((name) => {
+      const band = profile.dialBands[name];
+      return dials[name] < band.p10 || dials[name] > band.p90;
+    }),
+  );
+  const varianceBounds = profile.trendinessBounds;
+  if (
+    varianceBounds &&
+    (dials.trendiness < varianceBounds.p10 || dials.trendiness > varianceBounds.p90)
+  ) {
+    outside.add("trendinessVarianceRatio");
+  }
+  return outside.size
+    ? ["EXTRAPOLATION", ...[...outside].map((name) => `EXTRAPOLATION:${name}`)]
+    : [];
 }
 
 function selectTemplate(profile: CalibrationProfile, weekday: number, random: () => number) {
@@ -114,60 +126,115 @@ function drawGap(
 }
 
 function validateProfile(profile: CalibrationProfile): void {
-  if (profile.schemaVersion !== 2) throw new Error(`unsupported synth-v2 profile version: ${profile.schemaVersion}`);
+  if (profile.schemaVersion !== 2 && profile.schemaVersion !== 3) {
+    throw new Error(`unsupported synth-v2 profile version: ${profile.schemaVersion}`);
+  }
   if (!/^[a-f0-9]{64}$/i.test(profile.sourceSha256)) throw new Error("profile has no source SHA-256");
   if (profile.dayTemplates.length === 0 || profile.coreReturns.length === 0 || profile.spikeReturns.length === 0) {
     throw new Error("calibration profile is incomplete");
   }
 }
 
-export function generatePath(profile: CalibrationProfile, config: GenerateConfig): SyntheticPath {
+export function createPathSchedule(profile: CalibrationProfile, config: GenerateConfig): PathSchedule {
   validateProfile(profile);
-  const dials = resolveDials(profile, config.dials);
-  const flags = extrapolationFlags(profile, dials);
   const dates = weekdayDates(config.startDate ?? "2026-01-05", config.weekdays ?? 120);
+  const scheduleRandom = createRandom(config.seed, "schedule");
+  const templates = dates.map((date) => {
+    const weekday = new Date(`${date}T00:00:00Z`).getUTCDay();
+    return selectTemplate(profile, weekday, scheduleRandom);
+  });
+  const barCounts = templates.map((template) => template.slots.length);
+  return {
+    dates,
+    templates,
+    barCounts,
+    totalBars: barCounts.reduce((sum, count) => sum + count, 0),
+  };
+}
+
+export function generatePath(profile: CalibrationProfile, config: GenerateConfig): SyntheticPath {
+  return generatePathWithSchedule(profile, config, createPathSchedule(profile, config));
+}
+
+export function generatePathWithSchedule(
+  profile: CalibrationProfile,
+  config: GenerateConfig,
+  schedule: PathSchedule,
+): SyntheticPath {
+  validateProfile(profile);
+  if (
+    schedule.dates.length !== schedule.templates.length ||
+    schedule.dates.length !== schedule.barCounts.length ||
+    schedule.barCounts.some((count, index) => count !== schedule.templates[index]!.slots.length) ||
+    schedule.totalBars !== schedule.barCounts.reduce((sum, count) => sum + count, 0)
+  ) {
+    throw new Error("path schedule is inconsistent");
+  }
+  const defaultDials = resolveDials(profile, config.dials);
+  if (config.barDials && config.barDials.length !== schedule.totalBars) {
+    throw new Error(`barDials length ${config.barDials.length} does not match scheduled bars ${schedule.totalBars}`);
+  }
+  if (config.scenarioLabels && config.scenarioLabels.length !== schedule.totalBars) {
+    throw new Error(`scenarioLabels length ${config.scenarioLabels.length} does not match scheduled bars ${schedule.totalBars}`);
+  }
   const startPrice = roundToCent(config.startPrice ?? profile.sourceMetrics.medianPrice);
   if (!(startPrice > 0 && Number.isFinite(startPrice))) throw new Error("startPrice must be finite and positive");
 
-  const scheduleRandom = createRandom(config.seed, "schedule");
   const volatilityRandom = createRandom(config.seed, "volatility");
   const returnRandom = createRandom(config.seed, "returns");
   const newsRandom = createRandom(config.seed, "news-selection");
   const gapRandom = createRandom(config.seed, "gaps");
   const shapeRandom = createRandom(config.seed, "bar-shapes");
+  const fastVolatilityRandom = createRandom(config.seed, "fast-volatility");
 
-  const templates = dates.map((date) => {
-    const parts = new Date(`${date}T00:00:00Z`).getUTCDay();
-    return selectTemplate(profile, parts, scheduleRandom);
-  });
-  let priorLogVolatility = Math.log(dials.volatilityLevel);
+  let priorLogVolatility = Math.log(defaultDials.volatilityLevel);
   let priorClose: number | undefined;
   let priorEpoch: number | undefined;
   let atrState = startPrice * profile.initialAtrPct;
   let priorInnovation = 0;
+  let barOffset = 0;
+  const fastStationaryVariance = Math.max(0, profile.volatilityModel.fastStationaryVariance ?? 0);
+  const fastPersistence = profile.volatilityModel.fastPersistence ?? 0;
+  const fastInnovationSd = profile.volatilityModel.fastInnovationSd ?? 0;
+  if (fastPersistence < 0 || fastPersistence >= 1 || !Number.isFinite(fastStationaryVariance)) {
+    throw new Error("invalid fitted fast-volatility parameters");
+  }
+  let fastLogVolatility =
+    fastStationaryVariance > 0 ? Math.sqrt(fastStationaryVariance) * normalRandom(fastVolatilityRandom) : 0;
   const candles: Candle[] = [];
   const labels: BarLabel[] = [];
 
-  for (let dayIndex = 0; dayIndex < dates.length; dayIndex++) {
-    const date = dates[dayIndex]!;
-    const template = templates[dayIndex]!;
-    const logTarget = Math.log(dials.volatilityLevel);
+  for (let dayIndex = 0; dayIndex < schedule.dates.length; dayIndex++) {
+    const date = schedule.dates[dayIndex]!;
+    const template = schedule.templates[dayIndex]!;
+    const slots = template.slots;
+    if (slots.length < 24) throw new Error(`weekday schedule template is too short: ${template.sourceDate}`);
+    const dayDials = slots.map((_, slotIndex) =>
+      resolveDials(profile, config.barDials?.[barOffset + slotIndex] ?? defaultDials),
+    );
+    const dayVolatilityTarget = Math.exp(
+      dayDials.reduce((sum, dials) => sum + Math.log(dials.volatilityLevel), 0) / dayDials.length,
+    );
+    const logTarget = Math.log(dayVolatilityTarget);
     const dailyLogVolatility =
       dayIndex === 0
         ? logTarget
         : logTarget +
           profile.volatilityModel.persistence * (priorLogVolatility - logTarget) +
           profile.volatilityModel.innovationSd * normalRandom(volatilityRandom);
-    const dailyVolatility = Math.exp(dailyLogVolatility);
-    if (!(dailyVolatility > 0 && Number.isFinite(dailyVolatility))) {
+    const dailyVolatilityState = Math.exp(dailyLogVolatility);
+    if (!(dailyVolatilityState > 0 && Number.isFinite(dailyVolatilityState))) {
       throw new Error(`invalid simulated daily volatility on ${date}`);
     }
     priorLogVolatility = dailyLogVolatility;
     priorInnovation = 0;
-    const slots = template.slots;
-    if (slots.length < 24) throw new Error(`weekday schedule template is too short: ${template.sourceDate}`);
     for (let slotIndex = 0; slotIndex < slots.length; slotIndex++) {
       const minuteOfDay = slots[slotIndex]!;
+      const barIndex = barOffset + slotIndex;
+      const dials = dayDials[slotIndex]!;
+      const flags = extrapolationFlags(profile, dials);
+      const scenario = config.scenarioLabels?.[barIndex];
+      const barDailyVolatility = dailyVolatilityState * (dials.volatilityLevel / dayVolatilityTarget);
       const epochMs = eatEpochForDateSlot(date, minuteOfDay);
       const datetime = formatEatDatetime(epochMs);
       if (priorEpoch !== undefined && epochMs <= priorEpoch) {
@@ -177,6 +244,14 @@ export function generatePath(profile: CalibrationProfile, config: GenerateConfig
         throw new Error(`source schedule is duplicate or out of order for ${template.sourceDate}`);
       }
       const elapsed = priorEpoch === undefined ? 0 : epochMs - priorEpoch;
+      if (priorEpoch !== undefined && fastStationaryVariance > 0) {
+        const elapsedBars = Math.max(1, Math.round(elapsed / HALF_HOUR_MS));
+        const decay = fastPersistence ** elapsedBars;
+        const oneBarVariance = Math.max(Number.EPSILON, 1 - fastPersistence * fastPersistence);
+        const innovationScale = fastInnovationSd * Math.sqrt(Math.max(0, 1 - decay * decay) / oneBarVariance);
+        fastLogVolatility = decay * fastLogVolatility + innovationScale * normalRandom(fastVolatilityRandom);
+      }
+      const fastVolatilityMultiplier = Math.exp(fastLogVolatility - fastStationaryVariance);
       const gapKind: BarLabel["gapKind"] =
         priorEpoch === undefined
           ? "none"
@@ -201,7 +276,7 @@ export function generatePath(profile: CalibrationProfile, config: GenerateConfig
       const innovation = dials.trendiness * priorInnovation + trendScale * rawInnovation;
       priorInnovation = innovation;
       const perBarDrift = dials.drift / slots.length;
-      const barLogReturn = innovation * dailyVolatility * seasonal + perBarDrift;
+      const barLogReturn = innovation * barDailyVolatility * seasonal * fastVolatilityMultiplier + perBarDrift;
       const close = roundToCent(open * Math.exp(barLogReturn));
       if (!(close > 0 && Number.isFinite(close))) throw new Error(`invalid close price at ${datetime}`);
 
@@ -233,7 +308,16 @@ export function generatePath(profile: CalibrationProfile, config: GenerateConfig
         flags,
         gapKind,
         newsSpike: spike,
-        dailyVolatility,
+        dailyVolatility: barDailyVolatility,
+        fastVolatilityMultiplier,
+        ...(scenario
+          ? {
+              regimeId: scenario.regimeId,
+              segmentIndex: scenario.segmentIndex,
+              inBlend: scenario.inBlend,
+              overlayFlags: [...scenario.overlays],
+            }
+          : {}),
       });
       const trueRange =
         previousClose === undefined
@@ -243,6 +327,7 @@ export function generatePath(profile: CalibrationProfile, config: GenerateConfig
       priorClose = close;
       priorEpoch = epochMs;
     }
+    barOffset += slots.length;
   }
   const csv = serializeEngineCsv(candles);
   return { candles, labels, csv };

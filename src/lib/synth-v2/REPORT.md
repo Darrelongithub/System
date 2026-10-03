@@ -1,51 +1,64 @@
-# Synth V2 — Stage 1 report
+# Synth V2 — Stage 0 and Stage 1b report
 
-Updated on **2026-10-03** for the Stage 0 timestamp audit and Stage 1b/Stage 2 continuation. This is a new, OHLC-only market-statistics generator. It does not use strategy outcomes. Stage 2 will add planted labelled regimes only; no detector or strategy evaluation is in scope.
+Updated **2026-10-03**. Stage 1b result: **PASSED**. This is an OHLC-only market-statistics generator; no planted regime paths, detector, or strategy evaluation are included.
 
 ## Data and protocol
 
 - Input: `XAUUSD_30min_2020-01-24_to_2026-10-01.csv`; SHA-256 verified before calibration: `cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3`.
 - All syntactically valid source OHLC rows are used, including both values of the source `is_reliable` flag; market returns are not filtered by a strategy or outcome column. Weekday schedule/metric paths use source EAT weekdays with at least 24 rows.
-- Source timestamps are unzoned wall-clock strings. The Stage 0 empirical audit below identifies them as fixed EAT (+03:00); no UTC-to-EAT conversion or recalibration was needed. London and New York local times are then resolved with IANA DST rules. This inference conflicts with a source section marker labelled UTC, which remains a provenance caveat.
+- Source timestamps are unzoned wall-clock strings. Stage 0 empirically supports fixed EAT (+03:00); bars were not shifted and the source profile was not rebuilt. The source also contains a contradictory section marker labelled UTC; see the evidence below and `QUESTIONS.md`.
 - Normal realism run: 20 seeds × 120 weekdays, fixed start date 2026-01-05. Each path samples a real weekday schedule template for the same weekday; weekend/session time gaps remain on the output calendar and their price gaps are bootstrapped from the real gap pools.
 - Real-data bootstrap: 300 moving windows, each 120 observed weekdays. For G1–G5 and G7, tolerance is the wider of ±20% around the full real estimate or the moving-window bootstrap 95% CI. G6 keeps its specified absolute ±0.05 tolerance.
 - No strategy trades, R, P&L, or strategy configuration were read or used.
 
 ## Stage 0 — timestamp clock audit
 
-The raw CSV hash was rechecked as `cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3`. It contains 79,586 parseable OHLC rows from 2020-01-24 05:00:00 through 2026-10-01 15:00:00. The unzoned timestamps were tested as recorded; the source's `is_reliable` flag was not used to select timestamps or infer a clock.
+The verified source has 79,586 parseable OHLC rows from 2020-01-24 05:00:00 to 2026-10-01 15:00:00. Among 203 Friday-to-Sunday/Monday gaps of at least 12 hours, the principal reopen was Monday 01:00 during US daylight time (151/167 reopens) and Monday 02:00 during US standard time (36/36). This is the fixed EAT pattern for the 18:00 New York weekly reopen. A broker clock tracking New York DST would keep its local reopen time constant.
 
-**Weekend reopen evidence.** Among 203 Friday-to-Sunday/Monday transitions with a gap of at least 12 hours, the main first-bar time was Monday 01:00 during US daylight time (151/167 such daylight-time reopens) and Monday 02:00 during US standard time (36/36). This one-hour shift is what a fixed EAT clock predicts for XAU's 18:00 New York weekly reopen: 18:00 EDT is 01:00 EAT next day; 18:00 EST is 02:00 EAT. A broker clock tracking New York DST would keep the local reopen hour fixed.
+For the requested weekday 12:00–16:00 stamp-clock test, mean `|log(close_t/close_(t-1))| / (prior source ATR_30m / close_(t-1))` peaked at 15:30 in US daylight time (1.068507, n=1,159). In standard time the 16:30 08:30-New-York release slot lies outside that strict window; the highest in-window slot was 12:00 (0.585957, n=567). The explicit boundary check found 16:30 means 0.934628 (DST) and 1.103242 (standard), showing the activity peak shift from 15:30 to 16:30 as New York changes clocks. This is an activity-timing proxy, not event attribution.
 
-**08:30 New York activity proxy.** For each weekday half-hour, I averaged `|log(close_t / close_(t-1))| / (prior source ATR_30m / close_(t-1))`, splitting dates by the US daylight-saving state after the EAT-to-UTC conversion. In the requested strict 12:00–16:00 stamp-clock window, the highest mean was 15:30 in US daylight time (1.068507, n=1,159); in standard time the 16:30 release slot falls outside that window, whose highest in-window mean was 12:00 (0.585957, n=567). The boundary check including 16:30 showed 16:30 mean 0.934628 in daylight time and 1.103242 in standard time; the event-associated high shifts from 15:30 in daylight time to 16:30 in standard time, as expected for a fixed UTC+3 clock. These are volatility timing proxies, not a news-event identification model.
+**Conclusion:** the rows are consistent with fixed EAT (UTC+3), not UTC or a New-York-following broker clock. The CSV `data_age` says 2026-10-01 15:00 EAT and `generated_at` is 12:14Z, consistent with the final 15:00 row. A section marker says `(UTC)`, so the source metadata conflict remains disclosed in `QUESTIONS.md`. No row was shifted; no profile recalibration was needed.
 
-**Conclusion:** the stamps are empirically consistent with fixed **EAT (UTC+3)**, not UTC and not a New-York-following broker clock. The CSV's `data_age` of 2026-10-01 15:00 EAT also agrees with `generated_at` 12:14Z and the newest row 15:00. A section marker says `(UTC)`, so source metadata are internally inconsistent, but weekly-open and daylight-shift evidence support EAT. Stage 1b retained the existing EAT interpretation; no timestamp conversion or profile rebuild was required.
+## Stage 1b — G2 lag-1 repair and full gates
+
+The previous Stage 1 (`f455643`) had G1–G7 at 20/21, with only raw absolute-return G2 lag-1 failing at 0.163927 vs [0.179604, 0.359461]. Its trend p10 endpoint also fell below the real VR range. Stage 1b used exactly one structural change: a two-timescale volatility process, with a slow daily log-volatility AR(1) and a fast per-bar AR(1) log-volatility component. The fast persistence starts from real standardized-residual absolute-return ACF; slow persistence/scale and fast variance were jointly fit to raw G2 ACF(1/6/48) using 64 deterministic candidates and 20 separate market-statistic calibration seeds. The previous 0.88 slow-innovation shrink was not retained as a patch; the final slow parameters were refit within the same composite model.
+
+| Fit item | Value |
+| --- | --- |
+| Grid candidates | 64 |
+| Slow daily persistence | 0.8000 |
+| Slow log-vol stationary-scale multiplier | 1.3000 |
+| Fast per-bar persistence | 0.6125 |
+| Fast log-vol stationary variance | 0.0800 |
+| Fit-seed G2 ACF(1/6/48) | 0.270015 / 0.183468 / 0.177597 |
+
+The real residual absolute-return ACF used to initialize the fast component was 1/6/48 = 0.095157 / 0.007794 / 0.000000. The grid's fitted raw G2 vector is compared with the real target in `gate-results.json`. No gate tolerance changed. The trend dial p10/p90 endpoints were separately constrained to the real 120-weekday VR p10–p90 bands; raw observed trend percentiles remain in `profile.json`, and inputs outside the constraint are labelled `EXTRAPOLATION`.
 
 ## Realism gate table
 
 | Statistic | Real | Real bootstrap 95% CI | Synthetic | Tolerance | Result |
 | --- | --- | --- | --- | --- | --- |
-| G1 return kurtosis ATR | 141.787424 | 8.607719–463.937721 | 33.194322 | wider of ±20% (28.36) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G2 abs return ACF lag1 | 0.299551 | 0.179604–0.336934 | 0.163927 | wider of ±20% (0.05991) or real-data 120-weekday moving-window bootstrap 95% CI | FAIL |
-| G2 abs return ACF lag6 | 0.162201 | 0.043622–0.205498 | 0.107471 | wider of ±20% (0.03244) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G2 abs return ACF lag48 | 0.187953 | 0.046138–0.232282 | 0.087722 | wider of ±20% (0.03759) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G3 mean range ATR | 0.982434 | 0.977652–0.988232 | 0.940271 | wider of ±20% (0.1965) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G3 body share | 0.460199 | 0.445057–0.483687 | 0.457432 | wider of ±20% (0.09204) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G3 upper wick share | 0.265030 | 0.255424–0.276290 | 0.271792 | wider of ±20% (0.05301) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G3 lower wick share | 0.274771 | 0.257541–0.288027 | 0.270776 | wider of ±20% (0.05495) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G1 return kurtosis ATR | 141.787424 | 8.607719–463.937721 | 33.618512 | wider of ±20% (28.36) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G2 abs return ACF lag1 | 0.299551 | 0.179604–0.336934 | 0.238883 | wider of ±20% (0.05991) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G2 abs return ACF lag6 | 0.162201 | 0.043622–0.205498 | 0.168649 | wider of ±20% (0.03244) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G2 abs return ACF lag48 | 0.187953 | 0.046138–0.232282 | 0.155055 | wider of ±20% (0.03759) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G3 mean range ATR | 0.982434 | 0.977652–0.988232 | 0.937558 | wider of ±20% (0.1965) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G3 body share | 0.460199 | 0.445057–0.483687 | 0.457804 | wider of ±20% (0.09204) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G3 upper wick share | 0.265030 | 0.255424–0.276290 | 0.271441 | wider of ±20% (0.05301) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G3 lower wick share | 0.274771 | 0.257541–0.288027 | 0.270755 | wider of ±20% (0.05495) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
 | G4 gap frequency | 0.018280 | 0.004082–0.024174 | 0.018328 | wider of ±20% (0.003656) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G4 gap median ATR | 0.111124 | 0.071705–0.629315 | 0.110052 | wider of ±20% (0.02222) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G4 gap p95 ATR | 1.215481 | 0.429190–2.965542 | 1.164024 | wider of ±20% (0.2431) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 0-4 share | 0.094561 | 0.068897–0.140636 | 0.113626 | wider of ±20% (0.01891) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 4-8 share | 0.144346 | 0.124725–0.169034 | 0.154535 | wider of ±20% (0.02887) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 8-12 share | 0.169854 | 0.153645–0.186956 | 0.166669 | wider of ±20% (0.03397) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 12-16 share | 0.185057 | 0.146537–0.221882 | 0.174701 | wider of ±20% (0.03701) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 16-20 share | 0.266406 | 0.221865–0.302912 | 0.236176 | wider of ±20% (0.05328) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G5 EAT 20-24 share | 0.139777 | 0.111069–0.159367 | 0.154294 | wider of ±20% (0.02796) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G6 variance ratio 8 | 0.965965 | 0.906777–1.058741 | 0.950902 | fixed ±0.05 absolute | PASS |
-| G6 variance ratio 16 | 0.963961 | 0.875945–1.099129 | 0.958526 | fixed ±0.05 absolute | PASS |
-| G7 daily range ATR median | 7.569537 | 7.017905–8.087323 | 8.230829 | wider of ±20% (1.514) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
-| G7 daily range ATR p90 | 12.599122 | 10.813547–13.724963 | 13.788679 | wider of ±20% (2.520) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G4 gap median ATR | 0.111124 | 0.071705–0.629315 | 0.109964 | wider of ±20% (0.02222) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G4 gap p95 ATR | 1.215481 | 0.429190–2.965542 | 1.163868 | wider of ±20% (0.2431) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 0-4 share | 0.094561 | 0.068897–0.140636 | 0.112566 | wider of ±20% (0.01891) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 4-8 share | 0.144346 | 0.124725–0.169034 | 0.152823 | wider of ±20% (0.02887) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 8-12 share | 0.169854 | 0.153645–0.186956 | 0.167884 | wider of ±20% (0.03397) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 12-16 share | 0.185057 | 0.146537–0.221882 | 0.175781 | wider of ±20% (0.03701) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 16-20 share | 0.266406 | 0.221865–0.302912 | 0.235616 | wider of ±20% (0.05328) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G5 EAT 20-24 share | 0.139777 | 0.111069–0.159367 | 0.155330 | wider of ±20% (0.02796) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G6 variance ratio 8 | 0.965965 | 0.906777–1.058741 | 0.955888 | fixed ±0.05 absolute | PASS |
+| G6 variance ratio 16 | 0.963961 | 0.875945–1.099129 | 0.964265 | fixed ±0.05 absolute | PASS |
+| G7 daily range ATR median | 7.569537 | 7.017905–8.087323 | 8.479383 | wider of ±20% (1.514) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
+| G7 daily range ATR p90 | 12.599122 | 10.813547–13.724963 | 14.323898 | wider of ±20% (2.520) or real-data 120-weekday moving-window bootstrap 95% CI | PASS |
 
 G6 uses the fixed absolute tolerance in the prompt. All other numeric tolerances use the wider of their ±20% band and the real-data moving-window bootstrap 95% interval shown above.
 
@@ -53,12 +66,11 @@ G6 uses the fixed absolute tolerance in the prompt. All other numeric tolerances
 
 ### Structural repair log and stop point
 
-- **Attempt 1/2:** coupled empirical body/wick proportions to each generated body and selected shape samples by estimated range/ATR, rather than imposing an independent wick range floor.
-- **Attempt 2/2:** applied one uniform 0.88 multiplier to fitted daily log-volatility innovations after exploratory clustering diagnostics; no time-bin-specific multiplier was introduced.
-- **G2 metric audit:** the final G2 rows below use raw absolute close-to-close log returns, as stated in the task; G1 alone uses ATR-standardized returns. Earlier exploratory clustering diagnostics had incorrectly ATR-standardized G2. The final gate table is authoritative, and no structural change followed this metric audit.
-- **Stop point:** after the second attempt, remaining failure(s): G2_abs_return_ACF_lag1: synthetic 0.16392687 vs allowed [0.17960374, 0.35946138], outside by 0.01567687. No third repair or tolerance change was made.
-- **Diagnosis:** the generator under-reproduces one-bar volatility clustering; IID standardized intraday innovations plus a slow daily volatility state do not create enough short-lag persistence. A short-memory residual/volatility structure would be needed, but the two-repair budget is exhausted.
-- D1 news-spike intensity is checked using the fraction of per-bar labels routed to the empirical tail pool. That directly measures the dial; the first diagnostic used a separately re-standardized realized-tail rate and understated the dial response. This was a D1 measurement-definition correction, not a generator repair.
+- **Historical Stage 1:** two earlier repairs addressed candle-shape coupling and a uniform daily-volatility innovation shrink; the f455 report preserves those details and the raw-G2 metric audit.
+- **Stage 1b, attempt 1/1:** installed the single two-timescale slow-plus-fast log-volatility structure and fit its shared parameters jointly to real raw absolute-return ACF lags 1, 6, and 48. No per-lag multipliers, per-bin patches, or tolerance changes were used.
+- **Stage 1b result:** **PASSED**. All 21 G1–G7 statistics, G8, the five primary D1 checks, and the constrained trend endpoints pass.
+- **Diagnosis:** the two-timescale volatility fit brings raw G2 into the unchanged allowed ranges; no remaining numeric gate failure.
+- D1 news-spike intensity remains measured as the fraction of bars whose labels route them to the empirical tail pool; no strategy or outcome statistic is used.
 
 ### G8 invariant, determinism, and parser checks
 
@@ -70,7 +82,7 @@ G6 uses the fixed absolute tolerance in the prompt. All other numeric tolerances
 
 ## Calibration profile summary
 
-The profile is based on 79,270 weekday OHLC rows across 1,727 source weekdays; 1,727 days with at least 24 bars can donate a schedule. Within-day return residuals are sampled from the centered, volatility- and session-standardized real return pool; tail observations above the real |z| 97.5th percentile are separated so the news-spike-intensity dial controls their frequency. A daily log-volatility AR(1) is fitted to real daily return standard deviations; the second structural attempt applied a single uniform 0.88 multiplier to fitted innovation standard deviation after exploratory clustering diagnostics. Bar range and upper/lower wick proportions are bootstrapped together from real candles conditional on estimated range/ATR thirds, so the generated close/open body is not overwhelmed by an independent range floor. Continuous, session, and multi-day gaps use separate empirical pools.
+The profile is based on 79,270 weekday OHLC rows across 1,727 source weekdays; 1,727 days with at least 24 bars can donate a schedule. Within-day return residuals are sampled from the centered, volatility- and session-standardized real return pool; tail observations above the real |z| 97.5th percentile are separated so the news-spike-intensity dial controls their frequency. Volatility is the sum of a slow daily log-volatility AR(1) and a fast per-bar AR(1) log-volatility component. The slow component's baseline is fitted to real daily volatility; the final slow persistence/scale and fast variance are jointly fit against raw absolute-return ACF at lags 1, 6, and 48. The fast component's initial persistence is fitted to within-day standardized-residual absolute-return ACF. Bar range and upper/lower wick proportions are bootstrapped together from real candles conditional on estimated range/ATR thirds. Continuous, session, and multi-day gaps use separate empirical pools.
 
 London and New York each have a 48-slot local half-hour seasonality profile. Their exchange-local factors are combined and normalized, so the same EAT timestamp can map to different local session slots across the independent DST transitions.
 
@@ -88,40 +100,38 @@ The source has negative within-session daily log returns on 46.3% of eligible we
 
 ## D1 dial checks
 
-Each dial was varied alone from its real p10 to p90 while the other dials and the 20 matched seeds were held fixed. A passing check is monotone in the intended direction and moves by at least half the real p10–p90 span of its target statistic.
+Each dial was varied alone while the other dials and the 20 matched seeds were held fixed. The four non-trend dials use the source p10/p90 settings. Trendiness uses the constrained endpoints; its required D1 movement remains at least half the original observed real trend p10–p90 target span.
 
 | Dial | Target statistic | p10 setting | p90 setting | Observed low | Observed high | High−low | Required move | Result |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| volatilityLevel | median daily log-return volatility | 0.00079830 | 0.00217564 | 0.00077164 | 0.00210345 | 0.00133182 | ≥ 0.00068867 | PASS |
-| drift | mean within-session daily log return | -0.01234400 | 0.01287576 | -0.01255729 | 0.01265622 | 0.02521351 | ≥ 0.01260988 | PASS |
-| trendiness | lag-1 ACF of standardized returns | -0.09405640 | 0.00452192 | -0.11106758 | -0.02021496 | 0.09085262 | ≥ 0.04928916 | PASS |
-| gapSize | median absolute event gap / ATR | 0.01658094 | 0.64902937 | 0.01486803 | 0.58072901 | 0.56586098 | ≥ 0.31622422 | PASS |
+| volatilityLevel | median daily log-return volatility | 0.00079830 | 0.00217564 | 0.00077204 | 0.00210366 | 0.00133162 | ≥ 0.00068867 | PASS |
+| drift | mean within-session daily log return | -0.01234400 | 0.01287576 | -0.01268405 | 0.01253626 | 0.02522031 | ≥ 0.01260988 | PASS |
+| trendiness | lag-1 ACF of standardized returns | -0.06972971 | 0.00452192 | -0.08677013 | -0.02069352 | 0.06607661 | ≥ 0.04928916 | PASS |
+| gapSize | median absolute event gap / ATR | 0.01658094 | 0.64902937 | 0.01479762 | 0.58115546 | 0.56635784 | ≥ 0.31622422 | PASS |
 | newsSpikeIntensity | fraction of bars routed to the real standardized-return tail pool (per-bar labels) | 0.01665558 | 0.03358876 | 0.01653921 | 0.03362337 | 0.01708416 | ≥ 0.00846659 | PASS |
 
 ### Suggested trend-dial variance-ratio bound
 
-The prompt suggests bounding the trend dial by the observed variance-ratio range. I checked both trendiness p10/p90 endpoints against the real-data 120-weekday moving-window bootstrap 95% intervals; this is an additional endpoint diagnostic, separate from the fixed normal-setting G6 gate and the five D1 target-movement checks.
+Both trendiness endpoints are constrained so their 20-seed VR8/VR16 readings remain within the empirical real 120-weekday moving-window p10–p90 bands. Raw observed trend percentiles are preserved in the profile; out-of-bound user settings are allowed only with explicit `EXTRAPOLATION` labels. This is separate from the fixed normal-setting G6 gate.
 
-| Trend dial endpoint | Variance ratio | Endpoint value | Real moving-window 95% CI | Within range |
-| --- | --- | --- | --- | --- |
-| p10 | G6_variance_ratio_8 | 0.871698 | 0.906777–1.058741 | NO |
-| p90 | G6_variance_ratio_8 | 1.019635 | 0.906777–1.058741 | YES |
-| p10 | G6_variance_ratio_16 | 0.857231 | 0.875945–1.099129 | NO |
-| p90 | G6_variance_ratio_16 | 1.014012 | 0.875945–1.099129 | YES |
+| Variance ratio | Real 120-weekday p10–p90 | Raw p10 setting → value | Raw p90 setting → value | Constrained p10 setting → value | Constrained p90 setting → value | Constrained endpoints |
+| --- | --- | --- | --- | --- | --- | --- |
+| G6_variance_ratio_8 | 0.919681–1.033335 | -0.094056 → 0.886235 | 0.004522 → 1.030955 | -0.069730 → 0.919694 | 0.004522 → 1.030955 | PASS |
+| G6_variance_ratio_16 | 0.899694–1.052419 | -0.094056 → 0.873369 | 0.004522 → 1.027456 | -0.069730 → 0.908872 | 0.004522 → 1.027456 | PASS |
 
-**Endpoint bound:** FAIL — see the open item in QUESTIONS.md; the two structural repair attempts were already used. the trendiness p10 endpoint pushes VR8 and/or VR16 below the real-data moving-window bootstrap 95% interval; the normal-setting G6 gate still passes, but the suggested endpoint bound is not met. No further change was made after the two-repair budget.
+**Endpoint bound:** PASS. the raw mean-reverting endpoint was constrained from -0.094056 to -0.069730; both bounded endpoints keep VR8 and VR16 within the real moving-window p10–p90 bands.
 
 Non-target changes (high setting minus low setting) across every reported G1–G7 statistic:
 
-- **volatilityLevel:** G1_return_kurtosis_ATR: +0.01219; G2_abs_return_ACF_lag1: +0.00027; G2_abs_return_ACF_lag6: +0.00017; G2_abs_return_ACF_lag48: +0.00029; G3_mean_range_ATR: +0.00036; G3_body_share: +0.00070; G3_upper_wick_share: -0.00037; G3_lower_wick_share: -0.00033; G4_gap_frequency: +0.00000; G4_gap_median_ATR: -0.00003; G4_gap_p95_ATR: -0.00070; G5_EAT_0-4_share: -0.00045; G5_EAT_4-8_share: -0.00023; G5_EAT_8-12_share: +0.00001; G5_EAT_12-16_share: -0.00002; G5_EAT_16-20_share: +0.00064; G5_EAT_20-24_share: +0.00004; G6_variance_ratio_8: +0.00003; G6_variance_ratio_16: -0.00008; G7_daily_range_ATR_median: +0.03021; G7_daily_range_ATR_p90: +0.06674
-- **drift:** G1_return_kurtosis_ATR: +0.10041; G2_abs_return_ACF_lag1: -0.00125; G2_abs_return_ACF_lag6: -0.00435; G2_abs_return_ACF_lag48: -0.00285; G3_mean_range_ATR: +0.00585; G3_body_share: +0.00076; G3_upper_wick_share: +0.00448; G3_lower_wick_share: -0.00524; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.00008; G4_gap_p95_ATR: -0.00094; G5_EAT_0-4_share: -0.00228; G5_EAT_4-8_share: -0.00101; G5_EAT_8-12_share: -0.00140; G5_EAT_12-16_share: +0.00238; G5_EAT_16-20_share: +0.00160; G5_EAT_20-24_share: +0.00071; G6_variance_ratio_8: +0.00159; G6_variance_ratio_16: +0.00307; G7_daily_range_ATR_median: +0.00750; G7_daily_range_ATR_p90: +0.15084
-- **trendiness:** G1_return_kurtosis_ATR: -0.33284; G2_abs_return_ACF_lag1: -0.00619; G2_abs_return_ACF_lag6: +0.00029; G2_abs_return_ACF_lag48: +0.00138; G3_mean_range_ATR: -0.00018; G3_body_share: -0.00005; G3_upper_wick_share: -0.00006; G3_lower_wick_share: +0.00010; G4_gap_frequency: +0.00000; G4_gap_median_ATR: -0.00025; G4_gap_p95_ATR: +0.00095; G5_EAT_0-4_share: +0.00043; G5_EAT_4-8_share: -0.00104; G5_EAT_8-12_share: -0.00054; G5_EAT_12-16_share: -0.00018; G5_EAT_16-20_share: +0.00002; G5_EAT_20-24_share: +0.00131; G6_variance_ratio_8: +0.14794; G6_variance_ratio_16: +0.15678; G7_daily_range_ATR_median: +0.21486; G7_daily_range_ATR_p90: +0.22747
-- **gapSize:** G1_return_kurtosis_ATR: +651.38589; G2_abs_return_ACF_lag1: -0.14686; G2_abs_return_ACF_lag6: -0.09232; G2_abs_return_ACF_lag48: -0.08178; G3_mean_range_ATR: -0.01814; G3_body_share: -0.00109; G3_upper_wick_share: +0.00040; G3_lower_wick_share: +0.00069; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.56586; G4_gap_p95_ATR: +6.88794; G5_EAT_0-4_share: +0.00039; G5_EAT_4-8_share: +0.00026; G5_EAT_8-12_share: +0.00017; G5_EAT_12-16_share: +0.00032; G5_EAT_16-20_share: -0.00040; G5_EAT_20-24_share: -0.00075; G6_variance_ratio_8: +0.03421; G6_variance_ratio_16: +0.03202; G7_daily_range_ATR_median: -0.14162; G7_daily_range_ATR_p90: -0.08271
-- **newsSpikeIntensity:** G1_return_kurtosis_ATR: +0.33465; G2_abs_return_ACF_lag1: -0.00708; G2_abs_return_ACF_lag6: -0.00514; G2_abs_return_ACF_lag48: -0.00933; G3_mean_range_ATR: -0.00216; G3_body_share: -0.00130; G3_upper_wick_share: +0.00034; G3_lower_wick_share: +0.00096; G4_gap_frequency: +0.00000; G4_gap_median_ATR: -0.00014; G4_gap_p95_ATR: +0.00125; G5_EAT_0-4_share: -0.00067; G5_EAT_4-8_share: -0.00006; G5_EAT_8-12_share: -0.00069; G5_EAT_12-16_share: +0.00048; G5_EAT_16-20_share: -0.00015; G5_EAT_20-24_share: +0.00109; G6_variance_ratio_8: +0.00513; G6_variance_ratio_16: +0.01099; G7_daily_range_ATR_median: +0.11030; G7_daily_range_ATR_p90: +0.45272
+- **volatilityLevel:** G1_return_kurtosis_ATR: -0.04618; G2_abs_return_ACF_lag1: +0.00028; G2_abs_return_ACF_lag6: +0.00022; G2_abs_return_ACF_lag48: +0.00003; G3_mean_range_ATR: -0.00006; G3_body_share: +0.00087; G3_upper_wick_share: -0.00082; G3_lower_wick_share: -0.00005; G4_gap_frequency: +0.00000; G4_gap_median_ATR: -0.00058; G4_gap_p95_ATR: -0.00097; G5_EAT_0-4_share: -0.00016; G5_EAT_4-8_share: -0.00013; G5_EAT_8-12_share: +0.00010; G5_EAT_12-16_share: -0.00020; G5_EAT_16-20_share: +0.00024; G5_EAT_20-24_share: +0.00015; G6_variance_ratio_8: +0.00002; G6_variance_ratio_16: -0.00010; G7_daily_range_ATR_median: -0.00791; G7_daily_range_ATR_p90: +0.07182
+- **drift:** G1_return_kurtosis_ATR: +1.75957; G2_abs_return_ACF_lag1: -0.00076; G2_abs_return_ACF_lag6: -0.00358; G2_abs_return_ACF_lag48: -0.00087; G3_mean_range_ATR: +0.00579; G3_body_share: +0.00140; G3_upper_wick_share: +0.00405; G3_lower_wick_share: -0.00545; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.00026; G4_gap_p95_ATR: +0.00153; G5_EAT_0-4_share: -0.00191; G5_EAT_4-8_share: -0.00144; G5_EAT_8-12_share: -0.00161; G5_EAT_12-16_share: +0.00032; G5_EAT_16-20_share: +0.00302; G5_EAT_20-24_share: +0.00161; G6_variance_ratio_8: +0.00011; G6_variance_ratio_16: +0.00213; G7_daily_range_ATR_median: +0.27613; G7_daily_range_ATR_p90: +0.15066
+- **trendiness:** G1_return_kurtosis_ATR: -0.04774; G2_abs_return_ACF_lag1: -0.00140; G2_abs_return_ACF_lag6: +0.00061; G2_abs_return_ACF_lag48: +0.00066; G3_mean_range_ATR: -0.00004; G3_body_share: -0.00013; G3_upper_wick_share: +0.00013; G3_lower_wick_share: +0.00001; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.00005; G4_gap_p95_ATR: +0.00045; G5_EAT_0-4_share: +0.00004; G5_EAT_4-8_share: +0.00013; G5_EAT_8-12_share: -0.00064; G5_EAT_12-16_share: -0.00022; G5_EAT_16-20_share: +0.00103; G5_EAT_20-24_share: -0.00033; G6_variance_ratio_8: +0.11126; G6_variance_ratio_16: +0.11858; G7_daily_range_ATR_median: +0.11718; G7_daily_range_ATR_p90: +0.19630
+- **gapSize:** G1_return_kurtosis_ATR: +600.01019; G2_abs_return_ACF_lag1: -0.21072; G2_abs_return_ACF_lag6: -0.13672; G2_abs_return_ACF_lag48: -0.13503; G3_mean_range_ATR: -0.01792; G3_body_share: -0.00083; G3_upper_wick_share: +0.00047; G3_lower_wick_share: +0.00036; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.56636; G4_gap_p95_ATR: +6.88702; G5_EAT_0-4_share: +0.00014; G5_EAT_4-8_share: +0.00089; G5_EAT_8-12_share: -0.00031; G5_EAT_12-16_share: -0.00001; G5_EAT_16-20_share: -0.00009; G5_EAT_20-24_share: -0.00062; G6_variance_ratio_8: +0.02663; G6_variance_ratio_16: +0.02425; G7_daily_range_ATR_median: -0.13439; G7_daily_range_ATR_p90: -0.15978
+- **newsSpikeIntensity:** G1_return_kurtosis_ATR: -0.25769; G2_abs_return_ACF_lag1: -0.01615; G2_abs_return_ACF_lag6: -0.01079; G2_abs_return_ACF_lag48: -0.01371; G3_mean_range_ATR: -0.00211; G3_body_share: -0.00050; G3_upper_wick_share: +0.00011; G3_lower_wick_share: +0.00039; G4_gap_frequency: +0.00000; G4_gap_median_ATR: +0.00040; G4_gap_p95_ATR: -0.00099; G5_EAT_0-4_share: -0.00047; G5_EAT_4-8_share: +0.00015; G5_EAT_8-12_share: -0.00026; G5_EAT_12-16_share: -0.00015; G5_EAT_16-20_share: -0.00061; G5_EAT_20-24_share: +0.00135; G6_variance_ratio_8: +0.00720; G6_variance_ratio_16: +0.01519; G7_daily_range_ATR_median: +0.16834; G7_daily_range_ATR_p90: +0.32873
 
 ## Assumptions and unverified items
 
-- The calibration interprets raw datetimes as EAT wall-clock time; source section-marker descriptions do not unambiguously prove this. The generated file follows the engine's unzoned EAT parser contract.
+- Stage 0 evidence supports fixed EAT timestamps; the `(UTC)` section-marker conflict remains a source-provenance uncertainty. The generated file follows the engine's unzoned EAT parser contract.
 - Only weekday dates with at least 24 source rows provide schedule templates and daily-volatility/daily-drift observations. Incomplete/shorter weekdays and weekends are not emitted as target weekdays. Multi-day price gaps are labeled as weekend gaps; the empirical pool can include other multi-day closures.
 - “News spike” is a statistical tail proxy (absolute standardized return above the real 97.5th percentile), not an economic-news calendar or event attribution.
 - The trendiness band is derived from rolling 20-weekday lag-1 autocorrelation of standardized returns. This is a bounded AR(1) dial, not a statement about a strategy edge.
@@ -130,22 +140,112 @@ Non-target changes (high setting minus low setting) across every reported G1–G
 - Time-zone behavior uses the runtime's IANA/Intl database; the tzdata version is not pinned.
 - The round-trip gate calls the engine CSV parser only. No analyzer strategy evaluation or strategy result is part of this stage.
 
+## Out-of-scope working-tree edits
+
+These paths were already present in `git status --short` at task entry; they were not edited or staged for Stage 0, Stage 1b, or Stage 2. The initial local checkout was at 5b5 while the session branch's already-pushed Stage 1 commit was f455. To continue from the requested base without overwriting worktree content, local `HEAD`/index was aligned to the existing remote f455 history. The legacy `src/lib/synth/**` and `tests/synth.test.mjs` changes listed at entry match the pre-existing 9748 parent of f455; no new commit in this task stages them. Remaining out-of-scope edits after aligning to f455 were:
+
+```text
+ M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs
+```
+
+The complete pre-alignment `git status --short` snapshot, including the legacy paths that now match existing f455 history, was:
+
+```text
+ M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/lib/synth/ASSUMPTIONS.md
+ M src/lib/synth/INTEGRATION.md
+ M src/lib/synth/README.md
+ M src/lib/synth/REPORT.md
+ M src/lib/synth/SHA256SUMS.txt
+ M src/lib/synth/calibrate.ts
+ M src/lib/synth/generate.ts
+ M src/lib/synth/math.ts
+ M src/lib/synth/profile-default.ts
+ M src/lib/synth/profile.json
+ M src/lib/synth/types.ts
+ M src/lib/synth/validation-report.json
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+ M tests/synth.test.mjs
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? src/lib/synth/QUESTIONS.md
+?? src/lib/synth/backups/phase0-synth-no-dayblock-catalog.tar.gz
+?? src/lib/synth/profile-summary.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs
+```
+
 ## Output hashes
 
 The separate `SHA256SUMS.txt` lists SHA-256 for the report, source modules, tests, script, profile, gate results, and sample outputs. The report's own digest is in that manifest (a file cannot contain its own final digest).
 
 | Output | SHA-256 |
 | --- | --- |
-| profile.json | 1aa6033bc948be19092fff71f6af1526d7460387915f43a4d26fefacb6179fd0 |
-| normal-seed-1.csv | f39cafe8c765e76ecdc0790db382b9601cd13873c304d2be4802ef88d9741a95 |
-| normal-seed-1.candles.json | e06885c4e504418098a0c193eaf4c366768f680c01d2f0ce1b177e45bca17279 |
-| normal-seed-1.labels.json | 1b2ce5e5beae799d36b4149c92b782258c4366261a39c4e2a1d7d2b398dff6a5 |
-| gate-results.json | 91c25b2c79cedd972c0e18b903fe82ca2031fcf97bed4d44ffd489f9797d067a |
+| profile.json | 6a5a387c00929697fda3ffdd3c32e866ca0c275a18e175a3969965ee60df2203 |
+| normal-seed-1.csv | 1f27ef38a563a82f57d0ccf39148c3b9070603c6da766e79e7e12a4fe9ee8a72 |
+| normal-seed-1.candles.json | 129bb15bd710c1bc8de0d322dd9ddcc18a8dbf7157b8cca6af9cb00fd35fee6c |
+| normal-seed-1.labels.json | f8d331c61207b932becb3609bc5d0db22e1b15a6fc657839658dbed2035dde4d |
+| gate-results.json | af6084881afba94bc1f916ddc2c87e1fb7d9d51c3b789457ac4ffe8a6ed0470a |
 
 ## Stage result
 
-- G1–G7 numeric gates: **20/21 PASS**.
+- G1–G7 numeric gates: **21/21 PASS**.
 - G8 checks: **PASS**.
-- D1 primary dial-movement checks: **5/5 PASS**; suggested trend-endpoint variance-ratio bound: **FAIL**.
-- Structural repair attempts after the initial design: **2/2**.
-- No planted regimes, detector tests, or strategy results were run.
+- D1 primary dial-movement checks: **5/5 PASS**; suggested trend-endpoint variance-ratio bound: **PASS**.
+- Stage 1b structural changes: **1/1**.
+- No regime plant, detector, or strategy result is reported in this Stage 1b artifact. Stage 2 is documented separately in `STAGE2-REPORT.md`.

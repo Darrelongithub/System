@@ -41,8 +41,21 @@ export interface BarLabel {
   flags: string[];
   gapKind: "none" | "session" | "weekend";
   newsSpike: boolean;
-  /** Simulated weekday log-volatility state, before the intraday seasonal factor. */
+  /** Simulated daily volatility state scaled by this bar's active volatility dial, before intraday seasonality. */
   dailyVolatility: number;
+  /** Fast, fitted multiplicative volatility component applied to this bar. */
+  fastVolatilityMultiplier?: number;
+  regimeId?: string;
+  segmentIndex?: number;
+  inBlend?: boolean;
+  overlayFlags?: string[];
+}
+
+export interface ScenarioBarLabel {
+  regimeId: string;
+  segmentIndex: number;
+  inBlend: boolean;
+  overlays: string[];
 }
 
 export interface RawCandle extends Candle {
@@ -68,10 +81,18 @@ export interface ShapeSample {
 }
 
 export interface VolatilityModel {
+  /** Slow weekday-scale AR(1) fitted to the real daily volatility series. */
   meanLogVolatility: number;
   persistence: number;
   innovationSd: number;
   medianAtrPct: number;
+  /** Fast per-bar AR(1) log-volatility fit to standardized real |return| ACF. */
+  fastPersistence?: number;
+  fastInnovationSd?: number;
+  fastStationaryVariance?: number;
+  fastTargetAbsReturnAcf?: { lag1: number; lag6: number; lag48: number };
+  fastAbsMomentRatio?: number;
+  fastFitLoss?: number;
 }
 
 export interface SourceMetrics {
@@ -89,15 +110,30 @@ export interface SourceMetrics {
   dailyNearFlatDriftShare: number;
   nearFlatDriftThreshold: number;
   medianPrice: number;
+  rawAbsReturnAcf: { lag1: number; lag6: number; lag48: number };
+  standardizedResidualAbsReturnAcf: { lag1: number; lag6: number; lag48: number };
+}
+
+export interface TrendinessVarianceBounds {
+  p10: number;
+  p90: number;
+  varianceRatio8: { p10: number; p90: number };
+  varianceRatio16: { p10: number; p90: number };
+  endpointMetrics?: {
+    p10: { varianceRatio8: number; varianceRatio16: number };
+    p90: { varianceRatio8: number; varianceRatio16: number };
+  };
 }
 
 export interface CalibrationProfile {
-  schemaVersion: 2;
+  schemaVersion: 2 | 3;
   sourceSha256: string;
   sourceFile: string;
   sourceMetrics: SourceMetrics;
   dialBands: DialBands;
   defaultDials: DialValues;
+  /** Allowed trend endpoints after matching source 120-weekday VR p10–p90 bands. */
+  trendinessBounds?: TrendinessVarianceBounds;
   volatilityModel: VolatilityModel;
   /** Standardized, centered empirical 30-minute close/open return pool. */
   coreReturns: number[];
@@ -123,6 +159,15 @@ export interface GenerateConfig {
   startDate?: string;
   startPrice?: number;
   dials?: Partial<DialValues>;
+  barDials?: readonly DialValues[];
+  scenarioLabels?: readonly ScenarioBarLabel[];
+}
+
+export interface PathSchedule {
+  dates: string[];
+  templates: DayTemplate[];
+  barCounts: number[];
+  totalBars: number;
 }
 
 export interface SyntheticPath {

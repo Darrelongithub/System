@@ -14,6 +14,24 @@
 
 ## Q3 — Stage 2 meaning of a “real-data band”
 
-- **Options:** (A) use empirical 10th–90th percentiles of the applicable source daily or rolling-window statistic; (B) use the wider bootstrap 95% interval already used by the Stage 1 gates.
-- **Recommendation:** A, because the Stage 2 check explicitly says “real-data band” and the generator's dials are calibrated at p10/p50/p90.
-- **What I did meanwhile:** use source-data p10–p90 bands for daily ATR%, daily drift, and 120-weekday moving-window VR8/VR16. Check (a) will count segment-days outside those bands after excluding blend bars; any regime below 90% will be marked DEGRADED and left unchanged.
+- **Options:** (A) derive empirical source p10–p90 bands at the same five-weekday VR horizon available inside the minimum ten-weekday planted segment; (B) reuse the Stage 1 120-weekday moving-window VR band even though it crosses segment boundaries or has no fully contained window in short segments.
+- **Recommendation:** A, to avoid mixing two planted regimes in one statistic and to keep the VR observation wholly within a segment.
+- **What I did meanwhile:** used source p10–p90 bands for Wilder ATR(14)/close per bar, one-weekday close/open log drift, and overlapping five-weekday VR8/VR16. Segment calculations exclude blend bars; missing samples count as zero. A segment attains only if at least 90% of each applicable sample is in-band. No failed check is repaired.
+
+## Q4 — Exact names/settings of the seven Stage 2 base regimes
+
+- **Options:** (A) use the established seven single-condition presets `quiet_range`, `normal_chop`, `slow_grind_up`, `strong_uptrend`, `slow_grind_down`, `strong_downtrend`, and `whipsaw`; (B) use a different explicit seven-regime list from the original task details.
+- **Recommendation:** A as the conservative interim because those are the seven established base presets and keep `news_storm`/`gap_shocks` separate as the requested optional overlays.
+- **What I did meanwhile:** planted A, mapping low/normal/high volatility to source p10/p50/p90, flat/up/down drift to p50/p90/p10, mean-reverting/random/trending dial to the constrained trend p10/source p50/constrained p90, respectively. The condensed task context did not contain the original explicit list; the Stage 2 report calls this out.
+
+## Q5 — Meaning of “±10% within-segment dial wobble”
+
+- **Options:** (A) additive wobble bounded by ±10% of each dial's empirical p10–p90 width; (B) multiply each dial by 0.9–1.1, which produces no useful wobble for a zero-centered flat drift dial.
+- **Recommendation:** A, because it also gives meaningful bounded wobble to flat/negative drift and trend settings.
+- **What I did meanwhile:** linearly interpolated deterministic daily wobble knots with amplitude at most 10% of the empirical dial-band width. Any resulting setting outside observed bands is marked `EXTRAPOLATION` per bar.
+
+## Q6 — Pairwise AUC threshold for “inseparable”
+
+- **Options:** (A) call a pair operationally inseparable when its best single-feature AUC is below 0.60; (B) use a stricter cutoff such as 0.65 or report AUCs without a binary class.
+- **Recommendation:** A as a transparent, modest-above-chance reporting threshold; this is not a generator gate or detector-performance claim.
+- **What I did meanwhile:** reported all four feature AUCs and labels pairs below 0.60 `INSEPARABLE`; the threshold is disclosed and no Stage 2 patch follows from it.
