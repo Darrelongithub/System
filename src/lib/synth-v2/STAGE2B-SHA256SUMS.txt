@@ -1,4 +1,5 @@
 # Stage 2b SHA-256 inventory — PARTIAL (LOCKED TEST generation aborted at seed 6142)
+# 2026-10-04 replay: all 1,041 listed paths reproduced their canonical/compressed hashes and byte counts; seed 6142 failed again before writing an artifact.
 # Path data are ignored/local and will not be committed. Locked-test rows are hash-only; no locked artifact was decompressed or analyzed.
 # Rows contain canonical JSON SHA-256, compressed-file SHA-256, compressed byte count, and repo-relative path.
 # source_sha256	cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3
@@ -1081,9 +1082,9 @@ cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3  XAUUSD_30min_2
 88bfcfeb364820bbb4cb6f6139b1f2b2643575ddecce74ff85b1412b68564911  src/lib/synth-v2/STAGE2B-CONFIG.json
 f7850b1d2d491b528c50fed19521f2c3dcc2c1ff2eab7872aa2e4eda38677f6b  src/lib/synth-v2/STAGE2B-PRE-REGISTRATION.json
 696cbca363abb312b1411d45a573c0e49317aa40a572acbe9da2e7ae7ee20356  src/lib/synth-v2/STAGE2B-REAL-BANDS.json
-2e72d35d2426db325bd39f8eb486d376a8e03f862630da1d2c8391e5af936e31  src/lib/synth-v2/STAGE2B-OUT-OF-SCOPE.txt
-5be6a1f65ee3520e4014b8d7baa8deea74ebe3f6213976251272c11fc570ae81  src/lib/synth-v2/QUESTIONS.md
-caa59f392ac642b7befcc0bf9cd1d9ebaddee7de52efed1ec04d07967866dba6  src/lib/synth-v2/README.md
-08a29c1471376859983a5ac127ea3b82c17bdaa8337c4c76493ca9af3bc83d6b  src/lib/synth-v2/STAGE2B-REPORT.md
+202055cc2d815a77596910d1b91bcec3f4be1c86502145d54196a424c5d4d718  src/lib/synth-v2/STAGE2B-OUT-OF-SCOPE.txt
+b58192687a49f3ba2d29b4e5ad0d56dfb53faf0209624825e082d2bc3a251d46  src/lib/synth-v2/QUESTIONS.md
+7ee62a4c208b9e58e966863d59334209dd1b3df1f1def64bc9bb11724c6b25d7  src/lib/synth-v2/README.md
+277a8742f1e44aca8c7e3212c1586c9bfb3e10c1a7c48e92a9084bf69cce0ac4  src/lib/synth-v2/STAGE2B-REPORT.md
 678b7bbc3efd5330e1d20c435eda8b82f94833a884c6a753fd9cdc97036d8b6c  tests/synth-v2-stage2b.test.mjs
 2019a09fa44860516c78ba0d5964b40e02076b37e0c444ebd13a8c6cef0d670c  src/lib/synth-v2/STAGE2B-ATR-DIAGNOSIS.md

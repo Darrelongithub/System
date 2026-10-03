@@ -83,3 +83,23 @@
 - **Options:** (A) retain the W=20 realized ATR% estimand and preregister a market-statistics-only mapping from Stage 1b `volatilityLevel` to achieved W=20 ATR% using disjoint calibration/validation data; (B) redefine the Stage 2b volatility target as Stage 1b's daily standard deviation of 30-minute returns, changing the requested estimand; (C) accept the present DEGRADED result and do not run a follow-up.
 - **Recommendation:** A if the W=20 ATR% target is still required. The report-only diagnosis finds the control and target are different quantities; the completed cohorts must not be repaired or reused as validation.
 - **What I did meanwhile:** made no generator/config/seed/path changes and generated no new paths. The current DESIGN/NULL results remain DEGRADED, LOCKED TEST remains incomplete and unopened, and the approximately 2.517 NULL scale ratio is descriptive only—not a correction factor.
+
+## Reissued full Stage 2b task — fixed-seed replay (2026-10-04)
+
+### The earlier report-only / no-new-paths restriction was superseded
+
+- **Options:** (A) leave the prior report-only ATR diagnosis as the terminal state and generate no paths; (B) follow the reissued full Stage 2b task, retaining the exact existing specification, configuration, and seed lists.
+- **Recommendation:** B, because the latest owner request explicitly re-authorized the complete fixed-cohort regeneration while forbidding post-result changes.
+- **What I did meanwhile:** verified the required source CSV hash, spec SHA-256, preregistered code/input/config/seed hashes, and recorded runtime before replay. No spec, setting, code, profile, or seed was changed. Re-generated DESIGN 5001–5200, LOCKED TEST 6001–6141 in hash-only mode, and all 700 NULL paths; all 1,041 canonical/compressed hash pairs matched the committed partial inventory. The 20 preregistered DESIGN/NULL rebuild samples matched both hashes. DESIGN seed 5001 passed the engine CSV parser round trip.
+
+### Fixed LOCKED TEST seed 6142 fails deterministically
+
+- **Options:** (A) stop this locked cohort and report it incomplete; (B) patch Stage 1b, alter settings, or replace/reseed a path after seeing the failure.
+- **Recommendation:** A for this registered cohort. B is outside the current scope and would invalidate the frozen holdout. A future repair must use a separately approved, versioned, newly preregistered cohort rather than silently reusing this seed list.
+- **What I did meanwhile:** re-attempted seed 6142 under the exact frozen runtime/config. The unchanged Stage 1b generator again threw `bar-shape construction produced invalid OHLC at 2026-08-24 15:00:00`; no artifact was written for the failing seed and seeds 6142–6200 remain ungenerated. The first 141 locked paths were generated and hashed only. No locked artifact was decompressed, parsed, statistically inspected, or analyzed. No workaround was applied. The study remains **INCOMPLETE**.
+
+### Proposed next phase (not started)
+
+- **Options:** (A) authorize a separate Stage 1b OHLC-construction defect investigation, focused regression test, and minimal repair, followed by a new frozen Stage 2b specification/config/seed list and full DESIGN/NULL plus hash-only LOCKED generation; (B) accept this Stage 2b study as incomplete and stop without changing Stage 1b.
+- **Recommendation:** A only as a separately scoped follow-up, with explicit approval for Stage 1b changes and a new cohort; until then choose B for the current fixed study. Never repair or substitute seed 6142 inside this registered cohort.
+- **What I did meanwhile:** stopped after recording the deterministic failure and the allowed market-statistic results. No detector, strategy, trade, R, P&L, or analyzer-result work was performed. The next phase has not begun.

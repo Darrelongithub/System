@@ -19,6 +19,8 @@ Stage 2b retains the seven regimes `quiet_range`, `normal_chop`, `trend_up`, `tr
 
 The Stage 2b cohort is **INCOMPLETE**, not a completed study. DESIGN 5001–5200 and NULL 7001–7100 for all seven regimes were generated and analyzed; LOCKED TEST 6001–6141 were generated and hash-checked only. The frozen runner then failed while attempting LOCKED TEST seed 6142 with an invalid-OHLC exception from the unchanged Stage 1b generator; seeds 6142–6200 were not produced. No LOCKED TEST artifact was decompressed or analyzed. No seed, setting, Stage 1b behavior, or generated OHLC was repaired or replaced. See `STAGE2B-REPORT.md` and the failure decision in `QUESTIONS.md`; do not interpret the partial LOCKED TEST set as a completed holdout.
 
+On 2026-10-04, the fixed cohorts were replayed under the same verified hashes and runtime: all 200 DESIGN, 141 previously successful LOCKED TEST paths (hash-only), and all 700 NULL paths matched the committed partial inventory. The identical seed-6142 invalid-OHLC failure recurred; the cohort remains incomplete.
+
 ## Run and validate
 
 From the repository root, with dependencies installed:

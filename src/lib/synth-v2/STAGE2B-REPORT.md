@@ -2,7 +2,7 @@
 
 **Status: INCOMPLETE.** DESIGN 5001–5200 and all 700 NULL paths were generated; the LOCKED TEST cohort stopped during generation at seed 6142 after seeds 6001–6141. The failure arose from the unchanged Stage 1b OHLC generator. No LOCKED TEST artifact was decompressed or analyzed. Do not treat this as a completed holdout or a completed preregistered study.
 
-Report compiled **2026-10-03**. Calibration, protocol, settings, seeds, and executable code hashes were frozen before any cohort paths. Results here are descriptive market-statistic checks only; no detector, strategy, trade, R, P&L, or analyzer outcome was used.
+Initial report compiled **2026-10-03**. The same fixed inputs, runtime, and seeds were replayed on **2026-10-04** after revalidating all frozen hashes; no criterion, setting, executable, profile, or seed was changed. Calibration, protocol, settings, seeds, and executable code hashes were frozen before any cohort paths. Results here are descriptive market-statistic checks only; no detector, strategy, trade, R, P&L, or analyzer outcome was used.
 
 ## Part A — report-only audit of superseded Stage 2
 
@@ -368,6 +368,15 @@ Features are causal: sampled every fourth non-blend observation beginning at bar
 - After the partial generation and report build: `npx tsc --noEmit` passed and full `npm test` passed **242/242**.
 - These checks do not change the cohort status: the frozen LOCKED TEST generation remains incomplete at seed 6142.
 
+### Fixed-seed replay verification (2026-10-04)
+
+- Dependencies were installed with `npm ci`. Before replay, `npx tsc --noEmit` passed and full `npm test` passed **242/242**. The required source SHA-256, `SPEC-2b.md` SHA-256, preregistered execution-code/input/config/seed hashes, and runtime matched the frozen record: Node `v22.22.3`, ICU `78.2`, tzdata `2026a`, with `TZ` unset.
+- After the 2026-10-04 replay and report updates, `npx tsc --noEmit` passed and full `npm test` passed **242/242** (0 failures).
+- Re-generated DESIGN seeds 5001–5200 (**200/200**), LOCKED TEST seeds 6001–6141 (**141/200**, hash-only), and all seven NULL cohorts (**700/700**). Every one of the **1,041** regenerated paths matched its committed partial-inventory canonical JSON SHA-256, compressed SHA-256, and byte count. The 59 LOCKED TEST paths 6142–6200 remain absent.
+- LOCKED TEST generation again stopped at seed **6142** with `bar-shape construction produced invalid OHLC at 2026-08-24 15:00:00` in unchanged `generate.ts`. No artifact was written for 6142; no locked artifact was decompressed, parsed, analyzed, or statistically inspected.
+- All **20** frozen DESIGN/NULL rebuild selections again matched both inventory hashes. DESIGN seed 5001 again round-tripped through the engine CSV parser: 10,604 candles, exact timestamp/OHLC equality, CSV SHA-256 `8248b2e7d0e4ad1c67c2d3551df4dfecc260bdf5ab4458c741d8dd30ade9c575`.
+- Recomputed DESIGN and NULL fixed checks reproduced the report: every regime remains `DEGRADED` because of preregistered C1/C2 failures; all four C3 orderings pass; no real-ceiling cell is `THIN`; DESIGN and NULL extrapolation shares are 0.0% in all regimes. The 21 DESIGN pairwise AUCs also reproduced, including the four `INSEPARABLE` pairs. No result was repaired or reinterpreted.
+
 ## Assumptions, limitations, and out-of-scope working-tree edits
 
 - EAT is fixed +03:00 per the owner; source timestamps were not shifted. The conflicting source `(UTC)` marker remains unresolved.
@@ -426,6 +435,47 @@ Features are causal: sampled every fourth non-blend observation beginning at bar
 ?? tests/mt5-routes.test.mjs
 ?? tests/mt5-safety.test.mjs
 ```
+
+### Current replay-entry snapshot (2026-10-04)
+
+After syncing the fixed session branch and before this replay's scoped documentation edits, the following out-of-scope paths were present; they were left untouched and unstaged:
+
+```text
+ M .env.example
+ M README.md
+ M docs/MT5-AUTOMATION.md
+ M src/components/MT5AutomationPanel.tsx
+ M src/lib/market-data.ts
+ M src/lib/mt5/bridge-auth.ts
+ M src/lib/mt5/engine.ts
+ M src/lib/mt5/mql5-ea.ts
+ M src/lib/mt5/mt5-store.ts
+ M src/lib/mt5/news-filter.ts
+ M src/lib/mt5/server-daemon.ts
+ M src/lib/mt5/standalone-ea.ts
+ M src/lib/mt5/types.ts
+ M src/pages/MapGenerator.tsx
+ M src/routes/__root.tsx
+ M src/routes/api/market-data.health.ts
+ M src/routes/api/market-data.ts
+ M src/routes/api/mt5.bridge.ts
+ M src/routes/api/mt5.ea.ts
+ M src/routes/api/mt5.ts
+ M tests/mt5-automation.test.mjs
+ M tests/mt5-bridge-auth.test.mjs
+ M tests/run.mjs
+ M tests/server-env.test.mjs
+?? .coding-latest.patch
+?? AUDIT-ARENA-2026-10-01.md
+?? src/components/ServerAccessPanel.tsx
+?? src/lib/app-access-client.ts
+?? src/lib/mt5/validation.ts
+?? src/lib/server-access.ts
+?? tests/mt5-routes.test.mjs
+?? tests/mt5-safety.test.mjs
+```
+
+The earlier task-entry snapshot above is retained verbatim in `STAGE2B-OUT-OF-SCOPE.txt`; the current snapshot is recorded there as well.
 
 ## Output artifacts
 
