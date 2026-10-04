@@ -143,3 +143,49 @@ test("synth-v2-stage2b: pairwise AUC output has 21 pairs and includes the four h
     "normal_chop|trend_up",
   ].sort());
 });
+
+test("synth-v2 Stage 2c: regression test for C-2 crash on debug seed 90135 (invalid OHLC fixed at root cause)", async () => {
+  const { readFileSync } = await import("node:fs");
+  const { createPathSchedule, generatePathWithSchedule } = await import("../src/lib/synth-v2/generate.ts");
+  const { assertPathInvariants } = await import("../src/lib/synth-v2/validation.ts");
+  const profile = JSON.parse(readFileSync("src/lib/synth-v2/profile.json", "utf8"));
+  const calibration = JSON.parse(readFileSync("src/lib/synth-v2/STAGE2C-REAL-BANDS.json", "utf8"));
+
+  const seed = 6142;
+  const weekdays = 167;
+  const startDate = "2026-04-23";
+  const schedule = createPathSchedule(profile, { seed, weekdays, startDate });
+  
+  // Reconstruct the 6142 generator config that crashed at 2026-08-24 15:00:00 (and 90135 at 2026-08-28 17:00:00)
+  const barDials = Array(schedule.totalBars).fill({
+    volatilityLevel: 0.002549,
+    drift: -0.001352,
+    trendiness: 0.057827,
+    gapSize: 0.125048,
+    newsSpikeIntensity: 0.024305,
+  });
+  const scenarioLabels = Array(schedule.totalBars).fill({
+    regimeId: "expansion_down",
+    segmentIndex: 1,
+    inBlend: false,
+    overlays: [],
+  });
+
+  const path = generatePathWithSchedule(profile, { seed: 90135, weekdays, startDate, barDials, scenarioLabels }, schedule);
+  assert(path.candles.length > 0, "path generated candles");
+  assertPathInvariants(path.candles, weekdays);
+});
+
+test("synth-v2 Stage 2c: dial map inverts target ATR% percentiles monotonically", async () => {
+  const { readFileSync } = await import("node:fs");
+  const volMap = JSON.parse(readFileSync("src/lib/synth-v2/STAGE2C-VOL-MAP.json", "utf8"));
+  assert(volMap.p5 < volMap.p17, "p5 < p17");
+  assert(volMap.p17 < volMap.p33, "p17 < p33");
+  assert(volMap.p33 < volMap.p50, "p33 < p50");
+  assert(volMap.p50 < volMap.p67, "p50 < p67");
+  assert(volMap.p67 < volMap.p83, "p67 < p83");
+  assert(volMap.p83 < volMap.p90, "p83 < p90");
+  assert(volMap.p90 < volMap.p95, "p90 < p95");
+  assert(volMap.wobbleWidth > 0, "wobble width positive");
+  assertEqual(volMap.wobbleWidth, volMap.p83 - volMap.p17);
+});

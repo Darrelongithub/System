@@ -293,7 +293,7 @@ export function generatePathWithSchedule(
       const upperPool = shape.upperWickShare + shape.lowerWickShare;
       const upperFraction = upperPool > 0 ? shape.upperWickShare / upperPool : 0.5;
       let high = roundToCent(Math.max(open, close) + wickTotal * upperFraction);
-      let low = roundToCent(Math.min(open, close) - wickTotal * (1 - upperFraction));
+      let low = Math.max(0.01, roundToCent(Math.min(open, close) - wickTotal * (1 - upperFraction)));
       high = Math.max(high, open, close);
       low = Math.min(low, open, close);
       if (!(low > 0 && high >= low && Number.isFinite(high) && Number.isFinite(low))) {

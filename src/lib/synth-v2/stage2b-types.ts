@@ -53,6 +53,20 @@ export interface Stage2BTrendControl {
   normalizedSquaredError: number;
 }
 
+export interface Stage2CVolatilityMap {
+  p5: number;
+  p17: number;
+  p33: number;
+  p50: number;
+  p67: number;
+  p83: number;
+  p90: number;
+  p95: number;
+  wobbleWidth: number;
+  grid: Array<{ dial: number; realizedMedianAtr: number; p10: number; p90: number }>;
+  calibrationSeeds: { start: number; count: number; weekdays: number };
+}
+
 export interface Stage2BRealCalibration {
   schemaVersion: 1;
   sourceSha256: string;
@@ -63,6 +77,7 @@ export interface Stage2BRealCalibration {
   sourceWindowCount: number;
   sourceStretchCount: number;
   distributions: Record<Stage2BAnyMetric, Stage2BDistribution>;
+  volatilityMap?: Stage2CVolatilityMap;
   realCeilings: Record<Stage2BMetric, Record<Stage2BLevel, Stage2BRealCeiling>>;
   trendControls: Record<Stage2BLevel, Stage2BTrendControl>;
   newsStandardization: {

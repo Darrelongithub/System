@@ -608,11 +608,17 @@ export function stage2BExtrapolationFlags(
 ): string[] {
   const outside: string[] = [];
   const direct: Array<[keyof CalibrationProfile["defaultDials"], Stage2BAnyMetric]> = [
-    ["volatilityLevel", "atrPercent"],
     ["drift", "drift"],
     ["gapSize", "gapSize"],
     ["newsSpikeIntensity", "newsSpikeIntensity"],
   ];
+  if (calibration.volatilityMap) {
+    if (dials.volatilityLevel < calibration.volatilityMap.p5 || dials.volatilityLevel > calibration.volatilityMap.p95) {
+      outside.push("volatilityLevel");
+    }
+  } else {
+    direct.push(["volatilityLevel", "atrPercent"]);
+  }
   for (const [dial, metric] of direct) {
     const distribution = calibration.distributions[metric];
     if (dials[dial] < distribution.p5 || dials[dial] > distribution.p95) outside.push(dial);

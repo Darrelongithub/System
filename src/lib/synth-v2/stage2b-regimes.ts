@@ -25,15 +25,21 @@ export function getStage2BSettings(calibration: Stage2BRealCalibration, regimeId
   if (!definition) throw new Error(`unknown Stage 2b regime ${regimeId}`);
   const { distributions, trendControls } = calibration;
   const trend = trendControls[definition.trend];
+  const volDial = calibration.volatilityMap
+    ? percentileValue(calibration.volatilityMap, definition.volatility)
+    : percentileValue(distributions.atrPercent, definition.volatility);
+  const volWobbleWidth = calibration.volatilityMap
+    ? calibration.volatilityMap.wobbleWidth
+    : distributions.atrPercent.p83 - distributions.atrPercent.p17;
   const dials: DialValues = {
-    volatilityLevel: percentileValue(distributions.atrPercent, definition.volatility),
+    volatilityLevel: volDial,
     drift: percentileValue(distributions.drift, definition.drift),
     trendiness: trend.phi,
     gapSize: distributions.gapSize.p50,
     newsSpikeIntensity: distributions.newsSpikeIntensity.p50,
   };
   const wobbleWidths: DialValues = {
-    volatilityLevel: distributions.atrPercent.p83 - distributions.atrPercent.p17,
+    volatilityLevel: volWobbleWidth,
     drift: distributions.drift.p83 - distributions.drift.p17,
     trendiness: trendControls.HIGH.phi - trendControls.LOW.phi,
     gapSize: distributions.gapSize.p83 - distributions.gapSize.p17,

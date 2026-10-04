@@ -103,3 +103,24 @@
 - **Options:** (A) authorize a separate Stage 1b OHLC-construction defect investigation, focused regression test, and minimal repair, followed by a new frozen Stage 2b specification/config/seed list and full DESIGN/NULL plus hash-only LOCKED generation; (B) accept this Stage 2b study as incomplete and stop without changing Stage 1b.
 - **Recommendation:** A only as a separately scoped follow-up, with explicit approval for Stage 1b changes and a new cohort; until then choose B for the current fixed study. Never repair or substitute seed 6142 inside this registered cohort.
 - **What I did meanwhile:** stopped after recording the deterministic failure and the allowed market-statistic results. No detector, strategy, trade, R, P&L, or analyzer-result work was performed. The next phase has not begun.
+
+## Stage 2c questions, assumptions, and interim actions (2026-10-04)
+
+### Q1 — Monotone dial-response map calibration protocol
+
+- **Options:** (A) Calibrate a 16-point grid of \`volatilityLevel\` on disjoint calibration seeds 91001–91200, then invert linearly to map real W=20 ATR% targets (p17/p50/p83) into dial space; (B) Structurally refit the slow volatility AR(1) parameters.
+- **Recommendation:** A. The base model at its default normal setting already passed both G9 (median, p10, p90) and G10 (persistence) within the bootstrap 95% CI tolerances. As preregistered in SPEC-2c, when G9/G10 pass on the default setting, only the dial map is changed.
+- **What I did meanwhile:** Fit the monotone dial-response map across 200 separate calibration seeds (91001–91200) spanning dials 0.00030 to 0.00180. The inverted dial mapping yielded p17=0.00063163, p50=0.00075683, p83=0.00108368, with wobble width 0.00045204. Applied this mapping to Stage 2c regime generation.
+
+### Q2 — Generator invariant crash fix at root cause
+
+- **Options:** (A) Enforce price positivity in \`generate.ts\` by flooring \`low\` at the minimum positive cent tick (\`Math.max(0.01, ...)\`); (B) Catch and skip failing seeds.
+- **Recommendation:** A. Fixing at the root cause guarantees that physical price positivity ($0 < \\text{low} \\le \\min(\\text{open}, \\text{close})$) is strictly maintained across all extreme returns and wick geometries, while option B is forbidden by the specification.
+- **What I did meanwhile:** Implemented the root-cause fix in \`src/lib/synth-v2/generate.ts\`. Verified that debug seed 90135 reproduces the crash before the fix and passes all invariants with the fix. Verified that all 200 LOCKED TEST seeds (6001–6200) generate completely without error (hash-only mode, price data unopened). Passed the 5,000-path invariant stress test (G11) with zero invalid bars across 7,343,911 bars.
+
+### Q3 — Separate seed cohorts and inventory durability
+
+- **Options:** (A) Flush each path hash to disk immediately after generation so that interruptions lose no progress; (B) Buffer all hashes in memory and write at script completion.
+- **Recommendation:** A, to satisfy Rule 3 durability and prevent hash loss.
+- **What I did meanwhile:** Implemented immediate flushed appending to \`STAGE2C-SHA256SUMS.txt\` in \`scripts/synth-v2-stage2c.mjs\`. All 1,100 paths (DESIGN 8001–8200, LOCKED TEST 6001–6200, NULL 20001–20700) were generated and recorded on disk.
+
