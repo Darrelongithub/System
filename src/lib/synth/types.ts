@@ -37,6 +37,13 @@ export type GapDial = "normal" | "heavy";
 export type NewsDial = "light" | "normal" | "heavy";
 export type VolatilityShape = "expanding" | "stable" | "contracting";
 export type ShockFollowThrough = "continue" | "revert" | "mixed";
+export type IntradayClock = "EAT" | "Europe/London" | "America/New_York";
+
+export interface IntradayClockSlot {
+  clock: IntradayClock;
+  weekday: number;
+  minuteOfDay: number;
+}
 
 export interface SynthDials {
   volatility: VolatilityDial;
@@ -142,8 +149,18 @@ export interface SourceFileSummary {
 
 /** One price-free, Wilder-ATR-standardized real bar stored in the self-contained profile. */
 export interface StandardizedBar {
+  /** EAT wall-clock slot retained for the output calendar and D1 comparison. */
   minuteOfDay: number;
   weekday: number;
+  /** Local slot aliases for the same instant; IANA rules resolve each DST state. */
+  londonMinuteOfDay: number;
+  londonWeekday: number;
+  newYorkMinuteOfDay: number;
+  newYorkWeekday: number;
+  /** Session-selected clock used for intraday donor matching and scheduled spikes. */
+  intradayClock: IntradayClock;
+  clockMinuteOfDay: number;
+  clockWeekday: number;
   /** log(open / previous close) divided by previous ATR/previous close. */
   openGapAtr: number;
   /** log(close / open) divided by previous ATR/previous close. */
@@ -246,13 +263,25 @@ export interface CalibrationProfile {
       meanAbsoluteReturnAtr: number;
       meanAtrPercent: number;
     }>;
-    scheduledSpikeWindows: Array<{
+    intradayVolatilityByClock: Array<{
+      clock: IntradayClock;
       minuteOfDay: number;
-      timeEAT: string;
+      timeLocal: string;
+      sampleCount: number;
+      meanAbsoluteReturnAtr: number;
+      meanAtrPercent: number;
+    }>;
+    scheduledSpikeWindows: Array<{
+      clock: IntradayClock;
+      minuteOfDay: number;
+      timeLocal: string;
       sampleCount: number;
       meanAbsoluteReturnAtr: number;
       medianSlotMean: number;
       fixedMarginFractionOfMedian: 0.25;
+      eventProbability: number;
+      eventReturnAtrSamples: number[];
+      nonEventReturnAtrSamples: number[];
     }>;
     scheduledSpikeThresholdAbsReturnAtr: number;
     newsIntensity: {

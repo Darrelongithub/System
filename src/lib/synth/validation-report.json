@@ -5,7 +5,7 @@
     "sourcePath": "XAUUSD_30min_2020-01-24_to_2026-10-01.csv",
     "rawFileSha256": "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3",
     "profilePath": "src/lib/synth/profile.json",
-    "profileFileSha256": "0d5cc8402b34b986c7602380116a54c84d804364534f8d855e8f32393993b2de",
+    "profileFileSha256": "380793aa96c784ae2e169af7138a90f0c63da170ff6ed5e3d79e947edb2130c5",
     "profileCanonicalCandlesSha256": "a3b9f2d0bdfa3e578f94189256d191e1b0c45445c25ce206891bb24a471f3229",
     "profileSourceFiles": [
       {
@@ -40,7 +40,7 @@
     "seed": 20261001,
     "candles": 5520,
     "labels": 5520,
-    "outputJsonSha256": "6969634591b795b5098f2e944ecf5686c00d6f54a53739353de204b402ed23c3",
+    "outputJsonSha256": "6c4a28fd8f609f92f4fe3b52e0aee7e0a80e770d172603aa3fbcd5f594662fef",
     "realMetrics": {
       "returnKurtosisExcess": 151.18975020472834,
       "volatilityClusteringLag1": 0.13179070964533884,
@@ -78,46 +78,46 @@
       ]
     },
     "syntheticMetrics": {
-      "returnKurtosisExcess": 13.09157780110192,
-      "volatilityClusteringLag1": 0.186193996547124,
-      "meanRangeAtr": 0.9850164282108279,
-      "meanWickShare": 0.5046587245812559,
+      "returnKurtosisExcess": 35.231072750995395,
+      "volatilityClusteringLag1": 0.13325723574713952,
+      "meanRangeAtr": 0.9852434059842972,
+      "meanWickShare": 0.5316275926615501,
       "weekendGapFrequencyPerWeek": 0.8333333333333334,
-      "meanWeekendGapSizeAtr": 0.3299321684083142,
-      "varianceRatio8": 0.9448317281885472,
-      "varianceRatio16": 0.9073482362270954,
+      "meanWeekendGapSizeAtr": 0.6661549518755222,
+      "varianceRatio8": 0.9560096505480363,
+      "varianceRatio16": 0.9357396654293363,
       "hourlyVolatility": [
         0,
-        0.3331841127633877,
-        0.3294040574042922,
-        0.5115437252190593,
-        0.7777663386860438,
-        0.47126526287188686,
-        0.4554108061544731,
-        0.32968117077993225,
-        0.6112395570780418,
-        0.8182052282099541,
-        0.8716389946073391,
-        0.6921968347442202,
-        0.5257856772982276,
-        0.43623432469822193,
-        0.5614956022847714,
-        1.1469619946933336,
-        0.9329333329835579,
-        0.844787941114658,
-        0.6013911237965149,
-        0.33545834666666197,
-        0.34035216580649563,
-        0.351917526028304,
-        0.3517017234409023,
-        0.2624655905159901
+        0.3560303480141055,
+        0.3463807551914646,
+        0.5298683750792648,
+        0.7290125379659432,
+        0.5869838438143234,
+        0.40823756307344716,
+        0.3681130629464619,
+        0.5978934056513787,
+        0.6561223194917069,
+        0.682091839937322,
+        0.5677383082201674,
+        0.5228639644176633,
+        0.44316935340940694,
+        0.5530207164538761,
+        0.7353161553938895,
+        0.7218216406535595,
+        0.6021644185524554,
+        0.5098791495728336,
+        0.3489082800881288,
+        0.34255951780246696,
+        0.33943480812228727,
+        0.36849702703092035,
+        0.2869565301974467
       ]
     },
     "comparisons": [
       {
         "statistic": "excess return kurtosis",
         "real": 151.18975020472834,
-        "synthetic": 13.09157780110192,
+        "synthetic": 35.231072750995395,
         "bootstrap95Ci": [
           5.585195352223125,
           23.068612015722138
@@ -131,12 +131,12 @@
           181.427700245674
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -91.3409620801844
+        "relativeDifferencePercent": -76.69744628634648
       },
       {
         "statistic": "absolute-return autocorrelation lag 1",
         "real": 0.13179070964533884,
-        "synthetic": 0.186193996547124,
+        "synthetic": 0.13325723574713952,
         "bootstrap95Ci": [
           0.12500149999341895,
           0.19443449023793702
@@ -150,12 +150,12 @@
           0.19443449023793702
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 41.28006218965625
+        "relativeDifferencePercent": 1.1127689544636599
       },
       {
         "statistic": "mean range / Wilder ATR",
         "real": 0.9822298820892648,
-        "synthetic": 0.9850164282108279,
+        "synthetic": 0.9852434059842972,
         "bootstrap95Ci": [
           0.9770935472533999,
           0.990204903163887
@@ -169,12 +169,12 @@
           1.1786758585071178
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 0.2836959221436015
+        "relativeDifferencePercent": 0.3068043387788656
       },
       {
         "statistic": "combined wick share",
         "real": 0.5395330808398552,
-        "synthetic": 0.5046587245812559,
+        "synthetic": 0.5316275926615501,
         "bootstrap95Ci": [
           0.5356315446163491,
           0.5497974313335539
@@ -188,7 +188,7 @@
           0.6474396970078262
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -6.463803147030885
+        "relativeDifferencePercent": -1.4652462395816597
       },
       {
         "statistic": "weekend gaps per five trading days",
@@ -212,7 +212,7 @@
       {
         "statistic": "mean absolute weekend open gap / prior ATR",
         "real": 0.7138277826206891,
-        "synthetic": 0.3299321684083142,
+        "synthetic": 0.6661549518755222,
         "bootstrap95Ci": [
           0.28620356033878247,
           0.8545143032001464
@@ -226,12 +226,12 @@
           0.8565933391448269
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -53.77986449378195
+        "relativeDifferencePercent": -6.678477905433267
       },
       {
         "statistic": "variance ratio q=8 (mean 240-bar windows)",
         "real": 0.9518739269190778,
-        "synthetic": 0.9448317281885472,
+        "synthetic": 0.9560096505480363,
         "bootstrap95Ci": [
           0.8316057981775675,
           0.98916970075785
@@ -245,12 +245,12 @@
           1.1422487123028935
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -0.7398247321810782
+        "relativeDifferencePercent": 0.4344822893032267
       },
       {
         "statistic": "variance ratio q=16 (mean 240-bar windows)",
         "real": 0.9210570832885787,
-        "synthetic": 0.9073482362270954,
+        "synthetic": 0.9357396654293363,
         "bootstrap95Ci": [
           0.7734793382815216,
           0.9779818804724077
@@ -264,7 +264,7 @@
           1.1052684999462945
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -1.4883819157588727
+        "relativeDifferencePercent": 1.5941012133943209
       }
     ],
     "hourlyComparisons": [
@@ -290,7 +290,7 @@
       {
         "statistic": "EAT 01:00 mean |return| / ATR",
         "real": 0.3922018819778448,
-        "synthetic": 0.3331841127633877,
+        "synthetic": 0.3560303480141055,
         "bootstrap95Ci": [
           0.25719785622261615,
           0.3461160656698183
@@ -304,12 +304,12 @@
           0.4706422583734137
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -15.047803676217683
+        "relativeDifferencePercent": -9.22268240563481
       },
       {
         "statistic": "EAT 02:00 mean |return| / ATR",
         "real": 0.3934994530224277,
-        "synthetic": 0.3294040574042922,
+        "synthetic": 0.3463807551914646,
         "bootstrap95Ci": [
           0.24006005411536085,
           0.30462026568877465
@@ -323,12 +323,12 @@
           0.4721993436269133
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -16.288560282822655
+        "relativeDifferencePercent": -11.97427276430739
       },
       {
         "statistic": "EAT 03:00 mean |return| / ATR",
         "real": 0.4488674022439899,
-        "synthetic": 0.5115437252190593,
+        "synthetic": 0.5298683750792648,
         "bootstrap95Ci": [
           0.37001138691097624,
           0.4605001287031851
@@ -342,12 +342,12 @@
           0.5386408826927879
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 13.963215564716055
+        "relativeDifferencePercent": 18.04563495373748
       },
       {
         "statistic": "EAT 04:00 mean |return| / ATR",
         "real": 0.6478895540318598,
-        "synthetic": 0.7777663386860438,
+        "synthetic": 0.7290125379659432,
         "bootstrap95Ci": [
           0.5460013920219174,
           0.6782699618474115
@@ -360,13 +360,13 @@
           0.5183116432254878,
           0.7774674648382317
         ],
-        "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": 20.046130369899036
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 12.521113117081411
       },
       {
         "statistic": "EAT 05:00 mean |return| / ATR",
         "real": 0.45432032406472483,
-        "synthetic": 0.47126526287188686,
+        "synthetic": 0.5869838438143234,
         "bootstrap95Ci": [
           0.3762822260297368,
           0.4822347870984424
@@ -379,13 +379,13 @@
           0.3634562592517799,
           0.5451843888776698
         ],
-        "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 3.729733826468208
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": 29.20043694340618
       },
       {
         "statistic": "EAT 06:00 mean |return| / ATR",
         "real": 0.387403648052426,
-        "synthetic": 0.4554108061544731,
+        "synthetic": 0.40823756307344716,
         "bootstrap95Ci": [
           0.3382325551197647,
           0.4220029462482458
@@ -399,12 +399,12 @@
           0.4648843776629112
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 17.554599303319915
+        "relativeDifferencePercent": 5.3778313977574586
       },
       {
         "statistic": "EAT 07:00 mean |return| / ATR",
         "real": 0.33503150444609403,
-        "synthetic": 0.32968117077993225,
+        "synthetic": 0.3681130629464619,
         "bootstrap95Ci": [
           0.3048344798693073,
           0.3743849717733621
@@ -418,12 +418,12 @@
           0.40203780533531286
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -1.5969643436987986
+        "relativeDifferencePercent": 9.874163492493475
       },
       {
         "statistic": "EAT 08:00 mean |return| / ATR",
         "real": 0.5003733498227844,
-        "synthetic": 0.6112395570780418,
+        "synthetic": 0.5978934056513787,
         "bootstrap95Ci": [
           0.4651368398799725,
           0.5779269689531943
@@ -436,13 +436,13 @@
           0.4002986798582275,
           0.6004480197873412
         ],
-        "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": 22.156697053214874
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 19.489458394043712
       },
       {
         "statistic": "EAT 09:00 mean |return| / ATR",
         "real": 0.5615533933547695,
-        "synthetic": 0.8182052282099541,
+        "synthetic": 0.6561223194917069,
         "bootstrap95Ci": [
           0.5399470928978584,
           0.686389075236739
@@ -455,13 +455,13 @@
           0.4492427146838156,
           0.686389075236739
         ],
-        "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": 45.70390596732466
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 16.840593834180975
       },
       {
         "statistic": "EAT 10:00 mean |return| / ATR",
         "real": 0.5938406034063611,
-        "synthetic": 0.8716389946073391,
+        "synthetic": 0.682091839937322,
         "bootstrap95Ci": [
           0.5577421758205919,
           0.6724160400538931
@@ -474,13 +474,13 @@
           0.4750724827250889,
           0.7126087240876333
         ],
-        "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": 46.77995906771676
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": 14.861098420138033
       },
       {
         "statistic": "EAT 11:00 mean |return| / ATR",
         "real": 0.5842428338703161,
-        "synthetic": 0.6921968347442202,
+        "synthetic": 0.5677383082201674,
         "bootstrap95Ci": [
           0.4936790719514561,
           0.6190556087843205
@@ -494,12 +494,12 @@
           0.7010914006443792
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 18.477590928888763
+        "relativeDifferencePercent": -2.824942762380925
       },
       {
         "statistic": "EAT 12:00 mean |return| / ATR",
         "real": 0.488914704534358,
-        "synthetic": 0.5257856772982276,
+        "synthetic": 0.5228639644176633,
         "bootstrap95Ci": [
           0.4239191589391334,
           0.5255330261022828
@@ -513,12 +513,12 @@
           0.5866976454412296
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 7.541391662372984
+        "relativeDifferencePercent": 6.94380012882585
       },
       {
         "statistic": "EAT 13:00 mean |return| / ATR",
         "real": 0.4875680143306707,
-        "synthetic": 0.43623432469822193,
+        "synthetic": 0.44316935340940694,
         "bootstrap95Ci": [
           0.4504795179161108,
           0.5638235219289129
@@ -532,12 +532,12 @@
           0.5850816171968048
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -10.528518714034028
+        "relativeDifferencePercent": -9.106147166403824
       },
       {
         "statistic": "EAT 14:00 mean |return| / ATR",
         "real": 0.5239667488672254,
-        "synthetic": 0.5614956022847714,
+        "synthetic": 0.5530207164538761,
         "bootstrap95Ci": [
           0.4898542459492604,
           0.6020836294703633
@@ -551,12 +551,12 @@
           0.6287600986406705
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 7.162449429983941
+        "relativeDifferencePercent": 5.545002168451159
       },
       {
         "statistic": "EAT 15:00 mean |return| / ATR",
         "real": 0.7986733833202797,
-        "synthetic": 1.1469619946933336,
+        "synthetic": 0.7353161553938895,
         "bootstrap95Ci": [
           0.8167145586721901,
           1.1007079585939754
@@ -569,13 +569,13 @@
           0.6389387066562238,
           1.1007079585939754
         ],
-        "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": 43.60839094513621
+        "withinAvailableSampleTolerance": true,
+        "relativeDifferencePercent": -7.932808235451491
       },
       {
         "statistic": "EAT 16:00 mean |return| / ATR",
         "real": 0.9091614434525219,
-        "synthetic": 0.9329333329835579,
+        "synthetic": 0.7218216406535595,
         "bootstrap95Ci": [
           0.820583451404796,
           1.0397184006602929
@@ -588,13 +588,13 @@
           0.7273291547620175,
           1.0909937321430263
         ],
-        "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 2.6147049792127857
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": -20.6057795508291
       },
       {
         "statistic": "EAT 17:00 mean |return| / ATR",
         "real": 0.7926277631163884,
-        "synthetic": 0.844787941114658,
+        "synthetic": 0.6021644185524554,
         "bootstrap95Ci": [
           0.6923163888968025,
           0.8935520527292778
@@ -607,13 +607,13 @@
           0.6341022104931107,
           0.9511533157396661
         ],
-        "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": 6.580665026568157
+        "withinAvailableSampleTolerance": false,
+        "relativeDifferencePercent": -24.02935569845358
       },
       {
         "statistic": "EAT 18:00 mean |return| / ATR",
         "real": 0.6095201408180982,
-        "synthetic": 0.6013911237965149,
+        "synthetic": 0.5098791495728336,
         "bootstrap95Ci": [
           0.4741718625148159,
           0.5970264687951453
@@ -627,12 +627,12 @@
           0.7314241689817179
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -1.3336748824530287
+        "relativeDifferencePercent": -16.347448520983477
       },
       {
         "statistic": "EAT 19:00 mean |return| / ATR",
         "real": 0.44008497704797167,
-        "synthetic": 0.33545834666666197,
+        "synthetic": 0.3489082800881288,
         "bootstrap95Ci": [
           0.3534463010794474,
           0.4329109276631274
@@ -646,12 +646,12 @@
           0.528101972457566
         ],
         "withinAvailableSampleTolerance": false,
-        "relativeDifferencePercent": -23.774188131376462
+        "relativeDifferencePercent": -20.71797532636614
       },
       {
         "statistic": "EAT 20:00 mean |return| / ATR",
         "real": 0.3888359700536489,
-        "synthetic": 0.34035216580649563,
+        "synthetic": 0.34255951780246696,
         "bootstrap95Ci": [
           0.33125004872542646,
           0.4231933866999603
@@ -665,12 +665,12 @@
           0.4666031640643787
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -12.468960688092668
+        "relativeDifferencePercent": -11.90127864065586
       },
       {
         "statistic": "EAT 21:00 mean |return| / ATR",
         "real": 0.3979881969318673,
-        "synthetic": 0.351917526028304,
+        "synthetic": 0.33943480812228727,
         "bootstrap95Ci": [
           0.33479894957650724,
           0.47156770471223014
@@ -684,12 +684,12 @@
           0.4775858363182408
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -11.575888747135453
+        "relativeDifferencePercent": -14.712343044586312
       },
       {
         "statistic": "EAT 22:00 mean |return| / ATR",
         "real": 0.37055494684535195,
-        "synthetic": 0.3517017234409023,
+        "synthetic": 0.36849702703092035,
         "bootstrap95Ci": [
           0.308000781107096,
           0.40371171787183646
@@ -703,12 +703,12 @@
           0.44466593621442235
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -5.087834763765253
+        "relativeDifferencePercent": -0.5553615818521114
       },
       {
         "statistic": "EAT 23:00 mean |return| / ATR",
         "real": 0.30531922369497605,
-        "synthetic": 0.2624655905159901,
+        "synthetic": 0.2869565301974467,
         "bootstrap95Ci": [
           0.2296758590310332,
           0.2908135114003941
@@ -722,7 +722,7 @@
           0.3663830684339713
         ],
         "withinAvailableSampleTolerance": true,
-        "relativeDifferencePercent": -14.035681297879274
+        "relativeDifferencePercent": -6.014260509149687
       }
     ],
     "availableSampleMetricChecksPass": false
@@ -749,8 +749,8 @@
     },
     "D5": {
       "result": "TESTED IN UNIT SUITE",
-      "outputJsonSha256": "6969634591b795b5098f2e944ecf5686c00d6f54a53739353de204b402ed23c3",
-      "profileFileSha256": "0d5cc8402b34b986c7602380116a54c84d804364534f8d855e8f32393993b2de"
+      "outputJsonSha256": "6c4a28fd8f609f92f4fe3b52e0aee7e0a80e770d172603aa3fbcd5f594662fef",
+      "profileFileSha256": "380793aa96c784ae2e169af7138a90f0c63da170ff6ed5e3d79e947edb2130c5"
     },
     "D6": {
       "result": "TESTED IN UNIT SUITE",

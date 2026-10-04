@@ -1,0 +1,28 @@
+# Synth V2 Stage 2 SHA-256 inventory
+# Status: Stage 1b G2 passed
+197a0f80bd6cef3302b2ff6dc0c28e1e9663ebd680fd99c6538247099a5c438d  src/lib/synth-v2/STAGE2-REPORT.md
+b5b3a0c613c4550962b99b3717914b4213a38169eb8b58c5477e040594029cc8  src/lib/synth-v2/STAGE2-CHECKS.json
+d6b34d8eab863b1e14dac722e34d7e272d5c491811c6ec940df33403e2ac02d2  src/lib/synth-v2/STAGE2-MANIFEST.json
+07786620ea080ba7fb078a905cdf8179f3189c61640189fb1b4e18384cbd56b2  src/lib/synth-v2/DESIGN-seed-1-engine.csv
+04f674c1e960684bbe59b9b7185587e580aed741b09d832d719f0efb62daf6f7  src/lib/synth-v2/DESIGN-SHA256SUMS.txt
+316113d2f9a782bad56e9348bde2811fadd9941c65c8c4d8e385a389c1a6e2eb  src/lib/synth-v2/LOCKED-TEST-SHA256SUMS.txt
+2c561d10102eda64b2bef163dfd51ffe26a3f836bebfd459731f775a056cd1fd  src/lib/synth-v2/NULL-SHA256SUMS.txt
+8de5c3bd4e4dd95d1d5d962fd901b47ced5e7113009fce0379a9998a5de3237f  src/lib/synth-v2/stage2-data/FORMAT.md
+fa6ec133fa6a50944df1f511e52a7e95c02597236dc430ff5293efe39fa477dd  src/lib/synth-v2/regimes.ts
+d2f871289e2ec029382695e5873ccae9e66c01efa4f0b8bd753db46fbe6c920b  src/lib/synth-v2/stage2-validation.ts
+f62e73a7cd4edc0bc935a79670fcab1528da641b91002abfa8f0a55af6d84586  src/lib/synth-v2/stage2-artifacts.ts
+1a0941c56f5c1b618092100298748f463b3e7d96802ca6d70dd31c12fda52917  src/lib/synth-v2/generate.ts
+98239ee1b11be2535fd772c9584c21c701d79ba0b8f3b625882930b6aea52d41  src/lib/synth-v2/types.ts
+402aaf397c8fc41f97ed680a783bf2c890ad32859d36b0ab1523984d7a064a02  src/lib/synth-v2/index.ts
+41501f25df29eaf25d4756ee65c21a7cf374d58d5e6b57b7a61f281a3350a0bb  src/lib/synth-v2/README.md
+404cff8fa4607619766b4b063c1793240c73049cd4779da56871dbe98ea316e5  src/lib/synth-v2/QUESTIONS.md
+010ffd430e35fa80b33da9d8efef0782f1807ce40bba948bc02cb829a21a7c20  src/lib/synth-v2/SHA256SUMS.txt
+d9b8415703b0a293841955e2bdbcf9de6c1260191794218e187055b65ab5534d  src/lib/synth-v2/random.ts
+b1131f1f3156d1c57457cd90897888f8158d625cc2fae5227be063e5a1980b05  src/lib/synth-v2/time.ts
+0ac4507a2438fa04391248e9ae66b91366b601d662a954f196392ee495bf5aa8  src/lib/synth-v2/csv.ts
+473a62ef05826a582e4abbd27c4557c02f8bb0e754cf275ad18e8979e1e1f6fa  src/lib/synth-v2/metrics.ts
+ae988460658a0619e1c70c9fab5493b1a7547ad06af9d3aa05ef2943add488d5  src/lib/synth-v2/validation.ts
+6a5a387c00929697fda3ffdd3c32e866ca0c275a18e175a3969965ee60df2203  src/lib/synth-v2/profile.json
+af6084881afba94bc1f916ddc2c87e1fb7d9d51c3b789457ac4ffe8a6ed0470a  src/lib/synth-v2/gate-results.json
+a53d4387942b95ce9c6de0d2d90923796d080a00f9aad11b79071bd169e6aa3d  scripts/synth-v2-stage2.mjs
+d1cc8807cef509698bc0437858ba71657bc33a8edc859d5f2e727efd50e36d02  tests/synth-v2.test.mjs

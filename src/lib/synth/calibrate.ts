@@ -2,18 +2,25 @@ import type {
   CalibrationProfile,
   Candle,
   DistributionSummary,
+  IntradayClock,
   ResampleBlock,
   StandardizedBar,
 } from "./types";
 import {
   addCalendarDays,
   autocorrelation,
+  exchangeClockParts,
+  intradayClockSlot,
+  isDaylightSavingTime,
+  LONDON_TIME_ZONE,
   mean,
+  NEW_YORK_TIME_ZONE,
   parseEatDatetime,
   quantile,
   summarize,
   timeOfDayString,
   varianceRatio,
+  weekdayOfDate,
 } from "./math";
 import { hashCanonical } from "./hash";
 
@@ -44,6 +51,13 @@ interface ParsedBar {
   epochMs: number;
   weekday: number;
   minuteOfDay: number;
+  londonWeekday: number;
+  londonMinuteOfDay: number;
+  newYorkWeekday: number;
+  newYorkMinuteOfDay: number;
+  intradayClock: IntradayClock;
+  clockWeekday: number;
+  clockMinuteOfDay: number;
   trueRange: number;
   atr: number | undefined;
   priorAtr: number | undefined;
@@ -181,10 +195,10 @@ function finiteSummary(values: readonly number[]): DistributionSummary {
   return summarize(finite);
 }
 
-function sessionForMinute(minuteOfDay: number): "asia" | "london" | "newYork" {
-  if (minuteOfDay >= 60 && minuteOfDay <= 659) return "asia";
-  if (minuteOfDay >= 660 && minuteOfDay <= 959) return "london";
-  return "newYork";
+function sessionForClock(clock: IntradayClock): "asia" | "london" | "newYork" {
+  if (clock === NEW_YORK_TIME_ZONE) return "newYork";
+  if (clock === LONDON_TIME_ZONE) return "london";
+  return "asia";
 }
 
 function varianceAndMoments(values: readonly number[]) {
@@ -365,6 +379,72 @@ function buildCalendarSummary(
       );
     })
     ?.datetime.slice(0, 10);
+  const firstDate = candles[0]!.datetime.slice(0, 10);
+  const lastDate = candles[candles.length - 1]!.datetime.slice(0, 10);
+  const dstStateByDate = new Map<string, string>();
+  const observedWeekdayDateCounts = new Map<string, number>();
+  for (const bar of parsed) {
+    if (bar.weekday < 1 || bar.weekday > 5) continue;
+    const date = bar.candle.datetime.slice(0, 10);
+    if (!dstStateByDate.has(date)) {
+      const noon = parseEatDatetime(`${date} 12:00:00`)!;
+      const state = `${Number(isDaylightSavingTime(noon, LONDON_TIME_ZONE))}:${Number(isDaylightSavingTime(noon, NEW_YORK_TIME_ZONE))}`;
+      dstStateByDate.set(date, state);
+      observedWeekdayDateCounts.set(state, (observedWeekdayDateCounts.get(state) ?? 0) + 1);
+    }
+  }
+  const observedWeekdayDateTotal = [...observedWeekdayDateCounts.values()].reduce(
+    (sum, count) => sum + count,
+    0,
+  );
+  const dstStates = ["0:0", "0:1", "1:0", "1:1"];
+  const targetDstShares = new Map(
+    dstStates.map((state) => [
+      state,
+      observedWeekdayDateTotal > 0
+        ? (observedWeekdayDateCounts.get(state) ?? 0) / observedWeekdayDateTotal
+        : 0,
+    ]),
+  );
+  if (observedWeekdayDateTotal > 0) {
+    for (let date = firstDate; date <= lastDate; date = addCalendarDays(date, 1)) {
+      const noon = parseEatDatetime(`${date} 12:00:00`)!;
+      dstStateByDate.set(
+        date,
+        `${Number(isDaylightSavingTime(noon, LONDON_TIME_ZONE))}:${Number(isDaylightSavingTime(noon, NEW_YORK_TIME_ZONE))}`,
+      );
+    }
+  }
+  let representativeStartDate: string | undefined;
+  let bestDstShareError = Infinity;
+  const calendarDaysForValidationPath = 120;
+  let candidate = firstDate;
+  while (new Date(`${candidate}T00:00:00Z`).getUTCDay() !== 1) {
+    candidate = addCalendarDays(candidate, 1);
+  }
+  for (; candidate <= lastDate; candidate = addCalendarDays(candidate, 7)) {
+    const stateCountsForWindow = new Map<string, number>();
+    let tradingDays = 0;
+    let date = candidate;
+    while (tradingDays < calendarDaysForValidationPath && date <= lastDate) {
+      const weekday = weekdayOfDate(date);
+      if (weekday >= 1 && weekday <= 5) {
+        const state = dstStateByDate.get(date);
+        if (state) stateCountsForWindow.set(state, (stateCountsForWindow.get(state) ?? 0) + 1);
+        tradingDays++;
+      }
+      date = addCalendarDays(date, 1);
+    }
+    if (tradingDays !== calendarDaysForValidationPath) break;
+    const error = dstStates.reduce((sum, state) => {
+      const actualShare = (stateCountsForWindow.get(state) ?? 0) / tradingDays;
+      return sum + (actualShare - (targetDstShares.get(state) ?? 0)) ** 2;
+    }, 0);
+    if (error < bestDstShareError - 1e-12) {
+      bestDstShareError = error;
+      representativeStartDate = candidate;
+    }
+  }
 
   return {
     barsByWeekday,
@@ -374,7 +454,10 @@ function buildCalendarSummary(
     longClosures,
     standardWeekBarCount,
     representativeStartDate:
-      primarySchedule?.firstWeek ?? firstObservedMonday ?? candles[0]!.datetime.slice(0, 10),
+      representativeStartDate ??
+      primarySchedule?.firstWeek ??
+      firstObservedMonday ??
+      candles[0]!.datetime.slice(0, 10),
     unclassifiedClosureRatePerTradingDay:
       activeWeekdays > 0 ? unclassified.length / activeWeekdays : 0,
     missingCalendarDates: countMissingDates(candles),
@@ -519,7 +602,10 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
     london: { returns: [] as number[], atr: [] as number[], tr: [] as number[] },
     newYork: { returns: [] as number[], atr: [] as number[], tr: [] as number[] },
   };
-  const slotAbsReturns = new Map<number, number[]>();
+  const intradayReturns = new Map<string, number[]>();
+  const intradaySignedReturns = new Map<string, number[]>();
+  const intradayAtrPercents = new Map<string, number[]>();
+  const intradaySlotInfo = new Map<string, { clock: IntradayClock; minuteOfDay: number }>();
   const gaps: number[] = [];
   const weekendGaps: number[] = [];
   const closureGaps: number[] = [];
@@ -533,6 +619,10 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
     const epochMs = timestamps[i]!;
     const eatWallClock = new Date(epochMs + 3 * 60 * 60 * 1000);
     const { weekday, minuteOfDay } = wallClockParts(epochMs);
+    const londonClock = exchangeClockParts(epochMs, LONDON_TIME_ZONE);
+    const newYorkClock = exchangeClockParts(epochMs, NEW_YORK_TIME_ZONE);
+    const activityClock = intradayClockSlot(weekday, minuteOfDay, londonClock, newYorkClock);
+    const activityClockKey = `${activityClock.clock}:${activityClock.minuteOfDay}`;
     const weekId = mondayDate(candle.datetime, weekday);
     const previous = i > 0 ? candles[i - 1] : undefined;
     const deltaMinutes = i > 0 ? (epochMs - timestamps[i - 1]!) / 60_000 : undefined;
@@ -578,6 +668,13 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
       epochMs,
       weekday,
       minuteOfDay,
+      londonWeekday: londonClock.weekday,
+      londonMinuteOfDay: londonClock.minuteOfDay,
+      newYorkWeekday: newYorkClock.weekday,
+      newYorkMinuteOfDay: newYorkClock.minuteOfDay,
+      intradayClock: activityClock.clock,
+      clockWeekday: activityClock.weekday,
+      clockMinuteOfDay: activityClock.minuteOfDay,
       trueRange: trueRanges[i]!,
       atr: currentAtr,
       priorAtr,
@@ -611,15 +708,29 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
       const hour = Math.floor(minuteOfDay / 60);
       hourlyReturns[hour]!.push(Math.abs(closeReturnAtr));
       weekdayReturns[weekday]!.push(Math.abs(closeReturnAtr));
-      const slotValues = slotAbsReturns.get(minuteOfDay) ?? [];
+      const slotValues = intradayReturns.get(activityClockKey) ?? [];
       slotValues.push(Math.abs(closeReturnAtr));
-      slotAbsReturns.set(minuteOfDay, slotValues);
+      intradayReturns.set(activityClockKey, slotValues);
+      const signedSlotValues = intradaySignedReturns.get(activityClockKey) ?? [];
+      signedSlotValues.push(closeReturnAtr);
+      intradaySignedReturns.set(activityClockKey, signedSlotValues);
+      intradaySlotInfo.set(activityClockKey, {
+        clock: activityClock.clock,
+        minuteOfDay: activityClock.minuteOfDay,
+      });
     }
     if (currentAtr !== undefined) {
       const hour = Math.floor(minuteOfDay / 60);
       hourlyAtr[hour]!.push(currentAtr / candle.close);
       weekdayAtr[weekday]!.push(currentAtr / candle.close);
-      const session = sessionForMinute(minuteOfDay);
+      const clockAtrValues = intradayAtrPercents.get(activityClockKey) ?? [];
+      clockAtrValues.push(currentAtr / candle.close);
+      intradayAtrPercents.set(activityClockKey, clockAtrValues);
+      intradaySlotInfo.set(activityClockKey, {
+        clock: activityClock.clock,
+        minuteOfDay: activityClock.minuteOfDay,
+      });
+      const session = sessionForClock(activityClock.clock);
       sessionRows[session].atr.push(currentAtr / candle.close);
       sessionRows[session].tr.push(trueRanges[i]! / currentAtr);
       if (closeReturnAtr !== undefined) sessionRows[session].returns.push(Math.abs(closeReturnAtr));
@@ -658,6 +769,13 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
       return {
         minuteOfDay: bar.minuteOfDay,
         weekday: bar.weekday,
+        londonMinuteOfDay: bar.londonMinuteOfDay,
+        londonWeekday: bar.londonWeekday,
+        newYorkMinuteOfDay: bar.newYorkMinuteOfDay,
+        newYorkWeekday: bar.newYorkWeekday,
+        intradayClock: bar.intradayClock,
+        clockMinuteOfDay: bar.clockMinuteOfDay,
+        clockWeekday: bar.clockWeekday,
         openGapAtr: bar.openGapAtr,
         bodyReturnAtr: bar.bodyReturnAtr,
         trueRangeAtr: bar.trueRange / bar.atr,
@@ -743,27 +861,51 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
     },
   };
 
-  const slotMeans = [...slotAbsReturns.entries()].map(([minuteOfDay, values]) => ({
-    minuteOfDay,
-    sampleCount: values.length,
-    mean: mean(values),
-  }));
+  const clockRank = (clock: IntradayClock) =>
+    clock === "EAT" ? 0 : clock === LONDON_TIME_ZONE ? 1 : 2;
+  const intradayVolatilityByClock = [...intradaySlotInfo.entries()]
+    .map(([key, slot]) => {
+      const returnsAtSlot = intradayReturns.get(key) ?? [];
+      const atrAtSlot = intradayAtrPercents.get(key) ?? [];
+      return {
+        clock: slot.clock,
+        minuteOfDay: slot.minuteOfDay,
+        timeLocal: timeOfDayString(slot.minuteOfDay),
+        sampleCount: returnsAtSlot.length,
+        meanAbsoluteReturnAtr: meanOrZero(returnsAtSlot),
+        meanAtrPercent: meanOrZero(atrAtSlot),
+      };
+    })
+    .sort((a, b) => clockRank(a.clock) - clockRank(b.clock) || a.minuteOfDay - b.minuteOfDay);
   const medianSlotMean = quantile(
-    slotMeans.map((slot) => slot.mean),
+    intradayVolatilityByClock.map((slot) => slot.meanAbsoluteReturnAtr),
     0.5,
   );
   const scheduledSpikeThresholdAbsReturnAtr = medianSlotMean * (1 + SCHEDULED_SPIKE_MARGIN);
-  const scheduledSpikeWindows = slotMeans
-    .filter((slot) => slot.mean > scheduledSpikeThresholdAbsReturnAtr)
-    .sort((a, b) => a.minuteOfDay - b.minuteOfDay)
-    .map((slot) => ({
-      minuteOfDay: slot.minuteOfDay,
-      timeEAT: timeOfDayString(slot.minuteOfDay),
-      sampleCount: slot.sampleCount,
-      meanAbsoluteReturnAtr: slot.mean,
-      medianSlotMean,
-      fixedMarginFractionOfMedian: 0.25 as const,
-    }));
+  const scheduledSpikeWindows = intradayVolatilityByClock
+    .filter((slot) => slot.meanAbsoluteReturnAtr > scheduledSpikeThresholdAbsReturnAtr)
+    .map((slot) => {
+      const signedReturns = intradaySignedReturns.get(`${slot.clock}:${slot.minuteOfDay}`) ?? [];
+      const eventReturnAtrSamples = signedReturns.filter(
+        (value) => Math.abs(value) > scheduledSpikeThresholdAbsReturnAtr,
+      );
+      const nonEventReturnAtrSamples = signedReturns.filter(
+        (value) => Math.abs(value) <= scheduledSpikeThresholdAbsReturnAtr,
+      );
+      return {
+        clock: slot.clock,
+        minuteOfDay: slot.minuteOfDay,
+        timeLocal: slot.timeLocal,
+        sampleCount: slot.sampleCount,
+        meanAbsoluteReturnAtr: slot.meanAbsoluteReturnAtr,
+        medianSlotMean,
+        fixedMarginFractionOfMedian: 0.25 as const,
+        eventProbability:
+          signedReturns.length > 0 ? eventReturnAtrSamples.length / signedReturns.length : 0,
+        eventReturnAtrSamples,
+        nonEventReturnAtrSamples,
+      };
+    });
 
   const tailEntries: Array<{
     index: number;
@@ -827,14 +969,18 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
   const heavyIntradayGapProbability =
     standardWeekBarCount > 0 ? Math.min(1, heavyGapFrequencyPerWeek / standardWeekBarCount) : 0;
 
-  const scheduledSlots = new Set(scheduledSpikeWindows.map((window) => window.minuteOfDay));
-  const eligibleScheduledBars = standardBars.filter((bar) => scheduledSlots.has(bar.minuteOfDay));
+  const scheduledSlots = new Set(
+    scheduledSpikeWindows.map((window) => `${window.clock}:${window.minuteOfDay}`),
+  );
+  const isScheduledSlot = (bar: StandardizedBar) =>
+    scheduledSlots.has(`${bar.intradayClock}:${bar.clockMinuteOfDay}`);
+  const eligibleScheduledBars = standardBars.filter(isScheduledSlot);
   const scheduledEvents = eligibleScheduledBars.filter(
     (bar) => Math.abs(bar.closeReturnAtr) > scheduledSpikeThresholdAbsReturnAtr,
   ).length;
   const scheduledWeeklyRates = completeWeeks.map((block) => {
     const weekBars = standardBars.slice(block.startBar, block.endBarExclusive);
-    const eligible = weekBars.filter((bar) => scheduledSlots.has(bar.minuteOfDay));
+    const eligible = weekBars.filter(isScheduledSlot);
     const events = eligible.filter(
       (bar) => Math.abs(bar.closeReturnAtr) > scheduledSpikeThresholdAbsReturnAtr,
     ).length;
@@ -903,7 +1049,7 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
     standardWeekBarCount: calendar.standardWeekBarCount,
     representativeStartDate: calendar.representativeStartDate,
     unclassifiedClosureRatePerTradingDay: calendar.unclassifiedClosureRatePerTradingDay,
-    note: "The primary week template is the most frequent exact Monday-Friday slot pattern; up to five recurring templates are summarized separately. Repeated non-weekend gaps of 60-240 minutes are classified as scheduled session breaks only when the exact EAT weekday/time pair and duration occur at least 40 times. All source bars and timestamps remain unchanged; other gaps are unclassified closures, not verified holidays or feed outages.",
+    note: "The primary week template is the most frequent exact Monday-Friday EAT slot pattern; up to five recurring templates are summarized separately. The default representative date minimizes squared differences between the full source weekday-date UK/US DST-state shares and the next 120 synthetic trading weekdays. London/New York local clocks are used for intraday resampling and EAT remains the output convention. Repeated non-weekend gaps of 60-240 minutes are classified as scheduled session breaks only when the exact EAT weekday/time pair and duration occur at least 40 times. All source bars and timestamps remain unchanged; other gaps are unclassified closures, not verified holidays or feed outages.",
   };
 
   return {
@@ -961,6 +1107,7 @@ export function calibrate(realCandles: Candle[]): CalibrationProfile {
       sessionVolatility,
       hourlyVolatilityEAT,
       dayOfWeekVolatilityEAT,
+      intradayVolatilityByClock,
       scheduledSpikeWindows,
       scheduledSpikeThresholdAbsReturnAtr,
       newsIntensity,

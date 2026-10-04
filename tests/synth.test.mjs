@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { parseCsv } from "../src/lib/analyzer/parse.ts";
 import {
@@ -11,6 +12,15 @@ import {
   toCsv,
 } from "../src/lib/synth/index.ts";
 import { sha256Hex } from "../src/lib/synth/hash.ts";
+import { DEFAULT_PROFILE_SUMMARY } from "../src/lib/synth/profile-summary.ts";
+import {
+  exchangeClockParts,
+  intradayClockSlot,
+  isDaylightSavingTime,
+  LONDON_TIME_ZONE,
+  NEW_YORK_TIME_ZONE,
+  parseEatDatetime,
+} from "../src/lib/synth/math.ts";
 
 function assertInvariants(candles) {
   assert(candles.length > 0, "generator returns candles");
@@ -130,6 +140,61 @@ function scheduleBars() {
   return out;
 }
 
+test("synth exchange clocks: London and New York local slots follow their independent DST rules", () => {
+  const winterNyOpen = parseEatDatetime("2021-01-18 16:00:00");
+  const summerNyOpen = parseEatDatetime("2021-07-19 15:00:00");
+  assert(winterNyOpen !== undefined && summerNyOpen !== undefined, "test timestamps parse as EAT");
+  assert(!isDaylightSavingTime(winterNyOpen, LONDON_TIME_ZONE), "London winter is standard time");
+  assert(
+    !isDaylightSavingTime(winterNyOpen, NEW_YORK_TIME_ZONE),
+    "New York winter is standard time",
+  );
+  assert(isDaylightSavingTime(summerNyOpen, LONDON_TIME_ZONE), "London summer is daylight time");
+  assert(
+    isDaylightSavingTime(summerNyOpen, NEW_YORK_TIME_ZONE),
+    "New York summer is daylight time",
+  );
+  const usOnlyDate = parseEatDatetime("2021-03-22 16:00:00");
+  assert(usOnlyDate !== undefined, "US-only DST test timestamp parses");
+  assert(
+    !isDaylightSavingTime(usOnlyDate, LONDON_TIME_ZONE),
+    "London remains standard in the spring offset interval",
+  );
+  assert(
+    isDaylightSavingTime(usOnlyDate, NEW_YORK_TIME_ZONE),
+    "New York has already switched in the spring offset interval",
+  );
+  const usOnlySlot = intradayClockSlot(
+    1,
+    16 * 60,
+    exchangeClockParts(usOnlyDate, LONDON_TIME_ZONE),
+    exchangeClockParts(usOnlyDate, NEW_YORK_TIME_ZONE),
+  );
+  assertEqual(
+    usOnlySlot.clock,
+    NEW_YORK_TIME_ZONE,
+    "overlap precedence selects the active New York local clock",
+  );
+  assertEqual(usOnlySlot.minuteOfDay, 9 * 60, "the US-only state preserves New York 09:00");
+  const winterNewYork = exchangeClockParts(winterNyOpen, NEW_YORK_TIME_ZONE);
+  const summerNewYork = exchangeClockParts(summerNyOpen, NEW_YORK_TIME_ZONE);
+  assertEqual(winterNewYork.minuteOfDay, 8 * 60, "winter EAT 16:00 is New York 08:00");
+  assertEqual(summerNewYork.minuteOfDay, 8 * 60, "summer EAT 15:00 is New York 08:00");
+  const winterLondonOpen = parseEatDatetime("2021-01-18 11:00:00");
+  const summerLondonOpen = parseEatDatetime("2021-07-19 10:00:00");
+  assert(
+    winterLondonOpen !== undefined && summerLondonOpen !== undefined,
+    "London timestamps parse",
+  );
+  for (const instant of [winterLondonOpen, summerLondonOpen]) {
+    const localLondon = exchangeClockParts(instant, LONDON_TIME_ZONE);
+    const localNewYork = exchangeClockParts(instant, NEW_YORK_TIME_ZONE);
+    const slot = intradayClockSlot(1, 11 * 60, localLondon, localNewYork);
+    assertEqual(slot.clock, LONDON_TIME_ZONE, "the London session uses London local time");
+    assertEqual(slot.minuteOfDay, 8 * 60, "the local London slot is stable over DST");
+  }
+});
+
 test("synth calibration: input is validated without sorting, deduplication, or OHLC repair", () => {
   const bars = simpleBars(24);
   const profile = calibrate(bars);
@@ -247,6 +312,41 @@ test("synth calibration: bundled profile is self-contained, hashable, and report
     DEFAULT_PROFILE.resampling.completeWeeks.length >= 20,
     "empirical block library is embedded",
   );
+  assertEqual(
+    DEFAULT_PROFILE.sample.calendar.representativeStartDate,
+    "2021-01-18",
+    "the default 120-day anchor matches the observed weekday-date DST-state mix",
+  );
+  assert(
+    DEFAULT_PROFILE.sample.intradayVolatilityByClock.length > 0,
+    "the profile carries exchange-local intraday statistics",
+  );
+  assert(
+    DEFAULT_PROFILE.sample.scheduledSpikeWindows.every(
+      (window) =>
+        window.eventReturnAtrSamples.length > 0 &&
+        window.nonEventReturnAtrSamples.length > 0 &&
+        Math.abs(
+          window.eventProbability - window.eventReturnAtrSamples.length / window.sampleCount,
+        ) < 1e-12,
+    ),
+    "scheduled event and background mixtures use each full-source local-clock rate",
+  );
+  const eligibleScheduledReturns = DEFAULT_PROFILE.sample.scheduledSpikeWindows.reduce(
+    (sum, window) => sum + window.sampleCount,
+    0,
+  );
+  const observedScheduledEvents = DEFAULT_PROFILE.sample.scheduledSpikeWindows.reduce(
+    (sum, window) => sum + window.eventReturnAtrSamples.length,
+    0,
+  );
+  assert(
+    Math.abs(
+      observedScheduledEvents / eligibleScheduledReturns -
+        DEFAULT_PROFILE.sample.newsIntensity.scheduledEventRatePerEligibleBar.normal,
+    ) < 1e-12,
+    "the eligible-bar normal rate matches the window-specific full-source rates",
+  );
   assert(
     DEFAULT_PROFILE.sample.atrPercent.quantiles.p10 <
       DEFAULT_PROFILE.sample.atrPercent.quantiles.p50 &&
@@ -258,6 +358,45 @@ test("synth calibration: bundled profile is self-contained, hashable, and report
     DEFAULT_PROFILE.source.files[0].sha256,
     "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3",
     "full-archive raw file SHA is pinned",
+  );
+});
+
+test("synth UI metadata: lightweight profile summary matches the bundled source profile", () => {
+  assertEqual(
+    DEFAULT_PROFILE_SUMMARY.sample.calendar.representativeStartDate,
+    DEFAULT_PROFILE.sample.calendar.representativeStartDate,
+    "default synthetic start date",
+  );
+  assertEqual(
+    DEFAULT_PROFILE_SUMMARY.sample.calendar.standardWeekBarCount,
+    DEFAULT_PROFILE.sample.calendar.standardWeekBarCount,
+    "standard weekly bar count",
+  );
+  for (const key of ["median", "minimum", "maximum"]) {
+    assertEqual(
+      DEFAULT_PROFILE_SUMMARY.sample.price[key],
+      DEFAULT_PROFILE.sample.price[key],
+      `price ${key}`,
+    );
+  }
+  for (const key of ["p10", "p90"]) {
+    assertEqual(
+      DEFAULT_PROFILE_SUMMARY.sample.atrPercent.quantiles[key],
+      DEFAULT_PROFILE.sample.atrPercent.quantiles[key],
+      `ATR ${key}`,
+    );
+    assertEqual(
+      DEFAULT_PROFILE_SUMMARY.sample.rolling60DayDriftLogReturn.quantiles[key],
+      DEFAULT_PROFILE.sample.rolling60DayDriftLogReturn.quantiles[key],
+      `drift ${key}`,
+    );
+  }
+  assertEqual(DEFAULT_PROFILE_SUMMARY.source.span.start, DEFAULT_PROFILE.source.span.start);
+  assertEqual(DEFAULT_PROFILE_SUMMARY.source.span.end, DEFAULT_PROFILE.source.span.end);
+  assertEqual(
+    DEFAULT_PROFILE_SUMMARY.source.canonicalCandlesSha256,
+    DEFAULT_PROFILE.source.canonicalCandlesSha256,
+    "canonical source hash",
   );
 });
 
@@ -548,4 +687,29 @@ test("synth CSV serializer rejects duplicate timestamps and invalid OHLC instead
     invalidRejected = String(error).includes("OHLC geometry");
   }
   assert(invalidRejected, "invalid geometry fails visibly");
+});
+
+test("synth UI: the map generator discloses the latest exhausted D1 result without claiming certification", () => {
+  const source = readFileSync(new URL("../src/pages/MapGenerator.tsx", import.meta.url), "utf8");
+  assert(source.includes("28/32 market-statistic checks"), "UI shows the final recorded D1 count");
+  assert(
+    source.includes("EAT 05:00, 16:00, 17:00, and 19:00"),
+    "UI shows the actual remaining failed hours",
+  );
+  assert(
+    source.includes("D2–D7 and Phase 4 were"),
+    "UI records that downstream calibration was not run",
+  );
+  assert(
+    !source.includes("26/32 market-statistic checks"),
+    "stale pre-final repair copy is removed",
+  );
+  assert(
+    !source.includes('from "@/lib/synth/profile-default"'),
+    "route does not eagerly import the large donor profile",
+  );
+  assert(
+    source.includes('await import("@/lib/synth/generate")'),
+    "synthesis engine loads only when generation is requested",
+  );
 });

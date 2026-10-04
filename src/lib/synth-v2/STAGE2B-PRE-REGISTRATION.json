@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "recordedBeforeSyntheticGeneration": true,
+  "generatedSyntheticPaths": 0,
+  "specSha256": "18537cb7992b9e3b0d86e42beb7fcaaa92e4cedeb8106a5660e5c41db508c574",
+  "sourceSha256": "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3",
+  "profileSha256": "6a5a387c00929697fda3ffdd3c32e866ca0c275a18e175a3969965ee60df2203",
+  "seedListSha256": "a430038890afd1a1aa81e9cd684c1496548a31ee3ff6d203a8d9c1ab23449dd4",
+  "realBandsSha256": "696cbca363abb312b1411d45a573c0e49317aa40a572acbe9da2e7ae7ee20356",
+  "configSha256": "88bfcfeb364820bbb4cb6f6139b1f2b2643575ddecce74ff85b1412b68564911",
+  "codeHashes": {
+    "package.json": "d9a2e925fac6a5e07a8d5b80281c802010f8d1736afeacf39ec5cf809e7757cc",
+    "scripts/synth-v2-stage2b-calibrate.mjs": "5c18ad8206efc32a5be2e1d166787974807b796b892338eb733a8d2e6d3579f0",
+    "scripts/synth-v2-stage2b.mjs": "2977c06df7945788b4d48bda3670a3ee0de241bb81d14d1dac66daa79ec90f50",
+    "src/lib/analyzer/parse.ts": "4fbe1424da4094c7e1aa0295a591fc3a9da0954639eb46ea2cdcf0d962c80dd8",
+    "src/lib/analyzer/types.ts": "2d2a808c5c8b362a40b5a94fbe74a7ec1d607c07f3520891e05a6cfc996aeebd",
+    "src/lib/synth-v2/csv.ts": "0ac4507a2438fa04391248e9ae66b91366b601d662a954f196392ee495bf5aa8",
+    "src/lib/synth-v2/generate.ts": "1a0941c56f5c1b618092100298748f463b3e7d96802ca6d70dd31c12fda52917",
+    "src/lib/synth-v2/random.ts": "d9b8415703b0a293841955e2bdbcf9de6c1260191794218e187055b65ab5534d",
+    "src/lib/synth-v2/regimes.ts": "fa6ec133fa6a50944df1f511e52a7e95c02597236dc430ff5293efe39fa477dd",
+    "src/lib/synth-v2/stage2-artifacts.ts": "f62e73a7cd4edc0bc935a79670fcab1528da641b91002abfa8f0a55af6d84586",
+    "src/lib/synth-v2/stage2b-math.ts": "e9eb398d1b2e749765339bae87b925a280192c5b9b0fe6a84412c0f6827f2d4b",
+    "src/lib/synth-v2/stage2b-provenance.ts": "76ce6c8fc3d8c6dc9f2516c7ff7dee736fa8343dc94516230cbf679f4cc563fd",
+    "src/lib/synth-v2/stage2b-regimes.ts": "bee5d16a9237a88587b96d0a7a4192c38be1ce6c1730e21ed6ad3713cb98f673",
+    "src/lib/synth-v2/stage2b-types.ts": "4b1a568280433add4094815b46f4f7e06c640d72789e4fe0a71ae7169c5219e4",
+    "src/lib/synth-v2/stage2b-validation.ts": "2848305b8201b0c6de7e9e7de341367def828a0281b36514e37f403a77d0af44",
+    "src/lib/synth-v2/time.ts": "b1131f1f3156d1c57457cd90897888f8158d625cc2fae5227be063e5a1980b05",
+    "src/lib/synth-v2/types.ts": "98239ee1b11be2535fd772c9584c21c701d79ba0b8f3b625882930b6aea52d41",
+    "tests/hooks.mjs": "fc9a5536bdab299a1f55e44e91101c153234ead8495d39a7ba82a32964518a2f",
+    "tests/register.mjs": "286b813c5cf21c66a921566a518b8e9ee5ab58edd84bd8e16faea3c2bfa80a17"
+  },
+  "frozenInputHashes": {
+    "src/lib/synth-v2/SPEC-2b.md": "18537cb7992b9e3b0d86e42beb7fcaaa92e4cedeb8106a5660e5c41db508c574",
+    "src/lib/synth-v2/SPEC-2b.sha256": "ec441491312a15a2eaedc6443f97bad0dd110c1cd85a95894fa7422f895c041e",
+    "src/lib/synth-v2/stage2b-data/.gitignore": "1ac283bda20bbd62be9918da0265293bc3723a654d112e47817a1558be115be8",
+    "src/lib/synth-v2/STAGE2B-SEEDS.json": "a430038890afd1a1aa81e9cd684c1496548a31ee3ff6d203a8d9c1ab23449dd4",
+    "src/lib/synth-v2/profile.json": "6a5a387c00929697fda3ffdd3c32e866ca0c275a18e175a3969965ee60df2203",
+    "XAUUSD_30min_2020-01-24_to_2026-10-01.csv": "cf393fc399ae63b921ce6d5ebc7de05e4cb7481d51079d2d18c164414cfea1d3"
+  }
+}
