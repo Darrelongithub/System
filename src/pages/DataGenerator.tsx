@@ -1030,7 +1030,13 @@ export default function Home() {
   return (
     <div className="app-shell min-h-screen bg-background text-foreground flex flex-col font-sans">
       {/* ═══ HEADER ═══ */}
-      <header className="sticky top-0 z-50 border-b border-white/5 bg-black/95 backdrop-blur-xl">
+      {/* No backdrop-blur here on purpose. This header is full-width and sticky,
+          and a 24px backdrop-filter on a sticky layer forces the compositor to
+          snapshot and re-blur the full width behind it on every composite and
+          scroll — which is a known stall when a native popup (the date pickers
+          directly below it) has to be composited over the region. At
+          `bg-black/95` the blur was visually redundant anyway. */}
+      <header className="sticky top-0 z-50 border-b border-white/5 bg-black/95">
         <div className="container mx-auto px-6 h-14 flex items-center justify-between max-w-7xl">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
