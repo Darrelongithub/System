@@ -1,70 +1,43 @@
-# Multi-Market Daily OHLC Dataset Manifest
+# Multi-Market Daily OHLC Dataset Manifest (Phase 2b)
 
-This manifest documents the target universe of 17 instruments across 5 asset classes for Phase 2 data sourcing, specifying symbols, data providers, endpoints, timezones, close conventions, documented start dates, and instrument types.
-
----
-
-## 1. Instrument Universe Specification
-
-| ID | Instrument | Asset Class | Primary Source & Symbol | Second Source & Symbol | Primary Timezone | Close Convention | Documented Start Date | Instrument Type | Sourcing Status |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **EQ-01** | **US500** | Equity Index | Yahoo: `^GSPC` | Dukascopy: `USA500.IDX/USD` | America/New_York | 16:00 EST / 21:00 UTC | Yahoo: 1927-12-30; Duka: 2011-09-19 | Cash Index (Primary) / CFD (Sec) | CAVEAT (Network Unreachable) |
-| **EQ-02** | **US Tech 100** | Equity Index | Yahoo: `^NDX` | Dukascopy: `USATECH.IDX/USD` | America/New_York | 16:00 EST / 21:00 UTC | Yahoo: 1985-10-01; Duka: 2011-09-19 | Cash Index (Primary) / CFD (Sec) | CAVEAT (Network Unreachable) |
-| **EQ-03** | **Germany 40** | Equity Index | Yahoo: `^GDAXI` | Dukascopy: `DEU.IDX/EUR` | Europe/Berlin | 17:30 CET / 16:30 UTC | Yahoo: 1987-12-30; Duka: 2012-01-19 | Performance Cash Index / CFD | CAVEAT (Network Unreachable) |
-| **EQ-04** | **UK 100** | Equity Index | Yahoo: `^FTSE` | Dukascopy: `GBR.IDX/GBP` | Europe/London | 16:30 GMT / 16:30 UTC | Yahoo: 1984-01-03; Duka: 2011-09-19 | Price Return Cash Index / CFD | CAVEAT (Network Unreachable) |
-| **EQ-05** | **Japan 225** | Equity Index | Yahoo: `^N225` | Dukascopy: `JPN.IDX/JPY` | Asia/Tokyo | 15:00 JST / 06:00 UTC | Yahoo: 1950-04-04; Duka: 2011-09-19 | Price Return Cash Index / CFD | CAVEAT (Network Unreachable) |
-| **RT-01** | **US 10Y Treasury** | Rates | Yahoo: `IEF` (ETF Adj) / `ZN=F` | Dukascopy: `IEF.US/USD` | America/New_York | 16:00 EST / 21:00 UTC | Yahoo: 2002-07-30; Duka: 2018-02-01 | Total Return ETF / Futures | CAVEAT (Rolls on ZN; Network Unreachable) |
-| **RT-02** | **US 30Y Treasury** | Rates | Yahoo: `TLT` (ETF Adj) / `ZB=F` | Dukascopy: `TLT.US/USD` | America/New_York | 16:00 EST / 21:00 UTC | Yahoo: 2002-07-30; Duka: 2017-01-23 | Total Return ETF / Futures | CAVEAT (Rolls on ZB; Network Unreachable) |
-| **RT-03** | **Euro Bund** | Rates | Dukascopy: `BUND.TR/EUR` | Eurex: `FGBL` (Req Creds) | Europe/Berlin | 17:15 CET / 16:15 UTC | Duka: 2016-02-05; Yahoo: None | Total Return CFD / Futures | NO SOURCE (Yahoo none; Duka Unreachable) |
-| **FX-01** | **EURUSD** | Foreign Exchange | Yahoo: `EURUSD=X` | Dukascopy: `EURUSD` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Yahoo: 2003-12-01; Duka: 2003-05-04 | Spot FX (OTC) | CAVEAT (Network Unreachable) |
-| **FX-02** | **GBPUSD** | Foreign Exchange | Yahoo: `GBPUSD=X` | Dukascopy: `GBPUSD` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Yahoo: 2003-12-01; Duka: 2003-05-05 | Spot FX (OTC) | CAVEAT (Network Unreachable) |
-| **FX-03** | **USDJPY** | Foreign Exchange | Yahoo: `JPY=X` | Dukascopy: `USDJPY` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Yahoo: 1996-10-30; Duka: 2003-05-05 | Spot FX (OTC) | CAVEAT (Network Unreachable) |
-| **FX-04** | **AUDUSD** | Foreign Exchange | Yahoo: `AUDUSD=X` | Dukascopy: `AUDUSD` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Yahoo: 2003-12-01; Duka: 2003-08-03 | Spot FX (OTC) | CAVEAT (Network Unreachable) |
-| **FX-05** | **USDCAD** | Foreign Exchange | Yahoo: `CAD=X` | Dukascopy: `USDCAD` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Yahoo: 2003-09-17; Duka: 2003-08-04 | Spot FX (OTC) | CAVEAT (Network Unreachable) |
-| **MT-01** | **Gold** | Commodities (Metals) | Dukascopy: `XAUUSD` | Yahoo: `GC=F` / `XAUUSD=X` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Duka: 2003-05-04; Yahoo: 2000-08-30 | Spot OTC (Duka) / Continuous Futures | CAVEAT (Rolls on GC; Network Unreachable) |
-| **MT-02** | **Silver** | Commodities (Metals) | Dukascopy: `XAGUSD` | Yahoo: `SI=F` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Duka: 2003-05-05; Yahoo: 2000-08-30 | Spot OTC (Duka) / Continuous Futures | CAVEAT (Rolls on SI; Network Unreachable) |
-| **MT-03** | **Copper** | Commodities (Metals) | Dukascopy: `COPPER.CMD/USD` | Yahoo: `HG=F` | UTC / America/New_York | 17:00 EST / 22:00 UTC | Duka: 2012-03-01; Yahoo: 2000-08-30 | CFD Commodity (Duka) / Continuous Futures | CAVEAT (Rolls on HG; Network Unreachable) |
-| **EN-01** | **Brent Crude** | Commodities (Energy) | Dukascopy: `BRENT.CMD/USD` | Yahoo: `BZ=F` | UTC / Europe/London | 19:30 GMT / 14:30 EST | Duka: 2011-09-20; Yahoo: 2007-07-30 | CFD Commodity (Duka) / Continuous Futures | CAVEAT (Rolls on BZ; Network Unreachable) |
+**Date:** 2026-10-05  
+**Branch:** `arena/01a107dc-system`  
+**Phase:** DATA SOURCING, PHASE 2b (Build and Validate Multi-Market Daily Data; No Strategy Work)  
+**Status:** **NO DATA** (No raw files in `data/multimarket/raw/`; external sources unreachable via sandbox network)
 
 ---
 
-## 2. Source Endpoints & Network Access Policy
+## 1. Instrument Specifications and Manifest
 
-1. **Yahoo Finance Public Endpoints:**
-   - Chart API URL: `https://query1.finance.yahoo.com/v8/finance/chart/{SYMBOL}?interval=1d&range=max`
-   - Download CSV URL: `https://query1.finance.yahoo.com/v7/finance/download/{SYMBOL}?period1=0&period2=9999999999&interval=1d&events=history`
-   - Access: Requires no API key.
-   - Status in Execution Sandbox: **UNREACHABLE** (TCP connection reset / TLS syscall error: firewall restricted).
-
-2. **Dukascopy Public Datafeed:**
-   - Feed Base URL: `https://datafeed.dukascopy.com/datafeed/{INSTRUMENT}/{YEAR}/{MONTH}/{DAY}/...`
-   - Catalog Reference: `https://tickstory.com/dukascopy-historical-data-available-date-ranges/`
-   - Access: Requires no API key or credentials.
-   - Status in Execution Sandbox: **UNREACHABLE** (TCP connection reset / TLS syscall error: firewall restricted).
-
-3. **Stooq Free Daily Data:**
-   - URL: `https://stooq.com/q/d/l/?s={symbol}&i=d`
-   - Access: Requires no API key.
-   - Status in Execution Sandbox: **UNREACHABLE** (TCP connection reset / TLS syscall error: firewall restricted).
-
-4. **FRED (Federal Reserve Bank of St. Louis):**
-   - URL: `https://fred.stlouisfed.org/graph/fredgraph.csv?id={SERIES_ID}`
-   - Access: Requires no API key for direct CSV download.
-   - Status in Execution Sandbox: **UNREACHABLE** (TCP connection reset / TLS syscall error: firewall restricted).
+| ID | Instrument | Asset Class | Primary Symbol & Source | Secondary Symbol & Source | Raw File Name | Primary Timezone | Daily Cut-Off Convention | Return Type | Start Date | End Date | Total Rows | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **EQ-01** | **US500** | Equity Index | Yahoo: `^GSPC` | Dukascopy: `USA500.IDX/USD` | None | America/New_York | 16:00 EST / 21:00 UTC | Price Return (Cash Index) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **EQ-02** | **US Tech 100** | Equity Index | Yahoo: `^NDX` | Dukascopy: `USATECH.IDX/USD` | None | America/New_York | 16:00 EST / 21:00 UTC | Price Return (Cash Index) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **EQ-03** | **Germany 40** | Equity Index | Yahoo: `^GDAXI` | Dukascopy: `DEU.IDX/EUR` | None | Europe/Berlin | 17:30 CET / 16:30 UTC | Total Return (DAX Performance) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **EQ-04** | **UK 100** | Equity Index | Yahoo: `^FTSE` | Dukascopy: `GBR.IDX/GBP` | None | Europe/London | 16:30 GMT / 16:30 UTC | Price Return (Cash Index) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **EQ-05** | **Japan 225** | Equity Index | Yahoo: `^N225` | Dukascopy: `JPN.IDX/JPY` | None | Asia/Tokyo | 15:00 JST / 06:00 UTC | Price Return (Cash Index) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **RT-01** | **US 10Y Treasury** | Rates | Yahoo: `IEF` (ETF Adj) | Dukascopy: `IEF.US/USD` | None | America/New_York | 16:00 EST / 21:00 UTC | Total Return (Div-Adjusted ETF) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **RT-02** | **US 30Y Treasury** | Rates | Yahoo: `TLT` (ETF Adj) | Dukascopy: `TLT.US/USD` | None | America/New_York | 16:00 EST / 21:00 UTC | Total Return (Div-Adjusted ETF) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **RT-03** | **Euro Bund** | Rates | Dukascopy: `BUND.TR/EUR` | Eurex: `FGBL` (Req Creds) | None | Europe/Berlin | 17:15 CET / 16:15 UTC | Total Return (Sovereign CFD) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **FX-01** | **EURUSD** | FX | Yahoo: `EURUSD=X` | Dukascopy: `EURUSD` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Price Return (Spot OTC) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **FX-02** | **GBPUSD** | FX | Yahoo: `GBPUSD=X` | Dukascopy: `GBPUSD` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Price Return (Spot OTC) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **FX-03** | **USDJPY** | FX | Yahoo: `JPY=X` | Dukascopy: `USDJPY` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Price Return (Spot OTC) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **FX-04** | **AUDUSD** | FX | Yahoo: `AUDUSD=X` | Dukascopy: `AUDUSD` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Price Return (Spot OTC) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **FX-05** | **USDCAD** | FX | Yahoo: `CAD=X` | Dukascopy: `USDCAD` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Price Return (Spot OTC) | NO DATA | NO DATA | 0 | **NO DATA** |
+| **MT-01** | **Gold** | Metals | Dukascopy: `XAUUSD` | Yahoo: `GC=F` / `XAUUSD=X` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Spot OTC (Duka) / Futures | NO DATA | NO DATA | 0 | **NO DATA** |
+| **MT-02** | **Silver** | Metals | Dukascopy: `XAGUSD` | Yahoo: `SI=F` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Spot OTC (Duka) / Futures | NO DATA | NO DATA | 0 | **NO DATA** |
+| **MT-03** | **Copper** | Metals | Dukascopy: `COPPER.CMD/USD` | Yahoo: `HG=F` | None | UTC / America/New_York | 17:00 NY (DST-aware) | Commodity CFD (Duka) / Futures | NO DATA | NO DATA | 0 | **NO DATA** |
+| **EN-01** | **Brent Crude** | Energy | Dukascopy: `BRENT.CMD/USD` | Yahoo: `BZ=F` | None | UTC / Europe/London | 17:00 NY (DST-aware) | Commodity CFD (Duka) / Futures | NO DATA | NO DATA | 0 | **NO DATA** |
 
 ---
 
-## 3. Daily Cut-Off and Timestamp Alignment Protocol
+## 2. Inventory and Network Reachability Status (Step 0)
 
-To prevent lookahead and synchronization skew across global timezones:
-- **Global Cut-off Convention:** 17:00 New York Wall Clock (ET).
-- In UTC terms, this corresponds to:
-  - 21:00 UTC during US Daylight Saving Time (EDT, UTC-4).
-  - 22:00 UTC during US Standard Time (EST, UTC-5).
-- All FX pairs and 24-hour commodities naturally close their daily session at 17:00 NY ET.
-- Equity indices close at their respective local market close:
-  - US500, US Tech 100: 16:00 ET (fully contained within the 17:00 NY daily bar).
-  - Germany 40: 17:30 CET (11:30 ET / 16:30 UTC, fully contained).
-  - UK 100: 16:30 GMT (11:30 ET / 16:30 UTC, fully contained).
-  - Japan 225: 15:00 JST (02:00 ET / 06:00 UTC, trading precedes the NY day).
-- Weekly alignment: Friday close to Friday close across all instruments.
+1. **Local Raw Files:**  
+   Directory `data/multimarket/raw/` does not exist in the working tree. File count: **0**.
+2. **Remote Raw Files on `origin/main`:**  
+   `git ls-tree -r --name-only origin/main data/multimarket/raw` returned **0** files.
+3. **Public Data Feeds:**  
+   All external financial data endpoints (`datafeed.dukascopy.com`, `query1.finance.yahoo.com`, `stooq.com`, `fred.stlouisfed.org`) are **UNREACHABLE** due to sandbox firewall restrictions (only npm registry and GitHub API permitted).
+4. **Conclusion:**  
+   Under Step 0 ("*Instruments with no file and no reachable source are NO DATA. If nothing at all is available, report that and stop*"), all 17 instruments are classified as **NO DATA** and the data pipeline stops without data fabrication.
