@@ -1,0 +1,4 @@
+fce5117ce8a2bd7308c9be0696bbed525f7f40a3516ddd0deeb16f70c906091d  scripts/data-check-connectivity.mjs
+b2457f4bb7d3916653dbf0160374ebbd7d3ea406483d7aeb2ac951e813b9941d  data/multimarket/MANIFEST.md
+972807d649dbaba3311975349f43192db65ccd796ce67932f968d105bd2ae3a5  data/multimarket/DATA-REPORT.md
+f29c73dd1f43f8cc5f9746b2c5e36035fb0b64a6626cbd860774f1dac599773a  data/multimarket/QUESTIONS.md
