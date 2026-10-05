@@ -124,3 +124,24 @@
 - **Recommendation:** A, to satisfy Rule 3 durability and prevent hash loss.
 - **What I did meanwhile:** Implemented immediate flushed appending to \`STAGE2C-SHA256SUMS.txt\` in \`scripts/synth-v2-stage2c.mjs\`. All 1,100 paths (DESIGN 8001–8200, LOCKED TEST 6001–6200, NULL 20001–20700) were generated and recorded on disk.
 
+## Stage 3 questions, assumptions, and interim actions (2026-10-05)
+
+### Q1 — Overlay disabling diagnostic on seeds 92001–92200
+
+- **Options:** (A) Modify `stage2b-regimes.ts` to expose an overlay toggle; (B) Generate paths without overlays using a custom wrapper; (C) Do not modify generator code per Rule 2, report that the config does not expose an overlay toggle, and use the pre-registered NULL cohort (which has overlays disabled by definition) to evaluate the overlay spread hypothesis.
+- **Recommendation:** C. Rule 2 strictly forbids modifying Stage 2b/2c generator code or configuration formats.
+- **What I did meanwhile:** Followed option C. Confirmed through the 700 NULL paths (where overlays are disabled) that realized ATR% medians match DESIGN medians to within $\pm 0.003\%$, proving overlays do not explain the window ATR% spread.
+
+### Q2 — Handling absurd bars in LOCKED TEST scoring
+
+- **Options:** (A) Decompress and inspect LOCKED TEST candle ranges before scoring to exclude absurd paths; (B) Score all 200 LOCKED TEST paths unconditionally and report the DESIGN absurd-path frequency (62.5%).
+- **Recommendation:** B, per the explicit pre-registered rule in Part 1.
+- **What I did meanwhile:** Scored all 200 LOCKED TEST paths in memory exactly once without cherry-picking or pre-filtering.
+
+### Q3 — Pass bar failure reporting on LOCKED TEST
+
+- **Options:** (A) Alter hyperparameters or retrain with a different model family to attempt a pass; (B) Report the verdict as FAIL without post-hoc modifications.
+- **Recommendation:** B, per Rule 8 and Part 4 ("If any bar fails, the verdict is FAIL; report it as is and change nothing").
+- **What I did meanwhile:** Reported the empirical results faithfully: LOCKED TEST failed D-1, D-2, D-3, and D-4, with final verdict FAIL.
+
+

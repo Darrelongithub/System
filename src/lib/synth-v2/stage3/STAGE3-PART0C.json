@@ -1,0 +1,194 @@
+{
+  "tableRows": [
+    {
+      "pair": "quiet_range vs normal_chop",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.5800634357125163,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.6548536541791635,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.7677736614207767
+    },
+    {
+      "pair": "quiet_range vs trend_up",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.6330407925959542,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.7744146722938909,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.9137221920218439
+    },
+    {
+      "pair": "quiet_range vs trend_down",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.6333234879036272,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.7522604010189282,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.8834260903615121
+    },
+    {
+      "pair": "quiet_range vs whipsaw",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.7428692251884716,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.7845184597885009,
+      "w960_best_feature": "ATR%",
+      "w960_best_auc": 0.8698768779911785
+    },
+    {
+      "pair": "quiet_range vs expansion_up",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.7412273271991556,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.7803725239306121,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.8978087658692528
+    },
+    {
+      "pair": "quiet_range vs expansion_down",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.7329869732218508,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.7716832322015583,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.905740944136199
+    },
+    {
+      "pair": "normal_chop vs trend_up",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.6343661392208643,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.7390035904070227,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.8598451898724226
+    },
+    {
+      "pair": "normal_chop vs trend_down",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.6247214457963618,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.7280178975311185,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.859103772914888
+    },
+    {
+      "pair": "normal_chop vs whipsaw",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6704880199781147,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.7032688278491768,
+      "w960_best_feature": "ATR%",
+      "w960_best_auc": 0.7690066468451382
+    },
+    {
+      "pair": "normal_chop vs expansion_up",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6669084254734694,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.6963023958446739,
+      "w960_best_feature": "ATR%",
+      "w960_best_auc": 0.7655876474963007
+    },
+    {
+      "pair": "normal_chop vs expansion_down",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6578412785927166,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.6899385036614785,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.8099631653393751
+    },
+    {
+      "pair": "trend_up vs trend_down",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.7362789285012131,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.881641145276965,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.978107170311632
+    },
+    {
+      "pair": "trend_up vs whipsaw",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6500657900779058,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.7686160421767949,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.9035269601736153
+    },
+    {
+      "pair": "trend_up vs expansion_up",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6461940542519935,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.6698859436603952,
+      "w960_best_feature": "ATR%",
+      "w960_best_auc": 0.7443436735135456
+    },
+    {
+      "pair": "trend_up vs expansion_down",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.7121656846550041,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.8584018959854153,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.9639287122136638
+    },
+    {
+      "pair": "trend_down vs whipsaw",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6772599132942512,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.7461992625683688,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.8704600396808306
+    },
+    {
+      "pair": "trend_down vs expansion_up",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.7046360806033625,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.8419442634758862,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.9549942995943912
+    },
+    {
+      "pair": "trend_down vs expansion_down",
+      "w48_best_feature": "ATR%",
+      "w48_best_auc": 0.6647241776365413,
+      "w240_best_feature": "ATR%",
+      "w240_best_auc": 0.6946788251840605,
+      "w960_best_feature": "ATR%",
+      "w960_best_auc": 0.7831956131240618
+    },
+    {
+      "pair": "whipsaw vs expansion_up",
+      "w48_best_feature": "VR8",
+      "w48_best_auc": 0.6357176510692264,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.763410345022163,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.8865210117409694
+    },
+    {
+      "pair": "whipsaw vs expansion_down",
+      "w48_best_feature": "VR8",
+      "w48_best_auc": 0.6378367813398942,
+      "w240_best_feature": "VR8",
+      "w240_best_auc": 0.7644122348934448,
+      "w960_best_feature": "VR8",
+      "w960_best_auc": 0.8957631702630631
+    },
+    {
+      "pair": "expansion_up vs expansion_down",
+      "w48_best_feature": "Drift z",
+      "w48_best_auc": 0.6791167827245395,
+      "w240_best_feature": "Drift z",
+      "w240_best_auc": 0.8141292083754749,
+      "w960_best_feature": "Drift z",
+      "w960_best_auc": 0.931128703968028
+    }
+  ],
+  "belowPointSixAllThree": []
+}
