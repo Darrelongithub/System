@@ -1,0 +1,697 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-10-05T05:49:42.721Z",
+  "specSha256": "151b5aac7dba2098d8e6700b5e1cca75c93ef652384df22a454646ca13a05b00",
+  "part0": {
+    "trainTotalPaths": 100,
+    "trainScoredPaths": 40,
+    "trainExcludedPaths": 60,
+    "valTotalPaths": 100,
+    "valScoredPaths": 35,
+    "valExcludedPaths": 65,
+    "trainScoredDaysByRegime": {
+      "quiet_range": 654,
+      "normal_chop": 827,
+      "trend_up": 555,
+      "trend_down": 538,
+      "whipsaw": 677,
+      "expansion_up": 503,
+      "expansion_down": 606
+    },
+    "trainExcludedDaysByRegime": {
+      "quiet_range": 893,
+      "normal_chop": 999,
+      "trend_up": 1022,
+      "trend_down": 1212,
+      "whipsaw": 1113,
+      "expansion_up": 1010,
+      "expansion_down": 995
+    },
+    "valScoredDaysByRegime": {
+      "quiet_range": 689,
+      "normal_chop": 528,
+      "trend_up": 736,
+      "trend_down": 524,
+      "whipsaw": 422,
+      "expansion_up": 349,
+      "expansion_down": 311
+    },
+    "valExcludedDaysByRegime": {
+      "quiet_range": 1004,
+      "normal_chop": 961,
+      "trend_up": 1044,
+      "trend_down": 883,
+      "whipsaw": 1896,
+      "expansion_up": 1228,
+      "expansion_down": 1330
+    }
+  },
+  "part1": {
+    "buckets": [
+      {
+        "bucket": "[5,10)",
+        "n": 431,
+        "isThin": false,
+        "headlineBalancedAccuracy": 0.16727777777777778,
+        "recalls": {
+          "quiet_range": 0.07042253521126761,
+          "normal_chop": 0,
+          "trend_up": 0.0875,
+          "trend_down": 0.16666666666666666,
+          "whipsaw": 0.28888888888888886,
+          "expansion_up": 0,
+          "expansion_down": 0.46
+        }
+      },
+      {
+        "bucket": "[10,20)",
+        "n": 922,
+        "isThin": false,
+        "headlineBalancedAccuracy": 0.2874427639306673,
+        "recalls": {
+          "quiet_range": 0.1393939393939394,
+          "normal_chop": 0,
+          "trend_up": 0.4695121951219512,
+          "trend_down": 0.2,
+          "whipsaw": 0.33663366336633666,
+          "expansion_up": 0,
+          "expansion_down": 0.6310679611650486
+        }
+      },
+      {
+        "bucket": "[20,40)",
+        "n": 1393,
+        "isThin": false,
+        "headlineBalancedAccuracy": 0.4290568891616188,
+        "recalls": {
+          "quiet_range": 0.1391941391941392,
+          "normal_chop": 0,
+          "trend_up": 0.7906976744186046,
+          "trend_down": 0.34615384615384615,
+          "whipsaw": 0.5606936416184971,
+          "expansion_up": 0,
+          "expansion_down": 0.7938931297709924
+        }
+      },
+      {
+        "bucket": "[40,end)",
+        "n": 788,
+        "isThin": false,
+        "headlineBalancedAccuracy": 0.5303484383462719,
+        "recalls": {
+          "quiet_range": 0.3611111111111111,
+          "normal_chop": 0,
+          "trend_up": 0.8586387434554974,
+          "trend_down": 0.11450381679389313,
+          "whipsaw": 0.7931034482758621,
+          "expansion_up": 0,
+          "expansion_down": 1
+        }
+      }
+    ],
+    "lagCurve": [
+      {
+        "lag": 1,
+        "shareCorrect": 0.07317073170731707,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 2,
+        "shareCorrect": 0.08536585365853659,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 3,
+        "shareCorrect": 0.08536585365853659,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 4,
+        "shareCorrect": 0.0975609756097561,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 5,
+        "shareCorrect": 0.08536585365853659,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 6,
+        "shareCorrect": 0.0975609756097561,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 7,
+        "shareCorrect": 0.10975609756097561,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 8,
+        "shareCorrect": 0.10975609756097561,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 9,
+        "shareCorrect": 0.12195121951219512,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 10,
+        "shareCorrect": 0.13414634146341464,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 11,
+        "shareCorrect": 0.13414634146341464,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 12,
+        "shareCorrect": 0.13414634146341464,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 13,
+        "shareCorrect": 0.15853658536585366,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 14,
+        "shareCorrect": 0.18292682926829268,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 15,
+        "shareCorrect": 0.21951219512195122,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 16,
+        "shareCorrect": 0.24390243902439024,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 17,
+        "shareCorrect": 0.3048780487804878,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 18,
+        "shareCorrect": 0.32926829268292684,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 19,
+        "shareCorrect": 0.35365853658536583,
+        "totalBoundaries": 82
+      },
+      {
+        "lag": 20,
+        "shareCorrect": 0.3924050632911392,
+        "totalBoundaries": 79
+      },
+      {
+        "lag": 21,
+        "shareCorrect": 0.4342105263157895,
+        "totalBoundaries": 76
+      },
+      {
+        "lag": 22,
+        "shareCorrect": 0.4383561643835616,
+        "totalBoundaries": 73
+      },
+      {
+        "lag": 23,
+        "shareCorrect": 0.45588235294117646,
+        "totalBoundaries": 68
+      },
+      {
+        "lag": 24,
+        "shareCorrect": 0.46153846153846156,
+        "totalBoundaries": 65
+      },
+      {
+        "lag": 25,
+        "shareCorrect": 0.45161290322580644,
+        "totalBoundaries": 62
+      },
+      {
+        "lag": 26,
+        "shareCorrect": 0.4576271186440678,
+        "totalBoundaries": 59
+      },
+      {
+        "lag": 27,
+        "shareCorrect": 0.41379310344827586,
+        "totalBoundaries": 58
+      },
+      {
+        "lag": 28,
+        "shareCorrect": 0.3508771929824561,
+        "totalBoundaries": 57
+      },
+      {
+        "lag": 29,
+        "shareCorrect": 0.3584905660377358,
+        "totalBoundaries": 53
+      },
+      {
+        "lag": 30,
+        "shareCorrect": 0.35294117647058826,
+        "totalBoundaries": 51
+      },
+      {
+        "lag": 31,
+        "shareCorrect": 0.40425531914893614,
+        "totalBoundaries": 47
+      },
+      {
+        "lag": 32,
+        "shareCorrect": 0.40425531914893614,
+        "totalBoundaries": 47
+      },
+      {
+        "lag": 33,
+        "shareCorrect": 0.43478260869565216,
+        "totalBoundaries": 46
+      },
+      {
+        "lag": 34,
+        "shareCorrect": 0.4782608695652174,
+        "totalBoundaries": 46
+      },
+      {
+        "lag": 35,
+        "shareCorrect": 0.5,
+        "totalBoundaries": 44
+      },
+      {
+        "lag": 36,
+        "shareCorrect": 0.5121951219512195,
+        "totalBoundaries": 41
+      },
+      {
+        "lag": 37,
+        "shareCorrect": 0.48717948717948717,
+        "totalBoundaries": 39
+      },
+      {
+        "lag": 38,
+        "shareCorrect": 0.45714285714285713,
+        "totalBoundaries": 35
+      },
+      {
+        "lag": 39,
+        "shareCorrect": 0.48484848484848486,
+        "totalBoundaries": 33
+      },
+      {
+        "lag": 40,
+        "shareCorrect": 0.5161290322580645,
+        "totalBoundaries": 31
+      }
+    ]
+  },
+  "part2": {
+    "nonExcludedHeadlineBalAcc": 0.38143203594024444,
+    "nonExcludedRecalls": {
+      "quiet_range": 0.19013062409288825,
+      "normal_chop": 0,
+      "trend_up": 0.6603260869565217,
+      "trend_down": 0.23282442748091603,
+      "whipsaw": 0.542654028436019,
+      "expansion_up": 0,
+      "expansion_down": 0.7041800643086816
+    },
+    "excludedHeadlineBalAcc": 0.3658713439352783,
+    "excludedRecalls": {
+      "quiet_range": 0.17131474103585656,
+      "normal_chop": 0,
+      "trend_up": 0.5220306513409961,
+      "trend_down": 0.18006795016987542,
+      "whipsaw": 0.5870253164556962,
+      "expansion_up": 0,
+      "expansion_down": 0.7203007518796992
+    },
+    "nNonExcluded": 3559,
+    "nExcluded": 8346
+  },
+  "part3": {
+    "frozenBalAccOverall": 0.38143203594024444,
+    "logisticBestC": 1,
+    "logisticBalAccOverall": 0.2946668591150415,
+    "ensembleBalAccOverall": 0.30974546429462213,
+    "byBucket": [
+      {
+        "bucket": "[5,10)",
+        "frozenBalAcc": 0.16727777777777778,
+        "logisticBalAcc": 0.14066666666666666,
+        "ensembleBalAcc": 0.08877777777777777
+      },
+      {
+        "bucket": "[10,20)",
+        "frozenBalAcc": 0.2874427639306673,
+        "logisticBalAcc": 0.2899400286458576,
+        "ensembleBalAcc": 0.2536785932724536
+      },
+      {
+        "bucket": "[20,40)",
+        "frozenBalAcc": 0.4290568891616188,
+        "logisticBalAcc": 0.31088314641937614,
+        "ensembleBalAcc": 0.3407316689527537
+      },
+      {
+        "bucket": "[40,end)",
+        "frozenBalAcc": 0.5303484383462719,
+        "logisticBalAcc": 0.3556898672262457,
+        "ensembleBalAcc": 0.49030899960670676
+      }
+    ],
+    "verdict": "feature-limited",
+    "reason": "Ensemble overall accuracy (30.97%) beats 37% by under 3 points (-6.03 pp) AND [40,end) steady state (49.03%) is under 50%"
+  },
+  "part4": {
+    "dials": {
+      "volatility": {
+        "dialName": "volatility",
+        "classes": [
+          "LOW",
+          "NORMAL",
+          "HIGH"
+        ],
+        "logisticBalAcc": 0.42971929614690607,
+        "logisticRecalls": {
+          "LOW": 0.25544267053701014,
+          "NORMAL": 0.5956375838926175,
+          "HIGH": 0.43807763401109057
+        },
+        "ensembleBalAcc": 0.4132035066094351,
+        "ensembleRecalls": {
+          "LOW": 0.14223512336719885,
+          "NORMAL": 0.5391498881431768,
+          "HIGH": 0.5582255083179297
+        },
+        "byBucket": [
+          {
+            "bucket": "[5,10)",
+            "logisticBalAcc": 0.33330895417086837,
+            "ensembleBalAcc": 0.319567971690621
+          },
+          {
+            "bucket": "[10,20)",
+            "logisticBalAcc": 0.3646440966984385,
+            "ensembleBalAcc": 0.38603214503710187
+          },
+          {
+            "bucket": "[20,40)",
+            "logisticBalAcc": 0.45740927985619595,
+            "ensembleBalAcc": 0.44677595183156354
+          },
+          {
+            "bucket": "[40,end)",
+            "logisticBalAcc": 0.4956709359935167,
+            "ensembleBalAcc": 0.40874710713420387
+          }
+        ]
+      },
+      "drift": {
+        "dialName": "drift",
+        "classes": [
+          "DOWN",
+          "FLAT",
+          "UP"
+        ],
+        "logisticBalAcc": 0.6892617679759568,
+        "logisticRecalls": {
+          "DOWN": 0.61437125748503,
+          "FLAT": 0.8755338621110433,
+          "UP": 0.5778801843317972
+        },
+        "ensembleBalAcc": 0.6379321219677312,
+        "ensembleRecalls": {
+          "DOWN": 0.5796407185628742,
+          "FLAT": 0.8401464307504576,
+          "UP": 0.49400921658986174
+        },
+        "byBucket": [
+          {
+            "bucket": "[5,10)",
+            "logisticBalAcc": 0.41417091196096717,
+            "ensembleBalAcc": 0.3910286766640358
+          },
+          {
+            "bucket": "[10,20)",
+            "logisticBalAcc": 0.6235042643555536,
+            "ensembleBalAcc": 0.5527112642972764
+          },
+          {
+            "bucket": "[20,40)",
+            "logisticBalAcc": 0.7417550884760183,
+            "ensembleBalAcc": 0.6967153562173681
+          },
+          {
+            "bucket": "[40,end)",
+            "logisticBalAcc": 0.8410456837594843,
+            "ensembleBalAcc": 0.7898804344775323
+          }
+        ]
+      },
+      "trendiness": {
+        "dialName": "trendiness",
+        "classes": [
+          "MEAN_REVERTING",
+          "RANDOM",
+          "TRENDING"
+        ],
+        "logisticBalAcc": 0.5076443581858187,
+        "logisticRecalls": {
+          "MEAN_REVERTING": 0.6678667866786678,
+          "RANDOM": 0.017045454545454544,
+          "TRENDING": 0.8380208333333333
+        },
+        "ensembleBalAcc": 0.49803839758975893,
+        "ensembleRecalls": {
+          "MEAN_REVERTING": 0.6102610261026102,
+          "RANDOM": 0.0625,
+          "TRENDING": 0.8213541666666667
+        },
+        "byBucket": [
+          {
+            "bucket": "[5,10)",
+            "logisticBalAcc": 0.38183908045977016,
+            "ensembleBalAcc": 0.36891954022988505
+          },
+          {
+            "bucket": "[10,20)",
+            "logisticBalAcc": 0.49454632486451583,
+            "ensembleBalAcc": 0.4666044315233829
+          },
+          {
+            "bucket": "[20,40)",
+            "logisticBalAcc": 0.5434643404834806,
+            "ensembleBalAcc": 0.5177404954304267
+          },
+          {
+            "bucket": "[40,end)",
+            "logisticBalAcc": 0.5230763133384856,
+            "ensembleBalAcc": 0.5638824346689515
+          }
+        ]
+      }
+    },
+    "aucs": {
+      "highVolVsRest": 0.7347982212696923,
+      "driftUpVsDriftDown": 0.9363547559259362,
+      "driftUpVsFlat": 0.7925884896657791
+    }
+  },
+  "part5": {
+    "driftDetectability": [
+      {
+        "regime": "quiet_range",
+        "plantedDailyDrift": 0.00032894371619127626,
+        "realizedDailyDriftMean": 0.00023115754305630534,
+        "realizedDailyDriftSd": 0.005423950384982829,
+        "snrPerSqrtDay": 0.01802052932016341,
+        "weekdaysNeededZ2": 12317.6,
+        "analyticAucByN": {
+          "5": 0.5113655595812738,
+          "10": 0.5160711434145822,
+          "20": 0.5227218624659161,
+          "40": 0.5321161593074959,
+          "60": 0.5393128176061164
+        }
+      },
+      {
+        "regime": "normal_chop",
+        "plantedDailyDrift": 0.00032894371619127626,
+        "realizedDailyDriftMean": 0.0002733832190232562,
+        "realizedDailyDriftSd": 0.0071165467956977625,
+        "snrPerSqrtDay": 0.007801084229545982,
+        "weekdaysNeededZ2": 65727.9,
+        "analyticAucByN": {
+          "5": 0.5049206951381997,
+          "10": 0.5069587348129377,
+          "20": 0.5098406334749555,
+          "40": 0.5139153375911405,
+          "60": 0.5170410029249293
+        }
+      },
+      {
+        "regime": "trend_up",
+        "plantedDailyDrift": 0.002684393519476197,
+        "realizedDailyDriftMean": 0.0026934780845413835,
+        "realizedDailyDriftSd": 0.007936075307580817,
+        "snrPerSqrtDay": 0.29795308044552643,
+        "weekdaysNeededZ2": 45.1,
+        "analyticAucByN": {
+          "5": 0.6812171745328606,
+          "10": 0.7473722784627321,
+          "20": 0.8269575400522343,
+          "40": 0.9086497777221032,
+          "60": 0.9486556567320789
+        }
+      },
+      {
+        "regime": "trend_down",
+        "plantedDailyDrift": -0.0016481691430732508,
+        "realizedDailyDriftMean": -0.0017774822920897117,
+        "realizedDailyDriftSd": 0.007308546020847742,
+        "snrPerSqrtDay": 0.2882081177406865,
+        "weekdaysNeededZ2": 48.2,
+        "analyticAucByN": {
+          "5": 0.6756960543757834,
+          "10": 0.7403591797083264,
+          "20": 0.8189561422707561,
+          "40": 0.901284527850543,
+          "60": 0.9427838815338281
+        }
+      },
+      {
+        "regime": "whipsaw",
+        "plantedDailyDrift": 0.00032894371619127626,
+        "realizedDailyDriftMean": 0.0001860245551919536,
+        "realizedDailyDriftSd": 0.009561813159246134,
+        "snrPerSqrtDay": 0.014942296239065072,
+        "weekdaysNeededZ2": 17915.4,
+        "analyticAucByN": {
+          "5": 0.5094245171983367,
+          "10": 0.5133270324804369,
+          "20": 0.5188437505105691,
+          "40": 0.5266391532896992,
+          "60": 0.532614017825499
+        }
+      },
+      {
+        "regime": "expansion_up",
+        "plantedDailyDrift": 0.002684393519476197,
+        "realizedDailyDriftMean": 0.002597886618391648,
+        "realizedDailyDriftSd": 0.01042522550463854,
+        "snrPerSqrtDay": 0.2176438886028986,
+        "weekdaysNeededZ2": 84.4,
+        "analyticAucByN": {
+          "5": 0.6346238689412849,
+          "10": 0.6867526602709094,
+          "20": 0.7543525150023794,
+          "40": 0.8348061021849005,
+          "60": 0.8833859130905477
+        }
+      },
+      {
+        "regime": "expansion_down",
+        "plantedDailyDrift": -0.0016481691430732508,
+        "realizedDailyDriftMean": -0.0018550280283576722,
+        "realizedDailyDriftSd": 0.01027963638165856,
+        "snrPerSqrtDay": 0.21245187546267155,
+        "weekdaysNeededZ2": 88.6,
+        "analyticAucByN": {
+          "5": 0.6315327928707352,
+          "10": 0.6826267562151558,
+          "20": 0.749154681539228,
+          "40": 0.8289727610434592,
+          "60": 0.8777163613915125
+        }
+      }
+    ],
+    "volatilityEmpiricalAucByN": {
+      "5": {
+        "lowVsNormal": 0.5170041852959417,
+        "normalVsHigh": 0.6993129385883297,
+        "lowVsHigh": 0.7096370479867149
+      },
+      "20": {
+        "lowVsNormal": 0.5041098047619512,
+        "normalVsHigh": 0.7327748762545125,
+        "lowVsHigh": 0.7400489337328873
+      },
+      "60": {
+        "lowVsNormal": 0.605738790777413,
+        "normalVsHigh": 0.6173912549053662,
+        "lowVsHigh": 0.7193057526646618
+      }
+    },
+    "realGoldNoiseShare": {
+      "definition": "Daily log return ln(close_t / close_{t-1}) across 30-min trading days with >=24 bars",
+      "completedDays": 1726,
+      "rolling20MeanSpreadReal": 0.004235231604176308,
+      "rolling20MeanSpreadIidShuffleMean": 0.0047128182752168585,
+      "ratioRealToIid": 0.8986621925245835,
+      "rolling20MeanSpreadBlockShuffleMean": 0.004675092710226772,
+      "ratioRealToBlock": 0.9059139287038592,
+      "isMostlyNoise": true
+    }
+  },
+  "part6": {
+    "totalAbsurdBarsDesign": 245,
+    "totalAbsurdBarsNull": 275,
+    "frequenciesPerMillionByRegime": {
+      "quiet_range": 3,
+      "normal_chop": 7,
+      "trend_up": 11,
+      "trend_down": 10,
+      "whipsaw": 42,
+      "expansion_up": 29,
+      "expansion_down": 26
+    },
+    "frequenciesPerMillionByOverlay": {
+      "none": 129,
+      "news_storm": 0,
+      "gap_shocks": 0,
+      "both": 0
+    },
+    "histogramOverPriceBins": {
+      "3%-5%": 11045,
+      "5%-10%": 3604,
+      "10%-20%": 480,
+      "20%-40%": 37,
+      ">40%": 3
+    },
+    "realGoldFreqAbove3PctPerMillion": 176,
+    "realGoldFreqAbove5PctPerMillion": 38,
+    "sampleAbsurdBar": {
+      "pathSeed": 8001,
+      "cohort": "DESIGN",
+      "barIndex": 6961,
+      "datetime": "2023-01-02 21:30:00",
+      "slotIndex": 1,
+      "regime": "trend_up",
+      "overlays": [],
+      "open": 1960.69,
+      "high": 2143.04,
+      "low": 1823.27,
+      "close": 1979.5,
+      "range": 319.77,
+      "rangeOverPrice": 0.16154079312957817,
+      "bodyShare": 0.05882352941176454,
+      "upperWickShare": 0.5114300903774587,
+      "lowerWickShare": 0.42974638021077677,
+      "trailing48AtrPercent": 0.014961127078513653,
+      "rangeOverAtrDollars": 10.900063615311842
+    },
+    "generatorCodeLocation": {
+      "file": "src/lib/synth-v2/generate.ts",
+      "lines": "287-296",
+      "mechanism": "In generatePathWithSchedule: `const wickTotal = shape.wickPoolShare * currentAtrDollars * wickExpansion; let high = roundToCent(Math.max(open, close) + wickTotal * upperFraction); let low = Math.max(0.01, roundToCent(Math.min(open, close) - wickTotal * (1 - upperFraction)));`. When return shock is extreme or wickPoolShare draws from high Pareto tail, wickTotal is not bounded relative to price, inflating high-low range."
+    }
+  }
+}

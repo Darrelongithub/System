@@ -1,0 +1,10 @@
+151b5aac7dba2098d8e6700b5e1cca75c93ef652384df22a454646ca13a05b00  src/lib/synth-v2/stage3b/SPEC-3b.md
+c8e23beb2f783e4aa94b1e10e4fcda3547fce80d09cb366c51914eb4ff45dd61  src/lib/synth-v2/stage3b/SPEC-3b.sha256
+5f21366020bd0eae5df8b28504f981c680303ad5a4cf3b157790dde48664bf56  src/lib/synth-v2/stage3b/types.ts
+8c7fdabf77290dc5d108d534bfbccda82f36049d566381c49a8e1cde132ee6ac  src/lib/synth-v2/stage3b/diagnostics.ts
+4aede085aa3cad7fa0c33b13f9193386e734343e442c685bed56768c65eb9f4c  src/lib/synth-v2/stage3b/STAGE3B-RESULTS.json
+e43e24b566fbec3eefda6fb84f0a90956fc438f6700f18a5f974ebcfc9d4f667  src/lib/synth-v2/stage3b/STAGE3B-RESULTS.sha256
+a76929754021bdd2dbb78e909599db2cb811cc77329f0c4864d09e4852db4022  src/lib/synth-v2/stage3b/STAGE3B-REPORT.md
+e314068e5f23d987daed06d76db1603db89c52e9fe4e4ab640c129095160145b  src/lib/synth-v2/QUESTIONS.md
+0558435f65bd3876c4750dae36dfdb9b04a8c9464a8ed0a3e02bdde225223696  tests/synth-v2-stage3b.test.mjs
+dab257c978d4fedf2adcb389c3b779558ac86bfe9c7a6dfaffd0fd111c1be66b  scripts/synth-v2-stage3b-run.mjs

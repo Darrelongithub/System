@@ -144,4 +144,25 @@
 - **Recommendation:** B, per Rule 8 and Part 4 ("If any bar fails, the verdict is FAIL; report it as is and change nothing").
 - **What I did meanwhile:** Reported the empirical results faithfully: LOCKED TEST failed D-1, D-2, D-3, and D-4, with final verdict FAIL.
 
+## Stage 3b questions, assumptions, and interim actions (2026-10-05)
+
+### Q1 — Model capacity comparison architecture
+
+- **Options:** (A) Implement a self-contained 100-tree Bagged Ensemble with bootstrap sampling and depth 6 trees; (B) Use an external npm package that may introduce network or environment dependencies.
+- **Recommendation:** A. A self-contained implementation guarantees pure determinism and zero environment instability.
+- **What I did meanwhile:** Implemented `trainBaggedTreeEnsemble` in `diagnostics.ts` with 100 bootstrap trees up to depth 6. Evaluated it side-by-side with multinomial logistic regression and the frozen detector.
+
+### Q2 — Real-gold daily return definition convention
+
+- **Options:** (A) NY session close / EAT 00:00 midnight end-of-calendar-day close; (B) Open-to-close return; (C) London fix close.
+- **Recommendation:** A. In standard market finance, daily returns are defined as log difference of consecutive daily closes ($\ln(\text{close}_t / \text{close}_{t-1})$).
+- **What I did meanwhile:** Grouped real gold 30-min bars by date and extracted the final 30-min close of each full trading day ($\ge 24$ bars), yielding 1,726 consecutive completed daily returns.
+
+### Q3 — Status of absurd bars in generator code
+
+- **Options:** (A) Patch `generate.ts` immediately to cap wicks; (B) Document the exact line numbers and mechanism in `STAGE3B-REPORT.md` without modifying generator code.
+- **Recommendation:** B. Rule 2 strictly forbids modifying the generator in Stage 3b ("Output bars only; do not modify the generator. Read generate.ts and state which construction step can produce a range this large, with line references. Do not fix it.").
+- **What I did meanwhile:** Identified lines 287–296 in `src/lib/synth-v2/generate.ts` and explained the unbounded wick expansion mechanism without altering code.
+
+
 
