@@ -27,10 +27,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { DEFAULT_PROFILE } from "@/lib/synth/profile-default";
+import { DEFAULT_PROFILE_SUMMARY } from "@/lib/synth/profile-summary";
 import { SCENARIOS, SEQUENCE_SCENARIOS, SINGLE_CONDITION_SCENARIOS } from "@/lib/synth/scenarios";
 import { toCsv } from "@/lib/synth/csv";
-import { generateSynthetic } from "@/lib/synth/generate";
 import type {
   DriftDial,
   GapDial,
@@ -427,10 +426,10 @@ export default function MapGenerator() {
   const [scenario, setScenario] = useState<ScenarioName>("normal_chop");
   const [seed, setSeed] = useState(DEFAULT_SEED);
   const [tradingDays, setTradingDays] = useState("120");
-  const [startDate, setStartDate] = useState(
-    DEFAULT_PROFILE.sample.calendar.representativeStartDate,
+  const [startDate, setStartDate] = useState<string>(
+    DEFAULT_PROFILE_SUMMARY.sample.calendar.representativeStartDate,
   );
-  const [priceLevel, setPriceLevel] = useState(String(DEFAULT_PROFILE.sample.price.median));
+  const [priceLevel, setPriceLevel] = useState(String(DEFAULT_PROFILE_SUMMARY.sample.price.median));
   const [volatilityMode, setVolatilityMode] = useState("scenario");
   const [customVolatilityPercent, setCustomVolatilityPercent] = useState("0.25");
   const [driftMode, setDriftMode] = useState("scenario");
@@ -447,8 +446,8 @@ export default function MapGenerator() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const profileStart = DEFAULT_PROFILE.source.span.start.slice(0, 10);
-  const profileEnd = DEFAULT_PROFILE.source.span.end.slice(0, 10);
+  const profileStart = DEFAULT_PROFILE_SUMMARY.source.span.start.slice(0, 10);
+  const profileEnd = DEFAULT_PROFILE_SUMMARY.source.span.end.slice(0, 10);
   const preset = SCENARIOS[scenario];
   const presetLine =
     preset.kind === "sequence"
@@ -533,6 +532,7 @@ export default function MapGenerator() {
     setIsGenerating(true);
     await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
     try {
+      const { generateSynthetic } = await import("@/lib/synth/generate");
       const next = generateSynthetic(buildConfig(), parsedSeed);
       setGenerated(next);
     } catch (generationError) {
@@ -650,9 +650,9 @@ export default function MapGenerator() {
                 </p>
                 <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                   Profile: {profileStart} to {profileEnd} EAT. The fixed D1 check passed coverage
-                  but only 26/32 market-statistic checks: EAT 04:00, 08:00, 09:00, 10:00, 15:00, and
-                  19:00 hourly cells are outside tolerance. Thresholds were not changed. D2–D4, D7,
-                  and strategy-result checks were not run.
+                  but only 28/32 market-statistic checks: EAT 05:00, 16:00, 17:00, and 19:00 hourly
+                  cells are outside tolerance. Thresholds were not changed. D2–D7 and Phase 4 were
+                  not run.
                 </p>
               </div>
             </div>
@@ -741,7 +741,7 @@ export default function MapGenerator() {
                 max={2000}
                 step={1}
                 onChange={setTradingDays}
-                hint={`1–2,000 Mon–Fri days; calendar follows the primary ${DEFAULT_PROFILE.sample.calendar.standardWeekBarCount}-bar weekly template.`}
+                hint={`1–2,000 Mon–Fri days; calendar follows the primary ${DEFAULT_PROFILE_SUMMARY.sample.calendar.standardWeekBarCount}-bar weekly template.`}
               />
               <TextField
                 id="map-start"
@@ -757,7 +757,7 @@ export default function MapGenerator() {
                 min={0.01}
                 step={0.01}
                 onChange={setPriceLevel}
-                hint={`Observed source range: ${DEFAULT_PROFILE.sample.price.minimum.toFixed(2)}–${DEFAULT_PROFILE.sample.price.maximum.toFixed(2)}.`}
+                hint={`Observed source range: ${DEFAULT_PROFILE_SUMMARY.sample.price.minimum.toFixed(2)}–${DEFAULT_PROFILE_SUMMARY.sample.price.maximum.toFixed(2)}.`}
               />
             </div>
 
@@ -808,7 +808,7 @@ export default function MapGenerator() {
                     min={0.001}
                     step={0.01}
                     onChange={setCustomVolatilityPercent}
-                    hint={`Observed p10–p90: ${(DEFAULT_PROFILE.sample.atrPercent.quantiles.p10 * 100).toFixed(3)}%–${(DEFAULT_PROFILE.sample.atrPercent.quantiles.p90 * 100).toFixed(3)}%. Out-of-range bars are flagged EXTRAPOLATION.`}
+                    hint={`Observed p10–p90: ${(DEFAULT_PROFILE_SUMMARY.sample.atrPercent.quantiles.p10 * 100).toFixed(3)}%–${(DEFAULT_PROFILE_SUMMARY.sample.atrPercent.quantiles.p90 * 100).toFixed(3)}%. Out-of-range bars are flagged EXTRAPOLATION.`}
                   />
                 )}
                 <SelectField
@@ -832,7 +832,7 @@ export default function MapGenerator() {
                     value={customDriftPercent}
                     step={0.1}
                     onChange={setCustomDriftPercent}
-                    hint={`Observed p10–p90: ${(DEFAULT_PROFILE.sample.rolling60DayDriftLogReturn.quantiles.p10 * 100).toFixed(2)}%–${(DEFAULT_PROFILE.sample.rolling60DayDriftLogReturn.quantiles.p90 * 100).toFixed(2)}%.`}
+                    hint={`Observed p10–p90: ${(DEFAULT_PROFILE_SUMMARY.sample.rolling60DayDriftLogReturn.quantiles.p10 * 100).toFixed(2)}%–${(DEFAULT_PROFILE_SUMMARY.sample.rolling60DayDriftLogReturn.quantiles.p90 * 100).toFixed(2)}%.`}
                   />
                 )}
                 <SelectField
@@ -1087,9 +1087,9 @@ export default function MapGenerator() {
                 </p>
                 <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
                   Canonical candle SHA-256:{" "}
-                  {DEFAULT_PROFILE.source.canonicalCandlesSha256.slice(0, 16)}… · row timestamps are
-                  unzoned; section markers say UTC while metadata says EAT. Per input convention,
-                  rows are interpreted as EAT+03:00 with no timestamp shift.
+                  {DEFAULT_PROFILE_SUMMARY.source.canonicalCandlesSha256.slice(0, 16)}… · row
+                  timestamps are unzoned; section markers say UTC while metadata says EAT. Per input
+                  convention, rows are interpreted as EAT+03:00 with no timestamp shift.
                 </p>
               </div>
               <div className="glass-card rounded-xl p-4">
@@ -1102,8 +1102,8 @@ export default function MapGenerator() {
                 <p className="mt-1 text-[10px] leading-relaxed text-muted-foreground">
                   The CSV is EAT wall-clock text with parser metadata and no precomputed ATR
                   override. Ground-truth regime labels download separately as JSON. Full-window D1
-                  coverage passed, but six hourly market-statistic checks failed; see the report. No
-                  strategy results are included.
+                  coverage passed, but four hourly market-statistic checks failed; see the report.
+                  No strategy results are included.
                 </p>
               </div>
             </section>

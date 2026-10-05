@@ -49,6 +49,7 @@ await import("./compositing-hygiene.test.mjs");
 await import("./mt5-automation.test.mjs");
 await import("./mt5-bridge-auth.test.mjs");
 await import("./mt5-daemon-feed.test.mjs");
+await import("./synth-v2-stage2b.test.mjs");
 await import("./synth.test.mjs");
 
 const filter = process.argv[2];
