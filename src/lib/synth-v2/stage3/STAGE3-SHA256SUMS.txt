@@ -1,0 +1,10 @@
+6a325087a357b66a87b96c5cc4de392c6d16e332743c3c6ebc0ac3c3f889fb1b  src/lib/synth-v2/stage3/SPEC-3.md
+d3b8d4e6a9e40577fe5b60b4e2c5c6448076579ba286a2253e8dc128a446fb7b  src/lib/synth-v2/stage3/SPEC-3.sha256
+648f42235908ce8b9de6fbe7509866c52b7e7db5dafd12cb49d30b3f59b6b640  src/lib/synth-v2/stage3/types.ts
+79d5fc4c434f22bd7433d6586221dd019326b8bdbc36849b4c1b874bf0543e22  src/lib/synth-v2/stage3/features.ts
+1986a21be9f4d96929b2548ac5580f25e273ff088e63d1604e61930370deaa12  src/lib/synth-v2/stage3/models.ts
+cd4f131fea06ebf78de1b0ac62bf95abc90defa41d114958ea0442fc99ad9444  src/lib/synth-v2/stage3/evaluator.ts
+c1ae973a9c951a13bafe26e351c9df0aadab30a6f5ac4d29471821c66da4229e  tests/synth-v2-stage3.test.mjs
+4e77d870366f4604efe4429f78f82e22bb8d4106a77dcfbaf74aec81e037162d  scripts/synth-v2-stage3-select.mjs
+548d336cc8116faba2d7d4b60a8bd59956c820200ddec3d28b10399883ca63c4  src/lib/synth-v2/stage3/STAGE3-TUNING.json
+f41a94c6f350678c83b9523ede59e06aeeecdb327a63f733a4b817c61ffc20cc  src/lib/synth-v2/stage3/STAGE3-FROZEN-DETECTOR.json
