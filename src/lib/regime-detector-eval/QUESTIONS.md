@@ -23,3 +23,11 @@
 - **Options:** (A) Provide/fetch the missing Git object and rerun the source comparison; (B) skip Part 4 and report it unverified.
 - **Recommendation:** A if Part 4 is important; source identity is a prerequisite in the task. The commit object is not present locally, and the task forbids other network access.
 - **What I did meanwhile:** Did not run the synthetic Part 4 cohort or modify the generator. Part 4 is marked `NOT RUN / UNVERIFIED`.
+
+## Implementation audit note (protocol unchanged)
+
+A review of the B3 implementation found that an initial draft's D5 calculation considered only non-wrapping date pairs, although the frozen protocol explicitly requires cyclic continuation. The final implementation computes the maximum five-weekday row offset on a duplicated cyclic weekday-date index; final Part 3 used it and retained the exact offsets. Each B3 cell retains its full 1,000-position null-effect array in `part3-results.json` (null where that shifted cell is undefined); percentile summaries use finite draws only. `SPEC-RD.md` remains unchanged.
+
+## Resource-limit restart (protocol unchanged)
+
+The full single-process run reached 140/200 causality cut points and hit Node's 2.8 GB heap limit. A second run completed seven 20-cutpoint batches (ranks 0–139) but hit the same limit on the next range; a five-cutpoint retry also exposed the peak-memory issue. Review found the runner held the large prefix feature matrix while allocating the full-length mutated-suffix result. The final runner releases and garbage-collects the prefix output before the mutation run. It reused the seven completed deterministic batches, executed the remaining ranks in twelve five-cutpoint ranges, validated/merged all 200 frozen cut points exactly once (zero mismatches), then completed Part 3. Failed/partial attempts are not counted as results.
