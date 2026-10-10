@@ -30,6 +30,12 @@
 - **Recommendation:** A, because network access is restricted and the README is part of the stated source bundle.
 - **What I did meanwhile:** Frozen README-only treatment. If no calendar is supplied, report the limitation and list gaps without importing external holiday data.
 
+## 6. The frozen C3 formula is not in ATR units
+
+- **Options:** (A) execute the literal frozen formula `(close[t+H]/close[t]-1)/ATR14[t]`; (B) issue a new pre-registration version using `(close[t+H]-close[t])/ATR14[t]`, which is a price change divided by price-unit ATR.
+- **Recommendation:** B. In SPEC-RD2, the numerator is a fractional return while ATR14 is explicitly the Wilder true-range average in price units, so the quotient has units of inverse price and cannot be the declared signed return in ATR units.
+- **What I did meanwhile:** Found this protocol defect during review before computing any outcome on either evaluation dataset. I did not edit the hashed SPEC-RD2.md and did not calculate market labels/outcomes. I stopped pending an authorized replacement/erratum that can be hashed before analysis.
+
 ## Run-state note
 
-Step 0's seven file hashes and detector-tree hash matched before commit and after rebase; the frozen source commit is pushed and `git ls-remote` matched local HEAD. `origin/main` contains a root `holdout.zip` and the real 2020-2026 CSV by path listing, but no archive member or holdout content has been opened or parsed. No detector labels or forward outcomes have been computed. The initial full-suite run while preserving the pre-existing user edits in a stash had one unrelated UI assertion failure; after restoring those exact user edits, the full suite passed (246/246), and the seven focused evaluation tests passed.
+Step 0's seven file hashes and detector-tree hash matched before commit and after rebase; the frozen source commit is pushed and `git ls-remote` matched local HEAD. Part 1 SPEC-RD2 is committed, hashed and pushed; its hash is in SPEC-RD2.sha256. The source archive was inventoried after preregistration: all 51 CSV members, including the three consolidated instrument files, are zero-byte placeholders and there is no README, so the holdout is unavailable. The gold 2020-2026 CSV copied from origin/main matches its required SHA-256. No evaluation labels or forward outcomes have been computed. The initial full-suite run while preserving the pre-existing user edits in a stash had one unrelated UI assertion failure; after restoring those exact user edits, the full suite passed (246/246), and the seven focused evaluation tests passed.
