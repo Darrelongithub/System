@@ -1,6 +1,6 @@
 # Claim cards — FULL TEXT (all 24, in TEST_ORDER)
 
-**Generated:** 2026-10-27T07:32:36.682Z
+**Generated:** 2026-10-27T14:04:37.624Z
 **Card status:** `DRAFT` — NOT FROZEN. NOT TESTED.
 **Cards:** 24 | **Families:** 8 | **Prior false fraction:** 0.8
 **Order:** EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.
@@ -48,6 +48,24 @@ was located and **opened on 2026-10-27**, with its full URL, or is marked
 Four Map states: EXPANSION, GRIND, WHIPSAW, QUIET. Mapping: EXPANSION->EFFICIENT, GRIND->EFFICIENT, WHIPSAW->CHOPPY, QUIET->CHOPPY.
 
 **Standard-exit caveat (task 4):** every verdict for band-reversion, osc-fade, candlestick-reversal is labelled _"under the standard exit (1.5 ATR stop, 2R target) only"_. No new exit is added in this cycle.
+
+## Strongest published criticism / failed replication (all VERIFIED)
+
+Every URL below was opened and read on **2026-10-27**. Nothing is cited from memory and no URL,
+author or year is invented. A family with no openable criticism is marked as such rather than left blank.
+
+| Family | Status | Criticism / failed replication | Full URL | Impact |
+| ------ | ------ | ---------------------------- | -------- | ------ |
+| channel-breakout | VERIFIED | Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691. | https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf | NEGATIVE |
+| ma-cross | VERIFIED | Allen, F. & Karjalainen, R. (1999). Using genetic algorithms to find technical trading rules. Journal of Financial Economics 51(2), 245-271. | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf | NEGATIVE |
+| opening-range | VERIFIED | Fetna, M. (2026). Opening-Range Breakout Does Not Survive Trading Costs: A Pre-Registered 225-Cell Study on Sixteen Years of Futures Data. SSRN 7428398. | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 | NEGATIVE |
+| level-retest | VERIFIED | Curcio, R., Goodhart, C., Guillaume, D. & Payne, R. (1997). Do technical trading rules generate profits? Conclusions from the intra-day foreign exchange market. International Journal of Finance and Economics 2(4), 267-280. | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf | NEGATIVE |
+| osc-fade | VERIFIED | Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46. | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf | NEGATIVE |
+| band-reversion | VERIFIED | Fang, J., Jacobsen, B. & Qin, Y. (2017). Popularity versus Profitability: Evidence from Bollinger Bands. Journal of Portfolio Management 43(4), 152-159. | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf | NEGATIVE |
+| candlestick-reversal | VERIFIED | Marshall, B. R., Young, M. R. & Cahan, R. (2008). Are candlestick technical trading strategies profitable in the Japanese equity market? Review of Quantitative Finance and Accounting 31, 191-207. | https://link.springer.com/article/10.1007/s11156-007-0068-1 | NEGATIVE |
+| vol-compression | VERIFIED | Casey, A. (2024, updated 2026). Toby Crabel Patterns Tested: 17,424 Backtests on 8 Markets. StatOasis. | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns | NEGATIVE |
+
+---
 
 ## Card relations (near-duplicates and mirror images)
 
@@ -130,6 +148,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf |
 | **What the study tests** | trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986 |
 | **Study finding** | in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping |
+| **Strongest criticism** | Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691. |
+| **Criticism URL** | https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 1 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -183,6 +204,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf |
 | **What the study tests** | trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986 |
 | **Study finding** | in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping |
+| **Strongest criticism** | Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691. |
+| **Criticism URL** | https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 2 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -236,6 +260,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf |
 | **What the study tests** | trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986 |
 | **Study finding** | in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping |
+| **Strongest criticism** | Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691. |
+| **Criticism URL** | https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 3 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -289,6 +316,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html |
 | **What the study tests** | MACD (exponential moving-average crossover) rule on 60 years of FT30 |
 | **Study finding** | MACD/RSI beat buy-and-hold in most cases (positive, single-market study) |
+| **Strongest criticism** | Allen, F. & Karjalainen, R. (1999). Using genetic algorithms to find technical trading rules. Journal of Financial Economics 51(2), 245-271. |
+| **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 4 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -342,6 +372,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html |
 | **What the study tests** | MACD (exponential moving-average crossover) rule on 60 years of FT30 |
 | **Study finding** | MACD/RSI beat buy-and-hold in most cases (positive, single-market study) |
+| **Strongest criticism** | Allen, F. & Karjalainen, R. (1999). Using genetic algorithms to find technical trading rules. Journal of Financial Economics 51(2), 245-271. |
+| **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 5 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -395,6 +428,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html |
 | **What the study tests** | MACD (exponential moving-average crossover) rule on 60 years of FT30 |
 | **Study finding** | MACD/RSI beat buy-and-hold in most cases (positive, single-market study) |
+| **Strongest criticism** | Allen, F. & Karjalainen, R. (1999). Using genetic algorithms to find technical trading rules. Journal of Financial Economics 51(2), 245-271. |
+| **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 6 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -448,6 +484,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7 |
 | **What the study tests** | NR7 / inside-bar / volatility-contraction patterns — NO academic test found |
 | **Study finding** | practitioner only. Holmberg et al. (2013) discusses Crabel's contraction-expansion principle but tests ORB, not NR7/inside-bar. This is the PLAINLY WRONG item: v1.2 ranked this family tier 1 with no empirical study. |
+| **Strongest criticism** | Casey, A. (2024, updated 2026). Toby Crabel Patterns Tested: 17,424 Backtests on 8 Markets. StatOasis. |
+| **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 22 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -501,6 +540,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7 |
 | **What the study tests** | NR7 / inside-bar / volatility-contraction patterns — NO academic test found |
 | **Study finding** | practitioner only. Holmberg et al. (2013) discusses Crabel's contraction-expansion principle but tests ORB, not NR7/inside-bar. This is the PLAINLY WRONG item: v1.2 ranked this family tier 1 with no empirical study. |
+| **Strongest criticism** | Casey, A. (2024, updated 2026). Toby Crabel Patterns Tested: 17,424 Backtests on 8 Markets. StatOasis. |
+| **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 23 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -554,6 +596,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7 |
 | **What the study tests** | NR7 / inside-bar / volatility-contraction patterns — NO academic test found |
 | **Study finding** | practitioner only. Holmberg et al. (2013) discusses Crabel's contraction-expansion principle but tests ORB, not NR7/inside-bar. This is the PLAINLY WRONG item: v1.2 ranked this family tier 1 with no empirical study. |
+| **Strongest criticism** | Casey, A. (2024, updated 2026). Toby Crabel Patterns Tested: 17,424 Backtests on 8 Markets. StatOasis. |
+| **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 24 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -607,6 +652,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://www.econ.umu.se/ueslpnr/ues845.pdf |
 | **What the study tests** | opening-range breakout on US crude-oil futures, bootstrap test |
 | **Study finding** | full-sample success is NOT robust across three sub-periods (mixed/negative) |
+| **Strongest criticism** | Fetna, M. (2026). Opening-Range Breakout Does Not Survive Trading Costs: A Pre-Registered 225-Cell Study on Sixteen Years of Futures Data. SSRN 7428398. |
+| **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 7 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -660,6 +708,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://www.econ.umu.se/ueslpnr/ues845.pdf |
 | **What the study tests** | opening-range breakout on US crude-oil futures, bootstrap test |
 | **Study finding** | full-sample success is NOT robust across three sub-periods (mixed/negative) |
+| **Strongest criticism** | Fetna, M. (2026). Opening-Range Breakout Does Not Survive Trading Costs: A Pre-Registered 225-Cell Study on Sixteen Years of Futures Data. SSRN 7428398. |
+| **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 8 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -713,6 +764,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | http://www.econ.umu.se/ueslpnr/ues845.pdf |
 | **What the study tests** | opening-range breakout on US crude-oil futures, bootstrap test |
 | **Study finding** | full-sample success is NOT robust across three sub-periods (mixed/negative) |
+| **Strongest criticism** | Fetna, M. (2026). Opening-Range Breakout Does Not Survive Trading Costs: A Pre-Registered 225-Cell Study on Sixteen Years of Futures Data. SSRN 7428398. |
+| **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 9 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -766,6 +820,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands |
 | **What the study tests** | Bollinger Band (20,2) and variants, four markets 1995-2004, transaction costs |
 | **Study finding** | BB underperform buy-and-hold; contrarian inversion does better (negative for the textbook fade) |
+| **Strongest criticism** | Fang, J., Jacobsen, B. & Qin, Y. (2017). Popularity versus Profitability: Evidence from Bollinger Bands. Journal of Portfolio Management 43(4), 152-159. |
+| **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 16 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -819,6 +876,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands |
 | **What the study tests** | Bollinger Band (20,2) and variants, four markets 1995-2004, transaction costs |
 | **Study finding** | BB underperform buy-and-hold; contrarian inversion does better (negative for the textbook fade) |
+| **Strongest criticism** | Fang, J., Jacobsen, B. & Qin, Y. (2017). Popularity versus Profitability: Evidence from Bollinger Bands. Journal of Portfolio Management 43(4), 152-159. |
+| **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 17 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -872,6 +932,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands |
 | **What the study tests** | Bollinger Band (20,2) and variants, four markets 1995-2004, transaction costs |
 | **Study finding** | BB underperform buy-and-hold; contrarian inversion does better (negative for the textbook fade) |
+| **Strongest criticism** | Fang, J., Jacobsen, B. & Qin, Y. (2017). Popularity versus Profitability: Evidence from Bollinger Bands. Journal of Portfolio Management 43(4), 152-159. |
+| **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 18 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -925,6 +988,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf |
 | **What the study tests** | support/resistance (level) signals from six FX firms, intraday 1996-1998 |
 | **Study finding** | levels predict intraday trend interruptions, but firms mis-rank level strength |
+| **Strongest criticism** | Curcio, R., Goodhart, C., Guillaume, D. & Payne, R. (1997). Do technical trading rules generate profits? Conclusions from the intra-day foreign exchange market. International Journal of Finance and Economics 2(4), 267-280. |
+| **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 10 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -978,6 +1044,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf |
 | **What the study tests** | support/resistance (level) signals from six FX firms, intraday 1996-1998 |
 | **Study finding** | levels predict intraday trend interruptions, but firms mis-rank level strength |
+| **Strongest criticism** | Curcio, R., Goodhart, C., Guillaume, D. & Payne, R. (1997). Do technical trading rules generate profits? Conclusions from the intra-day foreign exchange market. International Journal of Finance and Economics 2(4), 267-280. |
+| **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 11 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1031,6 +1100,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf |
 | **What the study tests** | support/resistance (level) signals from six FX firms, intraday 1996-1998 |
 | **Study finding** | levels predict intraday trend interruptions, but firms mis-rank level strength |
+| **Strongest criticism** | Curcio, R., Goodhart, C., Guillaume, D. & Payne, R. (1997). Do technical trading rules generate profits? Conclusions from the intra-day foreign exchange market. International Journal of Finance and Economics 2(4), 267-280. |
+| **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 12 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1084,6 +1156,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf |
 | **What the study tests** | RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002 |
 | **Study finding** | RSI(14,30/70) profitable on DJIA but not consistently across markets |
+| **Strongest criticism** | Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46. |
+| **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 13 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1137,6 +1212,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf |
 | **What the study tests** | RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002 |
 | **Study finding** | RSI(14,30/70) profitable on DJIA but not consistently across markets |
+| **Strongest criticism** | Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46. |
+| **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 14 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1190,6 +1268,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf |
 | **What the study tests** | RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002 |
 | **Study finding** | RSI(14,30/70) profitable on DJIA but not consistently across markets |
+| **Strongest criticism** | Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46. |
+| **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 15 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1243,6 +1324,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf |
 | **What the study tests** | 26 candlestick reversal patterns on DJIA component stocks 1992-2002, bootstrap |
 | **Study finding** | no value; neither bullish nor bearish signals beat buy-and-hold (negative) |
+| **Strongest criticism** | Marshall, B. R., Young, M. R. & Cahan, R. (2008). Are candlestick technical trading strategies profitable in the Japanese equity market? Review of Quantitative Finance and Accounting 31, 191-207. |
+| **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 19 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1296,6 +1380,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf |
 | **What the study tests** | 26 candlestick reversal patterns on DJIA component stocks 1992-2002, bootstrap |
 | **Study finding** | no value; neither bullish nor bearish signals beat buy-and-hold (negative) |
+| **Strongest criticism** | Marshall, B. R., Young, M. R. & Cahan, R. (2008). Are candlestick technical trading strategies profitable in the Japanese equity market? Review of Quantitative Finance and Accounting 31, 191-207. |
+| **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 20 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
@@ -1349,6 +1436,9 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Study full URL** | https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf |
 | **What the study tests** | 26 candlestick reversal patterns on DJIA component stocks 1992-2002, bootstrap |
 | **Study finding** | no value; neither bullish nor bearish signals beat buy-and-hold (negative) |
+| **Strongest criticism** | Marshall, B. R., Young, M. R. & Cahan, R. (2008). Are candlestick technical trading strategies profitable in the Japanese equity market? Review of Quantitative Finance and Accounting 31, 191-207. |
+| **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
+| **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
 | **Priority** | 21 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |

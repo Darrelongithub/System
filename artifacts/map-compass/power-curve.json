@@ -1,0 +1,326 @@
+{
+  "generatedAt": "2026-10-27T14:02:14.917Z",
+  "id": "AMENDMENT-4-POWER-CURVE",
+  "date": "2026-10-27",
+  "decidedBeforeResults": true,
+  "reportOnly": true,
+  "criteriaChanged": false,
+  "thresholdChanged": false,
+  "verdictChanged": false,
+  "definition": {
+    "confirmed": "CONFIRMED iff (meanNetR > +0.10R AND day-clustered tNet > 2) AND (excessVsRandomR > 0 AND day-clustered t > 2) AND all vetoes clear (n >= 100, concentration <= 0.50, LOYO >= 0.75, NO_BASELINE).",
+    "meanNetR": "absolute net R mean, signed by claim direction, net of the frozen cost model",
+    "excessVsRandomR": "mean of (netR_i - matchedBaselineMean_i), signed by claim direction",
+    "trueNetEdge": "the assumed TRUE absolute net mean R per trade for the simulated cell, evaluated at 0.05R, 0.10R, 0.20R and 0.30R. The simulated excess is (edge - b) where b is the MEASURED verdict-state baseline mean.",
+    "probability": "estimated as confirmed/400 over deterministic Monte Carlo runs"
+  },
+  "inputs": {
+    "tradeCount": "MEASURED DEV signal count AFTER the one-slot book (slot-model.json)",
+    "calendarDays": "MEASURED DEV calendar-day counts per (verdict state, session) from the Map",
+    "yearSpread": "MEASURED DEV bar counts per year per verdict state (exercises the concentration and LOYO vetoes)",
+    "perTradeSD": "the random baseline's own measured SD for that verdict state",
+    "dayCorrelation": "a day-level shock of 0.55 * SD added to every trade on that day (CR1-realistic)",
+    "matchedBaselineMean": "MEASURED verdict-state baseline mean from random-baseline.json",
+    "harness": "the REAL verifyClaim() from lib/verification.mjs, with a controlled baseline"
+  },
+  "assumptions": {
+    "perTradeSD": "the baseline's measured SD is used as the strategy's SD. This is an assumption: a real strategy's dispersion may differ.",
+    "dayCorrelation": "0.55 * SD is an assumption about within-day correlation, calibrated to the baseline's own measured inflation.",
+    "yearSpread": "trades are spread across DEV years proportional to MEASURED bar counts; a real strategy's year distribution may differ, which would change the concentration and LOYO veto outcomes.",
+    "slotModel": "the trade count uses the task-4 slot model, which is itself an assumption.",
+    "noOutcomes": "no strategy result exists; every input above is either measured from this project's own data or explicitly flagged as an assumption."
+  },
+  "cells": [
+    {
+      "verdictState": "EFFICIENT",
+      "session": "asian",
+      "cell": "EFFICIENT|asian",
+      "measuredDevDays": 1306,
+      "measuredTradesAfterSlot": 2085,
+      "baselineMeanR": -0.141437,
+      "measuredSdR": 1.4178,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.141437,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 208,
+          "probability": 0.52
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "EFFICIENT",
+      "session": "london",
+      "cell": "EFFICIENT|london",
+      "measuredDevDays": 932,
+      "measuredTradesAfterSlot": 2085,
+      "baselineMeanR": -0.141437,
+      "measuredSdR": 1.4178,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.141437,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 202,
+          "probability": 0.505
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "EFFICIENT",
+      "session": "ny",
+      "cell": "EFFICIENT|ny",
+      "measuredDevDays": 1416,
+      "measuredTradesAfterSlot": 2085,
+      "baselineMeanR": -0.141437,
+      "measuredSdR": 1.4178,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.141437,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 209,
+          "probability": 0.5225
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "CHOPPY",
+      "session": "asian",
+      "cell": "CHOPPY|asian",
+      "measuredDevDays": 2862,
+      "measuredTradesAfterSlot": 8832,
+      "baselineMeanR": -0.108333,
+      "measuredSdR": 1.4463,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.108333,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 192,
+          "probability": 0.48
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "CHOPPY",
+      "session": "london",
+      "cell": "CHOPPY|london",
+      "measuredDevDays": 2692,
+      "measuredTradesAfterSlot": 8832,
+      "baselineMeanR": -0.108333,
+      "measuredSdR": 1.4463,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.108333,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 195,
+          "probability": 0.4875
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "CHOPPY",
+      "session": "ny",
+      "cell": "CHOPPY|ny",
+      "measuredDevDays": 2886,
+      "measuredTradesAfterSlot": 8832,
+      "baselineMeanR": -0.108333,
+      "measuredSdR": 1.4463,
+      "tradeCountNote": "the family's slot-model kept trades in this verdict state divided evenly across the three sessions (a documented approximation; per-session signal splits are not yet measured)",
+      "baselineMeanB": -0.108333,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 0,
+          "probability": 0
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 191,
+          "probability": 0.4775
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 400,
+          "probability": 1
+        }
+      }
+    },
+    {
+      "verdictState": "EFFICIENT",
+      "session": "POOLED",
+      "cell": "EFFICIENT|POOLED",
+      "measuredDevDays": 3654,
+      "measuredTradesAfterSlot": 6254,
+      "baselineMeanR": -0.141437,
+      "measuredSdR": 1.4178,
+      "baselineMeanB": -0.141437,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 133,
+          "probability": 0.3325
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 222,
+          "probability": 0.555
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 321,
+          "probability": 0.8025
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 377,
+          "probability": 0.9425
+        }
+      }
+    },
+    {
+      "verdictState": "CHOPPY",
+      "session": "POOLED",
+      "cell": "CHOPPY|POOLED",
+      "measuredDevDays": 8440,
+      "measuredTradesAfterSlot": 26497,
+      "baselineMeanR": -0.108333,
+      "measuredSdR": 1.4463,
+      "baselineMeanB": -0.108333,
+      "powerCurve": {
+        "0.05": {
+          "runs": 400,
+          "confirmed": 134,
+          "probability": 0.335
+        },
+        "0.1": {
+          "runs": 400,
+          "confirmed": 222,
+          "probability": 0.555
+        },
+        "0.2": {
+          "runs": 400,
+          "confirmed": 316,
+          "probability": 0.79
+        },
+        "0.3": {
+          "runs": 400,
+          "confirmed": 375,
+          "probability": 0.9375
+        }
+      }
+    }
+  ],
+  "summary": {
+    "edgeCurve": [
+      {
+        "edge": 0.05,
+        "medianProbability": 0,
+        "minProbability": 0,
+        "maxProbability": 0.335
+      },
+      {
+        "edge": 0.1,
+        "medianProbability": 0.52,
+        "minProbability": 0.4775,
+        "maxProbability": 0.555
+      },
+      {
+        "edge": 0.2,
+        "medianProbability": 1,
+        "minProbability": 0.79,
+        "maxProbability": 1
+      },
+      {
+        "edge": 0.3,
+        "medianProbability": 1,
+        "minProbability": 0.9375,
+        "maxProbability": 1
+      }
+    ]
+  },
+  "note": "REPORT-ONLY. This does not change CLAIM_CRITERIA, the +0.10R floor, t > 2, the verdict, or any threshold. If zero claims are CONFIRMED at M6 the readout remains 'too little independent data', not 'textbook false'."
+}

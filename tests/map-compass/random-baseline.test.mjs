@@ -69,14 +69,20 @@ test("win rates are near 1/3 — confirming the reviewer's arithmetic", () => {
   }
 });
 
-test("matchedBaseline resolves fine -> coarse -> NO_BASELINE (never zero)", () => {
+test("matchedBaseline resolves verdict-state fine -> four-state fine -> coarse -> NO_BASELINE", () => {
   assert(baseline);
+  // Amendment 4 prefers the verdict-state fine cell.
   const fine = matchedBaseline(
     { state: "QUIET", side: "long", session: "london", vol: "mid" },
     baseline,
   );
-  assert(["fine", "coarse"].includes(fine.level), `got ${fine.level}`);
+  assert(
+    ["fine-verdictState", "fine", "coarse"].includes(fine.level),
+    `got ${fine.level}`,
+  );
   assert(fine.n > 0);
+  assert(fine.level !== "UNCONTROLLED_DRY_RUN");
+  assert(fine.mean !== null, "a resolved cell must have a numeric mean");
   const unknown = matchedBaseline(
     { state: "QUIET", side: "long", session: "nowhere", vol: "x" },
     baseline,
@@ -128,19 +134,28 @@ test("a claim that beats the matched baseline by >0.10R IS confirmed", () => {
 
 test("beating a LOSING baseline but still losing money is NOT confirmed", () => {
   assert(baseline);
-  // Baseline in EXPANSION|long is ~-0.20. Trades at -0.05 beat it by +0.15
-  // but absolute net R is negative -> not tradeable.
+  // Amendment 4: the resolved cell is the verdict-state fine cell
+  // (EFFICIENT|long|london|mid), whose mean is negative. Trades at -0.02 beat
+  // it but are still far below the restored +0.10R NET floor.
   const b = matchedBaseline(
     { state: "EXPANSION", side: "long", session: "london", vol: "mid" },
     baseline,
   );
-  const r = verifyClaim(trades(-0.05, 1200, "long", "EXPANSION"), { direction: +1, baseline });
-  assert(r.meanNetR < 0, "absolute net R must be negative");
-  assert(r.excessVsRandomR > 0, "but it beats the (losing) baseline");
-  // AMENDMENT 3: the restored +0.10R NET floor is the binding gate. Beating a
-  // losing random baseline cannot rescue an unprofitable claim.
+  assert(b.mean < 0, "the resolved baseline cell must be losing");
+  const r = verifyClaim(trades(-0.02, 3000, "long", "EXPANSION"), { direction: +1, baseline });
+  assert(r.meanNetR < CLAIM_CRITERIA.practicalFloorR, "absolute net R must be below the floor");
+  assert(r.rule.netGatePass === false, "the restored NET floor must fail");
   assert(r.verdict !== "CONFIRMED", "beating a losing baseline must not ship");
-  assert(r.rule.netGatePass === false || r.verdict === "REFUTED", "the net floor must not pass");
+
+  // Deterministic variant: a controlled losing baseline that the trades beat.
+  const controlled = {
+    cells: { "EXPANSION|long": { n: 4000, meanNetR: -0.20 }, "EXPANSION|short": { n: 4000, meanNetR: -0.20 } },
+    fineCells: {},
+  };
+  const r2 = verifyClaim(trades(-0.05, 3000, "long", "EXPANSION"), { direction: +1, baseline: controlled });
+  assert(r2.excessVsRandomR > 0, "it beats the (losing) controlled baseline");
+  assert(r2.rule.netGatePass === false, "but the NET floor still fails");
+  assert(r2.verdict !== "CONFIRMED", "beating a losing baseline must not ship");
 });
 
 test("every claim reports excess + CI + long/short split regardless of verdict", () => {

@@ -1,0 +1,392 @@
+{
+  "generatedAt": "2026-10-27T14:15:17.245Z",
+  "id": "AMENDMENT-4-MEASURED-OVERLAP",
+  "date": "2026-10-27",
+  "decidedBeforeResults": true,
+  "purpose": "Replace the v1.3 label-driven overlap and synthetic SE inflation with MEASURED values from the real DEV signal bars and the random-entry baseline trades.",
+  "replaced": {
+    "v13Overlap": {
+      "method": "label-driven: CARD_RELATIONS metadata + seeded RNG generating entry-bar multiplicities",
+      "pooledOverlapFraction": 0.8302,
+      "designEffect": 2.2948,
+      "whyReplaced": "The label-driven model assigned a fixed co-fire probability by card relation type. The real signals can now be measured directly, so the assumption is no longer needed for the power report."
+    },
+    "v13SeInflation": {
+      "value": 1.009,
+      "method": "measureDependence() on syntheticTradesV12({seed:7,perCell:900,trueEdgeR:0,sd:1.43})",
+      "whyReplaced": "Measured on the real random-entry baseline trades per verdict state instead of synthetic zero-edge noise."
+    }
+  },
+  "measuredInputs": {
+    "signalBars": "emitSignals() output on the real DEV bars for all 24 cards (lib/signals.mjs)",
+    "overlap": "Jaccard and Kish effective N over the measured entry-bar sets",
+    "seInflation": "CR1 vs plain SE on the random-entry baseline netR values, grouped by verdict state and calendar day",
+    "baselineSamples": "artifacts/map-compass/random-baseline.json (top-up included)",
+    "baselineDailySums": "artifacts/map-compass/random-baseline-daily-sums.json"
+  },
+  "assumptions": {
+    "sharedBarMeansSharedTrade": "A Kish effective N over entry bars assumes that variants firing on the same bar would be taken as separate trades. The one-position-per-slot book (task 4) is what actually decides that, so this is an UPPER bound on independent information.",
+    "perTradeSD": "The per-trade SD used downstream is the baseline's own measured SD for that cell, not a fitted parameter.",
+    "noOutcomes": "No strategy outcome, verdict, R value or trade record is used here. Only entry bars and the random-entry baseline's own netR values."
+  },
+  "byFamily": {
+    "channel-breakout": {
+      "cards": [
+        "donchian-20",
+        "donchian-55",
+        "dual-thrust"
+      ],
+      "variantSignalBars": [
+        25237,
+        12790,
+        49228
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "donchian-20",
+          "b": "donchian-55",
+          "jaccard": 0.506796,
+          "sharedBars": 12790
+        },
+        {
+          "a": "donchian-20",
+          "b": "dual-thrust",
+          "jaccard": 0.221759,
+          "sharedBars": 13516
+        },
+        {
+          "a": "donchian-55",
+          "b": "dual-thrust",
+          "jaccard": 0.238304,
+          "sharedBars": 11935
+        }
+      ],
+      "pooled": {
+        "n": 87255,
+        "distinctBars": 60949,
+        "nEffective": 46497.95,
+        "overlapFraction": 0.466185,
+        "designEffect": 1.8765
+      },
+      "barHash": "317a72675675913047a3b7925f949466e7db9aac470d44366f3e9f6c4684b2b3"
+    },
+    "ma-cross": {
+      "cards": [
+        "sma-20-50",
+        "macd-cross",
+        "ichimoku-tk"
+      ],
+      "variantSignalBars": [
+        2876,
+        10068,
+        6764
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "sma-20-50",
+          "b": "macd-cross",
+          "jaccard": 0.013229,
+          "sharedBars": 169
+        },
+        {
+          "a": "sma-20-50",
+          "b": "ichimoku-tk",
+          "jaccard": 0.014844,
+          "sharedBars": 141
+        },
+        {
+          "a": "macd-cross",
+          "b": "ichimoku-tk",
+          "jaccard": 0.029291,
+          "sharedBars": 479
+        }
+      ],
+      "pooled": {
+        "n": 19708,
+        "distinctBars": 18937,
+        "nEffective": 18246.98,
+        "overlapFraction": 0.077329,
+        "designEffect": 1.0801
+      },
+      "barHash": "286e32a19dde30a24bba07a48b48b549dc5d8ba6a1ca04ab942432608ebb857e"
+    },
+    "opening-range": {
+      "cards": [
+        "asian-range-break",
+        "london-orb-30",
+        "pdh-pdl-break"
+      ],
+      "variantSignalBars": [
+        3856,
+        6442,
+        49228
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "asian-range-break",
+          "b": "london-orb-30",
+          "jaccard": 0.159032,
+          "sharedBars": 1413
+        },
+        {
+          "a": "asian-range-break",
+          "b": "pdh-pdl-break",
+          "jaccard": 0.034877,
+          "sharedBars": 1789
+        },
+        {
+          "a": "london-orb-30",
+          "b": "pdh-pdl-break",
+          "jaccard": 0.056999,
+          "sharedBars": 3002
+        }
+      ],
+      "pooled": {
+        "n": 59526,
+        "distinctBars": 54051,
+        "nEffective": 49258.27,
+        "overlapFraction": 0.171706,
+        "designEffect": 1.2084
+      },
+      "barHash": "41f5c83522cc2abf58fb6ed0245431a389e412acafeaa8899b613ee905382d9f"
+    },
+    "level-retest": {
+      "cards": [
+        "pdh-retest",
+        "pdl-retest",
+        "classic-pivot"
+      ],
+      "variantSignalBars": [
+        1829,
+        1483,
+        6532
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "pdh-retest",
+          "b": "pdl-retest",
+          "jaccard": 0,
+          "sharedBars": 0
+        },
+        {
+          "a": "pdh-retest",
+          "b": "classic-pivot",
+          "jaccard": 0.022377,
+          "sharedBars": 183
+        },
+        {
+          "a": "pdl-retest",
+          "b": "classic-pivot",
+          "jaccard": 0.01972,
+          "sharedBars": 155
+        }
+      ],
+      "pooled": {
+        "n": 9844,
+        "distinctBars": 9506,
+        "nEffective": 9211.44,
+        "overlapFraction": 0.068671,
+        "designEffect": 1.0687
+      },
+      "barHash": "dc7360c54abc530208d698fc6c7800cf6a8c49fcf9e663d867777d7f0f748dc3"
+    },
+    "osc-fade": {
+      "cards": [
+        "rsi-14-30-70",
+        "williams-r-fade",
+        "stochastic-14-fade"
+      ],
+      "variantSignalBars": [
+        4020,
+        18216,
+        18216
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "rsi-14-30-70",
+          "b": "williams-r-fade",
+          "jaccard": 0.115649,
+          "sharedBars": 2305
+        },
+        {
+          "a": "rsi-14-30-70",
+          "b": "stochastic-14-fade",
+          "jaccard": 0.115649,
+          "sharedBars": 2305
+        },
+        {
+          "a": "williams-r-fade",
+          "b": "stochastic-14-fade",
+          "jaccard": 1,
+          "sharedBars": 18216
+        }
+      ],
+      "pooled": {
+        "n": 40452,
+        "distinctBars": 19931,
+        "nEffective": 19004.51,
+        "overlapFraction": 0.957604,
+        "designEffect": 2.1285
+      },
+      "barHash": "5776d099185575ac58bd212d510c12349919ebb9cedeacc57a617ab34c91fb38"
+    },
+    "band-reversion": {
+      "cards": [
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade"
+      ],
+      "variantSignalBars": [
+        8436,
+        6404,
+        2835
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "bollinger-20-2",
+          "b": "keltner-20-atr",
+          "jaccard": 0.300727,
+          "sharedBars": 3431
+        },
+        {
+          "a": "bollinger-20-2",
+          "b": "bb-squeeze-fade",
+          "jaccard": 0.33606,
+          "sharedBars": 2835
+        },
+        {
+          "a": "keltner-20-atr",
+          "b": "bb-squeeze-fade",
+          "jaccard": 0.214539,
+          "sharedBars": 1632
+        }
+      ],
+      "pooled": {
+        "n": 17675,
+        "distinctBars": 11409,
+        "nEffective": 9333.62,
+        "overlapFraction": 0.61669,
+        "designEffect": 1.8937
+      },
+      "barHash": "7025713bd8056b3ea350d94d1a791f55945627cc658c2c01abde9b11578d053c"
+    },
+    "candlestick-reversal": {
+      "cards": [
+        "engulfing",
+        "morning-evening-star",
+        "three-soldiers-crows"
+      ],
+      "variantSignalBars": [
+        2071,
+        13449,
+        2168
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "engulfing",
+          "b": "morning-evening-star",
+          "jaccard": 0.014114,
+          "sharedBars": 216
+        },
+        {
+          "a": "engulfing",
+          "b": "three-soldiers-crows",
+          "jaccard": 0,
+          "sharedBars": 0
+        },
+        {
+          "a": "morning-evening-star",
+          "b": "three-soldiers-crows",
+          "jaccard": 0,
+          "sharedBars": 0
+        }
+      ],
+      "pooled": {
+        "n": 17688,
+        "distinctBars": 17472,
+        "nEffective": 17266.3,
+        "overlapFraction": 0.024423,
+        "designEffect": 1.0244
+      },
+      "barHash": "9be592ac7057aff38447896f88fb8eac7b36d411dbe2cba77c97d65ae39e58ce"
+    },
+    "vol-compression": {
+      "cards": [
+        "atr-squeeze-break",
+        "nr7-break",
+        "inside-bar-break"
+      ],
+      "variantSignalBars": [
+        824,
+        14553,
+        23976
+      ],
+      "pairwiseJaccard": [
+        {
+          "a": "atr-squeeze-break",
+          "b": "nr7-break",
+          "jaccard": 0.00477,
+          "sharedBars": 73
+        },
+        {
+          "a": "atr-squeeze-break",
+          "b": "inside-bar-break",
+          "jaccard": 0.005188,
+          "sharedBars": 128
+        },
+        {
+          "a": "nr7-break",
+          "b": "inside-bar-break",
+          "jaccard": 0.229152,
+          "sharedBars": 7183
+        }
+      ],
+      "pooled": {
+        "n": 39353,
+        "distinctBars": 32008,
+        "nEffective": 28614.74,
+        "overlapFraction": 0.372297,
+        "designEffect": 1.3753
+      },
+      "barHash": "ad417efc6004ee1680b9d5ee1dfc8a50181b15e42a16c3f61e84483bcf1a3195"
+    }
+  },
+  "pooled": {
+    "n": 291501,
+    "distinctBars": 99125,
+    "nEffective": 72028.76,
+    "overlapFraction": 0.925211,
+    "designEffect": 4.047
+  },
+  "seInflation": {
+    "EFFICIENT": {
+      "n": 16268,
+      "dayClusters": 10758,
+      "plainSe": 0.011117,
+      "cr1Se": 0.012357,
+      "inflation": 1.1115
+    },
+    "CHOPPY": {
+      "n": 16270,
+      "dayClusters": 14086,
+      "plainSe": 0.011339,
+      "cr1Se": 0.011743,
+      "inflation": 1.0356
+    }
+  },
+  "seInflationVerifiedFromDailySums": {
+    "EFFICIENT": {
+      "publishedInflation": 1.1115,
+      "recomputationInflation": 1.1115,
+      "match": true
+    },
+    "CHOPPY": {
+      "publishedInflation": 1.0356,
+      "recomputationInflation": 1.0356,
+      "match": true
+    }
+  },
+  "seInflationNote": "CR1 over plain SE, computed on the random-entry baseline trades per verdict state. The v1.3 value 1.009 was measured on synthetic zero-edge noise; the measured baseline value is reported here instead.",
+  "minTradesPerCell": 100,
+  "note": "Report-only. This replaces the v1.3 overlap/SE inputs used by reportOnlyV13 but does NOT change CLAIM_CRITERIA, the +0.10R floor, t > 2, the verdict, or any threshold."
+}

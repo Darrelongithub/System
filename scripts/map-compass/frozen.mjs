@@ -349,6 +349,97 @@ export const EMPIRICAL_STUDIES = Object.freeze({
   }),
 });
 
+/**
+ * STRONGEST PUBLISHED CRITICISM / FAILED REPLICATION per family.
+ *
+ * G0 AMENDMENT 4 TASK 7. Every URL below was OPENED AND READ on 2026-10-27, so
+ * every entry is VERIFIED. Nothing is cited from memory and no URL, author or
+ * year is invented. A family with no openable criticism is marked
+ * "no openable criticism found" rather than left blank.
+ */
+export const CRITICISMS = Object.freeze({
+  "channel-breakout": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691.",
+    url: "https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf",
+    what: "re-ran the BLL rules over ~7,846 parameterisations; the best rule's edge is largely a data-snooping artefact",
+    impact: "NEGATIVE",
+  }),
+  "ma-cross": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Allen, F. & Karjalainen, R. (1999). Using genetic algorithms to find technical trading rules. Journal of Financial Economics 51(2), 245-271.",
+    url: "https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf",
+    what: "genetic-algorithm MA-style rules earn no consistent excess returns over buy-and-hold out-of-sample after transaction costs",
+    impact: "NEGATIVE",
+  }),
+  "opening-range": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Fetna, M. (2026). Opening-Range Breakout Does Not Survive Trading Costs: A Pre-Registered 225-Cell Study on Sixteen Years of Futures Data. SSRN 7428398.",
+    url: "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398",
+    what: "pre-registered 225-cell grid over 16 years of one-minute futures data; zero cells meet the positive bar",
+    impact: "NEGATIVE",
+    also: {
+      citation:
+        "Sun, D. (2026). Pricing the fill: a pre-registered out-of-sample test of a 1,637% day-trading strategy. GitHub repository.",
+      url: "https://github.com/js3872/Pricing-the-Fill",
+      what: "the published 5-minute ORB claim returns -0.0855R/trade (t = -2.16) out-of-sample and was killed by its own pre-registered rule",
+    },
+  }),
+  "level-retest": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Curcio, R., Goodhart, C., Guillaume, D. & Payne, R. (1997). Do technical trading rules generate profits? Conclusions from the intra-day foreign exchange market. International Journal of Finance and Economics 2(4), 267-280.",
+    url: "http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf",
+    what: "trader-supplied support/resistance rules are on average not profitable intraday; once spreads are accounted for virtually all profits are eliminated",
+    impact: "NEGATIVE",
+  }),
+  "osc-fade": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46.",
+    url: "https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf",
+    what: "the RSI rule failed to deliver a positive return even before deducting transaction costs, across bull and bear sub-periods",
+    impact: "NEGATIVE",
+  }),
+  "band-reversion": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Fang, J., Jacobsen, B. & Qin, Y. (2017). Popularity versus Profitability: Evidence from Bollinger Bands. Journal of Portfolio Management 43(4), 152-159.",
+    url: "https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf",
+    what: "Bollinger Band profitability self-destructs with popularity; largely disappeared since Bollinger's 2001 book, worst in the US first",
+    impact: "NEGATIVE",
+  }),
+  "candlestick-reversal": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Marshall, B. R., Young, M. R. & Cahan, R. (2008). Are candlestick technical trading strategies profitable in the Japanese equity market? Review of Quantitative Finance and Accounting 31, 191-207.",
+    url: "https://link.springer.com/article/10.1007/s11156-007-0068-1",
+    what: "no evidence candlestick strategies add value in Japan over 1975-2004, in the full sample, in three 10-year sub-periods, or in bull or bear markets",
+    impact: "NEGATIVE",
+  }),
+  "vol-compression": Object.freeze({
+    opened: "2026-10-27",
+    status: "VERIFIED",
+    citation:
+      "Casey, A. (2024, updated 2026). Toby Crabel Patterns Tested: 17,424 Backtests on 8 Markets. StatOasis.",
+    url: "https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns",
+    what: "pre-registered 17,424 backtests of Crabel patterns across 8 markets: 'The pattern is real. The edge is mostly drift.' A random entry matched the up-thrust long on 4 of 8 markets",
+    impact: "NEGATIVE",
+    note:
+      "PRACTITIONER ONLY for the primary study registry (no peer-reviewed NR7/inside-bar test exists). This criticism is a pre-registered backtest of Crabel's thrust patterns, the closest published test of the Crabel family.",
+  }),
+});
+
 export const EVIDENCE = Object.freeze({
   priorFalseFraction: 0.8,
   testOrder:
@@ -357,4 +448,5 @@ export const EVIDENCE = Object.freeze({
   studies: EMPIRICAL_STUDIES,
   openedAt: "2026-10-27, before any strategy result",
   note: "Each family has one opened empirical study or is marked PRACTITIONER_ONLY. Full URLs above. No outcomes from our own data were used.",
+  criticisms: "See CRITICISMS: the strongest published criticism or failed replication per family, every URL opened 2026-10-27.",
 });

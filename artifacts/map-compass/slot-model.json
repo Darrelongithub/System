@@ -1,0 +1,540 @@
+{
+  "generatedAt": "2026-10-27T13:59:08.372Z",
+  "id": "AMENDMENT-4-SLOT-MODEL",
+  "date": "2026-10-27",
+  "decidedBeforeResults": true,
+  "purpose": "Emulate one-position-per-slot blocking on the measured DEV signals, using the baseline's bars-to-exit distribution.",
+  "isAssumption": true,
+  "assumption": {
+    "holdDuration": "Drawn from the RANDOM-ENTRY BASELINE's own bars-to-exit histogram, not from any strategy's realised exits.",
+    "singleGlobalSlot": "One slot for the whole book (the conservative reading of decision #10). A per-state book would raise survival.",
+    "noOutcomes": "No strategy P&L, R value, verdict or trade record is used. Only signal bars and the baseline's exit-time distribution.",
+    "priorityNotReapplied": "Signals are processed in bar order; the frozen numeric priority is not re-applied here because a family's variants are pooled anyway."
+  },
+  "input": {
+    "baseline": "artifacts/map-compass/random-baseline.json#barsHeldStats",
+    "baselineHoldStats": {
+      "mean": 17.532,
+      "median": 10,
+      "p90": 40,
+      "max": 96,
+      "histogramBins": 96
+    },
+    "samplerSeed": 20261027
+  },
+  "perCard": {
+    "donchian-20": {
+      "cardId": "donchian-20",
+      "family": "channel-breakout",
+      "priority": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 25237,
+      "kept": 5370,
+      "droppedOccupied": 19867,
+      "survival": 0.2128,
+      "keptStrength": 586,
+      "keptWeakness": 3560,
+      "keptByVerdictState": {
+        "EFFICIENT": 586,
+        "CHOPPY": 3560
+      }
+    },
+    "donchian-55": {
+      "cardId": "donchian-55",
+      "family": "channel-breakout",
+      "priority": 2,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 12790,
+      "kept": 3800,
+      "droppedOccupied": 8990,
+      "survival": 0.2971,
+      "keptStrength": 633,
+      "keptWeakness": 1979,
+      "keptByVerdictState": {
+        "EFFICIENT": 633,
+        "CHOPPY": 1979
+      }
+    },
+    "dual-thrust": {
+      "cardId": "dual-thrust",
+      "family": "channel-breakout",
+      "priority": 3,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 49228,
+      "kept": 4943,
+      "droppedOccupied": 44285,
+      "survival": 0.1004,
+      "keptStrength": 953,
+      "keptWeakness": 2573,
+      "keptByVerdictState": {
+        "EFFICIENT": 953,
+        "CHOPPY": 2573
+      }
+    },
+    "sma-20-50": {
+      "cardId": "sma-20-50",
+      "family": "ma-cross",
+      "priority": 4,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 2876,
+      "kept": 2266,
+      "droppedOccupied": 610,
+      "survival": 0.7879,
+      "keptStrength": 243,
+      "keptWeakness": 1418,
+      "keptByVerdictState": {
+        "EFFICIENT": 243,
+        "CHOPPY": 1418
+      }
+    },
+    "macd-cross": {
+      "cardId": "macd-cross",
+      "family": "ma-cross",
+      "priority": 5,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 10068,
+      "kept": 4600,
+      "droppedOccupied": 5468,
+      "survival": 0.4569,
+      "keptStrength": 754,
+      "keptWeakness": 2710,
+      "keptByVerdictState": {
+        "EFFICIENT": 754,
+        "CHOPPY": 2710
+      }
+    },
+    "ichimoku-tk": {
+      "cardId": "ichimoku-tk",
+      "family": "ma-cross",
+      "priority": 6,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 6764,
+      "kept": 3816,
+      "droppedOccupied": 2948,
+      "survival": 0.5642,
+      "keptStrength": 90,
+      "keptWeakness": 3009,
+      "keptByVerdictState": {
+        "EFFICIENT": 90,
+        "CHOPPY": 3009
+      }
+    },
+    "atr-squeeze-break": {
+      "cardId": "atr-squeeze-break",
+      "family": "vol-compression",
+      "priority": 22,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 824,
+      "kept": 567,
+      "droppedOccupied": 257,
+      "survival": 0.6881,
+      "keptStrength": 369,
+      "keptWeakness": 97,
+      "keptByVerdictState": {
+        "EFFICIENT": 97,
+        "CHOPPY": 369
+      }
+    },
+    "nr7-break": {
+      "cardId": "nr7-break",
+      "family": "vol-compression",
+      "priority": 23,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 14553,
+      "kept": 5436,
+      "droppedOccupied": 9117,
+      "survival": 0.3735,
+      "keptStrength": 3360,
+      "keptWeakness": 817,
+      "keptByVerdictState": {
+        "EFFICIENT": 817,
+        "CHOPPY": 3360
+      }
+    },
+    "inside-bar-break": {
+      "cardId": "inside-bar-break",
+      "family": "vol-compression",
+      "priority": 24,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 23976,
+      "kept": 6263,
+      "droppedOccupied": 17713,
+      "survival": 0.2612,
+      "keptStrength": 3822,
+      "keptWeakness": 962,
+      "keptByVerdictState": {
+        "EFFICIENT": 962,
+        "CHOPPY": 3822
+      }
+    },
+    "asian-range-break": {
+      "cardId": "asian-range-break",
+      "family": "opening-range",
+      "priority": 7,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 3856,
+      "kept": 959,
+      "droppedOccupied": 2897,
+      "survival": 0.2487,
+      "keptStrength": 148,
+      "keptWeakness": 595,
+      "keptByVerdictState": {
+        "EFFICIENT": 148,
+        "CHOPPY": 595
+      }
+    },
+    "london-orb-30": {
+      "cardId": "london-orb-30",
+      "family": "opening-range",
+      "priority": 8,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 6442,
+      "kept": 2572,
+      "droppedOccupied": 3870,
+      "survival": 0.3993,
+      "keptStrength": 336,
+      "keptWeakness": 1615,
+      "keptByVerdictState": {
+        "EFFICIENT": 336,
+        "CHOPPY": 1615
+      }
+    },
+    "pdh-pdl-break": {
+      "cardId": "pdh-pdl-break",
+      "family": "opening-range",
+      "priority": 9,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 49228,
+      "kept": 4927,
+      "droppedOccupied": 44301,
+      "survival": 0.1001,
+      "keptStrength": 966,
+      "keptWeakness": 2588,
+      "keptByVerdictState": {
+        "EFFICIENT": 966,
+        "CHOPPY": 2588
+      }
+    },
+    "bollinger-20-2": {
+      "cardId": "bollinger-20-2",
+      "family": "band-reversion",
+      "priority": 16,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 8436,
+      "kept": 4352,
+      "droppedOccupied": 4084,
+      "survival": 0.5159,
+      "keptStrength": 2982,
+      "keptWeakness": 371,
+      "keptByVerdictState": {
+        "EFFICIENT": 371,
+        "CHOPPY": 2982
+      }
+    },
+    "keltner-20-atr": {
+      "cardId": "keltner-20-atr",
+      "family": "band-reversion",
+      "priority": 17,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 6404,
+      "kept": 3538,
+      "droppedOccupied": 2866,
+      "survival": 0.5525,
+      "keptStrength": 1993,
+      "keptWeakness": 491,
+      "keptByVerdictState": {
+        "EFFICIENT": 491,
+        "CHOPPY": 1993
+      }
+    },
+    "bb-squeeze-fade": {
+      "cardId": "bb-squeeze-fade",
+      "family": "band-reversion",
+      "priority": 18,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 2835,
+      "kept": 2020,
+      "droppedOccupied": 815,
+      "survival": 0.7125,
+      "keptStrength": 1016,
+      "keptWeakness": 335,
+      "keptByVerdictState": {
+        "EFFICIENT": 335,
+        "CHOPPY": 1016
+      }
+    },
+    "pdh-retest": {
+      "cardId": "pdh-retest",
+      "family": "level-retest",
+      "priority": 10,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 1829,
+      "kept": 1074,
+      "droppedOccupied": 755,
+      "survival": 0.5872,
+      "keptStrength": 171,
+      "keptWeakness": 596,
+      "keptByVerdictState": {
+        "EFFICIENT": 171,
+        "CHOPPY": 596
+      }
+    },
+    "pdl-retest": {
+      "cardId": "pdl-retest",
+      "family": "level-retest",
+      "priority": 11,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 1483,
+      "kept": 905,
+      "droppedOccupied": 578,
+      "survival": 0.6102,
+      "keptStrength": 134,
+      "keptWeakness": 491,
+      "keptByVerdictState": {
+        "EFFICIENT": 134,
+        "CHOPPY": 491
+      }
+    },
+    "classic-pivot": {
+      "cardId": "classic-pivot",
+      "family": "level-retest",
+      "priority": 12,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "rawSignals": 6532,
+      "kept": 2494,
+      "droppedOccupied": 4038,
+      "survival": 0.3818,
+      "keptStrength": 302,
+      "keptWeakness": 1427,
+      "keptByVerdictState": {
+        "EFFICIENT": 302,
+        "CHOPPY": 1427
+      }
+    },
+    "rsi-14-30-70": {
+      "cardId": "rsi-14-30-70",
+      "family": "osc-fade",
+      "priority": 13,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 4020,
+      "kept": 2516,
+      "droppedOccupied": 1504,
+      "survival": 0.6259,
+      "keptStrength": 699,
+      "keptWeakness": 896,
+      "keptByVerdictState": {
+        "EFFICIENT": 896,
+        "CHOPPY": 699
+      }
+    },
+    "williams-r-fade": {
+      "cardId": "williams-r-fade",
+      "family": "osc-fade",
+      "priority": 14,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 18216,
+      "kept": 5916,
+      "droppedOccupied": 12300,
+      "survival": 0.3248,
+      "keptStrength": 3628,
+      "keptWeakness": 931,
+      "keptByVerdictState": {
+        "EFFICIENT": 931,
+        "CHOPPY": 3628
+      }
+    },
+    "stochastic-14-fade": {
+      "cardId": "stochastic-14-fade",
+      "family": "osc-fade",
+      "priority": 15,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 18216,
+      "kept": 5820,
+      "droppedOccupied": 12396,
+      "survival": 0.3195,
+      "keptStrength": 3557,
+      "keptWeakness": 915,
+      "keptByVerdictState": {
+        "EFFICIENT": 915,
+        "CHOPPY": 3557
+      }
+    },
+    "engulfing": {
+      "cardId": "engulfing",
+      "family": "candlestick-reversal",
+      "priority": 19,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 2071,
+      "kept": 1601,
+      "droppedOccupied": 470,
+      "survival": 0.7731,
+      "keptStrength": 1002,
+      "keptWeakness": 235,
+      "keptByVerdictState": {
+        "EFFICIENT": 235,
+        "CHOPPY": 1002
+      }
+    },
+    "morning-evening-star": {
+      "cardId": "morning-evening-star",
+      "family": "candlestick-reversal",
+      "priority": 20,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 13449,
+      "kept": 4834,
+      "droppedOccupied": 8615,
+      "survival": 0.3594,
+      "keptStrength": 3052,
+      "keptWeakness": 678,
+      "keptByVerdictState": {
+        "EFFICIENT": 678,
+        "CHOPPY": 3052
+      }
+    },
+    "three-soldiers-crows": {
+      "cardId": "three-soldiers-crows",
+      "family": "candlestick-reversal",
+      "priority": 21,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "rawSignals": 2168,
+      "kept": 1473,
+      "droppedOccupied": 695,
+      "survival": 0.6794,
+      "keptStrength": 949,
+      "keptWeakness": 214,
+      "keptByVerdictState": {
+        "EFFICIENT": 214,
+        "CHOPPY": 949
+      }
+    }
+  },
+  "perFamily": [
+    {
+      "family": "channel-breakout",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "rawSignals": 87255,
+      "kept": 6281,
+      "survival": 0.072,
+      "keptStrength": 954,
+      "keptWeakness": 3813,
+      "expectedStrengthN": 954,
+      "expectedWeaknessN": 3813
+    },
+    {
+      "family": "ma-cross",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "rawSignals": 19708,
+      "kept": 5781,
+      "survival": 0.2933,
+      "keptStrength": 721,
+      "keptWeakness": 3757,
+      "expectedStrengthN": 721,
+      "expectedWeaknessN": 3757
+    },
+    {
+      "family": "opening-range",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "rawSignals": 59526,
+      "kept": 5513,
+      "survival": 0.0926,
+      "keptStrength": 986,
+      "keptWeakness": 3146,
+      "expectedStrengthN": 986,
+      "expectedWeaknessN": 3146
+    },
+    {
+      "family": "level-retest",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "rawSignals": 9844,
+      "kept": 3094,
+      "survival": 0.3143,
+      "keptStrength": 400,
+      "keptWeakness": 1759,
+      "expectedStrengthN": 400,
+      "expectedWeaknessN": 1759
+    },
+    {
+      "family": "osc-fade",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "rawSignals": 40452,
+      "kept": 5905,
+      "survival": 0.146,
+      "keptStrength": 3676,
+      "keptWeakness": 919,
+      "expectedStrengthN": 3676,
+      "expectedWeaknessN": 919
+    },
+    {
+      "family": "band-reversion",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "rawSignals": 17675,
+      "kept": 4675,
+      "survival": 0.2645,
+      "keptStrength": 3049,
+      "keptWeakness": 513,
+      "expectedStrengthN": 3049,
+      "expectedWeaknessN": 513
+    },
+    {
+      "family": "candlestick-reversal",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "rawSignals": 17688,
+      "kept": 5222,
+      "survival": 0.2952,
+      "keptStrength": 3282,
+      "keptWeakness": 773,
+      "expectedStrengthN": 3282,
+      "expectedWeaknessN": 773
+    },
+    {
+      "family": "vol-compression",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "rawSignals": 39353,
+      "kept": 6443,
+      "survival": 0.1637,
+      "keptStrength": 4015,
+      "keptWeakness": 988,
+      "expectedStrengthN": 4015,
+      "expectedWeaknessN": 988
+    }
+  ],
+  "pooled": {
+    "rawSignals": 291501,
+    "kept": 7401,
+    "survival": 0.0254
+  },
+  "minTradesPerCell": 100,
+  "note": "Survival is the share of raw signals that survive the one-slot book. It is NOT a strategy result and does not change any criterion."
+}

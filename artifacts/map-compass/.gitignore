@@ -3,3 +3,6 @@
 # and must never enter a patchset. Only small JSON reports are committed.
 raw/
 normalized/
+# One large auditability file is committed on purpose: the per-day baseline
+# aggregates that make the CR1 day-clustered SE exactly reproducible from
+# committed data alone (~2.4 MB, regenerable by mc:baseline).

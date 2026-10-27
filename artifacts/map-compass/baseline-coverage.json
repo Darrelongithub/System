@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T07:32:27.785Z",
+  "generatedAt": "2026-10-27T13:59:08.461Z",
   "purpose": "G0 Amendment 3 task 2b: how many claim / state / session cells would hit NO_BASELINE (no fine AND no coarse matched random cell)?",
   "decidedBeforeResults": true,
   "noStrategyOutcomesUsed": true,
@@ -7,7 +7,7 @@
     "baseline": "artifacts/map-compass/random-baseline.json",
     "cards": "claim-cards.draft.mjs (DRAFT)",
     "baselineMinCellN": 200,
-    "baselineHash": "b8278ee9fed521e5eae1e772de8ac09dd8108c3eb2615c05515eb4d13f21f44c"
+    "baselineHash": "669836a1f3b71dd3e5e4894198602dfc0cd53144aba5ab9209bd1ac40d9e51ca"
   },
   "rule": {
     "resolution": "fine (sufficient) -> coarse (n >= minN) -> NO_BASELINE",
@@ -51,9 +51,284 @@
     "distinctClaimStateSessionKeys": 136
   },
   "resolutionCounts": {
-    "FINE": 984,
-    "COARSE_FALLBACK": 648,
+    "FINE_VERDICT_STATE": 1632,
+    "FINE_FOUR_STATE": 0,
+    "COARSE_FALLBACK": 0,
     "NO_BASELINE": 0
+  },
+  "baselineKey": {
+    "preferredFineKey": "verdictState|side|session|volRegime (G0 Amendment 4)",
+    "legacyFineKey": "fourState|side|session|volRegime (v1.3, kept for compatibility)",
+    "coarseKey": "fourState|side",
+    "zeroFallback": false
+  },
+  "topup": {
+    "enabled": true,
+    "preRegisteredAt": "G0 Amendment 4, 2026-10-27, before any strategy result",
+    "cellKey": "verdictState|side|session|volRegime",
+    "minPerCell": 200,
+    "seed": 20268945,
+    "derivedFrom": "RANDOM_BASELINE.seed + 7919",
+    "identicalHarness": true,
+    "note": "Same 1.5xATR stop, 2R target, frozen cost model and 96-bar TIME_EXIT cap. Same four-state key is kept for backward compatibility.",
+    "cellsRequested": 36,
+    "cellsToppedUp": 6,
+    "cellsUnreachable": [],
+    "entriesAdded": 538,
+    "perCell": [
+      {
+        "cell": "EFFICIENT|long|asian|low",
+        "before": 425,
+        "after": 425,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|asian|mid",
+        "before": 1518,
+        "after": 1518,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|asian|high",
+        "before": 972,
+        "after": 972,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|london|low",
+        "before": 78,
+        "after": 200,
+        "added": 122,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "EFFICIENT|long|london|mid",
+        "before": 717,
+        "after": 717,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|london|high",
+        "before": 806,
+        "after": 806,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|ny|low",
+        "before": 198,
+        "after": 200,
+        "added": 2,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "EFFICIENT|long|ny|mid",
+        "before": 1080,
+        "after": 1080,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|long|ny|high",
+        "before": 2206,
+        "after": 2206,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|asian|low",
+        "before": 448,
+        "after": 448,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|asian|mid",
+        "before": 1565,
+        "after": 1565,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|asian|high",
+        "before": 927,
+        "after": 927,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|london|low",
+        "before": 61,
+        "after": 200,
+        "added": 139,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "EFFICIENT|short|london|mid",
+        "before": 666,
+        "after": 666,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|london|high",
+        "before": 778,
+        "after": 778,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|ny|low",
+        "before": 195,
+        "after": 200,
+        "added": 5,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "EFFICIENT|short|ny|mid",
+        "before": 1168,
+        "after": 1168,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "EFFICIENT|short|ny|high",
+        "before": 2192,
+        "after": 2192,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|asian|low",
+        "before": 491,
+        "after": 491,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|asian|mid",
+        "before": 1676,
+        "after": 1676,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|asian|high",
+        "before": 904,
+        "after": 904,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|london|low",
+        "before": 67,
+        "after": 200,
+        "added": 133,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "CHOPPY|long|london|mid",
+        "before": 617,
+        "after": 617,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|london|high",
+        "before": 648,
+        "after": 648,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|ny|low",
+        "before": 237,
+        "after": 237,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|ny|mid",
+        "before": 1291,
+        "after": 1291,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|long|ny|high",
+        "before": 2069,
+        "after": 2069,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|asian|low",
+        "before": 447,
+        "after": 447,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|asian|mid",
+        "before": 1696,
+        "after": 1696,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|asian|high",
+        "before": 858,
+        "after": 858,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|london|low",
+        "before": 63,
+        "after": 200,
+        "added": 137,
+        "status": "TOPPED_UP"
+      },
+      {
+        "cell": "CHOPPY|short|london|mid",
+        "before": 611,
+        "after": 611,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|london|high",
+        "before": 647,
+        "after": 647,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|ny|low",
+        "before": 248,
+        "after": 248,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|ny|mid",
+        "before": 1314,
+        "after": 1314,
+        "added": 0,
+        "status": "OK"
+      },
+      {
+        "cell": "CHOPPY|short|ny|high",
+        "before": 2116,
+        "after": 2116,
+        "added": 0,
+        "status": "OK"
+      }
+    ]
   },
   "answer": {
     "noBaselineTradeLevelCells": 0,
@@ -65,29 +340,29 @@
     "noBaselineSessions": []
   },
   "strictFineOnlyHypothetical": {
-    "wouldBeNoBaselineTradeLevelCells": 648,
-    "wouldBeAffectedClaimVerdictStateSessionCells": 136,
+    "wouldBeNoBaselineTradeLevelCells": 0,
+    "wouldBeAffectedClaimVerdictStateSessionCells": 0,
     "note": "NOT the shipped rule. Shows that removing the coarse fallback would create real NO_BASELINE holes; the shipped rule keeps coarse fallback but NEVER a zero fallback."
   },
   "coarseCellCoverage": {
     "EXPANSION|long": {
-      "n": 4000,
+      "n": 4006,
       "sufficient": true
     },
     "EXPANSION|short": {
-      "n": 4000,
+      "n": 4016,
       "sufficient": true
     },
     "GRIND|long": {
-      "n": 4000,
+      "n": 4118,
       "sufficient": true
     },
     "GRIND|short": {
-      "n": 4000,
+      "n": 4128,
       "sufficient": true
     },
     "WHIPSAW|long": {
-      "n": 4000,
+      "n": 4003,
       "sufficient": true
     },
     "WHIPSAW|short": {
@@ -95,11 +370,11 @@
       "sufficient": true
     },
     "QUIET|long": {
-      "n": 4000,
+      "n": 4130,
       "sufficient": true
     },
     "QUIET|short": {
-      "n": 4000,
+      "n": 4137,
       "sufficient": true
     }
   },
@@ -109,20 +384,20 @@
     "insufficient": 28,
     "insufficientKeys": [
       {
-        "key": "WHIPSAW|long|london|low",
-        "n": 1
-      },
-      {
         "key": "WHIPSAW|short|london|low",
         "n": 3
       },
       {
-        "key": "EXPANSION|short|london|low",
-        "n": 7
+        "key": "WHIPSAW|long|london|low",
+        "n": 4
       },
       {
         "key": "EXPANSION|long|london|low",
-        "n": 11
+        "n": 15
+      },
+      {
+        "key": "EXPANSION|short|london|low",
+        "n": 18
       },
       {
         "key": "WHIPSAW|short|london|mid",
@@ -145,28 +420,12 @@
         "n": 49
       },
       {
-        "key": "GRIND|short|london|low",
-        "n": 54
-      },
-      {
         "key": "QUIET|long|ny|low",
         "n": 57
       },
       {
-        "key": "QUIET|short|london|low",
-        "n": 60
-      },
-      {
         "key": "EXPANSION|long|london|mid",
         "n": 63
-      },
-      {
-        "key": "QUIET|long|london|low",
-        "n": 66
-      },
-      {
-        "key": "GRIND|long|london|low",
-        "n": 67
       },
       {
         "key": "QUIET|short|ny|low",
@@ -194,11 +453,11 @@
       },
       {
         "key": "EXPANSION|long|ny|low",
-        "n": 151
+        "n": 153
       },
       {
         "key": "EXPANSION|short|ny|low",
-        "n": 152
+        "n": 157
       },
       {
         "key": "EXPANSION|short|london|high",
@@ -219,6 +478,22 @@
       {
         "key": "WHIPSAW|long|ny|low",
         "n": 180
+      },
+      {
+        "key": "GRIND|short|london|low",
+        "n": 182
+      },
+      {
+        "key": "GRIND|long|london|low",
+        "n": 185
+      },
+      {
+        "key": "QUIET|long|london|low",
+        "n": 196
+      },
+      {
+        "key": "QUIET|short|london|low",
+        "n": 197
       }
     ]
   },
@@ -227,953 +502,953 @@
       "cell": "asian-range-break|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "asian-range-break|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "atr-squeeze-break|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bb-squeeze-fade|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "bollinger-20-2|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "classic-pivot|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-20|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "donchian-55|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "dual-thrust|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "engulfing|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "ichimoku-tk|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "inside-bar-break|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "keltner-20-atr|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "london-orb-30|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "london-orb-30|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "macd-cross|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "morning-evening-star|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "nr7-break|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-pdl-break|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdh-retest|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "pdl-retest|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "rsi-14-30-70|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|strength|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|strength|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|strength|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|weakness|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|weakness|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "sma-20-50|weakness|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "stochastic-14-fade|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "three-soldiers-crows|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|strength|CHOPPY|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|strength|CHOPPY|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|weakness|EFFICIENT|asian",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 10,
-      "coarseFallback": 2
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|weakness|EFFICIENT|london",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 4,
-      "coarseFallback": 8
+      "fine": 0,
+      "coarseFallback": 0
     },
     {
       "cell": "williams-r-fade|weakness|EFFICIENT|ny",
       "lookups": 12,
       "noBaseline": 0,
-      "fine": 8,
-      "coarseFallback": 4
+      "fine": 0,
+      "coarseFallback": 0
     }
   ],
   "reversionCaveat": {

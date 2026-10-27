@@ -19,7 +19,8 @@ Claim cards are still `DRAFT`; `verify-claims.mjs` refuses real verification.
 | **v1.0** | 2026-10-26 | `docs/BLUEPRINT-v1.0.md` | `420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe` | superseded by v1.1; **preserved** |
 | **v1.1** | 2026-10-26 | `docs/BLUEPRINT-v1.1.md` | `72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480` | superseded by v1.2; **preserved** |
 | **v1.2** | 2026-10-27 | `docs/BLUEPRINT-v1.2.md` | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` | superseded by v1.3; **preserved** |
-| **v1.3** | 2026-10-27 | `docs/BLUEPRINT-v1.3.md` | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` | current; `BLUEPRINT.md` |
+| **v1.3** | 2026-10-27 | `docs/BLUEPRINT-v1.3.md` | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` | superseded by v1.4; **preserved** |
+| **v1.4** | 2026-10-27 | `docs/BLUEPRINT-v1.4.md` | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` | current; `BLUEPRINT.md` |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -28,10 +29,10 @@ Claim cards are still `DRAFT`; `verify-claims.mjs` refuses real verification.
   blob cannot be certified; this is declared as a limitation in v1.2 §15.19.
   Every v1.1→v1.2 edit is enumerated below, so the chain is auditable from
   v1.1 onward.
-- v1.2's and v1.3's hashes are recorded at the bottom of this file (section D)
-  and in `artifacts/map-compass/blueprint-hashes.json`. All four are printed
-  in full below, each exactly 64 hexadecimal characters. A test re-hashes each
-  snapshot and compares.
+- v1.2's, v1.3's and v1.4's hashes are recorded at the bottom of this file
+  (section D) and in `artifacts/map-compass/blueprint-hashes.json`. All five
+  are printed in full below, each exactly 64 hexadecimal characters. A test
+  re-hashes each snapshot and compares.
 - `BLUEPRINT.md` at v1.3 is a byte copy of `docs/BLUEPRINT-v1.3.md`.
   `sha256sum` of both is `acf0fa73…`.
 
@@ -155,9 +156,34 @@ no criterion relaxed; no card reordered; no new exit.
 
 ---
 
+## A5 — 2026-10-27 · v1.4 — G0 AMENDMENT 4
+
+Header instruction: **"before any strategy result exists; frozen thresholds, Map,
+costs, exit and the CONFIRMED rule unchanged"**. `verify-claims` stays BLOCKED and
+the cards stay `DRAFT`. No real strategy verification was run; `claim-verification.json`
+does not exist; `enabledCount` is 0.
+
+| # | Amendment | What changed | Frozen value changed? |
+| --- | --- | --- | --- |
+| A5.1 | **Signal-only library** | `scripts/map-compass/lib/signals.mjs` implements the 24 entry-signal functions as pure causal functions with the exact card parameters (`signal-params.mjs`, attached to each card as `parameters`). They emit entry bars and sides ONLY — no stops, targets, trades or R. Two tests pin the properties: no-lookahead (deleting the future never changes earlier signals — on synthetic bars for all 24 cards × 2 seeds × 4 cuts, and on the REAL bars for the prior-day and session-range cards) and no-outcome-import (`signals.mjs` imports exactly frozen.mjs, signal-params.mjs and dst.mjs; no emitted row contains netR/grossR/costR/totalR/verdict/outcome/exit/stop/target/R/pnl). The build caught and fixed two genuine lookahead bugs. | No. Adding `parameters` changes no claim, state, priority, session restriction or TEST_ORDER position. |
+| A5.2 | **Signal counts on DEV** | `signal-counts.mjs` → `signal-counts.json`. Per card and per family: signals by side, by verdict state, by four Map state, by session, and by the verdict state 20 bars BEFORE the signal (diagnostic only). Plus each family's share landing in its strength state. **291,501 raw DEV signals; all 48 card claim cells and all 16 family claim cells have expected n ≥ 100; STRUCTURALLY THIN = 0; families lacking any testable cell = 0.** | No. Measurement only; no card, state or Map changed. |
+| A5.3 | **Overlap measured from data** | `measure-overlap.mjs` → `measured-overlap.json`. The v1.3 label-driven overlap (design effect 2.2948) is replaced by the MEASURED entry-bar overlap between the three variants of each family: Jaccard and Kish effective N. Per-family design effects 1.02–2.13, pooled 4.047. Measured findings: `osc-fade`'s williams-r/stochastic pair has Jaccard **1.000** (identical bars); `level-retest`'s mirror pair has Jaccard 0.000. The v1.3 synthetic SE inflation (1.009) is replaced by a day-clustered CR1/plain-SE ratio computed on the random-entry baseline trades per verdict state: EFFICIENT **1.1115**, CHOPPY **1.0356**. | No. Report-only. Measured inputs named; assumptions named (shared bar = shared trade is an UPPER bound; per-trade SD is the baseline's measured SD). |
+| A5.4 | **Slot model** | `slot-model.mjs` → `slot-model.json`. Emulates the one-position-per-slot book using the baseline's bars-to-exit distribution. **EXPLICITLY AN ASSUMPTION**: hold durations come from the RANDOM baseline, a single global slot is modelled, priority is not re-applied, no strategy outcome is used. Result: pooled 291,501 raw → 7,401 kept (survival 2.54%); per-family survival 7–31%; every family still clears n ≥ 100 in both verdict states. | No. Assumption only. |
+| A5.5 | **Power curve, report-only** | `power-curve.mjs` → `power-curve.json`. Per 2-state × 3-session cell and pooled, the probability of satisfying the FULL CONFIRMED conjunction for true net edges 0.05R, 0.10R, 0.20R, 0.30R. Monte Carlo over deterministic runs (400/cell-edge) through the REAL `verifyClaim()`, using measured trade counts after the slot model, measured DEV day counts, measured DEV per-year bar counts, the baseline's measured SD and day correlation, and the measured verdict-state baseline mean. | **No criterion may change because of the result — none did.** `criteriaChanged`/`thresholdChanged`/`verdictChanged` are all false; `power-projection.json` verdict stays UNDERPOWERED. |
+| A5.6 | **Baseline top-up** | `random-baseline.mjs` pre-registers a top-up so every fine cell (verdict state × session × vol regime × side) has ≥200 random entries, using the same stop, target, costs and 96-bar cap with a fixed derived seed (20268945). Before: 30/36 fine cells sufficient, 28/72 lookups (38.89%) on the coarse fallback. After: **36/36 sufficient, 0/72 (0%) on the coarse fallback, 0 NO_BASELINE**, 538 entries added. The v1.3 four-state fine key is kept; the verdict-state key is preferred by `matchedBaseline()`. | Coverage only. No criterion. The pre-top-up share is preserved in `coverage.before`. TIME_EXIT stays 398 entries; the resolved total rises 32,000 → 32,538, so the share moves 1.24375% → 1.22319% (the v1.2 value stays frozen in `EXIT_HARNESS.amendment`). |
+| A5.7 | **Criticism registry** | `frozen.mjs → CRITICISMS` (machine-readable), printed in `docs/EMPIRICAL-EVIDENCE.md` and in every card of the full-text dump. For each of the 8 families the strongest published criticism or failed replication was located and **OPENED on 2026-10-27**, so every entry is **VERIFIED**. Nothing is cited from memory and no URL, author or year is invented. All 8 are NEGATIVE; six are peer-reviewed or pre-registered, two are pre-registered replications. | No. Literature registry only. |
+| A5.8 | **v1.4 snapshot + hashes** | `docs/BLUEPRINT-v1.4.md` byte-copy of `BLUEPRINT.md`; `blueprint-hashes.json` now holds all five full 64-char SHA-256 values. | No. |
+| A5.9 | **Pinned by tests** | `tests/map-compass/amendment4.test.mjs`: signal library (6), signal counts (3), overlap (2), slot model (1), power curve (2), top-up (2), criticisms (1), guards (2). Also a real-data no-lookahead test. v1.2/v1.3 tests updated for the new baseline keying and coverage state. | No. |
+
+**Explicitly NOT done:** no real strategy verification; no claim card frozen; no
+criterion, threshold, Map value, cost, exit, stop, target, floor or t cutoff
+changed; no card reordered; no new exit.
+
+---
+
 ## B — Cumulative answer to "did a threshold change?"
 
-| Constant | v1.0 | v1.3 | Changed? |
+| Constant | v1.0 | v1.4 | Changed? |
 | --- | --- | --- | --- |
 | `MAP.erCutoff` | 0.35 | 0.35 | no |
 | `MAP.atrPctileCutoff` | 70 | 70 | no |
@@ -178,27 +204,32 @@ no criterion relaxed; no card reordered; no new exit.
 | `CLAIM_CRITERIA.concentrationMax` | 0.50 | 0.50 | no |
 | `CLAIM_CRITERIA.loyoPositiveMin` | 0.75 | 0.75 | no |
 | `ROLES` | 12/4/5/2 | 12/4/5/2 | no |
-| Claim card count / priorities / TEST_ORDER | 24 / 1–24 | 24 / 1–24 | no |
+| Claim card count / priorities / TEST_ORDER | 24 / 1–24 | 24 / 1–24 | no (Amendment 4 added a `parameters` field and a `criticism` field to each card; no claim, state, priority or order position moved) |
+| Verdict states | 4 Map states | **2 (EFFICIENT/CHOPPY)** | A4.4 — pooling, not a threshold change |
+| Evidence tiers | 1–4 subjective | **study registry + VERIFIED criticisms** | A4.8 / A5.7 — metadata, not a criterion |
+| Baseline coverage | — | **≥200 per verdict-state fine cell** | A5.6 — coverage, not a criterion |
 
-Every non-"no" row is either a **stricter** test or a **pre-results rule
-rearrangement explicitly requested by the user** — never a relaxation chosen
-after seeing an outcome. A4.1 changed the verification RULE (the user's task
-1) but kept every numeric constant. That distinction is the whole point of
-this log.
+Every non-"no" row is either a **stricter** test, a **pre-results rule
+rearrangement explicitly requested by the user**, or a **measurement added
+before any result existed** — never a relaxation chosen after seeing an
+outcome. A4.1 changed the verification RULE (the user's task 1) but kept every
+numeric constant; A5 added measurement and coverage only. That distinction is
+the whole point of this log.
 
 ---
 
-## C — Still open after Amendment 3
+## C — Still open after Amendment 4
 
 1. **Review and freeze the 24 claim cards** (decision #13) — STILL OPEN. `docs/CLAIM-CARDS-FULL-TEXT.md` is the review dump, now with opened study URLs, verdict states and card relations. Change any state assignment NOW — after results exist, changing a claim is laundering.
-2. **Power decision — partially resolved.** A4.4 implemented the "pre-register more pooling" option via the 2 verdict states. Pooled joint power after day clustering + relation-aware overlap is 0.280 EFFICIENT / 0.810 CHOPPY (§7.11.3). Open sub-decision: accept that EFFICIENT remains underpowered, or start a NEW cycle with a different DEV/HOLDOUT allocation. Forbidden: lower the +0.10R floor, soften `t > 2`, re-fit costs, edit thresholds after results.
-3. **Vol-compression sequence position** (A4.9): its evidence grade is corrected to PRACTITIONER_ONLY but it still sits at TEST_ORDER positions 7–9. Confirm whether to move it or leave it flagged.
+2. **Power decision — resolved in measurement, open as a judgement.** A5.2 measured the DEV signal counts directly: all 48 card cells and all 16 family cells clear n ≥ 100, far better than the v1.3 projection which assumed a 0.6 slot-survival factor. But A5.4's measured one-slot book cuts the pooled sample by ~39x (survival 2.54%), and A5.5's report-only power curve puts P(CONFIRMED) at ~0.5 for a true +0.10R edge and ~0.8–1.0 for +0.20R. Open sub-decision: accept that EFFICIENT stays thin, or start a NEW cycle with a different DEV/HOLDOUT allocation. Forbidden: lower the +0.10R floor, soften `t > 2`, re-fit costs, edit thresholds after results.
+3. **Vol-compression sequence position** (A4.9): its evidence grade is corrected to PRACTITIONER_ONLY but it still sits at TEST_ORDER positions 7–9. A5.7 opened a measured criticism for it. Confirm whether to move it or leave it flagged.
+4. **Adopt the measured overlap and slot model as standing inputs?** A5.3 replaced the label-driven overlap (DE 2.2948) with measured values (per-family 1.02–2.13, pooled 4.047); A5.4 added the one-slot model. Confirm both should replace the v1.3 assumptions in the standing power readout.
 
 ---
 
-## D — Full SHA-256 of every snapshot (G0 Amendment 3, task 6)
+## D — Full SHA-256 of every snapshot (Amendments 3 and 4, tasks 6 and 8)
 
-All four values are the complete **64-character** SHA-256 of the raw file
+All five values are the complete **64-character** SHA-256 of the raw file
 bytes (`sha256sum` equivalent). Machine-readable copy:
 `artifacts/map-compass/blueprint-hashes.json`.
 
@@ -208,9 +239,10 @@ bytes (`sha256sum` equivalent). Machine-readable copy:
 | v1.1 | `docs/BLUEPRINT-v1.1.md` | 40,483 | 692 | `72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480` |
 | v1.2 | `docs/BLUEPRINT-v1.2.md` | 58,249 | 978 | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` |
 | v1.3 | `docs/BLUEPRINT-v1.3.md` | 82,493 | 1,342 | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` |
+| v1.4 | `docs/BLUEPRINT-v1.4.md` | 103,632 | 1,678 | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` |
 
-`BLUEPRINT.md` at v1.3 is byte-identical to `docs/BLUEPRINT-v1.3.md`
-(same `acf0fa73…` hash). Earlier snapshots were never edited.
+`BLUEPRINT.md` at v1.4 is byte-identical to `docs/BLUEPRINT-v1.4.md`
+(same `c1433249…` hash). Earlier snapshots were never edited.
 
 ### Exactly how v1.0 was reconstructed
 

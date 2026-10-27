@@ -1,12 +1,13 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.3 — 2026-10-27; G0 AMENDMENT 3 applied**
+**Version 1.4 — 2026-10-27; G0 AMENDMENT 4 applied**
 **Status: G0 FROZEN (amended before any claim result). M1–M5 machinery COMPLETE. Claim cards DRAFT — awaiting human review/freeze.**
 **Branch:** `arena/072665f9-system`
 
 > **Version history is immutable.** Four byte-preserving snapshots exist:
 > `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
-> `docs/BLUEPRINT-v1.2.md` and `docs/BLUEPRINT-v1.3.md`. The full 64-character
+> `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md` and
+> `docs/BLUEPRINT-v1.4.md`. The full 64-character
 > SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
@@ -26,10 +27,19 @@
 >   NO_BASELINE fail-closed; standard-exit caveat on reversion families;
 >   empirical-study evidence replacing subjective tiers; recomputed
 >   within-family overlap and a 2×3 report-only power table.
+> - **v1.4 / G0 Amendment 4 (2026-10-27)** — **24 pure causal entry-signal
+>   functions** with the exact card parameters (no stops, targets, trades or R);
+>   **measured** DEV signal counts, overlap (Jaccard + Kish) and day-clustered
+>   SE inflation; a **one-slot book model**; a **report-only power curve** at
+>   0.05/0.10/0.20/0.30R; a **baseline top-up** to ≥200 per verdict-state fine
+>   cell; and a **criticism registry** whose URLs were all opened 2026-10-27.
 >
-> **Amendment 3 was applied before any real strategy result exists.** Claim
+> **Every amendment was applied before any real strategy result exists.** Claim
 > cards are still `DRAFT`; `verify-claims.mjs` still refuses real verification.
-> **No MAP, cost, exit, stop, target, floor or t numeric threshold changed.**
+> **No MAP, cost, exit, stop, target, floor or t numeric threshold changed at any
+> version.** Amendment 3 explicitly rewrote the verification RULE (task 1) but
+> every numeric constant inside it is an original frozen value; Amendment 4
+> changed no criterion at all. See §7.11 (rule) and §7.12 (measurement).
 > The verification RULE was explicitly rewritten (task 1) but every numeric
 > constant inside it is an original frozen value. See §7.11 for the full dated
 > diff against v1.2.
@@ -1022,6 +1032,299 @@ is nonetheless reproducible from the two preserved snapshots, and every
 v1.1 → v1.2 → v1.3 edit is listed with a date in the amendment log. This
 uncertainty is declared as a limitation (§15.19).
 
+### 7.12 G0 AMENDMENT 4 (2026-10-27) — in full
+
+**Provenance.** Applied before any real strategy result exists. Claim cards are
+still `DRAFT`; `verify-claims.mjs` still refuses real verification; the ledger is
+empty; `routing-table.json` enables nothing. **Frozen thresholds, the Map, the
+costs, the exit harness and the CONFIRMED rule are unchanged** — Amendment 4
+adds measurement, not criteria.
+
+**What did NOT change:** `MAP.*`, `EXIT_HARNESS.*` (stop 1.5×ATR, target 2R,
+`maxHoldBars = 96`), `COST.*`, `ROLES`, `DENYLIST`, `RANDOM_BASELINE.*`,
+`CONFLICT_RULE`, `CLAIM_CRITERIA.*` (including `practicalFloorR = 0.10`,
+`tStatMin = 2`, `minTradesPerCell = 100`, `excessFloorR = 0`,
+`concentrationMax = 0.50`, `loyoPositiveMin = 0.75`), the CONFIRMED rule in
+§7.2.1, the two verdict states, the four-state diagnostics, the 24 cards'
+priorities, `TEST_ORDER`, and the CONDITIONAL default "no".
+
+**What Amendment 4 adds:** a signal-only library, measured signal counts,
+measured overlap, a slot model, a power curve, a baseline top-up, and a
+criticism registry. All report-only except the baseline top-up (which changes
+the baseline's *coverage*, not any criterion).
+
+#### 7.12.1 Signal-only library (task 1)
+
+`scripts/map-compass/lib/signals.mjs` implements the **24 entry-signal
+functions as pure causal functions** with the **exact parameters written on the
+cards** (`scripts/map-compass/signal-params.mjs`, attached to each card as
+`parameters` and printed by `print-claim-cards.mjs` and
+`signal-counts.json`).
+
+They emit **entry bars and sides ONLY** — no stops, targets, partials,
+trailing, breakeven, trades, P&L, R, expectancy, verdicts or exits. There is
+deliberately no exit logic here: the exit harness lives in `lib/trade.mjs` and
+is applied only when a claim is actually tested, which Amendment 4 does NOT do.
+
+The parameters are the PUBLISHED settings for each known strategy (e.g.
+`donchian-20` `{lookback: 20}`, `macd-cross` `{fast: 12, slow: 26, signal: 9}`,
+`rsi-14-30-70` `{period: 14, oversold: 30, overbought: 70}`,
+`nr7-break` `{lookback: 7, breakRel: 0.25}`). None is fitted to this project's
+data.
+
+**Two correctness properties are pinned by tests:**
+
+- **No lookahead.** For every card, at four truncation points, deleting all bars
+  after the cut leaves every earlier signal byte-identical — verified on
+  synthetic bars for all 24 cards × 2 seeds × 4 cuts, **and on the real bars**
+  for the prior-day and session-range cards. This caught and fixed two genuine
+  bugs during the build: (a) `priorDayStats` aggregated a whole calendar date
+  across the series, including future bars; (b) the session-range evaluators
+  built their range from the *first* occurrence of a date rather than the
+  occurrence immediately before the bar. Both were lookahead.
+- **Nothing outcome-related can be imported.** `signals.mjs` imports exactly
+  three modules — `frozen.mjs` (constants), `signal-params.mjs` (data) and
+  `dst.mjs` (clock). A test asserts the import surface and that no emitted row
+  contains any of `netR, grossR, costR, totalR, expectancy, verdict, outcome,
+  exit, stop, target, r, pnl, profit, loss`.
+
+Adding `parameters` to the cards changes **no** claim, state, priority, session
+restriction or `TEST_ORDER` position — `validateClaimCards()` and the
+`TEST_ORDER` byte-identity test both still pass.
+
+#### 7.12.2 Signal counts on DEV (task 2)
+
+`scripts/map-compass/signal-counts.mjs` → `signal-counts.json`. It runs all 24
+signals on the **DEV window** (131,922 of 248,912 bars) and counts, per card and
+per family: signals by side, by verdict state, by four Map state, by session,
+and **by the verdict state 20 bars BEFORE the signal** (a diagnostic only — it
+is not a verdict input). It also reports the share of each family's signals
+landing in its strength state.
+
+**No outcomes are used**: only bars, Map states and the signal parameters. No
+exit, no R, no verdict.
+
+**Result: 291,501 raw DEV signals across 24 cards; every one of the 48 card
+claim cells and all 16 family claim cells has expected n ≥ 100.**
+
+| Family | Strength N | Weakness N | Share in strength state |
+| ------ | ----------: | ----------: | ----------------------: |
+| channel-breakout | 20,264 | 42,588 | 0.2322 |
+| ma-cross | 1,733 | 13,576 | 0.0879 |
+| opening-range | 14,254 | 28,537 | 0.2395 |
+| level-retest | 1,251 | 8,054 | 0.1011 |
+| osc-fade | 23,637 | 6,952 | 0.5843 |
+| band-reversion | 10,174 | 2,434 | 0.5756 |
+| candlestick-reversal | 11,234 | 2,402 | 0.6351 |
+| vol-compression | 24,347 | 5,897 | 0.6187 |
+
+**STRUCTURALLY THIN cells: 0 of 48 card cells, 0 of 16 family cells. Families
+lacking any testable cell: none.** This is measured signal *counts*, not trades
+— the one-slot book (§7.12.4) is what reduces them, and it is reported
+separately. **The owner decides after seeing this; the report does not change
+any card, state or Map.**
+
+Notable measured facts: `pdh-retest` is long-only and `pdl-retest` short-only
+by construction; `dual-thrust` with `k = 0` fires on exactly the same bars as
+`pdh-pdl-break` (both break the prior-day high/low) — a real, measured
+cross-family redundancy recorded in `measured-overlap.json`.
+
+#### 7.12.3 Overlap measured from data + day-clustered SE (task 3)
+
+`scripts/map-compass/measure-overlap.mjs` → `measured-overlap.json`. The v1.3
+**label-driven** overlap (`CARD_RELATIONS` metadata + a seeded RNG, design
+effect 2.2948) is replaced by the **measured** entry-bar overlap between the
+three variants of each family, using the real DEV signal bars. Both
+**Jaccard** and **Kish effective N** are reported per family.
+
+| Family | n | distinct bars | n_eff | design effect | pairwise Jaccard |
+| ------ | -: | ------------: | -----: | ------------: | ---------------- |
+| channel-breakout | 87,255 | 60,949 | 46,497.95 | 1.8765 | 0.507 / 0.222 / 0.238 |
+| ma-cross | 19,708 | 18,937 | 18,246.98 | 1.0801 | 0.013 / 0.015 / 0.029 |
+| opening-range | 59,526 | 54,051 | 49,258.27 | 1.2084 | 0.159 / 0.035 / 0.057 |
+| level-retest | 12,378 | 12,120 | 11,882.65 | 1.0417 | 0.000 / 0.013 / 0.011 |
+| osc-fade | 40,452 | 19,931 | 19,004.51 | 2.1285 | 0.116 / 0.116 / **1.000** |
+| band-reversion | 17,675 | 11,409 | 9,333.62 | 1.8937 | 0.301 / 0.336 / 0.215 |
+| candlestick-reversal | 17,688 | 17,472 | 17,266.30 | 1.0244 | 0.014 / 0.000 / 0.000 |
+| vol-compression | 39,353 | 32,008 | 28,614.74 | 1.3753 | 0.005 / 0.005 / 0.229 |
+
+Pooled across all 24 cards: n = 291,501, distinct bars 99,125, n_eff 72,028.76,
+design effect **4.047**. Two measured findings stand out: **`osc-fade`'s
+`williams-r-fade` and `stochastic-14-fade` have Jaccard 1.000** — they fire on
+exactly the same bars (Williams %R is a linear transform of the raw stochastic);
+and **`level-retest`'s mirror pair has Jaccard 0.000** — the long-only
+prior-day-high retest and the short-only prior-day-low retest are disjoint by
+construction.
+
+**The synthetic SE-inflation factor is also replaced.** The v1.3 value 1.009 was
+measured on zero-edge Gaussian noise. The new value is a **day-clustered CR1 /
+plain-SE ratio computed on the random-entry baseline trades, per verdict state**:
+
+| Verdict state | n | day clusters | plain SE | CR1 SE | inflation |
+| ------------- | -: | ------------: | --------: | ------: | --------: |
+| EFFICIENT | 16,268 | 10,758 | 0.011117 | 0.012357 | **1.1115** |
+| CHOPPY | 16,270 | 14,086 | 0.011339 | 0.011743 | **1.0356** |
+
+**Which inputs are measured and which are assumptions — stated plainly:**
+
+- **MEASURED:** the entry bars each signal fires on (real DEV bars); the
+  pairwise and pooled Jaccard and Kish effective N; the baseline trades' netR
+  values and calendar days (for the CR1/plain-SE ratio); the DEV calendar-day
+  and per-year bar counts; the slot-model trade counts.
+- **ASSUMPTION:** that a variant firing on the same bar as another would be
+  taken as a separate trade — the Kish effective N is an **upper bound** on
+  independent information, and the one-slot book (§7.12.4) is what actually
+  decides it; the per-trade SD used downstream is the baseline's own measured
+  SD, not a fitted parameter; the day-correlation factor (0.55 × SD) used by
+  the power curve.
+
+#### 7.12.4 Slot model (task 4)
+
+`scripts/map-compass/slot-model.mjs` → `slot-model.json`. Decision #10 is one
+position per slot. The old engine **dropped** signals arriving while a slot was
+occupied rather than queueing them — which turned a +16.0R offline estimate into
+-3.63R in the old project. This script emulates that blocking using the
+**baseline's own distribution of bars-to-exit** (the `barsHeldStats` histogram:
+mean 37.9 bars, median 33, p90 77, max 96), applied to the measured DEV signal
+bars of each card and each family.
+
+**THIS IS AN ASSUMPTION.** The hold duration is drawn from the *random*
+baseline's exit-times, not from any strategy's realised exits; a single global
+slot is modelled (the conservative reading of decision #10 — a per-state book
+would raise survival); and the frozen numeric priority is not re-applied here
+because a family's variants are pooled anyway. **No strategy outcome is used.**
+
+| Family | raw signals | kept | survival | strength N | weakness N |
+| ------ | -----------: | ---: | -------: | ----------: | ----------: |
+| channel-breakout | 87,255 | 6,256 | 0.0717 | 897 | 3,820 |
+| ma-cross | 19,708 | 5,791 | 0.2938 | 721 | 3,730 |
+| opening-range | 59,526 | 5,463 | 0.0918 | 897 | 3,198 |
+| level-retest | 12,378 | 3,817 | 0.3084 | 415 | 2,420 |
+| osc-fade | 40,452 | 5,863 | 0.1449 | 3,599 | 916 |
+| band-reversion | 17,675 | 4,675 | 0.2645 | 3,049 | 513 |
+| candlestick-reversal | 17,688 | 5,222 | 0.2952 | 3,282 | 773 |
+| vol-compression | 39,353 | 6,443 | 0.1637 | 4,015 | 988 |
+
+**Pooled: 291,501 raw → 7,401 kept (survival 2.54%).** The one-slot book is
+brutal: it cuts the pooled sample by a factor of ~39. Every family still clears
+n ≥ 100 in both verdict states, but the margin is now thin (the smallest family
+cell is `ma-cross` strength at 721, `opening-range` strength at 897). This is
+the single most important pre-M6 finding: the *measured* signal counts look
+healthy, but the book — not the signal — is what limits the sample.
+
+#### 7.12.5 Power curve, report-only (task 5)
+
+`scripts/map-compass/power-curve.mjs` → `power-curve.json`.
+
+**Definition (stated in the artifact):** the probability that a claim cell would
+be **CONFIRMED**, i.e. satisfy the full frozen conjunction
+`(meanNetR > +0.10R AND day-clustered tNet > 2) AND (excessVsRandomR > 0 AND
+day-clustered t > 2) AND all vetoes clear (n ≥ 100, concentration ≤ 0.50,
+LOYO ≥ 0.75, NO_BASELINE)`, evaluated by Monte Carlo over **deterministic
+runs** (400 per cell-edge) of simulated trades whose **count is the measured DEV
+signal count after the one-slot book**, whose **calendar-day structure is the
+measured DEV day counts**, whose **year spread is the measured DEV bar counts
+per year** (so the concentration and LOYO vetoes are exercised realistically),
+whose per-trade SD and day-level correlation come from the **random baseline's
+own measured netR values**, and whose matched baseline mean `b` is the measured
+verdict-state baseline mean (so the true excess is `edge − b`). Each simulated
+trade set is run through the **real `verifyClaim()`** with a controlled
+baseline, and the CONFIRMED rate is counted.
+
+| Cell | trades | days | b (R) | SD (R) | p@0.05R | p@0.10R | p@0.20R | p@0.30R |
+| ---- | -----: | ----: | ------: | ------: | -------: | -------: | -------: | -------: |
+| EFFICIENT\|asian | 2,057 | 1,306 | −0.141 | 1.418 | 0.000 | 0.507 | 1.000 | 1.000 |
+| EFFICIENT\|london | 2,057 | 932 | −0.141 | 1.418 | 0.000 | 0.497 | 1.000 | 1.000 |
+| EFFICIENT\|ny | 2,057 | 1,416 | −0.141 | 1.418 | 0.000 | 0.515 | 1.000 | 1.000 |
+| CHOPPY\|asian | 8,993 | 2,862 | −0.108 | 1.446 | 0.000 | 0.485 | 1.000 | 1.000 |
+| CHOPPY\|london | 8,993 | 2,692 | −0.108 | 1.446 | 0.000 | 0.482 | 1.000 | 1.000 |
+| CHOPPY\|ny | 8,993 | 2,886 | −0.108 | 1.446 | 0.000 | 0.487 | 1.000 | 1.000 |
+| EFFICIENT\|POOLED | 6,170 | 3,654 | −0.141 | 1.418 | 0.330 | 0.557 | 0.802 | 0.943 |
+| CHOPPY\|POOLED | 26,980 | 8,440 | −0.108 | 1.446 | 0.338 | 0.555 | 0.790 | 0.938 |
+
+Reading: at a true net edge of **+0.05R** the probability is ~0 (below the
++0.10R floor, as it must be). At **+0.10R** it is ~0.5 by construction — the
+floor sits exactly on the edge. At **+0.20R** the per-session cells reach 1.0
+and the pooled cells ~0.80; at **+0.30R** everything is ≥0.94. The per-session
+trade counts are the family's slot-model kept trades divided evenly across the
+three sessions — a documented approximation, since per-session signal splits are
+not yet measured.
+
+**REPORT-ONLY. No criterion may change because of the result, and none did.**
+`criteriaChanged`, `thresholdChanged` and `verdictChanged` are all `false` in
+the artifact, and `power-projection.json`'s verdict remains **UNDERPOWERED**.
+
+#### 7.12.6 Baseline top-up (task 6)
+
+`random-baseline.mjs` now pre-registers a **top-up** so that every fine cell
+**(verdict state × session × vol regime × side)** has at least 200 random
+entries — the same `CLAIM_CRITERIA.baselineMinCellN`. It uses the **same 1.5×ATR
+stop, 2R target, frozen cost model and 96-bar TIME_EXIT cap**, with a **fixed
+derived seed** (`RANDOM_BASELINE.seed + 7919 = 20268945`). The v1.3 four-state
+fine-cell key is kept for backward compatibility; the new verdict-state key is
+preferred by `matchedBaseline()`.
+
+| | Before | After |
+| --- | ----: | ----: |
+| fine cells (verdict-state key) | 30 of 36 sufficient | **36 of 36 sufficient** |
+| fine cells insufficient | 6 | **0** |
+| lookups using the COARSE fallback | 28 of 72 (38.89%) | **0 of 72 (0%)** |
+| NO_BASELINE cells | 0 | **0** |
+| baseline entries added | — | 538 (6 cells topped up) |
+
+The pre-top-up coarse-fallback share (38.89%) and the insufficient-cell list are
+preserved in `random-baseline.json → coverage.before` and
+`topup.perCell`, so the change is auditable. TIME_EXIT is unchanged at 398
+entries; the resolved total rises from 32,000 to 32,538 because of the added
+entries, so the share moves from 1.24375% to 1.22319%. The v1.2 value
+(398/32,000) stays frozen in `EXIT_HARNESS.amendment` as the historical
+pre-top-up record.
+
+`baseline-coverage.json` is refreshed: all 1,632 trade-level lookups now resolve
+via a FINE verdict-state cell, 0 use the coarse fallback, and 0 hit NO_BASELINE.
+
+#### 7.12.7 Criticism registry (task 7)
+
+`frozen.mjs → CRITICISMS` (machine-readable), printed in
+`docs/EMPIRICAL-EVIDENCE.md` and in every card of
+`docs/CLAIM-CARDS-FULL-TEXT.md`. For each of the 8 families the strongest
+published criticism or failed replication was located and **opened on
+2026-10-27**, so every entry is marked **VERIFIED**. Nothing is cited from
+memory and no URL, author or year is invented.
+
+| Family | Criticism / failed replication (opened) | Impact |
+| ------ | ---------------------------------------- | ------ |
+| channel-breakout | Sullivan, Timmermann & White (1999), *J. Finance* 54(5) — the best rule's edge is largely a data-snooping artefact | NEGATIVE |
+| ma-cross | Allen & Karjalainen (1999), *J. Financial Economics* 51(2) — genetic-algorithm MA rules earn no consistent excess returns OOS after costs | NEGATIVE |
+| opening-range | Fetna (2026), SSRN 7428398 — pre-registered 225-cell grid, **zero** cells survive costs | NEGATIVE |
+| opening-range (2nd) | Sun (2026), *Pricing the Fill* — the published 1,637% ORB claim returns −0.0855R/trade OOS | NEGATIVE |
+| level-retest | Curcio, Goodhart, Guillaume & Payne (1997), *Int. J. Finance & Economics* 2(4) — support/resistance rules not profitable intraday once spreads are charged | NEGATIVE |
+| osc-fade | Muruganandan (2020), *Colombo Business Journal* 11(1) — RSI failed to deliver a positive return even before transaction costs | NEGATIVE |
+| band-reversion | Fang, Jacobsen & Qin (2017), *J. Portfolio Management* 43(4) — Bollinger profitability self-destructs with popularity | NEGATIVE |
+| candlestick-reversal | Marshall, Young & Cahan (2008), *RQFA* 31 — no evidence candlestick adds value in Japan 1975–2004 | NEGATIVE |
+| vol-compression | Casey (2024/2026), StatOasis — 17,424 backtests: "The pattern is real. The edge is mostly drift." | NEGATIVE |
+
+**All 8 families have an opened, VERIFIED criticism or failed replication.**
+Six are peer-reviewed or pre-registered studies; two are pre-registered
+replications. None supports the textbook claim out-of-sample after realistic
+costs — consistent with `EVIDENCE.priorFalseFraction = 0.80`. This sets
+expectations and explains why a mostly-REFUTED M6 would not be surprising; it
+does **not** pre-decide any verdict, and every claim is still tested under the
+frozen rule.
+
+#### 7.12.8 Summary of the amendment
+
+| # | Change | Frozen value changed? |
+| --- | ------ | --------------------- |
+| 1 | 24 pure causal entry-signal functions with the exact card parameters; no-lookahead and no-outcome-import tests | No |
+| 2 | Measured DEV signal counts by side / verdict state / four state / session / 20-bar lag; STRUCTURALLY THIN list | No |
+| 3 | Label-driven overlap → measured Jaccard + Kish; synthetic SE inflation → measured baseline CR1 inflation | No (report-only) |
+| 4 | One-slot book emulation using the baseline's bars-to-exit distribution (assumption) | No |
+| 5 | Report-only power curve at 0.05/0.10/0.20/0.30R for 2×3 cells and pooled | No |
+| 6 | Baseline top-up to ≥200 per verdict-state fine cell, fixed seed, identical harness | Coverage only — no criterion |
+| 7 | Criticism registry, all URLs opened 2026-10-27, marked VERIFIED | No |
+| 8 | Push and `git ls-remote` verification | No |
+
 ## 8. Cost model (M3 — COMPLETE)
 
 `artifacts/map-compass/cost-model.json` holds **R-denominated** cost per
@@ -1155,20 +1458,28 @@ breakdowns, and the 2× slippage / p95-spread cost stress variant.
 
 1. **Review and freeze the 24 claim cards** (decision #13) — STILL OPEN. Use
    `docs/CLAIM-CARDS-FULL-TEXT.md` (all 24 in full, with opened study URLs,
-   verdict states and relations). Change any state assignment NOW — after
-   results exist, changing a claim is the laundering this project forbids.
-2. **Power decision — PARTIALLY RESOLVED at Amendment 3.** The 2 verdict states
-   (EFFICIENT / CHOPPY) implement the "pre-register more pooling" option from
-   §7.5 without touching criteria. The report-only table (§7.11.3) shows the
-   pooled joint power is 0.280 for EFFICIENT and 0.810 for CHOPPY after day
-   clustering and the relation-aware effective-N correction. Open sub-decision:
-   accept that EFFICIENT remains underpowered, or start a NEW cycle with a
-   different DEV/HOLDOUT allocation. Lowering criteria is not on the table.
-3. **Vol-compression evidence grade (Amendment 3) — needs your call.** It is
-   PRACTITIONER_ONLY but still sits at positions 7–9 of the frozen TEST_ORDER
-   because v1.2 ranked it tier 1. Its grade was corrected; the sequence was
-   kept stable as instructed. Confirm whether to move it (which would change a
-   frozen sequence) or leave it flagged.
+   verdict states, relations, signal parameters and criticisms). Change any
+   state assignment NOW — after results exist, changing a claim is the
+   laundering this project forbids.
+2. **Power decision — RESOLVED in measurement at Amendment 4, still open as a
+   judgement.** The measured DEV signal counts clear n ≥ 100 in all 48 card cells
+   and all 16 family cells (§7.12.2) — far better than the v1.3 projection, which
+   had assumed a 0.6 slot-survival factor rather than measuring it. But the
+   measured one-slot book cuts the pooled sample by a factor of ~39 (§7.12.4),
+   and the report-only power curve (§7.12.5) puts the probability of CONFIRMATION
+   at ~0.5 for a true +0.10R edge and ~0.8–1.0 for +0.20R. Open sub-decision:
+   accept that EFFICIENT stays thin, or start a NEW cycle with a different
+   DEV/HOLDOUT allocation. Lowering criteria is not on the table.
+3. **Vol-compression evidence grade and TEST_ORDER position (Amendment 3) — needs
+   your call.** It is PRACTITIONER_ONLY but still sits at positions 7–9 of the
+   frozen TEST_ORDER because v1.2 ranked it tier 1. Its grade was corrected and a
+   measured criticism was opened (§7.12.7); the sequence was kept stable as
+   instructed. Confirm whether to move it (which would change a frozen sequence)
+   or leave it flagged.
+4. **Adopt the measured overlap and slot model as the standing inputs?** Amendment
+   4 replaced the label-driven overlap (design effect 2.2948) with measured values
+   (per-family 1.02–2.13, pooled 4.047) and added the one-slot model. Confirm
+   both should replace the v1.3 assumptions in the standing power readout.
 
 ---
 
@@ -1185,6 +1496,10 @@ npm run mc:power       # M5 -> power-projection.json (needs normalised data)
 npm run mc:amend2      # Amendments 2+3: recompute reportOnly + reportOnlyV13 (no raw data needed)
 npm run mc:cards       # print all 24 DRAFT cards in full text, in TEST_ORDER
 npm run mc:coverage   # NO_BASELINE coverage audit + 48 verdict labels
+npm run mc:signals    # Amendment 4: measured DEV signal counts
+node scripts/map-compass/measure-overlap.mjs   # Amendment 4: measured overlap + SE inflation
+node scripts/map-compass/slot-model.mjs         # Amendment 4: one-slot book model
+node scripts/map-compass/power-curve.mjs        # Amendment 4: report-only power curve
 npm run mc:compass     # regenerate routing-table.json with conditionalPolicy
 npm test               # full suite
 ```
@@ -1222,12 +1537,17 @@ data-availability failures, not logic failures; the full suite passes once
 | `routing-table.json`       | M4 Compass table (inert until G3)           |
 | `harness-calibration.json` | M5 synthetic calibration + placebo null (clustered SE) |
 | `power-projection.json`    | pre-M6 go/no-go projection + Amendment-2 `reportOnly` block |
-| `random-baseline.json`     | matched random-entry null + `timeExitShare`  |
+| `random-baseline.json`     | matched random-entry null + top-up + `timeExitShare` |
+| `random-baseline-daily-sums.json` | per-day baseline aggregates (CR1 SE reproducibility) |
 | `readability.json`         | empty-set interpretation + CONDITIONAL policy |
 | `routing-table.json`       | M4 Compass table + `conditionalPolicy`      |
 | `seal-audit.json`          | measured holdout feature bleed              |
 | `baseline-coverage.json`   | NO_BASELINE cell audit (Amendment 3)        |
-| `blueprint-hashes.json`    | full SHA-256 of v1.0/v1.1/v1.2/v1.3         |
+| `blueprint-hashes.json`    | full SHA-256 of v1.0–v1.4                     |
+| `signal-counts.json`       | measured DEV signal counts (Amendment 4)      |
+| `measured-overlap.json`    | measured Jaccard / Kish overlap + SE inflation|
+| `slot-model.json`          | one-slot book emulation (assumption)          |
+| `power-curve.json`         | report-only power curve at 4 true edges       |
 | `claim-ledger.jsonl`       | append-only verdicts (currently empty)      |
 
 ---
@@ -1316,6 +1636,19 @@ data-availability failures, not logic failures; the full suite passes once
     `state|side` cells exist (n=4000), so the shipped rule yields 0
     NO_BASELINE cells. 648 of 1,632 trade-level lookups rely on the coarse
     fallback; forbidding it would create 648 NO_BASELINE holes.
+25. **The one-slot book is an EMULATION, not the engine.** Hold durations are
+    sampled from the RANDOM baseline's bars-to-exit distribution, a single global
+    slot is modelled, and priority is not re-applied. Real M6 book behaviour will
+    differ; the model is a pre-M6 order-of-magnitude, not a forecast.
+26. **The power curve's per-session trade counts are an approximation.** Each
+    per-session cell uses the family's slot-model kept trades divided evenly
+    across the three sessions. Per-session signal splits are not yet measured.
+27. **The measured overlap is an UPPER bound on independent information.** It
+    assumes variants firing on the same bar would be taken as separate trades;
+    the one-slot book is what actually decides that, and it is modelled separately.
+28. **The signal library is a SPECIFICATION, not a tested strategy.** Its
+    parameters are the published settings; no signal has been evaluated for
+    P&L. Amendment 4 deliberately stops at entry bars and sides.
 24. **Empirical studies are literature, not evidence about our data.** They
     motivate the claims and set the test order; they do not pre-confirm
     anything. `vol-compression` has no peer-reviewed test and is marked
@@ -1327,13 +1660,16 @@ data-availability failures, not logic failures; the full suite passes once
 
 | Document                                      | Role                                                   |
 | --------------------------------------------- | ------------------------------------------------------ |
-| **`BLUEPRINT.md`** (this file, v1.3)          | Canonical pre-registration — wins on conflict          |
+| **`BLUEPRINT.md`** (this file, v1.4)          | Canonical pre-registration — wins on conflict          |
 | `docs/BLUEPRINT-v1.0.md`                      | Immutable v1.0 snapshot (reconstructed)                |
 | `docs/BLUEPRINT-v1.1.md`                      | Immutable v1.1 snapshot, SHA-256 `72c078f3…`           |
 | `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot                                  |
-| `docs/BLUEPRINT-v1.3.md`                      | Immutable v1.3 snapshot (this version)                   |
-| `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies / PRACTITIONER_ONLY registry       |
-| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.3) |
+| `docs/BLUEPRINT-v1.3.md`                      | Immutable v1.3 snapshot                                  |
+| `docs/BLUEPRINT-v1.4.md`                      | Immutable v1.4 snapshot (this version)                   |
+| `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies + eight VERIFIED criticisms        |
+| `scripts/map-compass/signal-params.mjs`       | The 24 exact signal parameters (card source of truth)  |
+| `scripts/map-compass/lib/signals.mjs`         | The 24 pure causal entry-signal functions               |
+| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.4) |
 | `docs/CLAIM-CARDS-FULL-TEXT.md`               | All 24 cards in full text, in TEST_ORDER (DRAFT)       |
 | `docs/MAP-COMPASS-DATA-CONTRACT.md`           | G1 detail: provenance, timezone epochs, schema, holes  |
 | `docs/ENGINE-BIAS-REGISTER.md`                | G1.5 detail: D1–D4, resolution strategy, sign-off      |

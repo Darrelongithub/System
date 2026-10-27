@@ -90,8 +90,9 @@ export function excessFor(netR, baselineMean, direction = +1) {
 /**
  * Look up the matched random-entry null for one trade.
  *
- *   fine   state|side|session|vol  (only if sufficient && n >= baselineMinCellN)
- *   coarse state|side              (only if n >= baselineMinCellN)
+ *   fine   verdictState|side|session|vol   (Amendment 4 key; preferred)
+ *   fine   state|side|session|vol          (v1.3 key, kept for compatibility)
+ *   coarse state|side                      (only if n >= baselineMinCellN)
  *   else   MISSING — mean is NULL, never 0.
  *
  * `baseline === null` is the ONLY exception: an explicit UNCONTROLLED dry-run
@@ -103,6 +104,12 @@ export function matchedBaseline(trade, baseline) {
   const minN = CLAIM_CRITERIA.baselineMinCellN;
   if (!baseline) return { mean: 0, n: 0, level: UNCONTROLLED, missing: false };
   const { state, side, session, vol } = trade;
+  const vs = trade.verdictState ?? verdictStateOf(state);
+  if (vs) {
+    const vf = baseline.fineCellsVerdictState?.[`${vs}|${side}|${session}|${vol}`];
+    if (vf?.sufficient && vf.n >= minN && Number.isFinite(vf.meanNetR))
+      return { mean: vf.meanNetR, n: vf.n, level: "fine-verdictState", missing: false };
+  }
   const fine = baseline.fineCells?.[`${state}|${side}|${session}|${vol}`];
   if (fine?.sufficient && fine.n >= minN && Number.isFinite(fine.meanNetR))
     return { mean: fine.meanNetR, n: fine.n, level: "fine", missing: false };

@@ -24,6 +24,7 @@
  * Priority is a FROZEN number (decision #10), assigned by family/variant
  * order, NOT by performance — nothing here has been evaluated yet.
  */
+import { SIGNAL_PARAMS } from "./signal-params.mjs";
 import {
   STATES,
   VERDICT_STATES,
@@ -32,6 +33,7 @@ import {
   otherVerdictState,
   REVERSION_FAMILIES,
   EXIT_CAVEAT,
+  CRITICISMS,
   EMPIRICAL_STUDIES,
   EVIDENCE,
 } from "./frozen.mjs";
@@ -82,7 +84,16 @@ const card = (id, family, variant, textbookStrength, textbookWeakness, rationale
     direction: "both", // decision #11
     priority: opts.priority,
     rationale,
+    // G0 AMENDMENT 4: the EXACT parameter set for this entry signal. It is the
+    // strategy SPECIFICATION (what to trade), not a claim, state, threshold or
+    // priority. See scripts/map-compass/signal-params.mjs and
+    // lib/signals.mjs. Adding this field does not change any claim, state,
+    // priority, session restriction or TEST_ORDER position.
+    parameters: SIGNAL_PARAMS[id],
     sources: [...(opts.sources ?? []), ev.citation, ev.url],
+    // G0 AMENDMENT 4 TASK 7: the strongest published criticism or failed
+    // replication for this family, opened and read 2026-10-27.
+    criticism: CRITICISMS[family],
     // Task 4: reversion-family verdicts are exit-conditional, printed verbatim.
     exitCaveat: REVERSION_FAMILIES.includes(family) ? EXIT_CAVEAT : null,
   };
@@ -449,6 +460,8 @@ export function validateClaimCards() {
       errors.push(`${c.id}: bad four-state weakness diagnostic`);
     if (!c.evidence?.url || !c.evidence?.grade)
       errors.push(`${c.id}: missing empirical study / practitioner-only mark`);
+    if (!c.criticism || !c.criticism.url || !c.criticism.status)
+      errors.push(`${c.id}: missing Amendment 4 criticism record`);
     if (REVERSION_FAMILIES.includes(c.family) && c.exitCaveat !== EXIT_CAVEAT)
       errors.push(`${c.id}: reversion family must carry the standard-exit caveat`);
     if (c.sessionRestriction && !["asian", "london", "ny"].includes(c.sessionRestriction)) {
@@ -457,6 +470,7 @@ export function validateClaimCards() {
     if (c.direction !== "both") errors.push(`${c.id}: must trade both sides (decision #11)`);
     if (!c.rationale || c.rationale.length < 30) errors.push(`${c.id}: rationale too short`);
     if (![1, 2, 3, 4].includes(c.evidenceTier)) errors.push(`${c.id}: bad frozen order rank`);
+    if (!c.parameters) errors.push(`${c.id}: missing Amendment 4 signal parameters`);
   }
   if (CLAIM_CARDS.length !== 24) errors.push(`expected 24 cards, got ${CLAIM_CARDS.length}`);
   if (FAMILIES.length !== 8) errors.push(`expected 8 families, got ${FAMILIES.length}`);

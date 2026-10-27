@@ -20,6 +20,7 @@ import { CLAIM_CARDS, TEST_ORDER } from "./claim-cards.draft.mjs";
 import { matchedBaseline, NO_BASELINE } from "./lib/verification.mjs";
 import {
   VERDICT_STATES,
+  VERDICT_STATE_OF,
   FOUR_STATES_OF,
   STATES,
   CLAIM_CRITERIA,
@@ -29,13 +30,12 @@ import {
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const OUT = join(ROOT, "artifacts/map-compass");
-const baseline = JSON.parse(readFileSync(join(OUT, "random-baseline.json"), "utf8"));
-
 const SESSIONS = ["asian", "london", "ny"];
 const VOLS = ["low", "mid", "high"];
 const SIDES = ["long", "short"];
 const minN = CLAIM_CRITERIA.baselineMinCellN;
 
+const baseline = JSON.parse(readFileSync(join(OUT, "random-baseline.json"), "utf8"));
 const cells = [];
 const perClaim = new Map();
 for (const c of CLAIM_CARDS) {
@@ -50,15 +50,19 @@ for (const c of CLAIM_CARDS) {
           for (const vol of VOLS) {
             const trade = { state: fourState, side, session, vol };
             const b = matchedBaseline(trade, baseline);
-            const fine = baseline.fineCells?.[`${fourState}|${side}|${session}|${vol}`];
+            const vs = VERDICT_STATE_OF[fourState];
+            const fineVs = baseline.fineCellsVerdictState?.[`${vs}|${side}|${session}|${vol}`];
+            const fine4 = baseline.fineCells?.[`${fourState}|${side}|${session}|${vol}`];
             const coarse = baseline.cells?.[`${fourState}|${side}`];
-            const fineSufficient = !!fine?.sufficient && (fine.n ?? 0) >= minN;
+            const fineSufficient = !!(fineVs?.sufficient || fine4?.sufficient);
             const coarseSufficient = (coarse?.n ?? 0) >= minN;
             const resolution = b.missing
               ? NO_BASELINE
-              : b.level === "fine"
-                ? "FINE"
-                : "COARSE_FALLBACK";
+              : b.level === "coarse"
+                ? "COARSE_FALLBACK"
+                : b.level === "fine"
+                  ? "FINE_FOUR_STATE"
+                  : "FINE_VERDICT_STATE";
             cells.push({
               claimId: c.id,
               family: c.family,
@@ -68,7 +72,8 @@ for (const c of CLAIM_CARDS) {
               session,
               side,
               vol,
-              fineN: fine?.n ?? 0,
+              fineKeyUsed: fineVs?.sufficient ? `${vs}|${side}|${session}|${vol}` : fine4?.sufficient ? `${fourState}|${side}|${session}|${vol}` : null,
+              fineN: (fineVs?.sufficient ? fineVs.n : fine4?.sufficient ? fine4.n : 0) ?? 0,
               fineSufficient,
               coarseN: coarse?.n ?? 0,
               coarseSufficient,
@@ -143,10 +148,18 @@ const report = {
     ),
   },
   resolutionCounts: {
-    FINE: count((x) => x.resolution === "FINE"),
+    FINE_VERDICT_STATE: count((x) => x.resolution === "FINE_VERDICT_STATE"),
+    FINE_FOUR_STATE: count((x) => x.resolution === "FINE_FOUR_STATE"),
     COARSE_FALLBACK: count((x) => x.resolution === "COARSE_FALLBACK"),
     [NO_BASELINE]: count((x) => x.resolution === NO_BASELINE),
   },
+  baselineKey: {
+    preferredFineKey: "verdictState|side|session|volRegime (G0 Amendment 4)",
+    legacyFineKey: "fourState|side|session|volRegime (v1.3, kept for compatibility)",
+    coarseKey: "fourState|side",
+    zeroFallback: false,
+  },
+  topup: baseline.topup ?? null,
   answer: {
     noBaselineTradeLevelCells: count((x) => x.resolution === NO_BASELINE),
     noBaselineClaimVerdictStateSessionCells: noBaselineVerdictCells.length,
@@ -241,7 +254,7 @@ console.log(
   `NO_BASELINE: ${a.noBaselineTradeLevelCells} trade cells, ${a.noBaselineClaimVerdictStateSessionCells} verdict cells, ${a.noBaselineClaimFourStateSessionCells} four-state cells; ${a.noBaselineCards} cards, ${a.noBaselineClaimHalves} claim halves`,
 );
 console.log(
-  `resolutions: FINE ${report.resolutionCounts.FINE}, COARSE_FALLBACK ${report.resolutionCounts.COARSE_FALLBACK}, NO_BASELINE ${report.resolutionCounts[NO_BASELINE]}`,
+  `resolutions: FINE_VS ${report.resolutionCounts.FINE_VERDICT_STATE}, FINE_4STATE ${report.resolutionCounts.FINE_FOUR_STATE}, COARSE ${report.resolutionCounts.COARSE_FALLBACK}, NO_BASELINE ${report.resolutionCounts[NO_BASELINE]}`,
 );
 console.log(
   `strict-fine-only hypothetical NO_BASELINE cells: ${report.strictFineOnlyHypothetical.wouldBeNoBaselineTradeLevelCells}`,

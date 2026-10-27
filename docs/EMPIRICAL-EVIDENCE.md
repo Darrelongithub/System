@@ -74,3 +74,42 @@ plus a seeded RNG generating entry-bar multiplicities — **no outcomes**. A
   `docs/BLUEPRINT-AMENDMENTS.md` A4.5) because the user asked to keep
   TEST_ORDER stable unless an item is plainly wrong — the discrepancy is
   surfaced and put to the user rather than silently reshuffling a frozen list.
+
+---
+
+## Strongest published criticism / failed replication per family
+
+Every URL below was **opened and read during this run (2026-10-27)**, so each is
+marked **VERIFIED**. Nothing is cited from memory and no URL, author or year is
+invented. For each family the strongest criticism or failed replication found is
+listed; where several exist the most damaging is given, with a second where it
+materially differs.
+
+| # | Family | Criticism / failed replication (opened) | Full URL | Status |
+| -: | ------ | ---------------------------------------- | -------- | ------ |
+| 1 | channel-breakout | Sullivan, Timmermann & White (1999), *J. Finance* 54(5) 1647–1691 — re-ran the Brock/Lakonishok/LeBaron rules over a universe of ~7,846 parameterisations and showed the best rule's apparent edge is largely a data-snooping artefact (Sharpe-based p-value ends at 0.72 once snooping is adjusted). | `https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf` | VERIFIED |
+| 2 | ma-cross | Allen & Karjalainen (1999), *J. Financial Economics* 51(2) 245–271 — genetic-algorithm-discovered MA-style rules earn **no** consistent excess returns over buy-and-hold in out-of-sample periods once transaction costs are charged; the apparent forecasting ability is low-order serial correlation. | `https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf` | VERIFIED |
+| 3 | opening-range | Fetna (2026), SSRN 7428398 — pre-registered 225-cell grid over 16 years of one-minute futures data; **zero** cells meet the positive bar (t ≥ 2.5 at $25/round-trip, sign agreement, year stability). The grid earns +$1.57M gross but loses $6.49M after costs. | `https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398` | VERIFIED |
+| 3b | opening-range (second) | Sun (2026), *Pricing the Fill* — pre-registered out-of-sample test of the published 1,637% 5-minute ORB claim: **−0.0855R/trade (t = −2.16)** over 2020–2026, killed by the rule written before the run. | `https://github.com/js3872/Pricing-the-Fill` | VERIFIED |
+| 4 | level-retest | Curcio, Goodhart, Guillaume & Payne (1997), *Int. J. Finance & Economics* 2(4) 267–280 — trader-supplied support/resistance rules are **on average not profitable** intraday, and once spreads are accounted for "virtually all trading rule profits are eliminated". | `http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf` | VERIFIED |
+| 5 | osc-fade | Muruganandan (2020), *Colombo Business Journal* 11(1) 24–46 — the RSI rule "failed to deliver the positive return even before deducting transaction cost" on the BSE Sensex across bull and bear sub-periods. | `https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf` | VERIFIED |
+| 6 | band-reversion | Fang, Jacobsen & Qin (2017), *J. Portfolio Management* 43(4) 152–159 — Bollinger Band profitability **self-destructs with popularity**: strongly predictive before 1983, "largely disappeared" since Bollinger's 2001 book, worst in the US first. | `https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf` | VERIFIED |
+| 7 | candlestick-reversal | Marshall, Young & Cahan (2008), *Review of Quantitative Finance and Accounting* 31:191–207 — candlestick charting is **not profitable** in the Japanese equity market over 1975–2004, in the full 30-year sample, in three 10-year sub-periods, or in bull or bear markets. | `https://link.springer.com/article/10.1007/s11156-007-0068-1` | VERIFIED |
+| 8 | vol-compression | Casey (2024, updated 2026), StatOasis — 17,424 backtests of Crabel's up/down-thrust patterns across 8 markets: "The pattern is real. The edge is mostly drift." A random entry with the same holding period beat the up-thrust long on **4 of 8** markets; the published settings sit at a median rank of 81 of 225. | `https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns` | VERIFIED |
+
+**All 8 families have an opened, VERIFIED criticism or failed replication.**
+Six of the eight are peer-reviewed or pre-registered studies; two are
+pre-registered replications posted as a repository/preprint. None was found that
+supports the textbook claim on out-of-sample data after realistic costs — which
+is consistent with `EVIDENCE.priorFalseFraction = 0.80`.
+
+### What this does and does not mean
+
+- It sets expectations and explains why a mostly-REFUTED M6 outcome would not be
+  surprising. It does **not** pre-decide any verdict.
+- A negative replication is a reason to expect REFUTED, not a licence to skip the
+  test. Every claim is still tested under the frozen rule.
+- `vol-compression` remains **PRACTITIONER ONLY** for the primary study registry
+  (no peer-reviewed NR7/inside-bar test exists); the criticism above is a
+  pre-registered backtest of Crabel's *other* patterns, which is the closest
+  thing published.

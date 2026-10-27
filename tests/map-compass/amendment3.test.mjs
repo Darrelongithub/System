@@ -226,11 +226,28 @@ test("A3 2b: coverage audit reports exactly how many claim/state/session cells h
   assertEqual(cov.answer.noBaselineClaimVerdictStateSessionCells, 0);
   assertEqual(cov.answer.noBaselineClaimFourStateSessionCells, 0);
   assertEqual(cov.answer.noBaselineCards, 0);
-  assert(cov.resolutionCounts.COARSE_FALLBACK > 0, "coarse fallback must be exercised");
-  assert(
-    cov.strictFineOnlyHypothetical.wouldBeNoBaselineTradeLevelCells > 0,
-    "removing coarse fallback must create real holes",
+  // Amendment 4 topped the baseline up so every verdict-state fine cell is
+  // sufficient: the coarse fallback is no longer exercised, and NO_BASELINE
+  // stays at zero. The v1.3 state (648 coarse fallbacks) is preserved in the
+  // top-up record's before/after coverage.
+  assert(cov.resolutionCounts.FINE_VERDICT_STATE > 0, "verdict-state fine cells must be exercised");
+  assertEqual(cov.resolutionCounts.COARSE_FALLBACK, 0, "the top-up removed every coarse fallback");
+  assertEqual(cov.answer.noBaselineTradeLevelCells, 0);
+  assert(cov.topup && cov.topup.enabled, "the top-up record must be present");
+  assert(cov.topup.entriesAdded > 0, "the top-up must add entries");
+  const baselineReport = read("random-baseline.json");
+  assertEqual(
+    baselineReport.dailySumsRef,
+    "artifacts/map-compass/random-baseline-daily-sums.json",
+    "the per-day aggregates live in their own artifact",
   );
+  assert(
+    baselineReport.coverage.beforeCoarseFallbackShare >
+      baselineReport.coverage.afterCoarseFallbackShare,
+    "coarse fallback share must fall after the top-up",
+  );
+  assertEqual(baselineReport.coverage.afterCoarseFallbackShare, 0);
+  assert(baselineReport.coverage.beforeCoarseFallbackShare > 0, "the pre-top-up share is a real number");
 });
 
 // ---------------------------------------------------------------------------
@@ -427,6 +444,7 @@ test("A3 6: v1.0, v1.1, v1.2, v1.3 snapshots are preserved with full SHA-256", (
   const v11 = h("BLUEPRINT-v1.1.md");
   const v12 = h("BLUEPRINT-v1.2.md");
   const v13 = h("BLUEPRINT-v1.3.md");
+  const v14 = h("BLUEPRINT-v1.4.md");
   assertEqual(v10.length, 64);
   assertEqual(v11.length, 64);
   assertEqual(v12.length, 64);
@@ -438,8 +456,13 @@ test("A3 6: v1.0, v1.1, v1.2, v1.3 snapshots are preserved with full SHA-256", (
   assertEqual(hashes.v11.full, v11);
   assertEqual(hashes.v12.full, v12);
   assertEqual(hashes.v13.full, v13);
+  assertEqual(v14.length, 64);
+  assertEqual(hashes.v14.full, v14);
   const log = readFileSync(join(DOCS, "BLUEPRINT-AMENDMENTS.md"), "utf8");
-  assert(log.includes(v10) && log.includes(v11) && log.includes(v12) && log.includes(v13), "all four hashes printed in the log");
+  assert(
+    log.includes(v10) && log.includes(v11) && log.includes(v12) && log.includes(v13) && log.includes(v14),
+    "all five hashes printed in the log",
+  );
   assert(log.toLowerCase().includes("reconstruct"), "v1.0 reconstruction described");
 });
 

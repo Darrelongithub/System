@@ -86,9 +86,14 @@ test("Amendment 2: TIME_EXIT share is reported from baseline diagnostics", () =>
   assert(t !== undefined, "timeExitShare must be reported");
   assertEqual(t.capBars, 96);
   assertEqual(t.count, 398);
-  assertEqual(t.resolvedTotal, 32000);
-  assert(Math.abs(t.share - 398 / 32000) < 1e-8);
-  assert(Math.abs(t.sharePct - 1.24375) < 1e-6);
+  // Amendment 4's baseline top-up added 538 entries (none TIME_EXIT), so the
+  // resolved total is now 32538. The v1.2 value 398/32000 = 1.24375% is kept in
+  // EXIT_HARNESS.amendment as the historical pre-top-up record.
+  assert(t.resolvedTotal >= 32000, "the top-up can only add entries");
+  assert(Math.abs(t.share - t.count / t.resolvedTotal) < 1e-7, "share must equal count/resolvedTotal");
+  assertEqual(EXIT_HARNESS.amendment.baselineResolvedTotal, 32000);
+  assertEqual(EXIT_HARNESS.amendment.baselineTimeExitShare, 0.012438);
+  assertEqual(EXIT_HARNESS.maxHoldBars, 96);
 });
 
 test("clusterSe: CR1 inflates the SE when same-day residuals correlate", () => {

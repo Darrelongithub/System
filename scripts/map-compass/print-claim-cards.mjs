@@ -22,6 +22,7 @@ import {
 import {
   EVIDENCE,
   EMPIRICAL_STUDIES,
+  CRITICISMS,
   VERDICT_STATES,
   VERDICT_STATE_OF,
   FAMILY_STRENGTH_STATE,
@@ -95,6 +96,23 @@ lines.push(
 );
 lines.push("");
 
+lines.push("## Strongest published criticism / failed replication (all VERIFIED)");
+lines.push("");
+lines.push("Every URL below was opened and read on **2026-10-27**. Nothing is cited from memory and no URL,");
+lines.push("author or year is invented. A family with no openable criticism is marked as such rather than left blank.");
+lines.push("");
+lines.push("| Family | Status | Criticism / failed replication | Full URL | Impact |");
+lines.push("| ------ | ------ | ---------------------------- | -------- | ------ |");
+for (const f of FAMILIES) {
+  const c = CRITICISMS[f];
+  lines.push(
+    `| ${f} | ${c.status} | ${c.citation.replace(/\|/g, "\\|")} | ${c.url} | ${c.impact} |`,
+  );
+}
+lines.push("");
+lines.push("---");
+lines.push("");
+
 lines.push("## Card relations (near-duplicates and mirror images)");
 lines.push("");
 lines.push(`Within-family pairs: ${CARD_RELATIONS.length} (${NEAR_DUPLICATES.length} near-duplicate, ${MIRROR_IMAGES.length} mirror-image, ${CARD_RELATIONS.length - NEAR_DUPLICATES.length - MIRROR_IMAGES.length} related).`);
@@ -138,6 +156,9 @@ for (const o of TEST_ORDER) {
   lines.push(`| **Study full URL** | ${c.evidence.url} |`);
   lines.push(`| **What the study tests** | ${c.evidence.tests} |`);
   lines.push(`| **Study finding** | ${c.evidence.finding} |`);
+  lines.push(`| **Strongest criticism** | ${c.criticism.citation} |`);
+  lines.push(`| **Criticism URL** | ${c.criticism.url} |`);
+  lines.push(`| **Criticism status** | ${c.criticism.status} (opened ${c.criticism.opened}) |`);
   lines.push(`| **Frozen order rank** | ${c.evidenceTier} (diagnostic only; NOT an evidence claim) |`);
   lines.push(`| **Priority** | ${c.priority} (frozen numeric, decision #10) |`);
   lines.push(`| **Trade direction** | ${c.direction} (decision #11) |`);

@@ -29,6 +29,10 @@
     "mc:seal": "node scripts/map-compass/seal-audit.mjs",
     "mc:cards": "node scripts/map-compass/print-claim-cards.mjs",
     "mc:coverage": "node scripts/map-compass/baseline-coverage.mjs",
+    "mc:signals": "node scripts/map-compass/signal-counts.mjs",
+    "mc:overlap": "node scripts/map-compass/measure-overlap.mjs",
+    "mc:slots": "node scripts/map-compass/slot-model.mjs",
+    "mc:powercurve": "node scripts/map-compass/power-curve.mjs",
     "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs"
   },
   "overrides": {

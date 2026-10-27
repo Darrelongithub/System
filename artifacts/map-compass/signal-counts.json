@@ -1,0 +1,2165 @@
+{
+  "generatedAt": "2026-10-27T13:58:34.012Z",
+  "purpose": "G0 Amendment 4 task 2: signal counts on DEV for the 24 entry-signal functions. NO outcomes, NO exits, NO R.",
+  "decidedBeforeResults": true,
+  "noStrategyOutcomesUsed": true,
+  "inputs": {
+    "bars": "artifacts/map-compass/normalized/xauusd-m30-eat.csv",
+    "mapStates": "artifacts/map-compass/normalized/xauusd-m30-map.csv",
+    "cards": "claim-cards.draft.mjs (DRAFT) + signal-params.mjs",
+    "barsTotal": 248912,
+    "devBars": 131922,
+    "devBarShare": 0.53,
+    "verdictStates": [
+      "EFFICIENT",
+      "CHOPPY"
+    ],
+    "fourStates": [
+      "EXPANSION",
+      "GRIND",
+      "WHIPSAW",
+      "QUIET"
+    ],
+    "sessions": [
+      "asian",
+      "london",
+      "ny"
+    ],
+    "mapHash": "7ecb861e8a5c8cd1635cc49376400d96bc424e5abf508f439e7e7b70a0d6313a",
+    "signalLibrarySelfCheck": []
+  },
+  "cardCount": 24,
+  "familyCount": 8,
+  "totalSignalsAllCards": 557958,
+  "totalDevSignalsAllCards": 291501,
+  "forbiddenSignalFields": [],
+  "minTradesPerCell": 100,
+  "cards": [
+    {
+      "cardId": "donchian-20",
+      "family": "channel-breakout",
+      "variant": "Donchian 20-bar high/low break",
+      "priority": 1,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": null,
+      "parameters": {
+        "lookback": 20,
+        "breakAt": "prior-high/low",
+        "entryAt": "close"
+      },
+      "parametersString": "lookback=20, breakAt=prior-high/low, entryAt=close",
+      "allSignals": 50349,
+      "devSignals": 25237,
+      "buckets": {
+        "side": {
+          "short": 11761,
+          "long": 13476
+        },
+        "verdictState": {
+          "CHOPPY": 14312,
+          "EFFICIENT": 4299
+        },
+        "fourState": {
+          "QUIET": 12247,
+          "GRIND": 2973,
+          "WHIPSAW": 2065,
+          "EXPANSION": 1326
+        },
+        "session": {
+          "asian": 8084,
+          "london": 7699,
+          "ny": 9454
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 16097,
+          "EFFICIENT": 3589
+        },
+        "lagFourState": {
+          "WHIPSAW": 3778,
+          "QUIET": 12319,
+          "EXPANSION": 1530,
+          "GRIND": 2059
+        }
+      },
+      "strengthExpectedN": 4299,
+      "weaknessExpectedN": 14312,
+      "strengthShareOfCard": 0.1703
+    },
+    {
+      "cardId": "donchian-55",
+      "family": "channel-breakout",
+      "variant": "Donchian 55-bar high/low break",
+      "priority": 2,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": null,
+      "parameters": {
+        "lookback": 55,
+        "breakAt": "prior-high/low",
+        "entryAt": "close"
+      },
+      "parametersString": "lookback=55, breakAt=prior-high/low, entryAt=close",
+      "allSignals": 25927,
+      "devSignals": 12790,
+      "buckets": {
+        "side": {
+          "short": 5591,
+          "long": 7199
+        },
+        "verdictState": {
+          "CHOPPY": 5565,
+          "EFFICIENT": 3458
+        },
+        "fourState": {
+          "QUIET": 4487,
+          "GRIND": 2202,
+          "WHIPSAW": 1078,
+          "EXPANSION": 1256
+        },
+        "session": {
+          "asian": 3766,
+          "london": 3415,
+          "ny": 5609
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 8607,
+          "EFFICIENT": 1620
+        },
+        "lagFourState": {
+          "QUIET": 7146,
+          "WHIPSAW": 1461,
+          "GRIND": 1090,
+          "EXPANSION": 530
+        }
+      },
+      "strengthExpectedN": 3458,
+      "weaknessExpectedN": 5565,
+      "strengthShareOfCard": 0.2704
+    },
+    {
+      "cardId": "dual-thrust",
+      "family": "channel-breakout",
+      "variant": "Dual Thrust opening range break",
+      "priority": 3,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": null,
+      "parameters": {
+        "priorDayBars": 48,
+        "k": 0
+      },
+      "parametersString": "priorDayBars=48, k=0",
+      "allSignals": 94874,
+      "devSignals": 49228,
+      "buckets": {
+        "side": {
+          "short": 20951,
+          "long": 28277
+        },
+        "verdictState": {
+          "CHOPPY": 22711,
+          "EFFICIENT": 12507
+        },
+        "fourState": {
+          "QUIET": 15584,
+          "GRIND": 6926,
+          "EXPANSION": 5581,
+          "WHIPSAW": 7127
+        },
+        "session": {
+          "asian": 12460,
+          "london": 11719,
+          "ny": 25049
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 31040,
+          "EFFICIENT": 7855
+        },
+        "lagFourState": {
+          "QUIET": 25380,
+          "WHIPSAW": 5660,
+          "GRIND": 5417,
+          "EXPANSION": 2438
+        }
+      },
+      "strengthExpectedN": 12507,
+      "weaknessExpectedN": 22711,
+      "strengthShareOfCard": 0.2541
+    },
+    {
+      "cardId": "sma-20-50",
+      "family": "ma-cross",
+      "variant": "SMA20 x SMA50 crossover",
+      "priority": 4,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "fast": 20,
+        "slow": 50,
+        "entryAt": "close"
+      },
+      "parametersString": "fast=20, slow=50, entryAt=close",
+      "allSignals": 5486,
+      "devSignals": 2876,
+      "buckets": {
+        "side": {
+          "long": 1439,
+          "short": 1437
+        },
+        "verdictState": {
+          "CHOPPY": 1826,
+          "EFFICIENT": 298
+        },
+        "fourState": {
+          "WHIPSAW": 512,
+          "QUIET": 1314,
+          "EXPANSION": 69,
+          "GRIND": 229
+        },
+        "session": {
+          "ny": 1297,
+          "asian": 906,
+          "london": 673
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 2002,
+          "EFFICIENT": 267
+        },
+        "lagFourState": {
+          "WHIPSAW": 418,
+          "QUIET": 1584,
+          "GRIND": 213,
+          "EXPANSION": 54
+        }
+      },
+      "strengthExpectedN": 298,
+      "weaknessExpectedN": 1826,
+      "strengthShareOfCard": 0.1036
+    },
+    {
+      "cardId": "macd-cross",
+      "family": "ma-cross",
+      "variant": "MACD signal-line cross",
+      "priority": 5,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "fast": 12,
+        "slow": 26,
+        "signal": 9,
+        "entryAt": "close"
+      },
+      "parametersString": "fast=12, slow=26, signal=9, entryAt=close",
+      "allSignals": 19042,
+      "devSignals": 10068,
+      "buckets": {
+        "side": {
+          "short": 5035,
+          "long": 5033
+        },
+        "verdictState": {
+          "CHOPPY": 6358,
+          "EFFICIENT": 1298
+        },
+        "fourState": {
+          "WHIPSAW": 1414,
+          "QUIET": 4944,
+          "EXPANSION": 480,
+          "GRIND": 818
+        },
+        "session": {
+          "asian": 3875,
+          "ny": 3828,
+          "london": 2365
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 6672,
+          "EFFICIENT": 1148
+        },
+        "lagFourState": {
+          "QUIET": 5196,
+          "WHIPSAW": 1476,
+          "GRIND": 782,
+          "EXPANSION": 366
+        }
+      },
+      "strengthExpectedN": 1298,
+      "weaknessExpectedN": 6358,
+      "strengthShareOfCard": 0.1289
+    },
+    {
+      "cardId": "ichimoku-tk",
+      "family": "ma-cross",
+      "variant": "Ichimoku Tenkan/Kijun cross",
+      "priority": 6,
+      "evidenceTier": 1,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "tenkan": 9,
+        "kijun": 26,
+        "entryAt": "close"
+      },
+      "parametersString": "tenkan=9, kijun=26, entryAt=close",
+      "allSignals": 12706,
+      "devSignals": 6764,
+      "buckets": {
+        "side": {
+          "short": 3361,
+          "long": 3403
+        },
+        "verdictState": {
+          "CHOPPY": 5392,
+          "EFFICIENT": 137
+        },
+        "fourState": {
+          "WHIPSAW": 1319,
+          "QUIET": 4073,
+          "EXPANSION": 71,
+          "GRIND": 66
+        },
+        "session": {
+          "asian": 2709,
+          "ny": 2574,
+          "london": 1481
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 4029,
+          "EFFICIENT": 1111
+        },
+        "lagFourState": {
+          "WHIPSAW": 1015,
+          "QUIET": 3014,
+          "GRIND": 551,
+          "EXPANSION": 560
+        }
+      },
+      "strengthExpectedN": 137,
+      "weaknessExpectedN": 5392,
+      "strengthShareOfCard": 0.0203
+    },
+    {
+      "cardId": "atr-squeeze-break",
+      "family": "vol-compression",
+      "variant": "ATR-squeeze breakout",
+      "priority": 22,
+      "evidenceTier": 1,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "atrPeriod": 14,
+        "squeezeFactor": 0.8,
+        "lookback": 50,
+        "breakRel": 0.5
+      },
+      "parametersString": "atrPeriod=14, squeezeFactor=0.8, lookback=50, breakRel=0.5",
+      "allSignals": 1517,
+      "devSignals": 824,
+      "buckets": {
+        "side": {
+          "short": 287,
+          "long": 537
+        },
+        "verdictState": {
+          "CHOPPY": 488,
+          "EFFICIENT": 194
+        },
+        "fourState": {
+          "QUIET": 475,
+          "GRIND": 189,
+          "WHIPSAW": 13,
+          "EXPANSION": 5
+        },
+        "session": {
+          "asian": 535,
+          "london": 270,
+          "ny": 19
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 465,
+          "EFFICIENT": 99
+        },
+        "lagFourState": {
+          "QUIET": 201,
+          "WHIPSAW": 264,
+          "GRIND": 39,
+          "EXPANSION": 60
+        }
+      },
+      "strengthExpectedN": 488,
+      "weaknessExpectedN": 194,
+      "strengthShareOfCard": 0.5922
+    },
+    {
+      "cardId": "nr7-break",
+      "family": "vol-compression",
+      "variant": "NR7 narrowest-range breakout",
+      "priority": 23,
+      "evidenceTier": 1,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "lookback": 7,
+        "breakRel": 0.25
+      },
+      "parametersString": "lookback=7, breakRel=0.25",
+      "allSignals": 26316,
+      "devSignals": 14553,
+      "buckets": {
+        "side": {
+          "long": 7689,
+          "short": 6864
+        },
+        "verdictState": {
+          "CHOPPY": 9069,
+          "EFFICIENT": 2108
+        },
+        "fourState": {
+          "QUIET": 6513,
+          "WHIPSAW": 2556,
+          "EXPANSION": 983,
+          "GRIND": 1125
+        },
+        "session": {
+          "ny": 5411,
+          "asian": 5997,
+          "london": 3145
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 9032,
+          "EFFICIENT": 2204
+        },
+        "lagFourState": {
+          "WHIPSAW": 1875,
+          "QUIET": 7157,
+          "EXPANSION": 794,
+          "GRIND": 1410
+        }
+      },
+      "strengthExpectedN": 9069,
+      "weaknessExpectedN": 2108,
+      "strengthShareOfCard": 0.6232
+    },
+    {
+      "cardId": "inside-bar-break",
+      "family": "vol-compression",
+      "variant": "Inside-bar break",
+      "priority": 24,
+      "evidenceTier": 1,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": null,
+      "parameters": {
+        "lookback": 1
+      },
+      "parametersString": "lookback=1",
+      "allSignals": 41607,
+      "devSignals": 23976,
+      "buckets": {
+        "side": {
+          "short": 10018,
+          "long": 13958
+        },
+        "verdictState": {
+          "CHOPPY": 14790,
+          "EFFICIENT": 3595
+        },
+        "fourState": {
+          "QUIET": 10923,
+          "WHIPSAW": 3867,
+          "GRIND": 1976,
+          "EXPANSION": 1619
+        },
+        "session": {
+          "asian": 9646,
+          "london": 5089,
+          "ny": 9241
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 14840,
+          "EFFICIENT": 3492
+        },
+        "lagFourState": {
+          "QUIET": 11528,
+          "WHIPSAW": 3312,
+          "GRIND": 2102,
+          "EXPANSION": 1390
+        }
+      },
+      "strengthExpectedN": 14790,
+      "weaknessExpectedN": 3595,
+      "strengthShareOfCard": 0.6169
+    },
+    {
+      "cardId": "asian-range-break",
+      "family": "opening-range",
+      "variant": "Asian-session range breakout",
+      "priority": 7,
+      "evidenceTier": 2,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": "london",
+      "parameters": {
+        "rangeSession": "asian",
+        "rangeBars": 20,
+        "entrySession": "london",
+        "entryAt": "close"
+      },
+      "parametersString": "rangeSession=asian, rangeBars=20, entrySession=london, entryAt=close",
+      "allSignals": 10225,
+      "devSignals": 3856,
+      "buckets": {
+        "side": {
+          "long": 1762,
+          "short": 2094
+        },
+        "verdictState": {
+          "CHOPPY": 1998,
+          "EFFICIENT": 804
+        },
+        "fourState": {
+          "QUIET": 1883,
+          "GRIND": 657,
+          "EXPANSION": 147,
+          "WHIPSAW": 115
+        },
+        "session": {
+          "london": 3856
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 2674,
+          "EFFICIENT": 561
+        },
+        "lagFourState": {
+          "WHIPSAW": 371,
+          "QUIET": 2303,
+          "GRIND": 368,
+          "EXPANSION": 193
+        }
+      },
+      "strengthExpectedN": 804,
+      "weaknessExpectedN": 1998,
+      "strengthShareOfCard": 0.2085
+    },
+    {
+      "cardId": "london-orb-30",
+      "family": "opening-range",
+      "variant": "London first-30m ORB",
+      "priority": 8,
+      "evidenceTier": 2,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": "london",
+      "parameters": {
+        "rangeBars": 6,
+        "entrySession": "london",
+        "entryAt": "close"
+      },
+      "parametersString": "rangeBars=6, entrySession=london, entryAt=close",
+      "allSignals": 12128,
+      "devSignals": 6442,
+      "buckets": {
+        "side": {
+          "long": 3273,
+          "short": 3169
+        },
+        "verdictState": {
+          "CHOPPY": 3828,
+          "EFFICIENT": 943
+        },
+        "fourState": {
+          "QUIET": 3652,
+          "GRIND": 818,
+          "WHIPSAW": 176,
+          "EXPANSION": 125
+        },
+        "session": {
+          "london": 6442
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 4502,
+          "EFFICIENT": 840
+        },
+        "lagFourState": {
+          "QUIET": 3915,
+          "WHIPSAW": 587,
+          "GRIND": 569,
+          "EXPANSION": 271
+        }
+      },
+      "strengthExpectedN": 943,
+      "weaknessExpectedN": 3828,
+      "strengthShareOfCard": 0.1464
+    },
+    {
+      "cardId": "pdh-pdl-break",
+      "family": "opening-range",
+      "variant": "Prior-day high/low break",
+      "priority": 9,
+      "evidenceTier": 2,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "EXPANSION",
+      "fourStateTextbookWeakness": "QUIET",
+      "sessionRestriction": null,
+      "parameters": {
+        "priorDayBars": 48,
+        "entryAt": "close"
+      },
+      "parametersString": "priorDayBars=48, entryAt=close",
+      "allSignals": 94874,
+      "devSignals": 49228,
+      "buckets": {
+        "side": {
+          "short": 20951,
+          "long": 28277
+        },
+        "verdictState": {
+          "CHOPPY": 22711,
+          "EFFICIENT": 12507
+        },
+        "fourState": {
+          "QUIET": 15584,
+          "GRIND": 6926,
+          "EXPANSION": 5581,
+          "WHIPSAW": 7127
+        },
+        "session": {
+          "asian": 12460,
+          "london": 11719,
+          "ny": 25049
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 31040,
+          "EFFICIENT": 7855
+        },
+        "lagFourState": {
+          "QUIET": 25380,
+          "WHIPSAW": 5660,
+          "GRIND": 5417,
+          "EXPANSION": 2438
+        }
+      },
+      "strengthExpectedN": 12507,
+      "weaknessExpectedN": 22711,
+      "strengthShareOfCard": 0.2541
+    },
+    {
+      "cardId": "bollinger-20-2",
+      "family": "band-reversion",
+      "variant": "Bollinger 20/2 band fade",
+      "priority": 16,
+      "evidenceTier": 2,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 20,
+        "numerStd": 2
+      },
+      "parametersString": "period=20, numerStd=2",
+      "allSignals": 15934,
+      "devSignals": 8436,
+      "buckets": {
+        "side": {
+          "long": 4178,
+          "short": 4258
+        },
+        "verdictState": {
+          "CHOPPY": 5459,
+          "EFFICIENT": 828
+        },
+        "fourState": {
+          "WHIPSAW": 681,
+          "QUIET": 4778,
+          "GRIND": 666,
+          "EXPANSION": 162
+        },
+        "session": {
+          "asian": 2749,
+          "london": 2825,
+          "ny": 2862
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 5301,
+          "EFFICIENT": 1204
+        },
+        "lagFourState": {
+          "WHIPSAW": 1252,
+          "QUIET": 4049,
+          "EXPANSION": 536,
+          "GRIND": 668
+        }
+      },
+      "strengthExpectedN": 5459,
+      "weaknessExpectedN": 828,
+      "strengthShareOfCard": 0.6471
+    },
+    {
+      "cardId": "keltner-20-atr",
+      "family": "band-reversion",
+      "variant": "Keltner 20/ATR band fade",
+      "priority": 17,
+      "evidenceTier": 2,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 20,
+        "atrPeriod": 20,
+        "atrMultiple": 2
+      },
+      "parametersString": "period=20, atrPeriod=20, atrMultiple=2",
+      "allSignals": 11933,
+      "devSignals": 6404,
+      "buckets": {
+        "side": {
+          "short": 3367,
+          "long": 3037
+        },
+        "verdictState": {
+          "CHOPPY": 3328,
+          "EFFICIENT": 1090
+        },
+        "fourState": {
+          "QUIET": 2869,
+          "WHIPSAW": 459,
+          "EXPANSION": 291,
+          "GRIND": 799
+        },
+        "session": {
+          "ny": 2260,
+          "london": 2111,
+          "asian": 2033
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 4090,
+          "EFFICIENT": 929
+        },
+        "lagFourState": {
+          "WHIPSAW": 965,
+          "QUIET": 3125,
+          "GRIND": 521,
+          "EXPANSION": 408
+        }
+      },
+      "strengthExpectedN": 3328,
+      "weaknessExpectedN": 1090,
+      "strengthShareOfCard": 0.5197
+    },
+    {
+      "cardId": "bb-squeeze-fade",
+      "family": "band-reversion",
+      "variant": "Bollinger squeeze fade",
+      "priority": 18,
+      "evidenceTier": 2,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 20,
+        "numerStd": 2,
+        "squeezeFactor": 0.9
+      },
+      "parametersString": "period=20, numerStd=2, squeezeFactor=0.9",
+      "allSignals": 5332,
+      "devSignals": 2835,
+      "buckets": {
+        "side": {
+          "short": 1405,
+          "long": 1430
+        },
+        "verdictState": {
+          "CHOPPY": 1387,
+          "EFFICIENT": 516
+        },
+        "fourState": {
+          "QUIET": 985,
+          "WHIPSAW": 402,
+          "EXPANSION": 140,
+          "GRIND": 376
+        },
+        "session": {
+          "london": 769,
+          "ny": 1531,
+          "asian": 535
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 1998,
+          "EFFICIENT": 313
+        },
+        "lagFourState": {
+          "WHIPSAW": 243,
+          "QUIET": 1755,
+          "EXPANSION": 68,
+          "GRIND": 245
+        }
+      },
+      "strengthExpectedN": 1387,
+      "weaknessExpectedN": 516,
+      "strengthShareOfCard": 0.4892
+    },
+    {
+      "cardId": "pdh-retest",
+      "family": "level-retest",
+      "variant": "Prior-day high retest long",
+      "priority": 10,
+      "evidenceTier": 3,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "side": "long"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, side=long",
+      "allSignals": 3639,
+      "devSignals": 1829,
+      "buckets": {
+        "side": {
+          "long": 1829
+        },
+        "verdictState": {
+          "CHOPPY": 1056,
+          "EFFICIENT": 267
+        },
+        "fourState": {
+          "QUIET": 714,
+          "EXPANSION": 82,
+          "GRIND": 185,
+          "WHIPSAW": 342
+        },
+        "session": {
+          "ny": 804,
+          "asian": 661,
+          "london": 364
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 1187,
+          "EFFICIENT": 260
+        },
+        "lagFourState": {
+          "WHIPSAW": 220,
+          "QUIET": 967,
+          "EXPANSION": 71,
+          "GRIND": 189
+        }
+      },
+      "strengthExpectedN": 267,
+      "weaknessExpectedN": 1056,
+      "strengthShareOfCard": 0.146
+    },
+    {
+      "cardId": "pdl-retest",
+      "family": "level-retest",
+      "variant": "Prior-day low retest short",
+      "priority": 11,
+      "evidenceTier": 3,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "side": "short"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, side=short",
+      "allSignals": 2884,
+      "devSignals": 1483,
+      "buckets": {
+        "side": {
+          "short": 1483
+        },
+        "verdictState": {
+          "CHOPPY": 832,
+          "EFFICIENT": 220
+        },
+        "fourState": {
+          "QUIET": 523,
+          "WHIPSAW": 309,
+          "GRIND": 141,
+          "EXPANSION": 79
+        },
+        "session": {
+          "asian": 483,
+          "ny": 663,
+          "london": 337
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 977,
+          "EFFICIENT": 180
+        },
+        "lagFourState": {
+          "WHIPSAW": 196,
+          "QUIET": 781,
+          "GRIND": 101,
+          "EXPANSION": 79
+        }
+      },
+      "strengthExpectedN": 220,
+      "weaknessExpectedN": 832,
+      "strengthShareOfCard": 0.1483
+    },
+    {
+      "cardId": "classic-pivot",
+      "family": "level-retest",
+      "variant": "Classic floor-pivot bounce",
+      "priority": 12,
+      "evidenceTier": 3,
+      "verdictStrength": "EFFICIENT",
+      "verdictWeakness": "CHOPPY",
+      "fourStateTextbookStrength": "GRIND",
+      "fourStateTextbookWeakness": "WHIPSAW",
+      "sessionRestriction": null,
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "levels": "PP,S1,R1"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, levels=PP,S1,R1",
+      "allSignals": 12563,
+      "devSignals": 6532,
+      "buckets": {
+        "side": {
+          "short": 3388,
+          "long": 3144
+        },
+        "verdictState": {
+          "CHOPPY": 3863,
+          "EFFICIENT": 832
+        },
+        "fourState": {
+          "QUIET": 2544,
+          "WHIPSAW": 1319,
+          "EXPANSION": 216,
+          "GRIND": 616
+        },
+        "session": {
+          "ny": 3262,
+          "london": 1516,
+          "asian": 1754
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 4543,
+          "EFFICIENT": 694
+        },
+        "lagFourState": {
+          "QUIET": 3764,
+          "WHIPSAW": 779,
+          "GRIND": 509,
+          "EXPANSION": 185
+        }
+      },
+      "strengthExpectedN": 832,
+      "weaknessExpectedN": 3863,
+      "strengthShareOfCard": 0.1274
+    },
+    {
+      "cardId": "rsi-14-30-70",
+      "family": "osc-fade",
+      "variant": "RSI14 fade at 30/70",
+      "priority": 13,
+      "evidenceTier": 3,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "parametersString": "period=14, oversold=30, overbought=70",
+      "allSignals": 7587,
+      "devSignals": 4020,
+      "buckets": {
+        "side": {
+          "long": 1834,
+          "short": 2186
+        },
+        "verdictState": {
+          "EFFICIENT": 1552,
+          "CHOPPY": 1005
+        },
+        "fourState": {
+          "EXPANSION": 685,
+          "WHIPSAW": 192,
+          "QUIET": 813,
+          "GRIND": 867
+        },
+        "session": {
+          "asian": 1121,
+          "ny": 1878,
+          "london": 1021
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 2616,
+          "EFFICIENT": 612
+        },
+        "lagFourState": {
+          "QUIET": 2253,
+          "WHIPSAW": 363,
+          "EXPANSION": 235,
+          "GRIND": 377
+        }
+      },
+      "strengthExpectedN": 1005,
+      "weaknessExpectedN": 1552,
+      "strengthShareOfCard": 0.25
+    },
+    {
+      "cardId": "williams-r-fade",
+      "family": "osc-fade",
+      "variant": "Williams %R extreme fade",
+      "priority": 14,
+      "evidenceTier": 3,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 14,
+        "oversold": -80,
+        "overbought": -20
+      },
+      "parametersString": "period=14, oversold=-80, overbought=-20",
+      "allSignals": 34279,
+      "devSignals": 18216,
+      "buckets": {
+        "side": {
+          "long": 9325,
+          "short": 8891
+        },
+        "verdictState": {
+          "CHOPPY": 11316,
+          "EFFICIENT": 2700
+        },
+        "fourState": {
+          "QUIET": 9344,
+          "EXPANSION": 922,
+          "WHIPSAW": 1972,
+          "GRIND": 1778
+        },
+        "session": {
+          "ny": 6113,
+          "asian": 7253,
+          "london": 4850
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 11227,
+          "EFFICIENT": 2746
+        },
+        "lagFourState": {
+          "WHIPSAW": 2776,
+          "QUIET": 8451,
+          "GRIND": 1532,
+          "EXPANSION": 1214
+        }
+      },
+      "strengthExpectedN": 11316,
+      "weaknessExpectedN": 2700,
+      "strengthShareOfCard": 0.6212
+    },
+    {
+      "cardId": "stochastic-14-fade",
+      "family": "osc-fade",
+      "variant": "Stochastic 14 extreme fade",
+      "priority": 15,
+      "evidenceTier": 3,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "period": 14,
+        "kSmooth": 1,
+        "dSmooth": 3,
+        "low": 20,
+        "high": 80
+      },
+      "parametersString": "period=14, kSmooth=1, dSmooth=3, low=20, high=80",
+      "allSignals": 34279,
+      "devSignals": 18216,
+      "buckets": {
+        "side": {
+          "short": 9325,
+          "long": 8891
+        },
+        "verdictState": {
+          "CHOPPY": 11316,
+          "EFFICIENT": 2700
+        },
+        "fourState": {
+          "QUIET": 9344,
+          "EXPANSION": 922,
+          "WHIPSAW": 1972,
+          "GRIND": 1778
+        },
+        "session": {
+          "ny": 6113,
+          "asian": 7253,
+          "london": 4850
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 11227,
+          "EFFICIENT": 2746
+        },
+        "lagFourState": {
+          "WHIPSAW": 2776,
+          "QUIET": 8451,
+          "GRIND": 1532,
+          "EXPANSION": 1214
+        }
+      },
+      "strengthExpectedN": 11316,
+      "weaknessExpectedN": 2700,
+      "strengthShareOfCard": 0.6212
+    },
+    {
+      "cardId": "engulfing",
+      "family": "candlestick-reversal",
+      "variant": "Bull/bear engulfing reversal",
+      "priority": 19,
+      "evidenceTier": 4,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "bodyRatio": 0.6
+      },
+      "parametersString": "bodyRatio=0.6",
+      "allSignals": 3883,
+      "devSignals": 2071,
+      "buckets": {
+        "side": {
+          "long": 1061,
+          "short": 1010
+        },
+        "verdictState": {
+          "CHOPPY": 1317,
+          "EFFICIENT": 287
+        },
+        "fourState": {
+          "QUIET": 1050,
+          "GRIND": 165,
+          "WHIPSAW": 267,
+          "EXPANSION": 122
+        },
+        "session": {
+          "asian": 906,
+          "london": 496,
+          "ny": 669
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 1274,
+          "EFFICIENT": 330
+        },
+        "lagFourState": {
+          "QUIET": 927,
+          "WHIPSAW": 347,
+          "EXPANSION": 157,
+          "GRIND": 173
+        }
+      },
+      "strengthExpectedN": 1317,
+      "weaknessExpectedN": 287,
+      "strengthShareOfCard": 0.6359
+    },
+    {
+      "cardId": "morning-evening-star",
+      "family": "candlestick-reversal",
+      "variant": "Morning/evening star",
+      "priority": 20,
+      "evidenceTier": 4,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "bodyRatio": 0.4
+      },
+      "parametersString": "bodyRatio=0.4",
+      "allSignals": 26563,
+      "devSignals": 13449,
+      "buckets": {
+        "side": {
+          "long": 6832,
+          "short": 6617
+        },
+        "verdictState": {
+          "CHOPPY": 8550,
+          "EFFICIENT": 1761
+        },
+        "fourState": {
+          "QUIET": 6633,
+          "WHIPSAW": 1917,
+          "EXPANSION": 727,
+          "GRIND": 1034
+        },
+        "session": {
+          "asian": 5279,
+          "london": 3143,
+          "ny": 5027
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 8282,
+          "EFFICIENT": 2079
+        },
+        "lagFourState": {
+          "QUIET": 6323,
+          "WHIPSAW": 1959,
+          "EXPANSION": 868,
+          "GRIND": 1211
+        }
+      },
+      "strengthExpectedN": 8550,
+      "weaknessExpectedN": 1761,
+      "strengthShareOfCard": 0.6357
+    },
+    {
+      "cardId": "three-soldiers-crows",
+      "family": "candlestick-reversal",
+      "variant": "Three white soldiers / black crows fade",
+      "priority": 21,
+      "evidenceTier": 4,
+      "verdictStrength": "CHOPPY",
+      "verdictWeakness": "EFFICIENT",
+      "fourStateTextbookStrength": "QUIET",
+      "fourStateTextbookWeakness": "EXPANSION",
+      "sessionRestriction": null,
+      "parameters": {
+        "bodyRatio": 0.5
+      },
+      "parametersString": "bodyRatio=0.5",
+      "allSignals": 4031,
+      "devSignals": 2168,
+      "buckets": {
+        "side": {
+          "long": 1039,
+          "short": 1129
+        },
+        "verdictState": {
+          "CHOPPY": 1367,
+          "EFFICIENT": 354
+        },
+        "fourState": {
+          "QUIET": 1087,
+          "WHIPSAW": 280,
+          "GRIND": 205,
+          "EXPANSION": 149
+        },
+        "session": {
+          "asian": 896,
+          "london": 549,
+          "ny": 723
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 1318,
+          "EFFICIENT": 305
+        },
+        "lagFourState": {
+          "QUIET": 974,
+          "WHIPSAW": 344,
+          "GRIND": 154,
+          "EXPANSION": 151
+        }
+      },
+      "strengthExpectedN": 1367,
+      "weaknessExpectedN": 354,
+      "strengthShareOfCard": 0.6305
+    }
+  ],
+  "families": [
+    {
+      "family": "channel-breakout",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "strengthExpectedN": 20264,
+      "weaknessExpectedN": 42588,
+      "strengthShare": 0.2322,
+      "totalDevSignals": 87255,
+      "buckets": {
+        "side": {
+          "short": 38303,
+          "long": 48952
+        },
+        "verdictState": {
+          "CHOPPY": 42588,
+          "EFFICIENT": 20264
+        },
+        "fourState": {
+          "QUIET": 32318,
+          "GRIND": 12101,
+          "WHIPSAW": 10270,
+          "EXPANSION": 8163
+        },
+        "session": {
+          "asian": 24310,
+          "london": 22833,
+          "ny": 40112
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 55744,
+          "EFFICIENT": 13064
+        },
+        "lagFourState": {
+          "WHIPSAW": 10899,
+          "QUIET": 44845,
+          "EXPANSION": 4498,
+          "GRIND": 8566
+        }
+      }
+    },
+    {
+      "family": "ma-cross",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "strengthExpectedN": 1733,
+      "weaknessExpectedN": 13576,
+      "strengthShare": 0.0879,
+      "totalDevSignals": 19708,
+      "buckets": {
+        "side": {
+          "long": 9875,
+          "short": 9833
+        },
+        "verdictState": {
+          "CHOPPY": 13576,
+          "EFFICIENT": 1733
+        },
+        "fourState": {
+          "WHIPSAW": 3245,
+          "QUIET": 10331,
+          "EXPANSION": 620,
+          "GRIND": 1113
+        },
+        "session": {
+          "ny": 7699,
+          "asian": 7490,
+          "london": 4519
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 12703,
+          "EFFICIENT": 2526
+        },
+        "lagFourState": {
+          "WHIPSAW": 2909,
+          "QUIET": 9794,
+          "GRIND": 1546,
+          "EXPANSION": 980
+        }
+      }
+    },
+    {
+      "family": "opening-range",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "strengthExpectedN": 14254,
+      "weaknessExpectedN": 28537,
+      "strengthShare": 0.2395,
+      "totalDevSignals": 59526,
+      "buckets": {
+        "side": {
+          "long": 33312,
+          "short": 26214
+        },
+        "verdictState": {
+          "CHOPPY": 28537,
+          "EFFICIENT": 14254
+        },
+        "fourState": {
+          "QUIET": 21119,
+          "GRIND": 8401,
+          "EXPANSION": 5853,
+          "WHIPSAW": 7418
+        },
+        "session": {
+          "london": 22017,
+          "asian": 12460,
+          "ny": 25049
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 38216,
+          "EFFICIENT": 9256
+        },
+        "lagFourState": {
+          "WHIPSAW": 6618,
+          "QUIET": 31598,
+          "GRIND": 6354,
+          "EXPANSION": 2902
+        }
+      }
+    },
+    {
+      "family": "level-retest",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "strengthExpectedN": 1319,
+      "weaknessExpectedN": 5751,
+      "strengthShare": 0.134,
+      "totalDevSignals": 9844,
+      "buckets": {
+        "side": {
+          "long": 4973,
+          "short": 4871
+        },
+        "verdictState": {
+          "CHOPPY": 5751,
+          "EFFICIENT": 1319
+        },
+        "fourState": {
+          "QUIET": 3781,
+          "EXPANSION": 377,
+          "GRIND": 942,
+          "WHIPSAW": 1970
+        },
+        "session": {
+          "ny": 4729,
+          "asian": 2898,
+          "london": 2217
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 6707,
+          "EFFICIENT": 1134
+        },
+        "lagFourState": {
+          "WHIPSAW": 1195,
+          "QUIET": 5512,
+          "EXPANSION": 335,
+          "GRIND": 799
+        }
+      }
+    },
+    {
+      "family": "osc-fade",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "strengthExpectedN": 23637,
+      "weaknessExpectedN": 6952,
+      "strengthShare": 0.5843,
+      "totalDevSignals": 40452,
+      "buckets": {
+        "side": {
+          "long": 20050,
+          "short": 20402
+        },
+        "verdictState": {
+          "EFFICIENT": 6952,
+          "CHOPPY": 23637
+        },
+        "fourState": {
+          "EXPANSION": 2529,
+          "WHIPSAW": 4136,
+          "QUIET": 19501,
+          "GRIND": 4423
+        },
+        "session": {
+          "asian": 15627,
+          "ny": 14104,
+          "london": 10721
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 25070,
+          "EFFICIENT": 6104
+        },
+        "lagFourState": {
+          "QUIET": 19155,
+          "WHIPSAW": 5915,
+          "EXPANSION": 2663,
+          "GRIND": 3441
+        }
+      }
+    },
+    {
+      "family": "band-reversion",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "strengthExpectedN": 10174,
+      "weaknessExpectedN": 2434,
+      "strengthShare": 0.5756,
+      "totalDevSignals": 17675,
+      "buckets": {
+        "side": {
+          "long": 8645,
+          "short": 9030
+        },
+        "verdictState": {
+          "CHOPPY": 10174,
+          "EFFICIENT": 2434
+        },
+        "fourState": {
+          "WHIPSAW": 1542,
+          "QUIET": 8632,
+          "GRIND": 1841,
+          "EXPANSION": 593
+        },
+        "session": {
+          "asian": 5317,
+          "london": 5705,
+          "ny": 6653
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 11389,
+          "EFFICIENT": 2446
+        },
+        "lagFourState": {
+          "WHIPSAW": 2460,
+          "QUIET": 8929,
+          "EXPANSION": 1012,
+          "GRIND": 1434
+        }
+      }
+    },
+    {
+      "family": "candlestick-reversal",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "strengthExpectedN": 11234,
+      "weaknessExpectedN": 2402,
+      "strengthShare": 0.6351,
+      "totalDevSignals": 17688,
+      "buckets": {
+        "side": {
+          "long": 8932,
+          "short": 8756
+        },
+        "verdictState": {
+          "CHOPPY": 11234,
+          "EFFICIENT": 2402
+        },
+        "fourState": {
+          "QUIET": 8770,
+          "GRIND": 1404,
+          "WHIPSAW": 2464,
+          "EXPANSION": 998
+        },
+        "session": {
+          "asian": 7081,
+          "london": 4188,
+          "ny": 6419
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 10874,
+          "EFFICIENT": 2714
+        },
+        "lagFourState": {
+          "QUIET": 8224,
+          "WHIPSAW": 2650,
+          "EXPANSION": 1176,
+          "GRIND": 1538
+        }
+      }
+    },
+    {
+      "family": "vol-compression",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "strengthExpectedN": 24347,
+      "weaknessExpectedN": 5897,
+      "strengthShare": 0.6187,
+      "totalDevSignals": 39353,
+      "buckets": {
+        "side": {
+          "short": 17169,
+          "long": 22184
+        },
+        "verdictState": {
+          "CHOPPY": 24347,
+          "EFFICIENT": 5897
+        },
+        "fourState": {
+          "QUIET": 17911,
+          "GRIND": 3290,
+          "WHIPSAW": 6436,
+          "EXPANSION": 2607
+        },
+        "session": {
+          "asian": 16178,
+          "london": 8504,
+          "ny": 14671
+        },
+        "verdictStateLag20": {
+          "CHOPPY": 24337,
+          "EFFICIENT": 5795
+        },
+        "lagFourState": {
+          "QUIET": 18886,
+          "WHIPSAW": 5451,
+          "GRIND": 3551,
+          "EXPANSION": 2244
+        }
+      }
+    }
+  ],
+  "cells": [
+    {
+      "cardId": "donchian-20",
+      "family": "channel-breakout",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 4299,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "donchian-20",
+      "family": "channel-breakout",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 14312,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "donchian-55",
+      "family": "channel-breakout",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 3458,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "donchian-55",
+      "family": "channel-breakout",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 5565,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "dual-thrust",
+      "family": "channel-breakout",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 12507,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "dual-thrust",
+      "family": "channel-breakout",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 22711,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "sma-20-50",
+      "family": "ma-cross",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 298,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "sma-20-50",
+      "family": "ma-cross",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 1826,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "macd-cross",
+      "family": "ma-cross",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1298,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "macd-cross",
+      "family": "ma-cross",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 6358,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "ichimoku-tk",
+      "family": "ma-cross",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 137,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "ichimoku-tk",
+      "family": "ma-cross",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 5392,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "atr-squeeze-break",
+      "family": "vol-compression",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 488,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "atr-squeeze-break",
+      "family": "vol-compression",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 194,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "nr7-break",
+      "family": "vol-compression",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 9069,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "nr7-break",
+      "family": "vol-compression",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 2108,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "inside-bar-break",
+      "family": "vol-compression",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 14790,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "inside-bar-break",
+      "family": "vol-compression",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 3595,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "asian-range-break",
+      "family": "opening-range",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 804,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "asian-range-break",
+      "family": "opening-range",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 1998,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "london-orb-30",
+      "family": "opening-range",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 943,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "london-orb-30",
+      "family": "opening-range",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 3828,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdh-pdl-break",
+      "family": "opening-range",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 12507,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdh-pdl-break",
+      "family": "opening-range",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 22711,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "bollinger-20-2",
+      "family": "band-reversion",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 5459,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "bollinger-20-2",
+      "family": "band-reversion",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 828,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "keltner-20-atr",
+      "family": "band-reversion",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 3328,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "keltner-20-atr",
+      "family": "band-reversion",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1090,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "bb-squeeze-fade",
+      "family": "band-reversion",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 1387,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "bb-squeeze-fade",
+      "family": "band-reversion",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 516,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdh-retest",
+      "family": "level-retest",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 267,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdh-retest",
+      "family": "level-retest",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 1056,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdl-retest",
+      "family": "level-retest",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 220,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "pdl-retest",
+      "family": "level-retest",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 832,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "classic-pivot",
+      "family": "level-retest",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 832,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "classic-pivot",
+      "family": "level-retest",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 3863,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "rsi-14-30-70",
+      "family": "osc-fade",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 1005,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "rsi-14-30-70",
+      "family": "osc-fade",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1552,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "williams-r-fade",
+      "family": "osc-fade",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 11316,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "williams-r-fade",
+      "family": "osc-fade",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 2700,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "stochastic-14-fade",
+      "family": "osc-fade",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 11316,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "stochastic-14-fade",
+      "family": "osc-fade",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 2700,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "engulfing",
+      "family": "candlestick-reversal",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 1317,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "engulfing",
+      "family": "candlestick-reversal",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 287,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "morning-evening-star",
+      "family": "candlestick-reversal",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 8550,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "morning-evening-star",
+      "family": "candlestick-reversal",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1761,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "three-soldiers-crows",
+      "family": "candlestick-reversal",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 1367,
+      "structurallyThin": false
+    },
+    {
+      "cardId": "three-soldiers-crows",
+      "family": "candlestick-reversal",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 354,
+      "structurallyThin": false
+    }
+  ],
+  "thinCells": [],
+  "familyCells": [
+    {
+      "family": "channel-breakout",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 20264,
+      "structurallyThin": false
+    },
+    {
+      "family": "channel-breakout",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 42588,
+      "structurallyThin": false
+    },
+    {
+      "family": "ma-cross",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1733,
+      "structurallyThin": false
+    },
+    {
+      "family": "ma-cross",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 13576,
+      "structurallyThin": false
+    },
+    {
+      "family": "opening-range",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 14254,
+      "structurallyThin": false
+    },
+    {
+      "family": "opening-range",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 28537,
+      "structurallyThin": false
+    },
+    {
+      "family": "level-retest",
+      "kind": "strength",
+      "verdictState": "EFFICIENT",
+      "expectedN": 1319,
+      "structurallyThin": false
+    },
+    {
+      "family": "level-retest",
+      "kind": "weakness",
+      "verdictState": "CHOPPY",
+      "expectedN": 5751,
+      "structurallyThin": false
+    },
+    {
+      "family": "osc-fade",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 23637,
+      "structurallyThin": false
+    },
+    {
+      "family": "osc-fade",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 6952,
+      "structurallyThin": false
+    },
+    {
+      "family": "band-reversion",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 10174,
+      "structurallyThin": false
+    },
+    {
+      "family": "band-reversion",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 2434,
+      "structurallyThin": false
+    },
+    {
+      "family": "candlestick-reversal",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 11234,
+      "structurallyThin": false
+    },
+    {
+      "family": "candlestick-reversal",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 2402,
+      "structurallyThin": false
+    },
+    {
+      "family": "vol-compression",
+      "kind": "strength",
+      "verdictState": "CHOPPY",
+      "expectedN": 24347,
+      "structurallyThin": false
+    },
+    {
+      "family": "vol-compression",
+      "kind": "weakness",
+      "verdictState": "EFFICIENT",
+      "expectedN": 5897,
+      "structurallyThin": false
+    }
+  ],
+  "thinFamilyCells": [],
+  "structurallyThinSummary": {
+    "thinCellCount": 0,
+    "thinFamilyCellCount": 0,
+    "totalCells": 48,
+    "totalFamilyCells": 16,
+    "familiesWithAnyTestableCell": [
+      "channel-breakout",
+      "ma-cross",
+      "opening-range",
+      "level-retest",
+      "osc-fade",
+      "band-reversion",
+      "candlestick-reversal",
+      "vol-compression"
+    ],
+    "familiesWithoutAnyTestableCell": [],
+    "familiesWithoutAnyTestableCellCount": 0
+  },
+  "note": "STRUCTURALLY THIN means the measured DEV signal count for that claim cell is below the frozen n >= 100 gate. It says NOTHING about whether the strategy works — only that the cell cannot be tested with the current DEV window. It does NOT authorise changing any card, state, Map threshold or criterion."
+}
