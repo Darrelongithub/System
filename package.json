@@ -28,6 +28,7 @@
     "mc:readability": "node scripts/map-compass/readability.mjs",
     "mc:seal": "node scripts/map-compass/seal-audit.mjs",
     "mc:cards": "node scripts/map-compass/print-claim-cards.mjs",
+    "mc:coverage": "node scripts/map-compass/baseline-coverage.mjs",
     "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs"
   },
   "overrides": {

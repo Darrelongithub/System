@@ -16,16 +16,38 @@
  * threshold, verdict or kill criterion changes.
  */
 import { createHash } from "node:crypto";
-import { CLAIM_CRITERIA, SENSITIVITY_RULE, EXIT_HARNESS } from "../frozen.mjs";
+import { SENSITIVITY_RULE, EXIT_HARNESS } from "../frozen.mjs";
 import { effectiveCounts, clusterSe, dayKey } from "./cluster.mjs";
-import { syntheticTrades } from "../verify-claims.mjs";
+import { syntheticTradesV12 } from "../verify-claims.mjs";
 import { powerAt, mde } from "./verification.mjs";
 
 const SIGMA = 1.43;
 
-/** Measure overlap + day-cluster SE inflation on a pure-noise calibration run. */
+/**
+ * The v1.2 CLAIM_CRITERIA, frozen as a historical snapshot. Amendment 3
+ * explicitly changed the verification rule, so this block must NOT be
+ * recomputed against the new criteria — that would rewrite history. The hash
+ * below is the v1.2 value (verified against the v1.2 artifact).
+ */
+export const V12_CRITERIA = Object.freeze({
+  minTradesPerCell: 100,
+  practicalFloorR: 0.1,
+  tStatMin: 2,
+  absoluteNetRMin: 0,
+  concentrationMax: 0.5,
+  loyoPositiveMin: 0.75,
+  note: "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.",
+});
+
+/**
+ * Measure overlap + day-cluster SE inflation on a PURE-NOISE v1.2 calibration
+ * run. Uses `syntheticTradesV12` (the exact v1.2 generator) so the historical
+ * 0.2071 / 1.2316 values stay reproducible after Amendment 3. NO OUTCOMES:
+ * only `entryBar` is used for overlap; `netR` is Gaussian noise with
+ * `trueEdgeR = 0` and is used only for the day-clustered SE inflation.
+ */
 export function measureDependence({ seed = 7, perCell = 900 } = {}) {
-  const trades = syntheticTrades({ seed, perCell, trueEdgeR: 0, sd: SIGMA });
+  const trades = syntheticTradesV12({ seed, perCell, trueEdgeR: 0, sd: SIGMA });
   const eff = effectiveCounts(trades);
   const values = trades.map((t) => t.netR);
   const inf = clusterSe(values, trades.map(dayKey));
@@ -65,7 +87,7 @@ function adjustedPower(nRaw, designEffect, seInflation, effect, sigma = SIGMA) {
  */
 export function buildAmendment2Report(report) {
   const dep = measureDependence();
-  const effect = CLAIM_CRITERIA.practicalFloorR;
+  const effect = V12_CRITERIA.practicalFloorR;
   const central = report.centralCase ?? [];
   const overlapCases = [0, 0.25, 0.5, 0.75];
 
@@ -94,8 +116,12 @@ export function buildAmendment2Report(report) {
       thresholdChanged: false,
       verdictChanged: false,
       verdictUnchangedFrom: report.verdict,
-      criteria: CLAIM_CRITERIA,
-      criteriaHash: createHash("sha256").update(JSON.stringify(CLAIM_CRITERIA)).digest("hex"),
+      supersededBy: "reportOnlyV13",
+      supersededAt: "2026-10-27 (G0 Amendment 3)",
+      historyNote:
+        "This is the v1.2 historical snapshot. Its criteria hash is the v1.2 hash 788e01df... Amendment 3 explicitly changed the verification rule; the CURRENT criteria and hash are in reportOnlyV13. No numbers in this block were re-fitted to the new rule.",
+      criteria: V12_CRITERIA,
+      criteriaHash: createHash("sha256").update(JSON.stringify(V12_CRITERIA)).digest("hex"),
       purpose:
         "Show how clustered-by-day SEs and overlapping family-variant entry bars reduce effective power. This is a readout, NOT a new go/no-go gate and NOT a licence to relax criteria.",
       inference: {

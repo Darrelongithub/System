@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T04:33:45.391Z",
+  "generatedAt": "2026-10-27T07:32:28.527Z",
   "purpose": "Make an empty CONFIRMED set interpretable. Continuous evidence first, binary verdict second.",
   "reviewerArithmetic": {
     "randomWinRate": 0.3333333333333333,
@@ -15,19 +15,29 @@
       "value": 100
     },
     {
-      "id": "excessFloor",
-      "label": "excess > +0.10R",
+      "id": "netFloor",
+      "label": "net mean > +0.10R (ORIGINAL floor restored)",
       "value": 0.1
     },
     {
-      "id": "tStat",
-      "label": "t > 2",
+      "id": "netT",
+      "label": "day-clustered t(net) > 2",
       "value": 2
     },
     {
-      "id": "absoluteR",
-      "label": "absolute net R > 0",
+      "id": "excessControl",
+      "label": "excess over matched random > 0 (control)",
       "value": 0
+    },
+    {
+      "id": "excessT",
+      "label": "day-clustered t(excess) > 2",
+      "value": 2
+    },
+    {
+      "id": "noBaseline",
+      "label": "NO_BASELINE veto — no fine AND no coarse cell",
+      "value": true
     },
     {
       "id": "concentration",
@@ -42,7 +52,7 @@
     {
       "id": "placebo",
       "label": "beat placebo p95",
-      "value": 3
+      "value": 0
     },
     {
       "id": "strengthOnly",
@@ -55,7 +65,7 @@
       "value": true
     }
   ],
-  "gateStackNote": "Strength + weakness (old) x sweep stability (old) x power = multiplicative. Two gates removed at G0: weakness requirement and sweep veto. Neither change lowers the statistical bar; both remove redundant stacking.",
+  "gateStackNote": "G0 Amendment 3 RESTORED RULE: CONFIRMED = (net mean > +0.10R AND day-clustered t(net) > 2) AND (excess over matched random > 0 AND day-clustered t(excess) > 2) AND all vetoes. The v1.2 'excess > 0.10 and net > 0' rule is GONE. Two old multiplicative gates (weakness requirement, sweep veto) remain removed.",
   "powerByState": [
     {
       "state": "EXPANSION",
@@ -97,26 +107,36 @@
   },
   "perClaimTemplate": {
     "fields": [
+      "meanNetR",
+      "meanCi95",
+      "tNet",
       "excessVsRandomR",
       "excessCi95",
-      "meanNetR",
-      "n",
       "t",
+      "n",
+      "nEffective",
+      "baseline.mode",
+      "baseline.missing",
       "bySide.long",
       "bySide.short",
+      "byFourState.EXPANSION",
+      "byFourState.GRIND",
+      "byFourState.WHIPSAW",
+      "byFourState.QUIET",
       "years",
       "stability",
       "conditional",
+      "exitCaveat",
       "vetoes",
       "verdict"
     ],
-    "rule": "A claim with verdict INCONCLUSIVE still reports its point estimate and CI. Sort the ledger by excessVsRandomR to read the evidence even when nothing ships."
+    "rule": "AMENDMENT 3: BOTH gates must pass (net mean > +0.10R with tNet > 2, AND excess > 0 with t > 2). An INCONCLUSIVE claim still reports both point estimates and CIs, its four-state diagnostics, its baseline coverage and the standard-exit caveat (reversion families). No verdict may be read from a four-state diagnostic."
   },
   "m6Readout": {
     "primary": "count of CONFIRMED claims with stability != DEFINITION_SENSITIVE",
     "secondary": "count of CONDITIONAL claims (CONFIRMED + DEFINITION_SENSITIVE)",
     "continuous": "median and IQR of excessVsRandomR across all 48 claims",
-    "control": "CONFIRMED count must exceed placebo p95 = 3",
+    "control": "CONFIRMED count must exceed placebo p95 = 0",
     "decision": "If M6 returns zero CONFIRMED, the correct readout is UNDERPOWERED, not 'textbook is false'. Escalate to the G0 power decision rather than lowering criteria."
   },
   "conditionalPolicy": {
@@ -160,5 +180,37 @@
       }
     ]
   },
-  "amendment2": "2026-10-27: readout updated for clustered inference and CONDITIONAL default no. Verdict remains UNDERPOWERED."
+  "amendment2": "2026-10-27: readout updated for clustered inference and CONDITIONAL default no. Verdict remains UNDERPOWERED.",
+  "amendment3": {
+    "date": "2026-10-27",
+    "verdictStates": [
+      "EFFICIENT",
+      "CHOPPY"
+    ],
+    "fourStatesAreDiagnostics": true,
+    "reportOnlyPowerTable": "power-projection.json reportOnlyV13.powerTable2x3 (2 states x 3 sessions)",
+    "pooledPower": {
+      "EFFICIENT": 0.28,
+      "CHOPPY": 0.81
+    },
+    "reversionCaveat": {
+      "families": [
+        "band-reversion",
+        "osc-fade",
+        "candlestick-reversal"
+      ],
+      "label": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "note": "Every verdict for these families is labelled with the standard exit only; no new exit in this cycle."
+    },
+    "baselineCoverage": {
+      "noBaselineTradeLevelCells": 0,
+      "noBaselineClaimVerdictStateSessionCells": 0,
+      "noBaselineClaimFourStateSessionCells": 0,
+      "partiallyAffectedClaimVerdictStateSessionCells": 0,
+      "noBaselineClaimHalves": 0,
+      "noBaselineCards": 0,
+      "noBaselineSessions": []
+    },
+    "note": "Restored rule, 2 verdict states, NO_BASELINE veto, reversion exit caveat, empirical-study tiers. Verdict remains UNDERPOWERED; report-only power does not change any criterion."
+  }
 }

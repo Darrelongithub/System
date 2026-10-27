@@ -1,38 +1,38 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.2 — 2026-10-27; G0 AMENDMENT 2 applied**
+**Version 1.3 — 2026-10-27; G0 AMENDMENT 3 applied**
 **Status: G0 FROZEN (amended before any claim result). M1–M5 machinery COMPLETE. Claim cards DRAFT — awaiting human review/freeze.**
 **Branch:** `arena/072665f9-system`
 
-> **Version history is immutable.** `docs/BLUEPRINT-v1.0.md` (SHA-256
-> `420a4208…`), `docs/BLUEPRINT-v1.1.md` (SHA-256 `72c078f3…`) and
-> `docs/BLUEPRINT-v1.2.md` are byte-preserving snapshots. The dated log of
-> every amendment since v1.0 is `docs/BLUEPRINT-AMENDMENTS.md`. No earlier
-> version may be edited; superseded text is struck by a new dated amendment.
+> **Version history is immutable.** Four byte-preserving snapshots exist:
+> `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
+> `docs/BLUEPRINT-v1.2.md` and `docs/BLUEPRINT-v1.3.md`. The full 64-character
+> SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
+> printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
+> every amendment since v1.0. No earlier version may be edited; superseded
+> text is struck by a new dated amendment.
 >
-> **v1.1 (2026-10-26)** — six G0 review amendments, all made BEFORE any real
-> claim result: (1) strength alone ships, (2) sweep grades but never nullifies,
-> (3) a matched random-entry control replaces the zero null, (4) claims are
-> ordered by evidence quality with candlesticks last, (5) holdout feature bleed
-> is measured and declared, (6) VAL contamination is declared. See §7.6–§7.9
-> and §15.
+> **Version chain**
+> - **v1.0 (2026-10-26)** — initial consolidated pre-registration.
+> - **v1.1 (2026-10-26)** — six G0 review amendments: strength alone ships;
+>   sweep grades but never nullifies; matched random-entry control; claims
+>   ordered by evidence; holdout bleed measured; VAL contamination declared.
+> - **v1.2 / G0 Amendment 2 (2026-10-27)** — CONDITIONAL default NO; CR1
+>   day-clustered SEs + Kish effective N (report-only power); TIME_EXIT at 96
+>   bars frozen; full CONFIRMED rule printed; all 24 cards printed in full.
+> - **v1.3 / G0 Amendment 3 (2026-10-27)** — **restored CONFIRMED rule**
+>   (the original +0.10R NET floor PLUS the matched-baseline control); **two
+>   VERDICT STATES** (EFFICIENT / CHOPPY) with four Map states as diagnostics;
+>   NO_BASELINE fail-closed; standard-exit caveat on reversion families;
+>   empirical-study evidence replacing subjective tiers; recomputed
+>   within-family overlap and a 2×3 report-only power table.
 >
-> **v1.2 / G0 AMENDMENT 2 (2026-10-27)** — also before any real claim result:
-> (1) **CONDITIONAL default is NO** — the Compass must not enable CONDITIONAL
-> claims; they are reported at M9/M10 and enabled only if VAL supports them
-> under a criterion frozen now (§7.7, §7.10); (2) **every t and CI now uses SEs
-> clustered by calendar day**, with a Kish **effective-sample correction** for
-> overlapping family variants — `power-projection.json` gains a REPORT-ONLY
-> block with **no criterion change** (§7.10); (3) **TIME_EXIT at 96 bars** is
-> frozen in `EXIT_HARNESS` and applies to real claim evaluation, not just the
-> random control — baseline TIME_EXIT share **398/32,000 = 1.24375%** (§7.1,
-> §7.10); (4) the current CONFIRMED rule is printed in full (§7.2); (5) all 24
-> claim cards are printed in full in `TEST_ORDER` in
-> `docs/CLAIM-CARDS-FULL-TEXT.md` — they remain **DRAFT**.
->
-> **No threshold, stop, target, cost, floor or t cutoff changed in v1.2.** The
-> statistical *estimator* changed (clustered SE), which makes the test stricter,
-> not looser.
+> **Amendment 3 was applied before any real strategy result exists.** Claim
+> cards are still `DRAFT`; `verify-claims.mjs` still refuses real verification.
+> **No MAP, cost, exit, stop, target, floor or t numeric threshold changed.**
+> The verification RULE was explicitly rewritten (task 1) but every numeric
+> constant inside it is an original frozen value. See §7.11 for the full dated
+> diff against v1.2.
 
 This is the single pre-registration for the replacement of the old Signal
 Finder Pro research line. It is frozen **before any strategy result exists**.
@@ -43,6 +43,7 @@ The old project produced R 527.6 on 2025-11 → 2026-08 and failed on earlier
 data. Its nine "survivor" strategies were selected on that same window, so the
 data was spent before any rule was frozen. This project exists to make that
 impossible.
+
 
 ---
 
@@ -109,18 +110,23 @@ evaluation window**. Exact values:
 | `EXIT_HARNESS`                              | stop 1.5×ATR(14), target 2R, **maxHoldBars 96 → TIME_EXIT at market**, no trailing/breakeven/partials          |
 | `COST.slippage`                             | 0.02 ATR per side, stress multiplier 2                                                                         |
 | `COST.volRegime`                            | low < 0.0006, high ≥ 0.0016 (range/close)                                                                      |
-| `CLAIM_CRITERIA`                            | n ≥ 100, **excess over matched random** > +0.10R, t > 2, absolute net R > 0, concentration ≤ 0.50, LOYO ≥ 0.75 |
+| `CLAIM_CRITERIA`                            | n ≥ 100, **net mean > +0.10R with tNet > 2**, AND **excess over matched random > 0 with t > 2**, concentration ≤ 0.50, LOYO ≥ 0.75, NO_BASELINE veto |
 | `SENSITIVITY_RULE`                          | frozen cutoffs authoritative; sweep GRADES (ROBUST/FRAGILE/DEFINITION_SENSITIVE), never nullifies; **CONDITIONAL cannot enable Compass (default NO)** |
+| `VERDICT_STATES`                            | EFFICIENT = EXPANSION+GRIND, CHOPPY = WHIPSAW+QUIET; four Map states are diagnostics only (§7.11.3) |
+| `EMPIRICAL_STUDIES`                         | one opened empirical study per family (full URL) or PRACTITIONER_ONLY; subjective tiers removed (§7.11.6) |
 | `RANDOM_BASELINE`                           | 4000 random entries per state×side, seed 20261026, 96-bar max hold, matched on session/vol                     |
-| `EVIDENCE`                                  | prior false fraction 0.80; fixed-sequence test order by evidence tier                                          |
+| `EVIDENCE`                                  | prior false fraction 0.80; **explicit frozen TEST_ORDER** (v1.2 sequence); evidence = study registry      |
 | `ROLES`                                     | DEV 12y, HOLDOUT 4y, VAL 5y, STRESS 2y (see §4)                                                                |
 
 G0 Amendment 2 (2026-10-27) added `EXIT_HARNESS.maxHoldBars = 96` and the
 CONDITIONAL policy fields. **No numerical threshold changed** — the cap was
 already in use by the random-entry control and is now applied identically to
-real claim evaluation. The three G0 clarification fields below were likewise
-already stated in v1.0 and the generator's ATR metadata; **none of
-the six locked thresholds changed**.
+real claim evaluation. G0 Amendment 3 (2026-10-27) added the two verdict
+states, restored the CONFIRMED rule (same 0.10 / 2 / 100 / 0.50 / 0.75
+numbers, different arrangement), and replaced the subjective tiers with a
+study registry. **No MAP/COST/EXIT numeric value changed at any amendment.**
+The three G0 clarification fields were already stated in v1.0 and the
+generator's ATR metadata.
 
 ## 3. Architecture
 
@@ -296,6 +302,10 @@ expansion is wrong"; the sweep separates those two interpretations.
 ## 6. Stage 2 — Compass v0 (M4 — BUILT, inert as required)
 
 - Input: state + session → binary allow-list of strategy IDs.
+- **Amendment 3:** the allow-list is keyed by the TWO verdict states
+  (EFFICIENT / CHOPPY). A bar's four-state Map label is mapped through
+  `verdictStateOf()` at lookup; the four Map states are diagnostics. See
+  §7.11.3.
 - Enable S in state B **iff its STRENGTH claim is CONFIRMED for B**. Strength
   alone is sufficient (**G0 amendment**): everything not CONFIRMED is blocked by
   default, so requiring the weakness CONFIRMED too was a redundant second gate
@@ -361,9 +371,10 @@ that defaults to INCONCLUSIVE.
 
 Per claim:
 
-- `t > 2` on the **excess over a matched random-entry baseline**
-- excess `> +0.10R/trade` (practical floor — now relative, not absolute)
-- absolute net R `> 0` (beating a losing baseline but still losing money is not tradeable)
+- **net mean `> +0.10R/trade` with day-clustered `tNet > 2`** (ORIGINAL v1.0 floor, RESTORED at Amendment 3)
+- **excess over a matched random-entry baseline `> 0` with day-clustered `t > 2`** (the control)
+- both gates are a **CONJUNCTION** — the v1.2 rule "excess > 0.10 and net > 0" is REMOVED (§7.2.1)
+- veto if any trade lacks a fine AND coarse baseline cell (`NO_BASELINE`; never a zero fallback)
 - no single year contributes > 50% of cell R (concentration veto)
 - ≥ 75% of leave-one-year-out windows positive (LOYO consistency)
 - ≥ 100 trades per cell, else INCONCLUSIVE
@@ -379,113 +390,158 @@ exceed the placebo p95 to be credible.
 **Assume 80% of claims are false** (`EVIDENCE.priorFalseFraction = 0.80`, see
 §7.9). If only 3–5 families survive, that is a successful audit, not a failure.
 
-### 7.2.1 The current CONFIRMED rule, printed in full (Amendment 2)
+### 7.2.1 The current CONFIRMED rule, printed in full (Amendment 3)
 
 This is the **exact** decision procedure in
-`scripts/map-compass/lib/verification.mjs` after Amendment 2. It is reproduced
+`scripts/map-compass/lib/verification.mjs` after Amendment 3. It is reproduced
 here so no one can claim the rule was written after seeing results.
 
 ```
-INPUT  trades[] (each with netR, year, state, side, session, vol, day, entryBar)
+INPUT  trades[] (each with netR, year, state (four-state Map label), side,
+                 session, vol, day, entryBar, strategyId)
        direction  = +1 for a STRENGTH claim, -1 for a WEAKNESS claim
        sensitivityAgreementPct (from the M6 threshold sweep; GRADE only)
        baseline   = random-baseline.json (matched random-entry control)
-CFG    minTradesPerCell = 100
-       practicalFloorR  = 0.10        # EXCESS, net R/trade
-       tStatMin         = 2
-       absoluteNetRMin  = 0
-       concentrationMax = 0.50
-       loyoPositiveMin  = 0.75
+CFG    minTradesPerCell      = 100
+       practicalFloorR       = 0.10   # NET MEAN floor (ORIGINAL v1.0 floor)
+       tStatMin              = 2      # required for BOTH tNet and t(excess)
+       excessFloorR          = 0      # excess over matched random must be > 0
+       concentrationMax      = 0.50
+       loyoPositiveMin       = 0.75
+       requireMatchedBaseline = true
+       baselineMinCellN      = 200
 
  1  devTrades = trades.filter(t => ROLES.DEV.includes(t.year))   # SEAL
     n = devTrades.length
  2  for each trade i:
       signed_i  = netR_i * direction
       b_i       = matchedBaseline(t_i, baseline)
-                  # fine  cell state|side|session|vol if sufficient
-                  # else coarse state|side if n >= 200
-                  # else 0 (level recorded in baselineMatchLevels)
-      excess_i  = netR_i * direction - b_i.mean * direction
- 3  meanNetR        = mean(signed)          # ABSOLUTE, signed, NET of costs
-    excessVsRandomR = mean(excess)         # PRIMARY test statistic
- 4  dayKeys_i = calendar day of trade i    # fallback: year
-    se = CR1(excess, dayKeys) =
-         sqrt( (G/(G-1)) * SUM_g (SUM_{i in g} (excess_i - mean(excess)))^2 / n^2 )
-    t           = excessVsRandomR / se
-    excessCi95  = excessVsRandomR +/- 1.96*se
-    meanCi95    = meanNetR +/- 1.96*CR1(signed, dayKeys)
+                  # fine  cell state|side|session|vol if sufficient && n>=200
+                  # else coarse state|side if n>=200
+                  # else MISSING: mean = NULL, level = NO_BASELINE, never 0
+                  # baseline === null is UNCONTROLLED_DRY_RUN (calibration only)
+ 3  for each MATCHED trade i:
+      excess_i  = (netR_i - b_i.mean) * direction      # excessFor()
+                  # netR is ALREADY side-signed; direction is the CLAIM
+                  # direction, applied to the DIFFERENCE. A short winning
+                  # +1.0R vs a -0.10R random-short cell gives +1.10.
+    unmatched trades get excess_i = NULL and are excluded from excess stats
+ 4  meanNetR        = mean(signed)          # ABSOLUTE, signed, NET of costs
+    excessVsRandomR = mean(matched excesses)  # control statistic
+ 5  dayKeys_i = calendar day of trade i    # fallback: year
+    seExc = CR1(excesses, dayKeys) =
+         sqrt( (G/(G-1)) * SUM_g (SUM_{i in g} (excess_i - mean))^2 / m^2 )
+    seNet = CR1(signed, dayKeys)
+    t     = excessVsRandomR / seExc       # control gate t
+    tNet  = meanNetR / seNet             # NET FLOOR gate t
+    excessCi95 = excessVsRandomR +/- 1.96*seExc
+    meanCi95   = meanNetR +/- 1.96*seNet
     by-side and per-year CIs use the SAME CR1 estimator on their subsets
- 5  nEffective = n^2 / SUM_bars (n_bar^2)   # Kish, over entry-bar clusters
+ 6  nEffective = n^2 / SUM_bars (n_bar^2)   # Kish, over entry-bar clusters
     (REPORTED and used for POWER only; the CR1 SE already absorbs within-day
      correlation, so the SE is NOT inflated twice)
- 6  concentration = max(0, max_year totalExcessR_y) / SUM_y max(0, totalExcessR_y)
-    if concentration > 0.50  -> veto CONCENTRATION_<value>
- 7  yearMeans = per-year meanExcessR restricted to years with n >= 5
-    if yearMeans.length < 2  -> veto TOO_FEW_YEARS
-    else loyoPositivePct = share of yearMeans > 0
-         if loyoPositivePct < 0.75 -> veto LOYO_<value>
- 8  stability = ROBUST              if sensitivityAgreementPct >= 80
+ 7  byFourState: for each of EXPANSION/GRIND/WHIPSAW/QUIET/UNKNOWN report
+    n, meanNetR, ci95, t, excessR, verdictState — ALL diagnosticOnly: true
+ 8  concentration / LOYO computed from MATCHED excesses only (skip if <2)
+    concentration = max(0, max_year totalExcessR_y) / SUM_y max(0,...)
+    if concentration > 0.50 -> veto CONCENTRATION_<value>
+    yearMeans = per-year meanExcessR for years with n >= 5
+    if yearMeans.length < 2 -> veto TOO_FEW_YEARS
+    else loyoPositivePct = share > 0; if < 0.75 -> veto LOYO_<value>
+ 9  stability = ROBUST              if sensitivityAgreementPct >= 80
              = FRAGILE             if sensitivityAgreementPct >= 50
              = DEFINITION_SENSITIVE otherwise
     conditional = (stability == DEFINITION_SENSITIVE)
     # GRADE/TAG only. sweepsCanNullifyVerdict = false.
- 9  if n == 0        -> INCONCLUSIVE, veto NO_TRADES
-    if n < 100       -> INCONCLUSIVE, veto MIN_TRADES_n
-10  clearsFloor = (excessVsRandomR > 0.10) AND (t > 2)
-    absoluteOk  = (meanNetR > 0)
-    if clearsFloor AND absoluteOk AND vetoes.length == 0
+10  if n == 0            -> INCONCLUSIVE, veto NO_TRADES
+    if nMissingBaseline>0 -> veto NO_BASELINE_<k>_OF_<n> and FORCE INCONCLUSIVE
+    if n < 100           -> veto MIN_TRADES_n
+11  netGatePass     = (meanNetR > 0.10)        AND (tNet > 2)
+    controlGatePass = (excessVsRandomR > 0)   AND (t > 2)
+    netRefuted     = (meanNetR < -0.10)       AND (tNet < -2)
+    controlRefuted = (excessVsRandomR < 0)    AND (t < -2)
+
+    if netGatePass AND controlGatePass AND vetoes.length == 0
                      -> CONFIRMED
-    else if (excessVsRandomR < -0.10)
-            OR (t < -2 AND excessVsRandomR < 0)
-                     -> REFUTED       # vetoes do NOT block a refutation
+    else if netRefuted OR controlRefuted
+                     -> REFUTED
     else             -> INCONCLUSIVE
-                         (if !absoluteOk, also push ABSOLUTE_NET_R_<meanNetR>)
+                         (push NET_FLOOR_OR_T / EXCESS_CONTROL_OR_T)
 ```
 
-**Clarifications that were ambiguous before (now explicit):**
+**Clarifications (Amendment 3):**
 
-- **The +0.10R floor is on the EXCESS over random, not on the absolute net
-  mean.** Both quantities are in **net R** (after the real spread and frozen
-  slippage). So a claim whose mean net R is only +0.05R CAN be CONFIRMED if its
-  matched random baseline is −0.20R, giving +0.25R excess. The absolute net
-  mean has only a **`> 0`** gate. The reason for the two-gate structure is the
-  DEV 2004–2011 gold bull run: every unconditional long looks profitable, so
-  profitability alone is not evidence of a strategy. Conversely a claim that
-  beats a *losing* baseline but still loses money cannot be CONFIRMED.
-- **`t > 2` is the t of the EXCESS**, not of the absolute net R. Since
-  Amendment 2 it is a **CR1 cluster-robust** t clustered by **calendar day**
-  (`G` = number of distinct days). The `tNet` on absolute net R is reported but
-  is not a criterion. There is no per-claim multiplicity adjustment on t;
-  multiplicity is instead controlled by the fixed-sequence test order (§7.9)
-  and the within-year block-circular-shift placebo p95 gate.
-- **Statistic / SE of the excess.** The statistic is the sample mean of
-  `excess_i`. Its SE is the CR1 cluster-robust estimator shown in step 4; with
-  one trade per day this reduces (up to the `G/(G-1)` factor) to the ordinary
-  `sqrt(var/n)`. `seInflation = clusteredSe / plainSe` is reported on every
-  row so a reader can see how much dependence mattered. The 95% CI is a normal
-  `±1.96·se` interval.
-- **REFUTED is not gated by vetoes.** Concentration/LOYO/min-trades vetoes can
-  block a CONFIRMED verdict but cannot protect a claim from refutation.
+- **The +0.10R floor is back on the ABSOLUTE NET MEAN** — the original v1.0
+  floor. Both quantities are in **net R** (after real spread and frozen
+  slippage). A claim with net mean +0.05R and a huge +0.25R excess is **NOT**
+  CONFIRMED. A claim with net mean +0.20R and a *negative* excess is **NOT**
+  CONFIRMED. Both gates are required; this is a conjunction, not a choice.
+- **There are TWO `t > 2` statistics, both CR1 day-clustered**: `tNet` on the
+  net mean and `t` on the excess. `tStatMin = 2` is unchanged from G0. The
+  excess statistic is `mean(excess_i)`; its SE is the CR1 estimator in step 5
+  with the `G/(G-1)` small-sample factor. `seInflation = clusteredSe/plainSe`
+  is reported on every row. The 95% CIs are normal `±1.96·se`.
+- **Sign convention is explicit** (`excessFor(netR, baselineMean, direction)`):
+  `netR` is already signed by trade side; `baselineMean` is in the same R
+  units; `direction` is the CLAIM direction and is applied to the DIFFERENCE.
+  A short winning +1.0R against a random-short baseline of −0.10R gives
+  **+1.10**, never −1.10. Same for a long. Pinned by unit tests.
+- **NO_BASELINE is fail-closed.** If a supplied baseline has no fine AND no
+  coarse cell for ANY trade, the claim is INCONCLUSIVE with a `NO_BASELINE`
+  veto; the baseline mean is `null`, never 0. `baseline === null` is the only
+  zero-null mode and is flagged `UNCONTROLLED_DRY_RUN`; `verifyReal()` refuses
+  it and hard-fails if `random-baseline.json` is missing. §7.11.4 / 2b.
+- **REFUTED is not gated by vetoes** (but NO_BASELINE overrides it: a claim
+  with no control cannot be "refuted" either — it is simply unmeasurable).
+- **Verdicts are decided on TWO verdict states** (§7.11.3); the four Map
+  states are reported for every claim as `diagnosticOnly: true` and never
+  decide a verdict.
 - **A CONFIRMED strength alone enables a strategy** (§6); a CONFIRMED
-  CONDITIONAL strength does **not** (§7.7).
+  CONDITIONAL strength does **not** (§7.7, §7.10.2).
+
+#### Dated diff against v1.2 (G0 Amendment 3, 2026-10-27)
+
+| Step | v1.2 rule | v1.3 rule | Changed? |
+| ---- | --------- | --------- | -------- |
+| CFG | `practicalFloorR = 0.10` applied to **EXCESS**; `absoluteNetRMin = 0` | `practicalFloorR = 0.10` applied to **NET MEAN**; `absoluteNetRMin` REMOVED; `excessFloorR = 0` added | **YES — the requested rule change.** Numeric 0.10 and 2 unchanged. |
+| 2 | missing fine+coarse -> `mean = 0`, level `NONE_ASSUMED_ZERO` | missing -> `mean = NULL`, level `NO_BASELINE`, fail-closed | YES |
+| 3 | `excess_i = netR_i*direction - b.mean*direction` | `excess_i = (netR_i - b.mean) * direction` via named `excessFor()` with an explicit sign contract | Algebra identical; **sign convention now explicit and unit-tested** (short and long). |
+| 4-5 | one primary t on excess; `tNet` reported but not a criterion | **two** criteria t's: `tNet > 2` (net floor) and `t > 2` (excess control) | YES — conjunction |
+| 5 | CI of excess + CI of mean (day-clustered) | unchanged (both CR1 day-clustered) | no |
+| 7 | — | `byFourState` diagnostics for all four Map states | added (diagnostic only) |
+| 10 | `clearsFloor = excess > 0.10 && t > 2`; `absoluteOk = meanNetR > 0` | `netGatePass` AND `controlGatePass` | **YES** |
+| 10 | REFUTED if `excess < -0.10` or (`t < -2` and `excess < 0`) | REFUTED if `netRefuted` or `controlRefuted` | YES (symmetric to new gates) |
+| vetoes | `ABSOLUTE_NET_R_<v>` pushed on failure | `NET_FLOOR_OR_T` / `EXCESS_CONTROL_OR_T` / `NO_BASELINE_<k>_OF_<n>` | YES (labels) |
+| cells | four Map states (EXPANSION/GRIND/WHIPSAW/QUIET) | **two verdict states** EFFICIENT / CHOPPY; four states diagnostic | YES (§7.11.3) |
+| evidence | subjective tiers 1-4 | one opened empirical study per family or PRACTITIONER_ONLY | YES (§7.11.6) |
+| power | 4-state report-only table | **2 states × 3 sessions** report-only table + pooled 2-state rows | YES (§7.11.3) |
+| exits | standard 1.5 ATR / 2R only | **unchanged**, but reversion-family verdicts are explicitly labelled with the standard-exit caveat | label only |
+| cards | 24 DRAFT, TEST_ORDER by tier | 24 DRAFT, TEST_ORDER **explicit frozen list, byte-identical to v1.2** | no reorder |
+| `MAP.*`, `COST.*`, `EXIT_HARNESS.*`, `ROLES`, thresholds | frozen | **identical** | **no** |
+
+Nothing in this diff was chosen in response to a strategy outcome: there is
+none. The change was requested and applied at G0 on 2026-10-27.
 
 ### 7.3 Harness calibration — PASS
 
 `verify-claims.mjs --dry-run` → `harness-calibration.json`:
 
-| Check                                               | Result after Amendment 2 (clustered SE) | v1.1 (i.i.d. SE) |
-| --------------------------------------------------- | --------------------------------------- | ---------------- |
-| False-positive rate (8 seeds × 48 claims)           | **0.0026** (1 false CONFIRM total)      | 0.0026           |
-| Known +0.15R edge detection (600 trades/cell)       | **93.75%** (45/48)                      | 100%             |
-| Placebo null (40 within-year block circular shifts) | median 0, **p95 3** fake confirms       | median 0, p95 5  |
-| Power at +0.10R                                     | n=1000 → 0.599, n=1600 → 0.799         | 0.60 / 0.80      |
+| Check                                               | v1.0 | v1.1 | v1.2 (clustered SE) | v1.3 (restored rule) |
+| --------------------------------------------------- | ---- | ---- | ------------------- | -------------------- |
+| False-positive rate (8 seeds × 48 claims)           | 0.0026 | 0.0026 | 0.0026 | **0** |
+| Known +0.15R edge detection (600 trades/cell)       | 100% | 100% | 93.75% | **100%** |
+| Placebo null (40 within-year block circular shifts) | p95 5 | p95 5 | p95 3 | **p95 0** |
+| Power at +0.10R                                     | 0.60/0.80 | 0.60/0.80 | 0.599/0.799 | 0.599/0.799 |
 
-The detection rate fell from 100% to 93.75% because day-clustered SEs are
-conservative, and the placebo p95 fell from 5 to 3 (a stricter null, not a
-looser one). **This is a stricter test, not a relaxed one.** Kill criterion
-"harness fails synthetic power calibration" remains cleared. The synthetic
-calibration harness now generates calendar-day and overlapping entry-bar keys
-so the calibration exercises the same estimator used on real trades.
+v1.3's calibration is **UNCONTROLLED synthetic** (`baseline: null`, flagged
+`UNCONTROLLED_DRY_RUN` on every row and in `harness-calibration.json`). The
+restored rule requires a significant NET mean, so zero-edge noise produces no
+false confirms and the injected +0.15R net edge is detected in every claim;
+the placebo floor is therefore 0. This is a **stricter** test, not a relaxed
+one. Kill criterion "harness fails synthetic power calibration" remains
+cleared. Real verification (`verifyReal`) REFUSES this mode and requires
+`random-baseline.json`. The exact v1.2 generator is preserved as
+`syntheticTradesV12()` so the 0.2071 overlap estimate stays reproducible.
 
 ### 7.4 Seal leak found and fixed
 
@@ -520,6 +576,12 @@ different DEV/HOLDOUT allocation, (c) a pre-registered change to pool more
 variants. **Lowering the practical floor, softening the t-stat, or re-fitting
 costs is NOT an option** — that is exactly the laundering this project exists
 to prevent.
+
+**Amendment 3 (§7.11.3):** the report-only power table is now recomputed
+for **2 verdict states × 3 sessions** with real day counts and the
+relation-aware effective-N correction. Pooled joint power is 0.280 for
+EFFICIENT and 0.810 for CHOPPY; the v1.2 four-state block is kept as a
+superseded historical snapshot. Verdict remains **UNDERPOWERED**.
 
 **Amendment 2 REPORT-ONLY correction (2026-10-27).** `power-projection.json`
 now carries a `reportOnly` block. It does **not** change `verdict`, `criteria`,
@@ -620,6 +682,11 @@ phenomena, 4 = anecdotal). `TEST_ORDER` sorts tier ascending then frozen
 priority, so **candlestick patterns are tested LAST**. The ledger records each
 claim's `testOrder`, preserving the pre-registered sequence.
 
+**Amendment 3 replaced the tiers** with one opened empirical study per family
+(full URL) or a PRACTITIONER_ONLY mark — see §7.11.6. `TEST_ORDER` is now an
+explicit frozen list byte-identical to v1.2; `evidenceTier` is a diagnostic
+order rank only, not an evidence claim and not an ordering key.
+
 ### 7.10 G0 AMENDMENT 2 (2026-10-27) — in full
 
 **Provenance.** Applied before any real strategy result exists. Claim cards are
@@ -694,6 +761,266 @@ weakness claim/state, rationale, session restriction, sources). It is generated
 mechanically from `claim-cards.draft.mjs` by `print-claim-cards.mjs`.
 **Status stays DRAFT — this dump is for review, not a freeze.** No card was
 edited, reordered or frozen by Amendment 2.
+
+### 7.11 G0 AMENDMENT 3 (2026-10-27) — in full
+
+**Provenance.** Applied before any real strategy result exists. Claim cards are
+still `DRAFT`; `verify-claims.mjs` still refuses real verification; the ledger
+is empty; `routing-table.json` enables nothing. Nothing here was chosen in
+response to a strategy outcome. `docs/BLUEPRINT-AMENDMENTS.md` records the
+dated chain v1.0 → v1.1 → v1.2 → v1.3 including this amendment's diff.
+
+**What did NOT change:** `MAP.*`, `EXIT_HARNESS.*` (stop 1.5×ATR, target 2R,
+`maxHoldBars = 96`), `COST.*`, `ROLES`, `DENYLIST`, `RANDOM_BASELINE.*`,
+`CONFLICT_RULE`, the 24 cards' priorities, and `TEST_ORDER` (explicit frozen
+list, byte-identical to v1.2). The numeric values `0.10`, `2`, `100`, `0.50`,
+`0.75` are unchanged; only the verification RULE arrangement changed, as
+explicitly instructed.
+
+#### 7.11.1 Restored CONFIRMED rule (task 1)
+
+v1.1/v1.2 had replaced the original floor with an EXCESS floor
+(`excess > 0.10` and `net > 0`). That let a claim ship on a strong *relative*
+edge while being unprofitable in absolute terms, and spent the whole +0.10R
+budget on the control. The rule is restored to **the original floor PLUS the
+control**, a conjunction of two independent day-clustered tests:
+
+- **(A) NET MEAN `> +0.10R` with `tNet > 2`** — the original v1.0 floor.
+- **(B) EXCESS over matched random `> 0` with `t > 2`** — the control survives
+  as a second significance gate, merely positive.
+- **Plus the existing vetoes**: `n >= 100`, concentration `<= 0.50`, LOYO
+  `>= 0.75`, and the new `NO_BASELINE`.
+
+`absoluteNetRMin` is **removed**; the `ABSOLUTE_NET_R_*` veto is gone. The full
+pseudo-code, clarifications and a dated step-by-step diff against v1.2 are in
+§7.2.1. Encoded in `CLAIM_CRITERIA` and `verifyClaim`, pinned by 4 tests.
+
+#### 7.11.2 Unit tests and NO_BASELINE (task 2)
+
+**(a) Sign convention.** `excessFor(netR, baselineMean, direction)` applies the
+claim direction to the DIFFERENCE, never to one term. `netR` is already signed
+by trade side and `baselineMean` is in the same R units. Pinned by tests: a
+**short** winning +1.0R against a random-short baseline of −0.10R gives
+excess **+1.10**, not −1.10; the **long** case gives +1.10 too; both are
+checked at the `verifyClaim` row level (`excessVsRandomR` and
+`bySide.<side>.excessR`). A weakness claim (`direction = -1`) correctly gives
+−1.10 for the same winner.
+
+**(b) Fail-closed baseline.** `matchedBaseline()` now resolves
+fine → coarse → **MISSING** (`mean = null`, `level = NO_BASELINE`). The
+`NONE_ASSUMED_ZERO` fallback is **deleted**. If ANY trade in a claim cell has
+no fine and no coarse cell, `verifyClaim` returns **INCONCLUSIVE** with a
+`NO_BASELINE_<k>_OF_<n>` veto, and never computes a fabricated excess (the
+row reports `excessVsRandomR = 0` from an empty matched set and
+`controlGatePass = false`). `baseline === null` remains the only zero-null
+mode, is flagged `UNCONTROLLED_DRY_RUN` on every row, is disclosed in
+`harness-calibration.json`, and is **refused by `verifyReal()`** (which hard
+fails if `random-baseline.json` is absent).
+
+**Coverage audit — how many cells would hit NO_BASELINE.** From
+`artifacts/map-compass/baseline-coverage.json`, computed from the DRAFT card
+metadata and the frozen random baseline only (no outcomes):
+
+| Level | Cells | Would hit NO_BASELINE (shipped rule) |
+| ----- | ----: | -----------------------------------: |
+| claim halves (24 cards × strength/weakness) | 48 | 0 |
+| claim × verdictState × session | 136 | 0 |
+| claim × fourState × session | 272 | 0 |
+| trade-level lookups (× 2 sides × 3 vol) | 1,632 | 0 |
+
+All **8** coarse `state|side` cells exist with n = 4,000 ≥ 200, so with the
+coarse fallback the shipped rule produces **zero** NO_BASELINE cells. Of the
+1,632 trade-level lookups, **984 resolve FINE** and **648 (39.7%) use the
+COARSE fallback** because their fine cell has < 200 random entries. If the
+coarse fallback were forbidden (NOT the shipped rule), **648** lookups would
+become NO_BASELINE — this is reported so the reader can see exactly how much
+coverage depends on the legitimate coarse fallback. The audit also lists every
+insufficient fine cell individually with its n.
+
+#### 7.11.3 Verdict states and the 2×3 power table (task 3)
+
+**Two verdict states**, frozen in `VERDICT_STATES` / `VERDICT_STATE_OF`:
+
+- **EFFICIENT = EXPANSION + GRIND** (ER ≥ 0.35 — directional)
+- **CHOPPY = WHIPSAW + QUIET** (ER < 0.35 — non-directional)
+
+This is the answer to the G0 power decision: pooling along the ER axis
+increases the thin cells instead of lowering criteria. Verdicts are decided on
+these TWO states. **The four Map states stay as diagnostics** — every claim
+row carries `fourStateDiagnostics` / `stats.byFourState` with n, meanNetR,
+clustered CI, t and excessR for EXPANSION, GRIND, WHIPSAW and QUIET, each
+marked `diagnosticOnly: true`. No verdict may be read from a four-state row.
+The Map source hash and all Map thresholds are unchanged; the Compass table
+is re-keyed to the two verdict states and maps a bar's four-state label
+through `verdictStateOf()` at lookup time.
+
+**Strength state by family** (`FAMILY_STRENGTH_STATE`), weakness = the other
+verdict state for every family:
+
+| Family | Strength verdict state | Weakness |
+| ------ | ---------------------- | -------- |
+| channel-breakout | EFFICIENT | CHOPPY |
+| ma-cross | EFFICIENT | CHOPPY |
+| opening-range | EFFICIENT | CHOPPY |
+| level-retest | EFFICIENT | CHOPPY |
+| band-reversion | CHOPPY | EFFICIENT |
+| osc-fade | CHOPPY | EFFICIENT |
+| candlestick-reversal | CHOPPY | EFFICIENT |
+| vol-compression | **CHOPPY** | EFFICIENT |
+
+`vol-compression` is CHOPPY because **the signal is observed BEFORE the
+expansion** (the entry bar is still a compression bar), so the claim belongs
+to the pre-breakout regime, not the realised EXPANSION. Two v1.2 textbook
+weakness labels that sat in the same CHOPPY state as their strength
+(`bb-squeeze-fade`, `three-soldiers-crows`) were corrected to EXPANSION —
+these were the plainly-wrong state items.
+
+**Report-only power table, 2 verdict states × 3 sessions.** Recomputed in
+`power-projection.json → reportOnlyV13.powerTable2x3` from real DEV bar counts
+and **real DEV calendar-day counts** per cell, using the day-clustered SE
+inflation (1.009) and the recomputed within-family effective-N correction
+(design effect 2.2948). Session is now a CELL dimension, so there is no
+separate 1/3 session factor. `jointPowerConservative = min(net-floor power,
+control power)` — the two tests are strongly correlated on the same trades, so
+a product would understate power; the min is conservative.
+
+| Cell | DEV bars | DEV days | n | n_eff | i.i.d. power | joint power |
+| ---- | -------: | -------: | --: | ----: | -----------: | ----------: |
+| EFFICIENT\|asian | 7,363 | 1,306 | 346 | 150.8 | 0.255 | 0.134 |
+| EFFICIENT\|london | 4,189 | 932 | 197 | 85.8 | 0.164 | 0.094 |
+| EFFICIENT\|ny | 7,746 | 1,416 | 364 | 158.6 | 0.266 | 0.138 |
+| CHOPPY\|asian | 37,003 | 2,862 | 1,737 | 756.9 | 0.830 | 0.479 |
+| CHOPPY\|london | 19,264 | 2,692 | 904 | 393.9 | 0.557 | 0.279 |
+| CHOPPY\|ny | 25,655 | 2,886 | 1,204 | 524.7 | 0.680 | 0.355 |
+
+Pooled across sessions: **EFFICIENT n = 907 → n_eff 395.2, joint power 0.280**;
+**CHOPPY n = 3,845 → n_eff 1,675.5, joint power 0.810**. Compared with the
+v1.2 four-state adjusted powers (EXPANSION 0.226, GRIND 0.301, WHIPSAW
+0.461, QUIET 0.924), the 2-state pooling doubles the raw EFFICIENT sample but
+the larger relation-aware overlap removes most of the gain: near-duplicate
+variants do not add independent information. The control gate is **not** the
+binding constraint, because matched random baselines are negative in DEV, so a
+true +0.10R net edge implies a larger excess. `reportOnlyV13` also carries a
+sensitivity sweep over the share assumption (0 → 1 scale) and the pooled rows.
+
+**This is REPORT-ONLY.** `verdict` stays `UNDERPOWERED`; no criterion,
+threshold, kill criterion or card changes because of it. If zero claims are
+CONFIRMED the readout remains "too little independent data", not "textbook
+false".
+
+#### 7.11.4 Standard-exit caveat for reversion families (task 4)
+
+Every verdict row for **band-reversion, osc-fade and candlestick-reversal**
+carries the literal label:
+
+> **"under the standard exit (1.5 ATR stop, 2R target) only"**
+
+`REVERSION_FAMILIES` and `EXIT_CAVEAT` are frozen in `frozen.mjs`; the label is
+on each card (`exitCaveat`), on each `runBattery` row, in
+`power-projection.json → reportOnlyV13.reversionCaveat`, in
+`readability.json` and in `baseline-coverage.json`, which enumerates all 48
+pre-registered verdict slots and labels the **18** reversion ones (3 families ×
+3 cards × 2 halves). **No new exit is added in this cycle.** The caveat exists because a mean-reversion rule's verdict is
+especially sensitive to the exit: a 2R target may be reached less often than a
+smaller one, so a REFUTED reversion claim is a refutation of the rule *under
+this harness*, not of mean reversion in general. A new exit would be a NEW
+cycle with a NEW evaluation window.
+
+#### 7.11.5 Overlap provenance (NO outcomes used)
+
+**How the v1.2 `0.2071` was estimated.** `lib/amend2-report.mjs →
+measureDependence()` used `syntheticTradesV12({seed: 7, perCell: 900,
+trueEdgeR: 0, sd: 1.43})` from `verify-claims.mjs` — pure Gaussian **synthetic
+noise with ZERO injected edge**. The three variants of a family drew entry bars
+from ONE shared pool of 900 bars keyed
+`${family}|${fourState}|${year}|${bar}`. `effectiveCounts()` (Kish effective N
+over entry-bar clusters) on that set gave overlap fraction **0.2071**, design
+effect **1.2316**, 4,032 day clusters and SE inflation **1.009**. **Only the
+`entryBar` and `day` fields were used** — `netR` was zero-edge noise used only
+for the SE ratio and never entered the overlap computation. No strategy
+outcomes, no real trades, no verdicts. The exact v1.2 generator is preserved
+as `syntheticTradesV12()` so the number is reproducible byte-for-byte.
+
+**Amendment-3 recomputation.** `lib/overlap.mjs →
+recomputeWithinFamilyOverlap()` keeps the same Kish estimator but replaces the
+single uniform pool with **relation-aware shares** derived from
+`CARD_RELATIONS`: `NEAR_DUPLICATE 0.75`, `MIRROR_IMAGE 0.55`,
+`RELATED 0.30`, `INDEPENDENT 0.10`. It uses ONLY card metadata and a seeded
+RNG generating **entry-bar multiplicities** — no `netR`, no verdict, no
+strategy result, no realised trade. Result: pooled overlap **0.8302**, design
+effect **2.2948** (per-family 2.13–2.58). A sensitivity sweep scales all
+shares from 0 (independent) to 1 (frozen assumptions) so the reader can see
+how much the ASSUMPTION, not any outcome, drives the power number.
+
+#### 7.11.6 Evidence registry — tiers REPLACED (task 5)
+
+The four subjective tiers ("tier 1 = peer-reviewed phenomena exist") are
+**gone**. Each family now has **one empirical study that was located and
+OPENED on 2026-10-27**, with its full URL, or is marked **PRACTITIONER ONLY**.
+Full registry: `frozen.mjs → EMPIRICAL_STUDIES`, printed in
+`docs/CLAIM-CARDS-FULL-TEXT.md` and `docs/EMPIRICAL-EVIDENCE.md`.
+
+| Family | Study (opened 2026-10-27) | Full URL | Finding |
+| ------ | ------------------------- | -------- | ------- |
+| channel-breakout | Brock, Lakonishok & LeBaron (1992), J. Finance 47(5) | `http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf` | in-sample support; data-snooping caveat |
+| ma-cross | Chong & Ng (2008), Applied Econ. Letters 15(14) | `https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html` | MACD/RSI beat buy-and-hold (single market) |
+| opening-range | Holmberg, Lönnbark & Lundström (2013), Finance Res. Letters 10(1) | `http://www.econ.umu.se/ueslpnr/ues845.pdf` | full-sample success NOT robust across sub-periods |
+| level-retest | Osler (2000), FRBNY Econ. Policy Review 6(2) | `https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf` | levels predict interruptions; strength mis-ranked |
+| osc-fade | Chong, Ng & Liew (2014), JRFM 7(1) / MPRA 54149 | `https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf` | RSI(14,30/70) profitable on DJIA, not consistent |
+| band-reversion | Lento, Gradojevic & Wright (2007), Applied Fin. Econ. Letters 3(4) | `https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands` | BB underperform buy-and-hold; contrarian better |
+| candlestick-reversal | Marshall, Young & Rose (2006), J. Banking & Finance 30(8) | `https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf` | no value; neither signal beats buy-and-hold |
+| vol-compression | **PRACTITIONER ONLY** — Crabel (1990) book; no academic test of NR7/inside-bar found | `https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7` | Holmberg (2013) discusses the C–E principle but tests ORB, not NR7 |
+
+**TEST_ORDER stays stable.** It is now an **explicit frozen list**
+(`FROZEN_TEST_SEQUENCE`) byte-identical to the v1.2 tier-sorted order;
+`evidenceTier` survives only as a diagnostic order rank and is **not** an
+ordering key or an evidence claim. One item is **plainly wrong**:
+`vol-compression` was ranked tier 1 in v1.2 with no empirical study. Its
+evidence grade is corrected to PRACTITIONER_ONLY, but its SEQUENCE position
+is deliberately kept per the instruction to keep TEST_ORDER stable; the
+discrepancy is recorded here and in the amendment log rather than silently
+reshuffling a frozen sequence. Two diagnostic four-state labels were also
+fixed (§7.11.3).
+
+**Near-duplicate and mirror-image cards** — all 24 within-family pairs are
+listed in `CARD_RELATIONS` and printed in the full-text dump: **11
+NEAR_DUPLICATE** (e.g. `donchian-20`/`donchian-55`, `sma-20-50`/`macd-cross`,
+`rsi-14-30-70`/`williams-r-fade`, `bollinger-20-2`/`keltner-20-atr`,
+`atr-squeeze-break`/`nr7-break`), **1 MIRROR_IMAGE**
+(`pdh-retest`/`pdl-retest`), **12 RELATED**, plus 4 cross-family mirrors noted
+for review. These drive the recomputed within-family overlap (§7.11.5).
+
+#### 7.11.7 Version hashes and v1.0 reconstruction (task 6)
+
+The **full 64-character SHA-256** of the three earlier immutable snapshots
+(raw file bytes, `sha256sum` equivalent) is:
+
+| Version | File | Full SHA-256 |
+| ------- | ---- | ------------ |
+| v1.0 | `docs/BLUEPRINT-v1.0.md` | `420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe` |
+| v1.1 | `docs/BLUEPRINT-v1.1.md` | `72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480` |
+| v1.2 | `docs/BLUEPRINT-v1.2.md` | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` |
+
+v1.3's own hash (and all four again) is in
+`artifacts/map-compass/blueprint-hashes.json` and section D of
+`docs/BLUEPRINT-AMENDMENTS.md`; it is not printed here because embedding a
+file's hash inside that same file is self-referential.
+
+**How v1.0 was reconstructed — exactly.** v1.0 was authored on 2026-10-26 as
+`BLUEPRINT.md` and committed locally, but the workspace was subsequently
+re-cloned from GitHub `main` more than once; those re-clones wiped the local
+git history (including the original v1.0 blob) while leaving working-tree
+files untracked. The original v1.0 blob is therefore **not recoverable from
+this repository's git objects** (`git rev-list --all --objects` finds no
+BLUEPRINT blob). On 2026-10-27 the v1.0 snapshot
+`docs/BLUEPRINT-v1.0.md` was reconstructed by re-emitting the **exact v1.0
+text as authored** from the session transcript (596 lines / 28,232 bytes),
+then hashing it. v1.1's snapshot is the ORIGINAL committed file
+(`72c078f3…`), verified by a test. **Byte-for-byte identity of the v1.0
+snapshot with the lost v1.0 blob cannot be certified**; the v1.0 → v1.1 diff
+is nonetheless reproducible from the two preserved snapshots, and every
+v1.1 → v1.2 → v1.3 edit is listed with a date in the amendment log. This
+uncertainty is declared as a limitation (§15.19).
 
 ## 8. Cost model (M3 — COMPLETE)
 
@@ -826,12 +1153,22 @@ breakdowns, and the 2× slippage / p95-spread cost stress variant.
 
 ### 13.1 What YOU need to decide before M6
 
-1. **Review and freeze the 24 claim cards** (decision #13). Change any state
-   assignment or strategy NOW — after results exist, changing a claim is the
-   laundering this project forbids. See `docs/CLAIM-CARDS-REVIEW.md`.
-2. **Resolve the power warning** in §7.5: accept fewer survivors, start a new
-   cycle with a different DEV/HOLDOUT split, or pre-register more pooling.
-   Lowering criteria is not on the table.
+1. **Review and freeze the 24 claim cards** (decision #13) — STILL OPEN. Use
+   `docs/CLAIM-CARDS-FULL-TEXT.md` (all 24 in full, with opened study URLs,
+   verdict states and relations). Change any state assignment NOW — after
+   results exist, changing a claim is the laundering this project forbids.
+2. **Power decision — PARTIALLY RESOLVED at Amendment 3.** The 2 verdict states
+   (EFFICIENT / CHOPPY) implement the "pre-register more pooling" option from
+   §7.5 without touching criteria. The report-only table (§7.11.3) shows the
+   pooled joint power is 0.280 for EFFICIENT and 0.810 for CHOPPY after day
+   clustering and the relation-aware effective-N correction. Open sub-decision:
+   accept that EFFICIENT remains underpowered, or start a NEW cycle with a
+   different DEV/HOLDOUT allocation. Lowering criteria is not on the table.
+3. **Vol-compression evidence grade (Amendment 3) — needs your call.** It is
+   PRACTITIONER_ONLY but still sits at positions 7–9 of the frozen TEST_ORDER
+   because v1.2 ranked it tier 1. Its grade was corrected; the sequence was
+   kept stable as instructed. Confirm whether to move it (which would change a
+   frozen sequence) or leave it flagged.
 
 ---
 
@@ -845,8 +1182,9 @@ npm run mc:cost        # M3 -> cost-model.json (R units)
 npm run mc:compass     # M4 -> routing-table.json
 npm run mc:calibrate   # M5 dry-run -> harness-calibration.json (NO real claims)
 npm run mc:power       # M5 -> power-projection.json (needs normalised data)
-npm run mc:amend2      # Amendment 2: recompute power reportOnly (no data needed)
+npm run mc:amend2      # Amendments 2+3: recompute reportOnly + reportOnlyV13 (no raw data needed)
 npm run mc:cards       # print all 24 DRAFT cards in full text, in TEST_ORDER
+npm run mc:coverage   # NO_BASELINE coverage audit + 48 verdict labels
 npm run mc:compass     # regenerate routing-table.json with conditionalPolicy
 npm test               # full suite
 ```
@@ -888,6 +1226,8 @@ data-availability failures, not logic failures; the full suite passes once
 | `readability.json`         | empty-set interpretation + CONDITIONAL policy |
 | `routing-table.json`       | M4 Compass table + `conditionalPolicy`      |
 | `seal-audit.json`          | measured holdout feature bleed              |
+| `baseline-coverage.json`   | NO_BASELINE cell audit (Amendment 3)        |
+| `blueprint-hashes.json`    | full SHA-256 of v1.0/v1.1/v1.2/v1.3         |
 | `claim-ledger.jsonl`       | append-only verdicts (currently empty)      |
 
 ---
@@ -959,17 +1299,41 @@ data-availability failures, not logic failures; the full suite passes once
     the original v1.0 blob cannot be certified, but v1.1's snapshot is the
     original committed file (`72c078f3…`) and every v1.1→v1.2 edit is listed.
 
+20. **Real family-variant overlap is an ASSUMPTION (Amendment 3).** The
+    relation-aware design effect 2.2948 comes from `CARD_RELATIONS` metadata
+    plus a seeded RNG, not from measured signals — the 24 strategies are still
+    DRAFT and MUST NOT be run. A 0 → 1 share-scale sensitivity sweep is in
+    `reportOnlyV13`. It is report-only; no criterion depends on it.
+21. **The 2×3 power table is a FINER partition than the verdict cell.** Verdicts
+    are decided on the POOLED verdict state, so the pooled rows (0.280 / 0.810)
+    are the operative numbers; the six per-session rows are a conservative
+    diagnostic. Splitting by session reduces n in each row.
+22. **The UNCONTROLLED calibration mode is not a real result.** It exists so
+    the harness can be calibrated on pure noise before any strategy exists.
+    Every real verification row must have `baseline.mode = MATCHED_CONTROL`;
+    `verifyReal()` hard-fails otherwise.
+23. **NO_BASELINE coverage depends on the coarse fallback.** All 8 coarse
+    `state|side` cells exist (n=4000), so the shipped rule yields 0
+    NO_BASELINE cells. 648 of 1,632 trade-level lookups rely on the coarse
+    fallback; forbidding it would create 648 NO_BASELINE holes.
+24. **Empirical studies are literature, not evidence about our data.** They
+    motivate the claims and set the test order; they do not pre-confirm
+    anything. `vol-compression` has no peer-reviewed test and is marked
+    PRACTITIONER_ONLY; its tier-1 v1.2 rank was plainly wrong.
+
 ---
 
 ## 16. Document map
 
 | Document                                      | Role                                                   |
 | --------------------------------------------- | ------------------------------------------------------ |
-| **`BLUEPRINT.md`** (this file, v1.2)          | Canonical pre-registration — wins on conflict          |
+| **`BLUEPRINT.md`** (this file, v1.3)          | Canonical pre-registration — wins on conflict          |
 | `docs/BLUEPRINT-v1.0.md`                      | Immutable v1.0 snapshot (reconstructed)                |
 | `docs/BLUEPRINT-v1.1.md`                      | Immutable v1.1 snapshot, SHA-256 `72c078f3…`           |
-| `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot (this version)                  |
-| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0                |
+| `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot                                  |
+| `docs/BLUEPRINT-v1.3.md`                      | Immutable v1.3 snapshot (this version)                   |
+| `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies / PRACTITIONER_ONLY registry       |
+| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.3) |
 | `docs/CLAIM-CARDS-FULL-TEXT.md`               | All 24 cards in full text, in TEST_ORDER (DRAFT)       |
 | `docs/MAP-COMPASS-DATA-CONTRACT.md`           | G1 detail: provenance, timezone epochs, schema, holes  |
 | `docs/ENGINE-BIAS-REGISTER.md`                | G1.5 detail: D1–D4, resolution strategy, sign-off      |

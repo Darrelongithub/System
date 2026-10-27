@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { buildAmendment2Report } from "./lib/amend2-report.mjs";
+import { buildAmendment3Report } from "./lib/amend3-report.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const p = join(ROOT, "artifacts/map-compass/power-projection.json");
@@ -27,8 +28,13 @@ const before = {
   grossEdgeNeededR: report.grossEdgeNeededR,
 };
 
-const amendment = buildAmendment2Report(report);
-Object.assign(report, amendment);
+Object.assign(report, buildAmendment2Report(report));
+// G0 AMENDMENT 3: 2 verdict states x 3 sessions report-only power table.
+if (!report.verdictStateBySession)
+  throw new Error(
+    "verdictStateBySession missing — run `npm run mc:power` with normalised data first (or use the committed projection).",
+  );
+Object.assign(report, buildAmendment3Report(report));
 
 const after = {
   verdict: report.verdict,
@@ -52,4 +58,12 @@ for (const c of r.centralCaseAdjusted)
     `  ${c.state.padEnd(11)} iid p=${c.iidPowerAtFloor} -> clustered/effective p=${c.measuredOverlap.powerAtFloor} (n ${c.projectedTrades} -> ${c.measuredOverlap.nEffective})`,
   );
 console.log("criteria hash:", r.criteriaHash);
+const v13 = report.reportOnlyV13;
+console.log(
+  `\nAmendment 3: ${v13.verdictStates.cells} cells, worst joint power ${v13.readout.worstJointPower}, best ${v13.readout.bestJointPower}`,
+);
+for (const c of v13.powerTable2x3)
+  console.log(
+    `  ${(c.verdictState + "|" + c.session).padEnd(20)} n=${String(c.projectedTrades).padStart(5)} nEff=${String(c.nEffective).padStart(6)} days=${String(c.devCalendarDays).padStart(5)} iid=${c.iidPowerAtFloor} -> joint=${c.jointPowerConservative}`,
+  );
 console.log("report-only: no criterion, threshold, or verdict changed.");

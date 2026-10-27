@@ -1,0 +1,39 @@
+{
+  "generatedAt": "2026-10-27T07:35:34.021751Z",
+  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot (G0 Amendment 3 task 6).",
+  "algorithm": "SHA-256 over the raw file bytes (sha256sum equivalent)",
+  "note": "Earlier versions are never edited. BLUEPRINT.md is a byte copy of docs/BLUEPRINT-v1.3.md at v1.3.",
+  "v10": {
+    "file": "docs/BLUEPRINT-v1.0.md",
+    "bytes": 28232,
+    "lines": 596,
+    "sha256": "420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe",
+    "full": "420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe"
+  },
+  "v11": {
+    "file": "docs/BLUEPRINT-v1.1.md",
+    "bytes": 40483,
+    "lines": 692,
+    "sha256": "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480",
+    "full": "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480"
+  },
+  "v12": {
+    "file": "docs/BLUEPRINT-v1.2.md",
+    "bytes": 58249,
+    "lines": 978,
+    "sha256": "cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543",
+    "full": "cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543"
+  },
+  "v13": {
+    "file": "docs/BLUEPRINT-v1.3.md",
+    "bytes": 82493,
+    "lines": 1342,
+    "sha256": "acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd",
+    "full": "acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd"
+  },
+  "current": {
+    "file": "BLUEPRINT.md",
+    "sha256": "acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd",
+    "matchesV13": true
+  }
+}

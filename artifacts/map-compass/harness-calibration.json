@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T04:17:08.056Z",
+  "generatedAt": "2026-10-27T07:32:17.384Z",
   "cardsFrozen": false,
   "cardStatus": "DRAFT",
   "mode": "DRY_RUN_CALIBRATION",
@@ -7,10 +7,13 @@
     "minTradesPerCell": 100,
     "practicalFloorR": 0.1,
     "tStatMin": 2,
-    "absoluteNetRMin": 0,
+    "excessFloorR": 0,
     "concentrationMax": 0.5,
     "loyoPositiveMin": 0.75,
-    "note": "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7."
+    "requireMatchedBaseline": true,
+    "baselineMinCellN": 200,
+    "note": "CONJUNCTION: net mean > +0.10R with clustered t > 2 AND excess > 0 with clustered t > 2, plus n/concentration/year/NO_BASELINE vetoes. Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.2.1.",
+    "amendedAt": "G0 Amendment 3, 2026-10-27, before any claim result"
   },
   "states": [
     "EXPANSION",
@@ -85,11 +88,11 @@
   "calibration": {
     "seeds": 8,
     "totalClaimsPerRun": 48,
-    "falsePositiveConfirms": 1,
-    "falsePositiveRate": 0.0026,
+    "falsePositiveConfirms": 0,
+    "falsePositiveRate": 0,
     "knownEdgeR": 0.15,
-    "knownEdgeDetected": 45,
-    "knownEdgeDetectionRate": 0.9375
+    "knownEdgeDetected": 48,
+    "knownEdgeDetectionRate": 1
   },
   "placebo": {
     "shuffles": 40,
@@ -126,19 +129,19 @@
       0,
       0,
       0,
-      1,
-      1,
-      2,
-      2,
-      2,
-      3,
-      3,
-      3,
-      5
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
     ],
     "medianFakeConfirms": 0,
-    "p95FakeConfirms": 3,
-    "maxFakeConfirms": 5,
+    "p95FakeConfirms": 0,
+    "maxFakeConfirms": 0,
     "note": "A real CONFIRMED count must exceed p95FakeConfirms to be credible."
   },
   "real": null,
@@ -155,7 +158,7 @@
       "M9",
       "M10"
     ],
-    "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA (excess > 0.10R, clustered t > 2, absolute net R > 0, no vetoes), evaluated once, with the VAL role spent on promotion.",
+    "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA as amended at G0 Amendment 3 (net mean > +0.10R with day-clustered t > 2, AND excess over matched random > 0 with day-clustered t > 2, AND all vetoes clear), evaluated once, with the VAL role spent on promotion.",
     "requiresM9GridReport": true,
     "requiresM10SeparateReport": true,
     "thresholdsImmutableAfterResults": true,
@@ -164,13 +167,71 @@
   },
   "evidence": {
     "priorFalseFraction": 0.8,
-    "testOrder": "evidenceTier ascending, then priority ascending (fixed sequence)",
-    "tiers": {
-      "1": "peer-reviewed momentum/trend or volatility phenomena exist",
-      "2": "some academic support, mostly at daily horizon",
-      "3": "practitioner literature, little rigorous evidence",
-      "4": "largely anecdotal; weakest prior — tested LAST"
-    }
+    "testOrder": "EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.",
+    "grades": {
+      "PEER_REVIEWED_TEST": "at least one empirical study tests this family; URL opened 2026-10-27",
+      "PRACTITIONER_ONLY": "no empirical study found; claim rests on practitioner literature only"
+    },
+    "studies": {
+      "channel-breakout": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764.",
+        "url": "http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf",
+        "tests": "trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986",
+        "finding": "in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping"
+      },
+      "ma-cross": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Chong, T.T.-L. & Ng, W.-K. (2008). Technical analysis and the London stock exchange: testing the MACD and RSI rules using the FT30. Applied Economics Letters 15(14), 1111-1114. DOI 10.1080/13504850600993598.",
+        "url": "https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html",
+        "tests": "MACD (exponential moving-average crossover) rule on 60 years of FT30",
+        "finding": "MACD/RSI beat buy-and-hold in most cases (positive, single-market study)"
+      },
+      "opening-range": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Holmberg, U., Lönnbark, C. & Lundström, C. (2013). Assessing the profitability of intraday opening range breakout strategies. Finance Research Letters 10(1), 47-53. DOI 10.1016/j.frl.2012.09.001.",
+        "url": "http://www.econ.umu.se/ueslpnr/ues845.pdf",
+        "tests": "opening-range breakout on US crude-oil futures, bootstrap test",
+        "finding": "full-sample success is NOT robust across three sub-periods (mixed/negative)"
+      },
+      "level-retest": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Osler, C. L. (2000). Support for Resistance: Technical Analysis and Intraday Exchange Rates. FRBNY Economic Policy Review 6(2), 53-68.",
+        "url": "https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf",
+        "tests": "support/resistance (level) signals from six FX firms, intraday 1996-1998",
+        "finding": "levels predict intraday trend interruptions, but firms mis-rank level strength"
+      },
+      "osc-fade": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149.",
+        "url": "https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf",
+        "tests": "RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002",
+        "finding": "RSI(14,30/70) profitable on DJIA but not consistently across markets"
+      },
+      "band-reversion": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Lento, C., Gradojevic, N. & Wright, C. S. (2007). Investment information content in Bollinger Bands? Applied Financial Economics Letters 3(4), 263-267. DOI 10.1080/17446540701206576.",
+        "url": "https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands",
+        "tests": "Bollinger Band (20,2) and variants, four markets 1995-2004, transaction costs",
+        "finding": "BB underperform buy-and-hold; contrarian inversion does better (negative for the textbook fade)"
+      },
+      "candlestick-reversal": {
+        "grade": "PEER_REVIEWED_TEST",
+        "citation": "Marshall, B. R., Young, M. R. & Rose, L. C. (2006). Candlestick technical trading strategies: Can they create value for investors? Journal of Banking & Finance 30(8), 2303-2323. DOI 10.1016/j.jbankfin.2005.08.001.",
+        "url": "https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf",
+        "tests": "26 candlestick reversal patterns on DJIA component stocks 1992-2002, bootstrap",
+        "finding": "no value; neither bullish nor bearish signals beat buy-and-hold (negative)"
+      },
+      "vol-compression": {
+        "grade": "PRACTITIONER_ONLY",
+        "citation": "Crabel, T. (1990). Day Trading with Short Term Price Patterns & Opening Range Breakout (Traders Press) — practitioner book, not a peer-reviewed test.",
+        "url": "https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7",
+        "tests": "NR7 / inside-bar / volatility-contraction patterns — NO academic test found",
+        "finding": "practitioner only. Holmberg et al. (2013) discusses Crabel's contraction-expansion principle but tests ORB, not NR7/inside-bar. This is the PLAINLY WRONG item: v1.2 ranked this family tier 1 with no empirical study."
+      }
+    },
+    "openedAt": "2026-10-27, before any strategy result",
+    "note": "Each family has one opened empirical study or is marked PRACTITIONER_ONLY. Full URLs above. No outcomes from our own data were used."
   },
   "testOrder": [
     {
@@ -294,5 +355,10 @@
       "testOrder": 24
     }
   ],
-  "note": "DRY RUN: synthetic trades only. No ledger records written. This calibrates the harness (kill criterion #7)."
+  "note": "DRY RUN: synthetic trades only. No ledger records written. This calibrates the harness (kill criterion #7).",
+  "baselineMode": "UNCONTROLLED synthetic calibration (no baseline object). Amendment 3: verifyReal() REFUSES this mode and requires random-baseline.json; every real row is NO_BASELINE-guarded.",
+  "verdictStates": [
+    "EFFICIENT",
+    "CHOPPY"
+  ]
 }

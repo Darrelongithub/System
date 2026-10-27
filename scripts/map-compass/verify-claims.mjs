@@ -21,8 +21,8 @@ import { FREEZE, CLAIM_CARDS, validateClaimCards } from "./claim-cards.draft.mjs
 import { assertCardsFrozen, ledgerPath, readLedger, appendVerdict } from "./lib/claim-ledger.mjs";
 import {
   verifyClaim,
-  groupByFamilyState,
-  groupByStrategyState,
+  groupByFamilyVerdictState,
+  groupByStrategyVerdictState,
   mde,
   powerAt,
 } from "./lib/verification.mjs";
@@ -40,15 +40,19 @@ const familyOf = new Map(CLAIM_CARDS.map((c) => [c.id, c.family]));
 
 /**
  * The battery: for every card, verify its strength and weakness claim at FAMILY
- * level (pooled variants), and also record a strategy-level drill-down that
- * defaults to INCONCLUSIVE. Returns an array of verdict rows.
+ * level (pooled variants) in ONE of the TWO VERDICT STATES (Amendment 3), and
+ * also record a strategy-level drill-down that defaults to INCONCLUSIVE.
+ *
+ * The four Map states are reported for every row via `fourStateDiagnostics`
+ * (taken from stats.byFourState). They are DIAGNOSTICS: they never decide the
+ * verdict. Reversion-family rows carry the standard-exit caveat verbatim.
  */
 export function runBattery(
   trades,
   { windowKind = "DEV", baseline = null, sensitivityAgreementPct = 100 } = {},
 ) {
-  const familyCells = groupByFamilyState(trades, familyOf);
-  const strategyCells = groupByStrategyState(trades);
+  const familyCells = groupByFamilyVerdictState(trades, familyOf);
+  const strategyCells = groupByStrategyVerdictState(trades);
   const rows = [];
   for (const c of CLAIM_CARDS) {
     for (const [kind, half] of [
@@ -58,7 +62,8 @@ export function runBattery(
       const key = `${c.family}|${half.state}`;
       const pooled = familyCells.get(key) ?? [];
       const own = strategyCells.get(`${c.id}|${half.state}`) ?? [];
-      // Pooled (family) is the verdict; strategy-level is diagnostic only.
+      // Pooled (family | verdict state) is the verdict; strategy-level is
+      // diagnostic only.
       const stats = verifyClaim(pooled, {
         direction: half.direction,
         sensitivityAgreementPct,
@@ -72,11 +77,14 @@ export function runBattery(
       rows.push({
         claimId: c.id,
         family: c.family,
-        state: half.state,
+        state: half.state, // VERDICT STATE (EFFICIENT | CHOPPY)
+        fourStateTextbook: half.textbookState, // diagnostic
+        fourStatesInCell: half.fourStates, // the two Map states pooled
         kind,
         windowKind,
         verdict: stats.verdict,
         stats,
+        fourStateDiagnostics: stats.byFourState, // reported, never decisive
         strategyLevel: {
           n: diagnostic.n,
           meanNetR: diagnostic.meanNetR,
@@ -85,6 +93,8 @@ export function runBattery(
         },
         priority: c.priority,
         evidenceTier: c.evidenceTier,
+        evidence: { grade: c.evidence.grade, url: c.evidence.url },
+        exitCaveat: c.exitCaveat, // non-null for reversion families only
         conditional: stats.conditional,
         stability: stats.stability,
       });
@@ -123,13 +133,71 @@ export function syntheticTrades({ seed = 7, perCell = 900, trueEdgeR = 0, sd = 1
         const month = 1 + Math.floor(rng() * 12);
         const dayOfMonth = 1 + Math.floor(rng() * 28);
         const bar = Math.floor(rng() * perCell);
+        // Amendment 3: a synthetic trade carries one of the FOUR Map states
+        // (picked from the verdict state's members) plus its verdict state.
+        // The two-state verdict cells are the ones that decide verdicts.
+        const members = half.fourStates ?? ["EXPANSION"];
+        const fourState = members[Math.floor(rng() * members.length)];
         trades.push({
           strategyId: c.id,
           family: c.family,
-          state: half.state,
+          state: fourState,
+          verdictState: half.state,
           year,
           day: `${year}-${String(month).padStart(2, "0")}-${String(dayOfMonth).padStart(2, "0")}`,
           entryBar: `${c.family}|${half.state}|${year}|${bar}`,
+          session: ["asian", "london", "ny"][Math.floor(rng() * 3)],
+          vol: ["low", "mid", "high"][Math.floor(rng() * 3)],
+          netR: z * sd + trueEdgeR * half.direction,
+          side: rng() > 0.5 ? "long" : "short",
+        });
+      }
+    }
+  }
+  return trades;
+}
+
+/**
+ * EXACT v1.2 synthetic generator — kept ONLY so the Amendment-2 overlap
+ * estimate (0.2071 / design effect 1.2316) can be reproduced byte-for-byte
+ * after Amendment 3 changed the live generator. Do not use for calibration.
+ *
+ * Differences vs v1.3: `state` is the FOUR-STATE textbook label, entryBar is
+ * `family|fourState|year|bar` (one shared pool per family/state/year), and the
+ * RNG consumes exactly 7 draws per trade. No session/vol/verdictState fields.
+ */
+export function syntheticTradesV12({ seed = 7, perCell = 900, trueEdgeR = 0, sd = 1.43 } = {}) {
+  const rng = mulberry32(seed);
+  const trades = [];
+  const years = ROLES.DEV;
+  // Amendment 3 corrected two plainly-wrong textbook weakness labels
+  // (WHIPSAW -> EXPANSION). The v1.2 generator must use the ORIGINAL labels
+  // to reproduce the historical overlap estimate exactly.
+  const V12_LABEL_OVERRIDE = Object.freeze({
+    "bb-squeeze-fade|weakness": "WHIPSAW",
+    "three-soldiers-crows|weakness": "WHIPSAW",
+  });
+  for (const c of CLAIM_CARDS) {
+    for (const [halfKind, half] of [
+      ["strength", c.strength],
+      ["weakness", c.weakness],
+    ]) {
+      const v12State = V12_LABEL_OVERRIDE[`${c.id}|${halfKind}`] ?? half.textbookState;
+      for (let i = 0; i < perCell; i++) {
+        const u = Math.max(1e-9, rng());
+        const v = rng();
+        const z = Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+        const year = years[Math.floor(rng() * years.length)];
+        const month = 1 + Math.floor(rng() * 12);
+        const dayOfMonth = 1 + Math.floor(rng() * 28);
+        const bar = Math.floor(rng() * perCell);
+        trades.push({
+          strategyId: c.id,
+          family: c.family,
+          state: v12State,
+          year,
+          day: `${year}-${String(month).padStart(2, "0")}-${String(dayOfMonth).padStart(2, "0")}`,
+          entryBar: `${c.family}|${v12State}|${year}|${bar}`,
           netR: z * sd + trueEdgeR * half.direction,
           side: rng() > 0.5 ? "long" : "short",
         });
@@ -210,12 +278,23 @@ export function calibrate() {
   report.placebo = placebo;
   report.note =
     "DRY RUN: synthetic trades only. No ledger records written. This calibrates the harness (kill criterion #7).";
+  report.baselineMode =
+    "UNCONTROLLED synthetic calibration (no baseline object). Amendment 3: verifyReal() REFUSES this mode and requires random-baseline.json; every real row is NO_BASELINE-guarded.";
+  report.verdictStates = ["EFFICIENT", "CHOPPY"];
   return report;
 }
 
-/** Real verification. Requires frozen cards AND a trades JSONL. */
+/** Real verification. Requires frozen cards AND a trades JSONL AND a baseline. */
 export function verifyReal(tradesPath) {
   assertCardsFrozen(FREEZE); // hard gate — decision #13
+  // AMENDMENT 3 TASK 2b: real verification MUST have the matched random-entry
+  // control. An UNCONTROLLED dry run may never produce a real verdict.
+  const baseline = loadBaseline();
+  if (!baseline) {
+    throw new Error(
+      "NO_BASELINE: random-baseline.json is missing. Run mc:baseline first. Real verification may not use a zero null or an uncontrolled dry run.",
+    );
+  }
   if (!existsSync(tradesPath)) {
     throw new Error(`no trades file at ${tradesPath}. M6 strategy library must produce it.`);
   }
@@ -223,7 +302,7 @@ export function verifyReal(tradesPath) {
     .split("\n")
     .filter(Boolean)
     .map((l) => JSON.parse(l));
-  const rows = runBattery(trades);
+  const rows = runBattery(trades, { baseline });
   const ledger = ledgerPath(ROOT);
   for (const r of rows) {
     appendVerdict(ledger, {

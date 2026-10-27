@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T04:23:10.004Z",
+  "generatedAt": "2026-10-27T07:32:17.230Z",
   "compassVersion": "M4-v0 (binary allow-list, no learned weights)",
   "cardStatus": "DRAFT",
   "cardsFrozen": false,
@@ -8,6 +8,16 @@
   "ignoredNonDevRecords": 0,
   "verdictKeys": 0,
   "enabledCount": 0,
+  "verdictStates": [
+    "EFFICIENT",
+    "CHOPPY"
+  ],
+  "fourStateDiagnostics": [
+    "EXPANSION",
+    "GRIND",
+    "WHIPSAW",
+    "QUIET"
+  ],
   "conditionalIds": [],
   "conditionalPolicy": {
     "compassCanEnableConditional": false,
@@ -21,10 +31,8 @@
     "valPromotedConditionalIds": []
   },
   "table": {
-    "EXPANSION": [],
-    "GRIND": [],
-    "WHIPSAW": [],
-    "QUIET": []
+    "EFFICIENT": [],
+    "CHOPPY": []
   },
   "reasons": [
     {
@@ -196,7 +204,7 @@
       "note": "strength not CONFIRMED"
     }
   ],
-  "routingHash": "3d8827f54de7526c473fc9bff269aba04a98b3d717d28e67570369daec0f9b34",
+  "routingHash": "1ea36e1b4c91752411f1d1b0a75a8afa0682807596bd61e8757f2b57773e8b06",
   "plumbing": {
     "probeSignals": 288,
     "kept": 0,

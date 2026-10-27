@@ -69,7 +69,7 @@ test("win rates are near 1/3 — confirming the reviewer's arithmetic", () => {
   }
 });
 
-test("matchedBaseline resolves fine -> coarse -> zero with a recorded level", () => {
+test("matchedBaseline resolves fine -> coarse -> NO_BASELINE (never zero)", () => {
   assert(baseline);
   const fine = matchedBaseline(
     { state: "QUIET", side: "long", session: "london", vol: "mid" },
@@ -82,7 +82,20 @@ test("matchedBaseline resolves fine -> coarse -> zero with a recorded level", ()
     baseline,
   );
   assertEqual(unknown.level, "coarse", "must fall back to state|side, never silently to zero");
-  assertEqual(matchedBaseline({ state: "QUIET", side: "long" }, null).level, "NONE_ASSUMED_ZERO");
+  // AMENDMENT 3: a supplied baseline with NO fine and NO coarse cell returns
+  // mean: null and level NO_BASELINE. It NEVER falls back to 0.
+  const missing = matchedBaseline(
+    { state: "ATLANTIS", side: "long", session: "nowhere", vol: "x" },
+    baseline,
+  );
+  assertEqual(missing.level, "NO_BASELINE");
+  assertEqual(missing.mean, null, "missing baseline mean must be null, not 0");
+  assertEqual(missing.missing, true);
+  // baseline === null is the ONLY zero-null mode, and it is explicitly flagged.
+  assertEqual(
+    matchedBaseline({ state: "QUIET", side: "long" }, null).level,
+    "UNCONTROLLED_DRY_RUN",
+  );
 });
 
 test("a claim that only matches the random baseline is NOT confirmed", () => {
@@ -91,10 +104,13 @@ test("a claim that only matches the random baseline is NOT confirmed", () => {
     { state: "QUIET", side: "long", session: "london", vol: "mid" },
     baseline,
   );
-  // Trades whose mean equals the baseline mean have zero excess.
+  // Trades whose mean equals the baseline mean have ~zero excess. AMENDMENT 3:
+  // the restored NET floor (> +0.10R) also fails, so the claim is either
+  // INCONCLUSIVE or REFUTED — never CONFIRMED.
   const r = verifyClaim(trades(b.mean, 1200), { direction: +1, baseline });
   assert(r.excessVsRandomR < 0.05, `excess should be ~0, got ${r.excessVsRandomR}`);
-  assertEqual(r.verdict, "INCONCLUSIVE");
+  assert(r.verdict !== "CONFIRMED", "matching random is not an edge");
+  assertEqual(r.rule.netGatePass, false, "the restored net floor must fail");
 });
 
 test("a claim that beats the matched baseline by >0.10R IS confirmed", () => {
@@ -121,8 +137,10 @@ test("beating a LOSING baseline but still losing money is NOT confirmed", () => 
   const r = verifyClaim(trades(-0.05, 1200, "long", "EXPANSION"), { direction: +1, baseline });
   assert(r.meanNetR < 0, "absolute net R must be negative");
   assert(r.excessVsRandomR > 0, "but it beats the (losing) baseline");
-  assertEqual(r.verdict, "INCONCLUSIVE");
-  assert(r.vetoes.some((v) => v.startsWith("ABSOLUTE_NET_R")));
+  // AMENDMENT 3: the restored +0.10R NET floor is the binding gate. Beating a
+  // losing random baseline cannot rescue an unprofitable claim.
+  assert(r.verdict !== "CONFIRMED", "beating a losing baseline must not ship");
+  assert(r.rule.netGatePass === false || r.verdict === "REFUTED", "the net floor must not pass");
 });
 
 test("every claim reports excess + CI + long/short split regardless of verdict", () => {
@@ -140,8 +158,12 @@ test("G0 decisions are frozen in code, not just prose", () => {
   assertEqual(SENSITIVITY_RULE.thresholdsImmutableAfterResults, true);
   assert(SENSITIVITY_RULE.decidedAt.includes("before any claim result"));
   assert(EVIDENCE.priorFalseFraction >= 0.75);
-  assertEqual(CLAIM_CRITERIA.practicalFloorR, 0.1);
-  assertEqual(CLAIM_CRITERIA.absoluteNetRMin, 0);
+  // AMENDMENT 3 restored rule: numeric values unchanged, arrangement changed.
+  assertEqual(CLAIM_CRITERIA.practicalFloorR, 0.1); // NET mean floor (original)
+  assertEqual(CLAIM_CRITERIA.tStatMin, 2);
+  assertEqual(CLAIM_CRITERIA.excessFloorR, 0); // control: excess > 0
+  assertEqual(CLAIM_CRITERIA.requireMatchedBaseline, true);
+  assertEqual(CLAIM_CRITERIA.absoluteNetRMin, undefined, "v1.2 'net > 0' gate removed");
 });
 
 test("candlestick cards are the LAST three in test order", () => {

@@ -1,0 +1,1868 @@
+{
+  "generatedAt": "2026-10-27T07:32:27.785Z",
+  "purpose": "G0 Amendment 3 task 2b: how many claim / state / session cells would hit NO_BASELINE (no fine AND no coarse matched random cell)?",
+  "decidedBeforeResults": true,
+  "noStrategyOutcomesUsed": true,
+  "inputs": {
+    "baseline": "artifacts/map-compass/random-baseline.json",
+    "cards": "claim-cards.draft.mjs (DRAFT)",
+    "baselineMinCellN": 200,
+    "baselineHash": "b8278ee9fed521e5eae1e772de8ac09dd8108c3eb2615c05515eb4d13f21f44c"
+  },
+  "rule": {
+    "resolution": "fine (sufficient) -> coarse (n >= minN) -> NO_BASELINE",
+    "zeroFallback": false,
+    "note": "matchedBaseline() returns mean: null (never 0) when both levels are missing; verifyClaim then returns INCONCLUSIVE with a NO_BASELINE veto."
+  },
+  "universe": {
+    "cards": 24,
+    "claimHalves": 48,
+    "verdictStates": [
+      "EFFICIENT",
+      "CHOPPY"
+    ],
+    "fourStates": [
+      "EXPANSION",
+      "GRIND",
+      "WHIPSAW",
+      "QUIET"
+    ],
+    "sessions": [
+      "asian",
+      "london",
+      "ny"
+    ],
+    "volBuckets": [
+      "low",
+      "mid",
+      "high"
+    ],
+    "sides": [
+      "long",
+      "short"
+    ],
+    "sessionRestrictedCards": [
+      "asian-range-break",
+      "london-orb-30"
+    ],
+    "tradeLevelLookupCells": 1632,
+    "claimVerdictStateSessionCells": 136,
+    "claimFourStateSessionCells": 272,
+    "distinctClaimStateSessionKeys": 136
+  },
+  "resolutionCounts": {
+    "FINE": 984,
+    "COARSE_FALLBACK": 648,
+    "NO_BASELINE": 0
+  },
+  "answer": {
+    "noBaselineTradeLevelCells": 0,
+    "noBaselineClaimVerdictStateSessionCells": 0,
+    "noBaselineClaimFourStateSessionCells": 0,
+    "partiallyAffectedClaimVerdictStateSessionCells": 0,
+    "noBaselineClaimHalves": 0,
+    "noBaselineCards": 0,
+    "noBaselineSessions": []
+  },
+  "strictFineOnlyHypothetical": {
+    "wouldBeNoBaselineTradeLevelCells": 648,
+    "wouldBeAffectedClaimVerdictStateSessionCells": 136,
+    "note": "NOT the shipped rule. Shows that removing the coarse fallback would create real NO_BASELINE holes; the shipped rule keeps coarse fallback but NEVER a zero fallback."
+  },
+  "coarseCellCoverage": {
+    "EXPANSION|long": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "EXPANSION|short": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "GRIND|long": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "GRIND|short": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "WHIPSAW|long": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "WHIPSAW|short": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "QUIET|long": {
+      "n": 4000,
+      "sufficient": true
+    },
+    "QUIET|short": {
+      "n": 4000,
+      "sufficient": true
+    }
+  },
+  "fineCellCoverage": {
+    "total": 72,
+    "sufficient": 44,
+    "insufficient": 28,
+    "insufficientKeys": [
+      {
+        "key": "WHIPSAW|long|london|low",
+        "n": 1
+      },
+      {
+        "key": "WHIPSAW|short|london|low",
+        "n": 3
+      },
+      {
+        "key": "EXPANSION|short|london|low",
+        "n": 7
+      },
+      {
+        "key": "EXPANSION|long|london|low",
+        "n": 11
+      },
+      {
+        "key": "WHIPSAW|short|london|mid",
+        "n": 41
+      },
+      {
+        "key": "GRIND|short|ny|low",
+        "n": 43
+      },
+      {
+        "key": "GRIND|long|ny|low",
+        "n": 47
+      },
+      {
+        "key": "WHIPSAW|long|london|mid",
+        "n": 48
+      },
+      {
+        "key": "EXPANSION|short|london|mid",
+        "n": 49
+      },
+      {
+        "key": "GRIND|short|london|low",
+        "n": 54
+      },
+      {
+        "key": "QUIET|long|ny|low",
+        "n": 57
+      },
+      {
+        "key": "QUIET|short|london|low",
+        "n": 60
+      },
+      {
+        "key": "EXPANSION|long|london|mid",
+        "n": 63
+      },
+      {
+        "key": "QUIET|long|london|low",
+        "n": 66
+      },
+      {
+        "key": "GRIND|long|london|low",
+        "n": 67
+      },
+      {
+        "key": "QUIET|short|ny|low",
+        "n": 69
+      },
+      {
+        "key": "WHIPSAW|short|london|high",
+        "n": 108
+      },
+      {
+        "key": "WHIPSAW|long|london|high",
+        "n": 120
+      },
+      {
+        "key": "WHIPSAW|long|asian|low",
+        "n": 130
+      },
+      {
+        "key": "WHIPSAW|short|asian|low",
+        "n": 139
+      },
+      {
+        "key": "EXPANSION|long|asian|low",
+        "n": 148
+      },
+      {
+        "key": "EXPANSION|long|ny|low",
+        "n": 151
+      },
+      {
+        "key": "EXPANSION|short|ny|low",
+        "n": 152
+      },
+      {
+        "key": "EXPANSION|short|london|high",
+        "n": 165
+      },
+      {
+        "key": "EXPANSION|short|asian|low",
+        "n": 169
+      },
+      {
+        "key": "EXPANSION|long|london|high",
+        "n": 179
+      },
+      {
+        "key": "WHIPSAW|short|ny|low",
+        "n": 179
+      },
+      {
+        "key": "WHIPSAW|long|ny|low",
+        "n": 180
+      }
+    ]
+  },
+  "perClaimSummary": [
+    {
+      "cell": "asian-range-break|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "asian-range-break|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "atr-squeeze-break|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "atr-squeeze-break|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "atr-squeeze-break|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "atr-squeeze-break|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "atr-squeeze-break|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "atr-squeeze-break|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "bb-squeeze-fade|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "bb-squeeze-fade|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "bb-squeeze-fade|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "bb-squeeze-fade|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "bb-squeeze-fade|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "bb-squeeze-fade|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "bollinger-20-2|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "bollinger-20-2|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "bollinger-20-2|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "bollinger-20-2|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "bollinger-20-2|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "bollinger-20-2|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "classic-pivot|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "classic-pivot|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "classic-pivot|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "classic-pivot|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "classic-pivot|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "classic-pivot|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "donchian-20|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "donchian-20|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "donchian-20|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "donchian-20|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "donchian-20|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "donchian-20|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "donchian-55|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "donchian-55|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "donchian-55|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "donchian-55|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "donchian-55|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "donchian-55|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "dual-thrust|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "dual-thrust|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "dual-thrust|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "dual-thrust|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "dual-thrust|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "dual-thrust|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "engulfing|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "engulfing|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "engulfing|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "engulfing|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "engulfing|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "engulfing|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "ichimoku-tk|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "ichimoku-tk|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "ichimoku-tk|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "ichimoku-tk|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "ichimoku-tk|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "ichimoku-tk|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "inside-bar-break|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "inside-bar-break|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "inside-bar-break|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "inside-bar-break|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "inside-bar-break|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "inside-bar-break|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "keltner-20-atr|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "keltner-20-atr|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "keltner-20-atr|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "keltner-20-atr|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "keltner-20-atr|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "keltner-20-atr|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "london-orb-30|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "london-orb-30|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "macd-cross|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "macd-cross|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "macd-cross|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "macd-cross|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "macd-cross|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "macd-cross|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "morning-evening-star|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "morning-evening-star|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "morning-evening-star|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "morning-evening-star|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "morning-evening-star|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "morning-evening-star|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "nr7-break|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "nr7-break|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "nr7-break|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "nr7-break|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "nr7-break|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "nr7-break|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdh-pdl-break|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdh-pdl-break|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdh-pdl-break|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdh-pdl-break|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdh-pdl-break|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdh-pdl-break|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdh-retest|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdh-retest|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdh-retest|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdh-retest|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdh-retest|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdh-retest|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdl-retest|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdl-retest|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdl-retest|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "pdl-retest|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "pdl-retest|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "pdl-retest|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "rsi-14-30-70|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "rsi-14-30-70|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "rsi-14-30-70|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "rsi-14-30-70|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "rsi-14-30-70|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "rsi-14-30-70|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "sma-20-50|strength|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "sma-20-50|strength|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "sma-20-50|strength|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "sma-20-50|weakness|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "sma-20-50|weakness|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "sma-20-50|weakness|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "stochastic-14-fade|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "stochastic-14-fade|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "stochastic-14-fade|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "stochastic-14-fade|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "stochastic-14-fade|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "stochastic-14-fade|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "three-soldiers-crows|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "three-soldiers-crows|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "three-soldiers-crows|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "three-soldiers-crows|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "three-soldiers-crows|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "three-soldiers-crows|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "williams-r-fade|strength|CHOPPY|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "williams-r-fade|strength|CHOPPY|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "williams-r-fade|strength|CHOPPY|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    },
+    {
+      "cell": "williams-r-fade|weakness|EFFICIENT|asian",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 10,
+      "coarseFallback": 2
+    },
+    {
+      "cell": "williams-r-fade|weakness|EFFICIENT|london",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 4,
+      "coarseFallback": 8
+    },
+    {
+      "cell": "williams-r-fade|weakness|EFFICIENT|ny",
+      "lookups": 12,
+      "noBaseline": 0,
+      "fine": 8,
+      "coarseFallback": 4
+    }
+  ],
+  "reversionCaveat": {
+    "families": [
+      "band-reversion",
+      "osc-fade",
+      "candlestick-reversal"
+    ],
+    "label": "under the standard exit (1.5 ATR stop, 2R target) only",
+    "note": "Every verdict row for these families carries this label. No new exit is added in this cycle."
+  },
+  "verdictLabels": [
+    {
+      "claimId": "donchian-20",
+      "kind": "strength",
+      "family": "channel-breakout",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "donchian-20 strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "donchian-20",
+      "kind": "weakness",
+      "family": "channel-breakout",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "donchian-20 weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "donchian-55",
+      "kind": "strength",
+      "family": "channel-breakout",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "donchian-55 strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "donchian-55",
+      "kind": "weakness",
+      "family": "channel-breakout",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "donchian-55 weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "dual-thrust",
+      "kind": "strength",
+      "family": "channel-breakout",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "dual-thrust strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "dual-thrust",
+      "kind": "weakness",
+      "family": "channel-breakout",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "dual-thrust weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "sma-20-50",
+      "kind": "strength",
+      "family": "ma-cross",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "sma-20-50 strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "sma-20-50",
+      "kind": "weakness",
+      "family": "ma-cross",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "sma-20-50 weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "macd-cross",
+      "kind": "strength",
+      "family": "ma-cross",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "macd-cross strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "macd-cross",
+      "kind": "weakness",
+      "family": "ma-cross",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "macd-cross weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "ichimoku-tk",
+      "kind": "strength",
+      "family": "ma-cross",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "ichimoku-tk strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "ichimoku-tk",
+      "kind": "weakness",
+      "family": "ma-cross",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "ichimoku-tk weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "asian-range-break",
+      "kind": "strength",
+      "family": "opening-range",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "asian-range-break strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "asian-range-break",
+      "kind": "weakness",
+      "family": "opening-range",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "asian-range-break weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "london-orb-30",
+      "kind": "strength",
+      "family": "opening-range",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "london-orb-30 strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "london-orb-30",
+      "kind": "weakness",
+      "family": "opening-range",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "london-orb-30 weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdh-pdl-break",
+      "kind": "strength",
+      "family": "opening-range",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdh-pdl-break strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdh-pdl-break",
+      "kind": "weakness",
+      "family": "opening-range",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdh-pdl-break weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdh-retest",
+      "kind": "strength",
+      "family": "level-retest",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdh-retest strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdh-retest",
+      "kind": "weakness",
+      "family": "level-retest",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdh-retest weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdl-retest",
+      "kind": "strength",
+      "family": "level-retest",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdl-retest strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "pdl-retest",
+      "kind": "weakness",
+      "family": "level-retest",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "pdl-retest weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "classic-pivot",
+      "kind": "strength",
+      "family": "level-retest",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "classic-pivot strength in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "classic-pivot",
+      "kind": "weakness",
+      "family": "level-retest",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "classic-pivot weakness in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "rsi-14-30-70",
+      "kind": "strength",
+      "family": "osc-fade",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "rsi-14-30-70 strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "rsi-14-30-70",
+      "kind": "weakness",
+      "family": "osc-fade",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "rsi-14-30-70 weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "williams-r-fade",
+      "kind": "strength",
+      "family": "osc-fade",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "williams-r-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "williams-r-fade",
+      "kind": "weakness",
+      "family": "osc-fade",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "williams-r-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "stochastic-14-fade",
+      "kind": "strength",
+      "family": "osc-fade",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "stochastic-14-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "stochastic-14-fade",
+      "kind": "weakness",
+      "family": "osc-fade",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "stochastic-14-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "bollinger-20-2",
+      "kind": "strength",
+      "family": "band-reversion",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bollinger-20-2 strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "bollinger-20-2",
+      "kind": "weakness",
+      "family": "band-reversion",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bollinger-20-2 weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "keltner-20-atr",
+      "kind": "strength",
+      "family": "band-reversion",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "keltner-20-atr strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "keltner-20-atr",
+      "kind": "weakness",
+      "family": "band-reversion",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "keltner-20-atr weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "bb-squeeze-fade",
+      "kind": "strength",
+      "family": "band-reversion",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bb-squeeze-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "bb-squeeze-fade",
+      "kind": "weakness",
+      "family": "band-reversion",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bb-squeeze-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "engulfing",
+      "kind": "strength",
+      "family": "candlestick-reversal",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "engulfing strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "engulfing",
+      "kind": "weakness",
+      "family": "candlestick-reversal",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "engulfing weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "morning-evening-star",
+      "kind": "strength",
+      "family": "candlestick-reversal",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "morning-evening-star strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "morning-evening-star",
+      "kind": "weakness",
+      "family": "candlestick-reversal",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "morning-evening-star weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "three-soldiers-crows",
+      "kind": "strength",
+      "family": "candlestick-reversal",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "three-soldiers-crows strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "three-soldiers-crows",
+      "kind": "weakness",
+      "family": "candlestick-reversal",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "three-soldiers-crows weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "reversionFamily": true,
+      "verdictExists": false
+    },
+    {
+      "claimId": "atr-squeeze-break",
+      "kind": "strength",
+      "family": "vol-compression",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "atr-squeeze-break strength in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "atr-squeeze-break",
+      "kind": "weakness",
+      "family": "vol-compression",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "atr-squeeze-break weakness in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "nr7-break",
+      "kind": "strength",
+      "family": "vol-compression",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "nr7-break strength in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "nr7-break",
+      "kind": "weakness",
+      "family": "vol-compression",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "nr7-break weakness in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "inside-bar-break",
+      "kind": "strength",
+      "family": "vol-compression",
+      "verdictState": "CHOPPY",
+      "fourStates": [
+        "WHIPSAW",
+        "QUIET"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "inside-bar-break strength in CHOPPY",
+      "reversionFamily": false,
+      "verdictExists": false
+    },
+    {
+      "claimId": "inside-bar-break",
+      "kind": "weakness",
+      "family": "vol-compression",
+      "verdictState": "EFFICIENT",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND"
+      ],
+      "exitCaveat": null,
+      "verdictLabel": "inside-bar-break weakness in EFFICIENT",
+      "reversionFamily": false,
+      "verdictExists": false
+    }
+  ],
+  "verdictLabelSummary": {
+    "totalVerdictSlots": 48,
+    "labelledReversionSlots": 18,
+    "label": "under the standard exit (1.5 ATR stop, 2R target) only",
+    "note": "Cards are DRAFT, so no verdict has been produced. These are the pre-registered labels; every future verdict for a reversion-family slot MUST be printed with this suffix. No new exit in this cycle."
+  }
+}

@@ -11,9 +11,9 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
-import { STATES } from "./frozen.mjs";
+import { STATES, VERDICT_STATES } from "./frozen.mjs";
 import { CLAIM_CARDS, FREEZE, validateClaimCards } from "./claim-cards.draft.mjs";
-import { buildRoutingTable, routingFingerprint } from "./lib/compass.mjs";
+import { buildRoutingTable, routingFingerprint, routingStateOf } from "./lib/compass.mjs";
 import { readLedger, ledgerPath } from "./lib/claim-ledger.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -47,7 +47,9 @@ for (const r of records) {
 // G0 Amendment 2 (user default "no"): CONDITIONAL claims do not enable Compass.
 const routing = buildRoutingTable(verdicts, CLAIM_CARDS, { conditionalIds, records });
 const fingerprint = routingFingerprint(routing);
-const enabledCount = STATES.reduce((n, s) => n + routing.table[s].length, 0);
+// AMENDMENT 3: the table is keyed by the two VERDICT STATES. The four Map
+// states are still probed (below) and mapped through verdictStateOf at lookup.
+const enabledCount = VERDICT_STATES.reduce((n, s) => n + routing.table[s].length, 0);
 
 // Plumbing test: route a synthetic signal stream through the table.
 const probe = [];
@@ -71,6 +73,8 @@ const report = {
   ignoredNonDevRecords: ignored,
   verdictKeys: verdicts.size,
   enabledCount,
+  verdictStates: VERDICT_STATES,
+  fourStateDiagnostics: STATES,
   conditionalIds: [...conditionalIds],
   conditionalPolicy: routing.conditionalPolicy,
   table: routing.table,
@@ -80,7 +84,9 @@ const report = {
     probeSignals: probe.length,
     kept: routed.kept.length,
     dropped: routed.dropped,
-    exact: routed.kept.every((s) => routing.table[s.state].includes(s.strategyId)),
+    exact: routed.kept.every((s) =>
+      routing.table[routingStateOf(s.state)]?.includes(s.strategyId),
+    ),
   },
   note:
     enabledCount === 0

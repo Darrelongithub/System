@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T04:33:44.654Z",
+  "generatedAt": "2026-10-27T07:32:25.540Z",
   "purpose": "Pre-M6 go/no-go power projection. NOT a strategy result.",
   "devBars": 131922,
   "flatBars": 30702,
@@ -9,6 +9,52 @@
     "GRIND": 11310,
     "WHIPSAW": 18961,
     "QUIET": 62961
+  },
+  "tradeableBarsByStateSession": {
+    "QUIET|ny": 12125,
+    "WHIPSAW|ny": 13530,
+    "WHIPSAW|asian": 4673,
+    "QUIET|asian": 32330,
+    "QUIET|london": 18506,
+    "GRIND|ny": 2443,
+    "EXPANSION|ny": 5303,
+    "EXPANSION|asian": 2230,
+    "GRIND|london": 3734,
+    "GRIND|asian": 5133,
+    "WHIPSAW|london": 758,
+    "EXPANSION|london": 455
+  },
+  "verdictStateBySession": {
+    "EFFICIENT|asian": {
+      "bars": 7363,
+      "devDays": 1306,
+      "barsPerDay": 5.64
+    },
+    "EFFICIENT|london": {
+      "bars": 4189,
+      "devDays": 932,
+      "barsPerDay": 4.49
+    },
+    "EFFICIENT|ny": {
+      "bars": 7746,
+      "devDays": 1416,
+      "barsPerDay": 5.47
+    },
+    "CHOPPY|asian": {
+      "bars": 37003,
+      "devDays": 2862,
+      "barsPerDay": 12.93
+    },
+    "CHOPPY|london": {
+      "bars": 19264,
+      "devDays": 2692,
+      "barsPerDay": 7.16
+    },
+    "CHOPPY|ny": {
+      "bars": 25655,
+      "devDays": 2886,
+      "barsPerDay": 8.89
+    }
   },
   "assumptions": {
     "sigmaR": 1.43,
@@ -72,10 +118,13 @@
     "minTradesPerCell": 100,
     "practicalFloorR": 0.1,
     "tStatMin": 2,
-    "absoluteNetRMin": 0,
+    "excessFloorR": 0,
     "concentrationMax": 0.5,
     "loyoPositiveMin": 0.75,
-    "note": "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7."
+    "requireMatchedBaseline": true,
+    "baselineMinCellN": 200,
+    "note": "CONJUNCTION: net mean > +0.10R with clustered t > 2 AND excess > 0 with clustered t > 2, plus n/concentration/year/NO_BASELINE vetoes. Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.2.1.",
+    "amendedAt": "G0 Amendment 3, 2026-10-27, before any claim result"
   },
   "baselineCostR": 0.11897,
   "grossEdgeNeededR": 0.219,
@@ -583,6 +632,9 @@
     "thresholdChanged": false,
     "verdictChanged": false,
     "verdictUnchangedFrom": "UNDERPOWERED",
+    "supersededBy": "reportOnlyV13",
+    "supersededAt": "2026-10-27 (G0 Amendment 3)",
+    "historyNote": "This is the v1.2 historical snapshot. Its criteria hash is the v1.2 hash 788e01df... Amendment 3 explicitly changed the verification rule; the CURRENT criteria and hash are in reportOnlyV13. No numbers in this block were re-fitted to the new rule.",
     "criteria": {
       "minTradesPerCell": 100,
       "practicalFloorR": 0.1,
@@ -894,7 +946,7 @@
         "M9",
         "M10"
       ],
-      "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA (excess > 0.10R, clustered t > 2, absolute net R > 0, no vetoes), evaluated once, with the VAL role spent on promotion."
+      "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA as amended at G0 Amendment 3 (net mean > +0.10R with day-clustered t > 2, AND excess over matched random > 0 with day-clustered t > 2, AND all vetoes clear), evaluated once, with the VAL role spent on promotion."
     },
     "timeExit": {
       "maxHoldBars": 96,
@@ -905,5 +957,718 @@
       "baselineResolvedTotal": 32000,
       "note": "Same cap now applies to real claim evaluation by default in lib/trade.mjs."
     }
+  },
+  "reportOnlyV13": {
+    "id": "G0-AMENDMENT-3-POWER-REPORT-ONLY",
+    "date": "2026-10-27",
+    "decidedBeforeResults": true,
+    "criteriaChanged": false,
+    "thresholdChanged": false,
+    "verdictChanged": false,
+    "supersedes": "reportOnly (v1.2, kept for audit)",
+    "verdictUnchangedFrom": "UNDERPOWERED",
+    "criteria": {
+      "minTradesPerCell": 100,
+      "practicalFloorR": 0.1,
+      "tStatMin": 2,
+      "excessFloorR": 0,
+      "concentrationMax": 0.5,
+      "loyoPositiveMin": 0.75,
+      "requireMatchedBaseline": true,
+      "baselineMinCellN": 200,
+      "note": "CONJUNCTION: net mean > +0.10R with clustered t > 2 AND excess > 0 with clustered t > 2, plus n/concentration/year/NO_BASELINE vetoes. Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.2.1.",
+      "amendedAt": "G0 Amendment 3, 2026-10-27, before any claim result"
+    },
+    "criteriaHash": "c87e9da264da7cd75f0db3710f79301f6bc9736af296c40b25cc4d63aca19582",
+    "purpose": "Report-only power for the 2 verdict states x 3 sessions after G0 Amendment 3 pooling, using day clusters and the recomputed within-family effective-N correction. NOT a go/no-go gate.",
+    "ruleRestored": {
+      "netFloorR": 0.1,
+      "netGate": "meanNetR > 0.1 AND day-clustered tNet > 2",
+      "controlGate": "excessVsRandomR > 0 AND day-clustered t > 2",
+      "vetoes": [
+        "n >= 100",
+        "concentration <= 0.50",
+        "LOYO >= 0.75",
+        "NO_BASELINE"
+      ],
+      "removed": "v1.2 rule 'excess > 0.10 AND net > 0' is GONE"
+    },
+    "verdictStates": {
+      "definition": "EFFICIENT = EXPANSION + GRIND (ER >= 0.35); CHOPPY = WHIPSAW + QUIET",
+      "mapping": {
+        "EXPANSION": "EFFICIENT",
+        "GRIND": "EFFICIENT",
+        "WHIPSAW": "CHOPPY",
+        "QUIET": "CHOPPY"
+      },
+      "cells": "2 states x 3 sessions = 6",
+      "fourStateDiagnostics": "The four Map states are reported for every claim via stats.byFourState / fourStateDiagnostics, but they NEVER decide a verdict.",
+      "fourStates": [
+        "EXPANSION",
+        "GRIND",
+        "WHIPSAW",
+        "QUIET"
+      ]
+    },
+    "assumptions": {
+      "sigmaR": 1.43,
+      "variantsPerFamily": 3,
+      "slotSurvival": 0.6,
+      "perStrategyPerBarDensity": 0.02608,
+      "dayClusterMethod": "CR1 clustered by calendar day; inflation measured on pure-noise calibration trades",
+      "effectiveNMethod": "Kish effective N over entry-bar clusters, relation-aware (Amendment 3)",
+      "note": "Session is now a CELL dimension, so there is no separate 1/3 session factor. No outcomes were used."
+    },
+    "overlapProvenance": {
+      "v12": {
+        "v12OverlapFraction": 0.2071,
+        "v12DesignEffect": 1.2316,
+        "v12Source": "Amendment 2 measureDependence() in lib/amend2-report.mjs: syntheticTrades({seed:7, perCell:900, trueEdgeR:0, sd:1.43}) from verify-claims.mjs. Three variants per family drew entry bars from ONE shared pool of 900 bars keyed `${family}|${state}|${year}|${bar}`. effectiveCounts() (Kish over entry bars) on that synthetic set gave overlap 0.2071 / design effect 1.2316. Only the `entryBar` field was used; netR was pure Gaussian noise with ZERO injected edge and was NOT used. No strategy outcomes, no real trades.",
+        "v13Change": "Amendment 3 keeps the same Kish estimator but replaces the single uniform pool with relation-aware shares (NEAR_DUPLICATE 0.75, MIRROR_IMAGE 0.55, RELATED 0.30, INDEPENDENT 0.10) derived from CARD_RELATIONS. Still pure bar co-occurrence, still no outcomes."
+      },
+      "v13": {
+        "source": "lib/overlap.mjs recomputeWithinFamilyOverlap()",
+        "dataUsed": "ONLY CARD_RELATIONS metadata (near-duplicate / mirror-image / related pairs from claim-cards.draft.mjs) plus a seeded RNG generating ENTRY-BAR co-occurrence. The simulation emits bar multiplicities only — no netR, no verdict, no strategy result, no realised trade.",
+        "noOutcomesUsed": true,
+        "model": {
+          "seed": 20261027,
+          "barsPerCell": 1000,
+          "fireProbability": 0.3,
+          "shareByType": {
+            "NEAR_DUPLICATE": 0.75,
+            "MIRROR_IMAGE": 0.55,
+            "RELATED": 0.3,
+            "INDEPENDENT": 0.1
+          },
+          "decidedBeforeResults": true,
+          "usesOutcomes": false,
+          "note": "Assumptions frozen at G0 Amendment 3. A sensitivity sweep 0 -> 0.9 is reported alongside; no threshold depends on this value (power is report-only)."
+        },
+        "nearDuplicatePairs": 11,
+        "mirrorImagePairs": 1,
+        "relatedPairs": 12,
+        "pooled": {
+          "n": 7283,
+          "distinctBars": 3696,
+          "nEffective": 3173.7,
+          "overlapFraction": 0.8302,
+          "multiTradeBars": 2459,
+          "designEffect": 2.2948
+        },
+        "sensitivityByShareScale": [
+          {
+            "scale": 0,
+            "n": 7179,
+            "distinctBars": 5244,
+            "nEffective": 4478.84,
+            "overlapFraction": 0.5072,
+            "multiTradeBars": 1706,
+            "designEffect": 1.6029
+          },
+          {
+            "scale": 0.25,
+            "n": 7319,
+            "distinctBars": 4901,
+            "nEffective": 4143.23,
+            "overlapFraction": 0.6079,
+            "multiTradeBars": 2031,
+            "designEffect": 1.7665
+          },
+          {
+            "scale": 0.5,
+            "n": 7376,
+            "distinctBars": 4502,
+            "nEffective": 3791.32,
+            "overlapFraction": 0.6962,
+            "multiTradeBars": 2261,
+            "designEffect": 1.9455
+          },
+          {
+            "scale": 0.75,
+            "n": 7351,
+            "distinctBars": 4136,
+            "nEffective": 3496.87,
+            "overlapFraction": 0.761,
+            "multiTradeBars": 2379,
+            "designEffect": 2.1022
+          },
+          {
+            "scale": 1,
+            "n": 7283,
+            "distinctBars": 3696,
+            "nEffective": 3173.7,
+            "overlapFraction": 0.8302,
+            "multiTradeBars": 2459,
+            "designEffect": 2.2948
+          }
+        ],
+        "byFamily": {
+          "channel-breakout": {
+            "cards": [
+              "donchian-20",
+              "donchian-55",
+              "dual-thrust"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "donchian-20",
+                  "donchian-55"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "same Donchian rule, 20 vs 55-bar lookback"
+              },
+              {
+                "pair": [
+                  "donchian-20",
+                  "dual-thrust"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both range breakouts, different range definition"
+              },
+              {
+                "pair": [
+                  "donchian-55",
+                  "dual-thrust"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both range breakouts, different range definition"
+              }
+            ],
+            "n": 904,
+            "distinctBars": 476,
+            "nEffective": 407.79,
+            "overlapFraction": 0.8119,
+            "multiTradeBars": 306,
+            "designEffect": 2.2168
+          },
+          "ma-cross": {
+            "cards": [
+              "sma-20-50",
+              "macd-cross",
+              "ichimoku-tk"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "sma-20-50",
+                  "macd-cross"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "MACD is an EMA crossover of the same family"
+              },
+              {
+                "pair": [
+                  "sma-20-50",
+                  "ichimoku-tk"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both two-moving-average crosses"
+              },
+              {
+                "pair": [
+                  "macd-cross",
+                  "ichimoku-tk"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both EMA-based crosses"
+              }
+            ],
+            "n": 927,
+            "distinctBars": 397,
+            "nEffective": 359.4,
+            "overlapFraction": 0.9256,
+            "multiTradeBars": 328,
+            "designEffect": 2.5793
+          },
+          "opening-range": {
+            "cards": [
+              "asian-range-break",
+              "london-orb-30",
+              "pdh-pdl-break"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "asian-range-break",
+                  "london-orb-30"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both session-range breakouts"
+              },
+              {
+                "pair": [
+                  "asian-range-break",
+                  "pdh-pdl-break"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "prior-day range vs session range"
+              },
+              {
+                "pair": [
+                  "london-orb-30",
+                  "pdh-pdl-break"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "prior-day range vs session range"
+              }
+            ],
+            "n": 947,
+            "distinctBars": 499,
+            "nEffective": 425.63,
+            "overlapFraction": 0.8068,
+            "multiTradeBars": 316,
+            "designEffect": 2.2249
+          },
+          "level-retest": {
+            "cards": [
+              "pdh-retest",
+              "pdl-retest",
+              "classic-pivot"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "pdh-retest",
+                  "pdl-retest"
+                ],
+                "type": "MIRROR_IMAGE",
+                "share": 0.55,
+                "why": "prior-day HIGH retest long vs prior-day LOW retest short"
+              },
+              {
+                "pair": [
+                  "pdh-retest",
+                  "classic-pivot"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both retest a reference level"
+              },
+              {
+                "pair": [
+                  "pdl-retest",
+                  "classic-pivot"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both retest a reference level"
+              }
+            ],
+            "n": 906,
+            "distinctBars": 504,
+            "nEffective": 424.42,
+            "overlapFraction": 0.7638,
+            "multiTradeBars": 290,
+            "designEffect": 2.1347
+          },
+          "osc-fade": {
+            "cards": [
+              "rsi-14-30-70",
+              "williams-r-fade",
+              "stochastic-14-fade"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "rsi-14-30-70",
+                  "williams-r-fade"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "Williams %R is a normalised stochastic/RSI-family oscillator"
+              },
+              {
+                "pair": [
+                  "rsi-14-30-70",
+                  "stochastic-14-fade"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both 14-period bounded oscillators with 30/70-style extremes"
+              },
+              {
+                "pair": [
+                  "williams-r-fade",
+                  "stochastic-14-fade"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "Williams %R is a linear transform of the raw stochastic"
+              }
+            ],
+            "n": 928,
+            "distinctBars": 398,
+            "nEffective": 360.93,
+            "overlapFraction": 0.9278,
+            "multiTradeBars": 331,
+            "designEffect": 2.5711
+          },
+          "band-reversion": {
+            "cards": [
+              "bollinger-20-2",
+              "keltner-20-atr",
+              "bb-squeeze-fade"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "bollinger-20-2",
+                  "keltner-20-atr"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both 20-bar envelope fades, sigma vs ATR width"
+              },
+              {
+                "pair": [
+                  "bollinger-20-2",
+                  "bb-squeeze-fade"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both Bollinger-based, different trigger (band vs squeeze)"
+              },
+              {
+                "pair": [
+                  "keltner-20-atr",
+                  "bb-squeeze-fade"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "envelope fade vs volatility-squeeze fade"
+              }
+            ],
+            "n": 884,
+            "distinctBars": 474,
+            "nEffective": 401.57,
+            "overlapFraction": 0.7907,
+            "multiTradeBars": 289,
+            "designEffect": 2.2014
+          },
+          "candlestick-reversal": {
+            "cards": [
+              "engulfing",
+              "morning-evening-star",
+              "three-soldiers-crows"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "engulfing",
+                  "morning-evening-star"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both multi-bar reversal candle patterns"
+              },
+              {
+                "pair": [
+                  "engulfing",
+                  "three-soldiers-crows"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both candle-body reversal/exhaustion"
+              },
+              {
+                "pair": [
+                  "morning-evening-star",
+                  "three-soldiers-crows"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both multi-candle exhaustion patterns"
+              }
+            ],
+            "n": 894,
+            "distinctBars": 480,
+            "nEffective": 407.77,
+            "overlapFraction": 0.7931,
+            "multiTradeBars": 295,
+            "designEffect": 2.1924
+          },
+          "vol-compression": {
+            "cards": [
+              "atr-squeeze-break",
+              "nr7-break",
+              "inside-bar-break"
+            ],
+            "relations": [
+              {
+                "pair": [
+                  "atr-squeeze-break",
+                  "nr7-break"
+                ],
+                "type": "NEAR_DUPLICATE",
+                "share": 0.75,
+                "why": "both narrow-range compression breakouts"
+              },
+              {
+                "pair": [
+                  "atr-squeeze-break",
+                  "inside-bar-break"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "both compression, different bar definition"
+              },
+              {
+                "pair": [
+                  "nr7-break",
+                  "inside-bar-break"
+                ],
+                "type": "RELATED",
+                "share": 0.3,
+                "why": "multi-bar vs single-bar compression"
+              }
+            ],
+            "n": 893,
+            "distinctBars": 468,
+            "nEffective": 401.74,
+            "overlapFraction": 0.8163,
+            "multiTradeBars": 304,
+            "designEffect": 2.2228
+          }
+        }
+      },
+      "seInflationProvenance": {
+        "value": 1.009,
+        "source": "lib/amend2-report.mjs measureDependence() using syntheticTradesV12 (exact v1.2 generator)",
+        "dataUsed": "'day' field of pure-noise Gaussian synthetic trades with trueEdgeR = 0. netR is zero-edge Gaussian noise used ONLY to compute the SE ratio; no strategy outcomes.",
+        "dayClusters": 4032,
+        "plainSe": 0.006926,
+        "clusteredSe": 0.006989
+      }
+    },
+    "baselineMeansByVerdictState": {
+      "EFFICIENT": -0.144828,
+      "CHOPPY": -0.112244
+    },
+    "powerTable2x3": [
+      {
+        "verdictState": "EFFICIENT",
+        "session": "asian",
+        "cell": "EFFICIENT|asian",
+        "tradeableDevBars": 7363,
+        "devCalendarDays": 1306,
+        "barsPerDay": 5.64,
+        "projectedTrades": 346,
+        "nEffective": 150.8,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.3292,
+        "iidPowerAtFloor": 0.255,
+        "dayClusteredEffectivePowerAtFloor": 0.134,
+        "powerUsingV12DesignEffect": 0.212,
+        "matchedBaselineMeanR": -0.144828,
+        "controlEffectR": 0.244828,
+        "controlPowerAtExcess": 0.549,
+        "jointPowerConservative": 0.134,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      },
+      {
+        "verdictState": "EFFICIENT",
+        "session": "london",
+        "cell": "EFFICIENT|london",
+        "tradeableDevBars": 4189,
+        "devCalendarDays": 932,
+        "barsPerDay": 4.49,
+        "projectedTrades": 197,
+        "nEffective": 85.8,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.4364,
+        "iidPowerAtFloor": 0.164,
+        "dayClusteredEffectivePowerAtFloor": 0.094,
+        "powerUsingV12DesignEffect": 0.139,
+        "matchedBaselineMeanR": -0.144828,
+        "controlEffectR": 0.244828,
+        "controlPowerAtExcess": 0.349,
+        "jointPowerConservative": 0.094,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      },
+      {
+        "verdictState": "EFFICIENT",
+        "session": "ny",
+        "cell": "EFFICIENT|ny",
+        "tradeableDevBars": 7746,
+        "devCalendarDays": 1416,
+        "barsPerDay": 5.47,
+        "projectedTrades": 364,
+        "nEffective": 158.6,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.321,
+        "iidPowerAtFloor": 0.266,
+        "dayClusteredEffectivePowerAtFloor": 0.138,
+        "powerUsingV12DesignEffect": 0.221,
+        "matchedBaselineMeanR": -0.144828,
+        "controlEffectR": 0.244828,
+        "controlPowerAtExcess": 0.57,
+        "jointPowerConservative": 0.138,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      },
+      {
+        "verdictState": "CHOPPY",
+        "session": "asian",
+        "cell": "CHOPPY|asian",
+        "tradeableDevBars": 37003,
+        "devCalendarDays": 2862,
+        "barsPerDay": 12.93,
+        "projectedTrades": 1737,
+        "nEffective": 756.9,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.1469,
+        "iidPowerAtFloor": 0.83,
+        "dayClusteredEffectivePowerAtFloor": 0.479,
+        "powerUsingV12DesignEffect": 0.74,
+        "matchedBaselineMeanR": -0.112244,
+        "controlEffectR": 0.212244,
+        "controlPowerAtExcess": 0.982,
+        "jointPowerConservative": 0.479,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      },
+      {
+        "verdictState": "CHOPPY",
+        "session": "london",
+        "cell": "CHOPPY|london",
+        "tradeableDevBars": 19264,
+        "devCalendarDays": 2692,
+        "barsPerDay": 7.16,
+        "projectedTrades": 904,
+        "nEffective": 393.9,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.2037,
+        "iidPowerAtFloor": 0.557,
+        "dayClusteredEffectivePowerAtFloor": 0.279,
+        "powerUsingV12DesignEffect": 0.467,
+        "matchedBaselineMeanR": -0.112244,
+        "controlEffectR": 0.212244,
+        "controlPowerAtExcess": 0.831,
+        "jointPowerConservative": 0.279,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      },
+      {
+        "verdictState": "CHOPPY",
+        "session": "ny",
+        "cell": "CHOPPY|ny",
+        "tradeableDevBars": 25655,
+        "devCalendarDays": 2886,
+        "barsPerDay": 8.89,
+        "projectedTrades": 1204,
+        "nEffective": 524.7,
+        "designEffect": 2.2948,
+        "dayClusterSeInflation": 1.009,
+        "sigmaEffectiveR": 1.4429,
+        "mdeR": 0.1765,
+        "iidPowerAtFloor": 0.68,
+        "dayClusteredEffectivePowerAtFloor": 0.355,
+        "powerUsingV12DesignEffect": 0.582,
+        "matchedBaselineMeanR": -0.112244,
+        "controlEffectR": 0.212244,
+        "controlPowerAtExcess": 0.921,
+        "jointPowerConservative": 0.355,
+        "adequatePower": false,
+        "meetsMinTrades": true
+      }
+    ],
+    "pooledByVerdictState": [
+      {
+        "verdictState": "EFFICIENT",
+        "sessionsPooled": 3,
+        "tradeableDevBars": 19298,
+        "devCalendarDays": 1416,
+        "projectedTrades": 907,
+        "nEffective": 395.2,
+        "designEffect": 2.2948,
+        "iidPowerAtFloor": 0.558,
+        "dayClusteredEffectivePowerAtFloor": 0.28,
+        "controlPowerAtExcess": 0.921,
+        "jointPowerConservative": 0.28,
+        "adequatePower": false
+      },
+      {
+        "verdictState": "CHOPPY",
+        "sessionsPooled": 3,
+        "tradeableDevBars": 81922,
+        "devCalendarDays": 2886,
+        "projectedTrades": 3845,
+        "nEffective": 1675.5,
+        "designEffect": 2.2948,
+        "iidPowerAtFloor": 0.991,
+        "dayClusteredEffectivePowerAtFloor": 0.81,
+        "controlPowerAtExcess": 1,
+        "jointPowerConservative": 0.81,
+        "adequatePower": true
+      }
+    ],
+    "comparisonToV12FourState": {
+      "v12": "v1.2 reportOnly.centralCaseAdjusted (4 Map states, i.i.d. -> day-clustered + v1.2 effective N)",
+      "v12AdjustedPowers": {
+        "EXPANSION": 0.226,
+        "GRIND": 0.301,
+        "WHIPSAW": 0.461,
+        "QUIET": 0.924
+      },
+      "v13PooledPowers": {
+        "EFFICIENT": 0.28,
+        "CHOPPY": 0.81
+      },
+      "explanation": "The 2-state pooling DOUBLES the raw sample in EFFICIENT (EXPANSION 375 + GRIND 531 = 906 raw), but the Amendment-3 relation-aware overlap (design effect ~2.29 vs v1.2's 1.23) removes most of that gain: near-duplicate variants do not contribute independent information. Report-only, no criterion changes."
+    },
+    "readout": {
+      "worstJointPower": 0.094,
+      "bestJointPower": 0.479,
+      "cellsAdequate": 0,
+      "totalCells": 6,
+      "pooledJointPower": {
+        "EFFICIENT": 0.28,
+        "CHOPPY": 0.81
+      },
+      "verdict": "UNDERPOWERED",
+      "explanation": "Pooling four Map states into two verdict states roughly doubles the EFFICIENT sample, but day clustering AND the larger relation-aware within-family overlap both REDUCE effective power. The control gate (excess > 0) is NOT the binding constraint because matched random baselines are negative in DEV, making the true excess larger than the +0.10R net floor. jointPowerConservative = min(net-floor power, control power).",
+      "caution": "This is REPORT-ONLY. It does not change CLAIM_CRITERIA, the +0.10R floor, t > 2, the verdict, or the kill criterion. If zero claims are CONFIRMED, the correct readout remains 'too little independent data', not 'textbook false'."
+    },
+    "reversionCaveat": {
+      "families": [
+        "band-reversion",
+        "osc-fade",
+        "candlestick-reversal"
+      ],
+      "label": "under the standard exit (1.5 ATR stop, 2R target) only",
+      "note": "Every verdict for these families is labelled with the standard exit only. NO new exit is added in this cycle."
+    },
+    "noBaseline": {
+      "rule": "A missing fine AND coarse matched-baseline cell => INCONCLUSIVE (NO_BASELINE). Zero fallback is forbidden.",
+      "audit": "artifacts/map-compass/baseline-coverage.json"
+    },
+    "forbiddenResponses": [
+      "lower the +0.10R practical floor",
+      "soften the t > 2 statistic",
+      "re-fit the cost model after results",
+      "edit thresholds or cards after seeing outcomes"
+    ]
   }
 }

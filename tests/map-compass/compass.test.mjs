@@ -1,7 +1,7 @@
 /** M4 Compass + claim-card structure tests. */
 import { readFileSync, existsSync } from "node:fs";
 import { test, assert, assertEqual } from "../tiny.mjs";
-import { STATES, ROLES, CONFLICT_RULE, EVIDENCE } from "../../scripts/map-compass/frozen.mjs";
+import { VERDICT_STATES, ROLES, CONFLICT_RULE, EVIDENCE } from "../../scripts/map-compass/frozen.mjs";
 import {
   CLAIM_CARDS,
   FAMILIES,
@@ -70,7 +70,7 @@ test("claims are written from literature, with real rationales", () => {
   for (const c of CLAIM_CARDS) {
     assert(c.rationale.length >= 30, `${c.id} needs a substantive rationale`);
     assert(c.sources.length >= 1, `${c.id} needs a source`);
-    assert(STATES.includes(c.strength.state) && STATES.includes(c.weakness.state));
+    assert(VERDICT_STATES.includes(c.strength.state) && VERDICT_STATES.includes(c.weakness.state));
     assertEqual(c.strength.direction, +1);
     assertEqual(c.weakness.direction, -1);
   }
@@ -78,9 +78,9 @@ test("claims are written from literature, with real rationales", () => {
 
 test("Compass with NO confirmed claims is flat everywhere", () => {
   const r = buildRoutingTable(new Map());
-  for (const s of STATES) assertEqual(r.table[s].length, 0, `${s} must be empty`);
+  for (const s of VERDICT_STATES) assertEqual(r.table[s].length, 0, `${s} must be empty`);
   assertEqual(r.reasons.filter((x) => x.decision === "NOT_SHIPPABLE").length, 24);
-  for (const s of STATES) assertEqual(activeStrategies(s, "london", r).length, 0);
+  for (const s of VERDICT_STATES) assertEqual(activeStrategies(s, "london", r).length, 0);
   assertEqual(activeStrategies("UNKNOWN", "london", r).length, 0);
 });
 
@@ -97,7 +97,7 @@ test("G0 REVISION: strength ALONE ships; weakness alone does not", () => {
 
   const onlyWeakness = new Map([[`${c.id}|${c.weakness.state}`, "CONFIRMED"]]);
   const r2 = buildRoutingTable(onlyWeakness);
-  assert(!STATES.some((s) => r2.table[s].includes(c.id)), "weakness alone must not enable");
+  assert(!VERDICT_STATES.some((s) => r2.table[s].includes(c.id)), "weakness alone must not enable");
 });
 
 test("a CONFIRMED weakness still adds a hard block when strength is CONFIRMED", () => {
@@ -120,7 +120,7 @@ test("both halves CONFIRMED enables ONLY in the strength state", () => {
   const r = buildRoutingTable(v);
   assert(r.table[c.strength.state].includes(c.id));
   assert(!r.table[c.weakness.state].includes(c.id), "confirmed weakness must hard-block");
-  for (const s of STATES.filter((x) => x !== c.strength.state)) {
+  for (const s of VERDICT_STATES.filter((x) => x !== c.strength.state)) {
     assert(!r.table[s].includes(c.id), `${s} must not be enabled`);
   }
 });
@@ -133,7 +133,7 @@ test("REFUTED / INCONCLUSIVE never enable anything", () => {
       [`${c.id}|${c.weakness.state}`, "CONFIRMED"],
     ]);
     const r = buildRoutingTable(v);
-    assert(!STATES.some((s) => r.table[s].includes(c.id)), `${verdict} must not enable`);
+    assert(!VERDICT_STATES.some((s) => r.table[s].includes(c.id)), `${verdict} must not enable`);
   }
 });
 
@@ -158,7 +158,7 @@ test("allow-list is sorted by frozen numeric priority", () => {
     v.set(`${c.id}|${c.weakness.state}`, "CONFIRMED");
   }
   const r = buildRoutingTable(v);
-  for (const s of STATES) {
+  for (const s of VERDICT_STATES) {
     const ids = r.table[s];
     const ps = ids.map((id) => chosen.find((c) => c.id === id).priority);
     assertEqual(JSON.stringify(ps), JSON.stringify([...ps].sort((a, b) => a - b)));

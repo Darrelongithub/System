@@ -3,32 +3,44 @@
  *
  * Input: Map state (+ session). Output: sorted list of ENABLED strategy IDs.
  *
- * Rule (blueprint §6, REVISED at G0 after review): enable S in state B iff its
- * STRENGTH claim is CONFIRMED for B. Strength alone is sufficient. Everything
- * not CONFIRMED is blocked by default, so requiring weakness CONFIRMED too was
- * a redundant second gate that stacked the pass probability for no safety gain.
- * A CONFIRMED weakness still adds an explicit hard block. No learned weights,
- * no scoring, no optimizer — a fixed table is falsifiable, a learned policy is not.
+ * Rule (blueprint §6, REVISED at G0): enable S in verdict state B iff its
+ * STRENGTH claim is CONFIRMED for B. Strength alone is sufficient. A
+ * CONFIRMED weakness still adds an explicit hard block in the OTHER verdict
+ * state. No learned weights, no scoring, no optimizer — a fixed table is
+ * falsifiable, a learned policy is not.
  *
- * UNKNOWN state -> flat. No confirmed strategy -> flat.
- * Session is a GATE on top of the state allow-list, never a third Map axis.
+ * G0 AMENDMENT 3: the table is keyed by the TWO VERDICT STATES
+ * (EFFICIENT / CHOPPY), not the four Map states. A bar's four-state Map label
+ * is mapped through verdictStateOf() at lookup time. The four Map states
+ * remain diagnostics. UNKNOWN -> flat. Session gates on top.
  */
-import { STATES, SENSITIVITY_RULE, CLAIM_CRITERIA } from "../frozen.mjs";
+import {
+  VERDICT_STATES,
+  verdictStateOf,
+  SENSITIVITY_RULE,
+  CLAIM_CRITERIA,
+} from "../frozen.mjs";
 import { CLAIM_CARDS } from "../claim-cards.draft.mjs";
 
 export const VERDICTS = Object.freeze(["CONFIRMED", "REFUTED", "INCONCLUSIVE"]);
 export const NOT_SHIPPABLE = "NOT_SHIPPABLE";
 export const CONDITIONAL_NOT_ENABLED = "CONDITIONAL_NOT_ENABLED";
 
+/** Accept either a verdict state or a four-state Map label. */
+export function routingStateOf(state) {
+  return VERDICT_STATES.includes(state) ? state : verdictStateOf(state);
+}
+
 /**
  * G0 AMENDMENT 2 (user default "no"): CONDITIONAL claims do not enable the
  * Compass. They may be promoted ONLY by VAL support under the criterion frozen
- * in SENSITIVITY_RULE.valSupportCriterion — the SAME frozen criteria, on the
- * VAL window, evaluated once. This function is a pure predicate over ledger
- * records; it never loosens a threshold.
+ * in SENSITIVITY_RULE.valSupportCriterion. AMENDMENT 3: that criterion is now
+ * the RESTORED rule (net floor + excess control + vetoes), not the v1.2 rule.
+ * This is a pure predicate over ledger records; it never loosens a threshold.
  */
 export function conditionalValPromotions(records = []) {
   const promoted = new Set();
+  const cfg = CLAIM_CRITERIA;
   for (const r of records) {
     if (r.windowKind !== "VAL") continue;
     if (r.kind !== "strength") continue;
@@ -36,10 +48,13 @@ export function conditionalValPromotions(records = []) {
     const s = r.stats ?? {};
     const ok =
       r.verdict === "CONFIRMED" &&
-      s.n >= CLAIM_CRITERIA.minTradesPerCell &&
-      s.excessVsRandomR > CLAIM_CRITERIA.practicalFloorR &&
-      s.t > CLAIM_CRITERIA.tStatMin &&
-      s.meanNetR > CLAIM_CRITERIA.absoluteNetRMin &&
+      s.n >= cfg.minTradesPerCell &&
+      s.meanNetR > cfg.practicalFloorR &&
+      s.tNet > cfg.tStatMin &&
+      s.excessVsRandomR > cfg.excessFloorR &&
+      s.t > cfg.tStatMin &&
+      s.baseline?.mode === "MATCHED_CONTROL" &&
+      s.baseline?.missing === 0 &&
       Array.isArray(s.vetoes) &&
       s.vetoes.length === 0;
     if (ok) promoted.add(r.claimId);
@@ -50,13 +65,9 @@ export function conditionalValPromotions(records = []) {
 /**
  * Build the routing table from a claim ledger.
  *
- * `verdicts`: Map or object keyed `${strategyId}|${state}` -> verdict. Each
- * card contributes up to two keys (strength state, weakness state). A state
- * not mentioned in a card is UNASSIGNED -> never enabled.
- *
+ * `verdicts`: Map or object keyed `${strategyId}|${verdictState}` -> verdict.
  * Only CONFIRMED strengths enable. A CONFIRMED weakness adds a hard block for
- * that state (defence in depth even though the strength would already be
- * unconfirmed there). REFUTED/INCONCLUSIVE never enable anything.
+ * the other verdict state. REFUTED/INCONCLUSIVE never enable anything.
  */
 export function buildRoutingTable(
   verdicts,
@@ -64,7 +75,7 @@ export function buildRoutingTable(
   { conditionalIds = new Set(), valPromotedIds = new Set(), records = [] } = {},
 ) {
   const get = verdicts instanceof Map ? (k) => verdicts.get(k) : (k) => verdicts[k];
-  const table = Object.fromEntries(STATES.map((s) => [s, []]));
+  const table = Object.fromEntries(VERDICT_STATES.map((s) => [s, []]));
   const reasons = [];
   const conditional = conditionalIds instanceof Set ? conditionalIds : new Set(conditionalIds);
   const valPromotions = new Set([
@@ -78,9 +89,7 @@ export function buildRoutingTable(
     const sv = get(strengthKey);
     const wv = get(weaknessKey);
 
-    // G0 AMENDMENT 2 (user default "no", still before any result): a
-    // CONDITIONAL claim cannot enable the Compass. It is reported at M9/M10
-    // and enabled only if VAL supports it under the frozen criterion.
+    // AMENDMENT 2 (user default "no"): CONDITIONAL claims cannot enable Compass.
     const isConditional = conditional.has(c.id);
     const valBacked = valPromotions.has(c.id);
     if (isConditional && !SENSITIVITY_RULE.compassCanEnableConditional && !valBacked) {
@@ -96,9 +105,7 @@ export function buildRoutingTable(
       continue;
     }
 
-    // STRENGTH ALONE is sufficient (G0 revision). Everything not CONFIRMED is
-    // blocked by default, so the weakness gate added no safety — it only
-    // multiplied the already-low pass probability.
+    // STRENGTH ALONE is sufficient (G0 revision).
     if (sv !== "CONFIRMED") {
       reasons.push({
         id: c.id,
@@ -110,8 +117,8 @@ export function buildRoutingTable(
       continue;
     }
 
-    // Hard block from the confirmed weakness.
-    if (table[c.weakness.state].includes(c.id)) {
+    // Hard block from the confirmed weakness (the OTHER verdict state).
+    if (table[c.weakness.state]?.includes(c.id)) {
       table[c.weakness.state] = table[c.weakness.state].filter((x) => x !== c.id);
     }
     if (!table[c.strength.state].includes(c.id)) table[c.strength.state].push(c.id);
@@ -133,12 +140,13 @@ export function buildRoutingTable(
 
   // Frozen numeric priority order (decision #10).
   const priority = new Map(cards.map((c) => [c.id, c.priority]));
-  for (const s of STATES)
+  for (const s of VERDICT_STATES)
     table[s].sort((a, b) => (priority.get(a) ?? 1e9) - (priority.get(b) ?? 1e9));
 
   return {
     table,
     reasons,
+    verdictStates: VERDICT_STATES,
     conditionalPolicy: {
       compassCanEnableConditional: SENSITIVITY_RULE.compassCanEnableConditional,
       conditionalRequiresValSupport: SENSITIVITY_RULE.conditionalRequiresValSupport,
@@ -152,10 +160,11 @@ export function buildRoutingTable(
   };
 }
 
-/** Active strategy IDs for one bar. UNKNOWN / unrouted -> empty (flat). */
+/** Active strategy IDs for one bar. Accepts a four-state or verdict state. */
 export function activeStrategies(state, session, routing, cards = CLAIM_CARDS) {
-  if (!STATES.includes(state)) return [];
-  const allowed = routing.table?.[state] ?? [];
+  const vs = routingStateOf(state);
+  if (!vs) return [];
+  const allowed = routing.table?.[vs] ?? [];
   const byId = new Map(cards.map((c) => [c.id, c]));
   return allowed.filter((id) => {
     const c = byId.get(id);
@@ -170,9 +179,9 @@ export function isAllowed(strategyId, state, session, routing, cards = CLAIM_CAR
 }
 
 /**
- * Apply the Compass to a signal stream. Returns kept + dropped signals.
- * `signals`: [{ index, strategyId, side, state, session, ... }]
- * Uses `activeStrategies` for gating, then the frozen priority for tie-break.
+ * Apply the Compass to a signal stream. `signals[i].state` may be a four-state
+ * Map label or a verdict state. Uses activeStrategies for gating, then the
+ * frozen priority for tie-break.
  */
 export function routeSignals(signals, routing, cards = CLAIM_CARDS) {
   const priority = new Map(cards.map((c) => [c.id, c.priority]));
@@ -183,13 +192,14 @@ export function routeSignals(signals, routing, cards = CLAIM_CARDS) {
     droppedUnrouted = 0;
 
   for (const s of signals) {
-    if (!STATES.includes(s.state)) {
+    const vs = routingStateOf(s.state);
+    if (!vs) {
       droppedState++;
       continue;
     }
-    const key = `${s.state}|${s.session}`;
+    const key = `${vs}|${s.session}`;
     if (!allowedByBar.has(key))
-      allowedByBar.set(key, activeStrategies(s.state, s.session, routing, cards));
+      allowedByBar.set(key, activeStrategies(vs, s.session, routing, cards));
     const allowed = allowedByBar.get(key);
     const card = cards.find((c) => c.id === s.strategyId);
     if (card?.sessionRestriction && card.sessionRestriction !== s.session) {

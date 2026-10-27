@@ -1,7 +1,7 @@
 /**
  * M4/M6 — CLAIM CARDS (DRAFT).
  *
- * STATUS: DRAFT. NOT FROZEN. NOT TESTED.
+ * STATUS: DRAFT. NOT FROZEN. NOT TESTED. (G0 Amendment 3 did NOT freeze them.)
  *
  * Decision #13: "Draft, review, freeze before testing." This file is the
  * DRAFT. `verify-claims.mjs` REFUSES to run against DRAFT cards unless a
@@ -9,19 +9,32 @@
  *
  * These are TEXTBOOK CLAIMS, not findings. They are written from the published
  * rationale for each strategy family, BEFORE looking at any result on our
- * data. The entire point of M5 is to falsify most of them. Where sources
- * disagree, the claim records the stronger/more common version so the test is
- * a real test rather than a soft target.
+ * data. The entire point of M5 is to falsify most of them.
  *
- * Strength = state where the strategy is claimed to have positive NET R.
- * Weakness = state where it is claimed to have negative NET R.
- * Both must be CONFIRMED for a strategy to ship (no half-verified strategies).
+ * G0 AMENDMENT 3 (2026-10-27, before any result) — VERDICT STATES:
+ * strength/weakness `state` is now one of TWO verdict states, EFFICIENT or
+ * CHOPPY (see frozen.mjs VERDICT_STATES). The old four Map states are kept as
+ * `textbookState` + `fourStates` DIAGNOSTICS and never decide a verdict.
  *
- * Priority is a FROZEN number (decision #10). It breaks same-bar ties in the
- * one-slot book. It is assigned by family/variant order, NOT by performance —
- * nothing here has been evaluated yet.
+ * EVIDENCE: the old subjective 1-4 tiers were REPLACED by one opened empirical
+ * study per family (full URL in frozen.mjs EMPIRICAL_STUDIES) or the label
+ * PRACTITIONER_ONLY. `evidenceTier` survives only as a frozen ORDER RANK.
+ * TEST_ORDER is an EXPLICIT frozen list, byte-identical to v1.2.
+ *
+ * Priority is a FROZEN number (decision #10), assigned by family/variant
+ * order, NOT by performance — nothing here has been evaluated yet.
  */
-import { STATES, EVIDENCE } from "./frozen.mjs";
+import {
+  STATES,
+  VERDICT_STATES,
+  FOUR_STATES_OF,
+  FAMILY_STRENGTH_STATE,
+  otherVerdictState,
+  REVERSION_FAMILIES,
+  EXIT_CAVEAT,
+  EMPIRICAL_STUDIES,
+  EVIDENCE,
+} from "./frozen.mjs";
 
 export const CLAIM_CARD_STATUS = "DRAFT";
 
@@ -33,19 +46,47 @@ export const FREEZE = Object.freeze({
   note: "DRAFT only. Set status=FROZEN with approver + date after human review.",
 });
 
-const card = (id, family, variant, strength, weakness, rationale, opts = {}) => ({
-  id,
-  family,
-  variant,
-  evidenceTier: opts.tier, // 1 = best-supported ... 4 = weakest (tested LAST)
-  strength: { state: strength, direction: +1, claim: `positive net R in confirmed ${strength}` },
-  weakness: { state: weakness, direction: -1, claim: `negative net R in confirmed ${weakness}` },
-  sessionRestriction: opts.session ?? null, // null = all sessions
-  direction: "both", // decision #11
-  priority: opts.priority,
-  rationale,
-  sources: opts.sources ?? [],
-});
+/**
+ * `strength`/`weakness` arguments below are the ORIGINAL four-state textbook
+ * labels; they are retained as DIAGNOSTICS. The authoritative claim states are
+ * derived from the family mapping frozen at G0 Amendment 3.
+ */
+const card = (id, family, variant, textbookStrength, textbookWeakness, rationale, opts = {}) => {
+  const vs = FAMILY_STRENGTH_STATE[family];
+  const ws = otherVerdictState(vs);
+  const ev = EMPIRICAL_STUDIES[family];
+  if (!ev) throw new Error(`no evidence registry entry for family ${family}`);
+  return {
+    id,
+    family,
+    variant,
+    evidenceTier: opts.tier, // FROZEN ORDER RANK only — not an evidence claim
+    evidence: ev, // { grade, citation, url, tests, finding }
+    verdictStrength: vs,
+    verdictWeakness: ws,
+    strength: {
+      state: vs,
+      direction: +1,
+      claim: `positive net R in ${vs}`,
+      textbookState: textbookStrength, // four-state diagnostic
+      fourStates: FOUR_STATES_OF[vs],
+    },
+    weakness: {
+      state: ws,
+      direction: -1,
+      claim: `negative net R in ${ws}`,
+      textbookState: textbookWeakness,
+      fourStates: FOUR_STATES_OF[ws],
+    },
+    sessionRestriction: opts.session ?? null,
+    direction: "both", // decision #11
+    priority: opts.priority,
+    rationale,
+    sources: [...(opts.sources ?? []), ev.citation, ev.url],
+    // Task 4: reversion-family verdicts are exit-conditional, printed verbatim.
+    exitCaveat: REVERSION_FAMILIES.includes(family) ? EXIT_CAVEAT : null,
+  };
+};
 
 /**
  * 8 families x 3 variants = 24 known strategies.
@@ -222,7 +263,11 @@ export const CLAIM_CARDS = Object.freeze([
     "band-reversion",
     "Bollinger squeeze fade",
     "QUIET",
-    "WHIPSAW",
+    // G0 Amendment 3 STATE CORRECTION (pre-results): v1.2 used WHIPSAW as the
+    // textbook weakness, which is in the SAME CHOPPY verdict state as its
+    // strength QUIET. With "weakness = the other verdict state" that is plainly
+    // wrong. Corrected to EXPANSION (EFFICIENT). Verdict was already CHOPPY/EFFICIENT.
+    "EXPANSION",
     "A squeeze precedes expansion, so fading the first move is claimed to work only while volatility stays compressed.",
     { tier: 2, priority: 18, sources: ["Bollinger, squeeze"] },
   ),
@@ -251,7 +296,9 @@ export const CLAIM_CARDS = Object.freeze([
     "candlestick-reversal",
     "Three white soldiers / black crows fade",
     "QUIET",
-    "WHIPSAW",
+    // G0 Amendment 3 STATE CORRECTION (pre-results): same CHOPPY/CHOPPY
+    // conflict as bb-squeeze-fade. Corrected to EXPANSION (EFFICIENT).
+    "EXPANSION",
     "A three-bar directional run in a quiet market is claimed to be exhausted; in high-vol chop it is meaningless.",
     { tier: 4, priority: 21, sources: ["Nison, Japanese Candlestick Charting"] },
   ),
@@ -289,19 +336,94 @@ export const CLAIM_CARDS = Object.freeze([
 export const FAMILIES = Object.freeze([...new Set(CLAIM_CARDS.map((c) => c.family))]);
 
 /**
- * FIXED-SEQUENCE TEST ORDER (decision: evidence quality, reviewed at G0).
- * Tier 1 first, tier 4 (candlestick) last. Ties break on frozen priority.
- * This is a PRE-REGISTERED order, not a result-dependent one.
+ * CARD RELATIONS (G0 Amendment 3) — near-duplicate and mirror-image cards.
+ *
+ * Near-duplicates are two variants of essentially the SAME signal (different
+ * lookback or parameter), so they fire on overlapping entry bars. Mirror
+ * images are the long/short versions of one pattern. Both reduce the
+ * effective sample of a pooled family cell. Listed exhaustively for all
+ * 8 families x 3 pairs = 24 within-family pairs.
  */
+export const CARD_RELATIONS = Object.freeze([
+  // F1 channel-breakout
+  { family: "channel-breakout", a: "donchian-20", b: "donchian-55", type: "NEAR_DUPLICATE", why: "same Donchian rule, 20 vs 55-bar lookback" },
+  { family: "channel-breakout", a: "donchian-20", b: "dual-thrust", type: "RELATED", why: "both range breakouts, different range definition" },
+  { family: "channel-breakout", a: "donchian-55", b: "dual-thrust", type: "RELATED", why: "both range breakouts, different range definition" },
+  // F2 ma-cross
+  { family: "ma-cross", a: "sma-20-50", b: "macd-cross", type: "NEAR_DUPLICATE", why: "MACD is an EMA crossover of the same family" },
+  { family: "ma-cross", a: "sma-20-50", b: "ichimoku-tk", type: "NEAR_DUPLICATE", why: "both two-moving-average crosses" },
+  { family: "ma-cross", a: "macd-cross", b: "ichimoku-tk", type: "NEAR_DUPLICATE", why: "both EMA-based crosses" },
+  // F3 opening-range
+  { family: "opening-range", a: "asian-range-break", b: "london-orb-30", type: "NEAR_DUPLICATE", why: "both session-range breakouts" },
+  { family: "opening-range", a: "asian-range-break", b: "pdh-pdl-break", type: "RELATED", why: "prior-day range vs session range" },
+  { family: "opening-range", a: "london-orb-30", b: "pdh-pdl-break", type: "RELATED", why: "prior-day range vs session range" },
+  // F4 level-retest
+  { family: "level-retest", a: "pdh-retest", b: "pdl-retest", type: "MIRROR_IMAGE", why: "prior-day HIGH retest long vs prior-day LOW retest short" },
+  { family: "level-retest", a: "pdh-retest", b: "classic-pivot", type: "RELATED", why: "both retest a reference level" },
+  { family: "level-retest", a: "pdl-retest", b: "classic-pivot", type: "RELATED", why: "both retest a reference level" },
+  // F5 osc-fade
+  { family: "osc-fade", a: "rsi-14-30-70", b: "williams-r-fade", type: "NEAR_DUPLICATE", why: "Williams %R is a normalised stochastic/RSI-family oscillator" },
+  { family: "osc-fade", a: "rsi-14-30-70", b: "stochastic-14-fade", type: "NEAR_DUPLICATE", why: "both 14-period bounded oscillators with 30/70-style extremes" },
+  { family: "osc-fade", a: "williams-r-fade", b: "stochastic-14-fade", type: "NEAR_DUPLICATE", why: "Williams %R is a linear transform of the raw stochastic" },
+  // F6 band-reversion
+  { family: "band-reversion", a: "bollinger-20-2", b: "keltner-20-atr", type: "NEAR_DUPLICATE", why: "both 20-bar envelope fades, sigma vs ATR width" },
+  { family: "band-reversion", a: "bollinger-20-2", b: "bb-squeeze-fade", type: "RELATED", why: "both Bollinger-based, different trigger (band vs squeeze)" },
+  { family: "band-reversion", a: "keltner-20-atr", b: "bb-squeeze-fade", type: "RELATED", why: "envelope fade vs volatility-squeeze fade" },
+  // F7 candlestick-reversal
+  { family: "candlestick-reversal", a: "engulfing", b: "morning-evening-star", type: "NEAR_DUPLICATE", why: "both multi-bar reversal candle patterns" },
+  { family: "candlestick-reversal", a: "engulfing", b: "three-soldiers-crows", type: "RELATED", why: "both candle-body reversal/exhaustion" },
+  { family: "candlestick-reversal", a: "morning-evening-star", b: "three-soldiers-crows", type: "RELATED", why: "both multi-candle exhaustion patterns" },
+  // F8 vol-compression
+  { family: "vol-compression", a: "atr-squeeze-break", b: "nr7-break", type: "NEAR_DUPLICATE", why: "both narrow-range compression breakouts" },
+  { family: "vol-compression", a: "atr-squeeze-break", b: "inside-bar-break", type: "RELATED", why: "both compression, different bar definition" },
+  { family: "vol-compression", a: "nr7-break", b: "inside-bar-break", type: "RELATED", why: "multi-bar vs single-bar compression" },
+]);
+
+export const NEAR_DUPLICATES = Object.freeze(
+  CARD_RELATIONS.filter((r) => r.type === "NEAR_DUPLICATE").map((r) => [r.a, r.b]),
+);
+export const MIRROR_IMAGES = Object.freeze(
+  CARD_RELATIONS.filter((r) => r.type === "MIRROR_IMAGE").map((r) => [r.a, r.b]),
+);
+
+/**
+ * CROSS-FAMILY mirror images (diagnostic only; they do NOT change within-family
+ * overlap because pooling is per family). Listed so a reviewer can see them.
+ */
+export const CROSS_FAMILY_MIRRORS = Object.freeze([
+  { a: "pdh-pdl-break", b: "pdh-retest", why: "break vs retest of the same prior-day high" },
+  { a: "pdh-pdl-break", b: "pdl-retest", why: "break vs retest of the same prior-day low" },
+  { a: "rsi-14-30-70", b: "bollinger-20-2", why: "oscillator extreme vs band extreme fade" },
+  { a: "engulfing", b: "three-soldiers-crows", why: "reversal candle vs continuation-candle fade" },
+]);
+
+/**
+ * EXPLICIT FROZEN TEST SEQUENCE — byte-identical to v1.2 (tier ascending,
+ * then priority). G0 Amendment 3 replaced the tier DEFINITIONS but deliberately
+ * did NOT re-sort this sequence. Any change here is a new cycle.
+ */
+export const FROZEN_TEST_SEQUENCE = Object.freeze([
+  "donchian-20", "donchian-55", "dual-thrust",
+  "sma-20-50", "macd-cross", "ichimoku-tk",
+  "atr-squeeze-break", "nr7-break", "inside-bar-break",
+  "asian-range-break", "london-orb-30", "pdh-pdl-break",
+  "bollinger-20-2", "keltner-20-atr", "bb-squeeze-fade",
+  "pdh-retest", "pdl-retest", "classic-pivot",
+  "rsi-14-30-70", "williams-r-fade", "stochastic-14-fade",
+  "engulfing", "morning-evening-star", "three-soldiers-crows",
+]);
+
 export const TEST_ORDER = Object.freeze(
-  CLAIM_CARDS.map((c, i) => ({
-    id: c.id,
-    tier: c.evidenceTier,
-    priority: c.priority,
-    originalIndex: i,
-  }))
-    .sort((a, b) => a.tier - b.tier || a.priority - b.priority)
-    .map((x, i) => ({ ...x, testOrder: i + 1 })),
+  FROZEN_TEST_SEQUENCE.map((id, i) => {
+    const c = CLAIM_CARDS.find((x) => x.id === id);
+    return {
+      id,
+      tier: c.evidenceTier,
+      priority: c.priority,
+      originalIndex: CLAIM_CARDS.indexOf(c),
+      testOrder: i + 1,
+    };
+  }),
 );
 
 /** Structural validation — run by tests, not by a human. */
@@ -314,18 +436,38 @@ export function validateClaimCards() {
     ids.add(c.id);
     if (priorities.has(c.priority)) errors.push(`duplicate priority ${c.priority}`);
     priorities.add(c.priority);
-    if (!STATES.includes(c.strength.state)) errors.push(`${c.id}: bad strength state`);
-    if (!STATES.includes(c.weakness.state)) errors.push(`${c.id}: bad weakness state`);
+    if (!VERDICT_STATES.includes(c.strength.state)) errors.push(`${c.id}: bad strength verdict state`);
+    if (!VERDICT_STATES.includes(c.weakness.state)) errors.push(`${c.id}: bad weakness verdict state`);
     if (c.strength.state === c.weakness.state) errors.push(`${c.id}: strength == weakness`);
+    if (c.strength.state !== FAMILY_STRENGTH_STATE[c.family])
+      errors.push(`${c.id}: strength state contradicts family mapping`);
+    if (c.weakness.state !== otherVerdictState(c.strength.state))
+      errors.push(`${c.id}: weakness must be the other verdict state`);
+    if (!STATES.includes(c.strength.textbookState))
+      errors.push(`${c.id}: bad four-state strength diagnostic`);
+    if (!STATES.includes(c.weakness.textbookState))
+      errors.push(`${c.id}: bad four-state weakness diagnostic`);
+    if (!c.evidence?.url || !c.evidence?.grade)
+      errors.push(`${c.id}: missing empirical study / practitioner-only mark`);
+    if (REVERSION_FAMILIES.includes(c.family) && c.exitCaveat !== EXIT_CAVEAT)
+      errors.push(`${c.id}: reversion family must carry the standard-exit caveat`);
     if (c.sessionRestriction && !["asian", "london", "ny"].includes(c.sessionRestriction)) {
       errors.push(`${c.id}: bad session restriction`);
     }
     if (c.direction !== "both") errors.push(`${c.id}: must trade both sides (decision #11)`);
     if (!c.rationale || c.rationale.length < 30) errors.push(`${c.id}: rationale too short`);
-    if (![1, 2, 3, 4].includes(c.evidenceTier)) errors.push(`${c.id}: bad evidence tier`);
+    if (![1, 2, 3, 4].includes(c.evidenceTier)) errors.push(`${c.id}: bad frozen order rank`);
   }
   if (CLAIM_CARDS.length !== 24) errors.push(`expected 24 cards, got ${CLAIM_CARDS.length}`);
   if (FAMILIES.length !== 8) errors.push(`expected 8 families, got ${FAMILIES.length}`);
+  if (CARD_RELATIONS.length !== 24) errors.push("expected 24 within-family card pairs");
+  for (const f of FAMILIES) {
+    if (CARD_RELATIONS.filter((r) => r.family === f).length !== 3)
+      errors.push(`${f}: expected 3 within-family pairs`);
+  }
+  // TEST_ORDER is EXACTLY the frozen sequence — no re-sorting by new tiers.
+  if (JSON.stringify(TEST_ORDER.map((t) => t.id)) !== JSON.stringify(FROZEN_TEST_SEQUENCE))
+    errors.push("TEST_ORDER is not the frozen v1.2 sequence");
   // Candlestick must be LAST in evidence order (explicit review decision).
   const lastTier = TEST_ORDER[TEST_ORDER.length - 1];
   const lastCard = CLAIM_CARDS.find((c) => c.id === lastTier.id);

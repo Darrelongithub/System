@@ -3,6 +3,17 @@
 **Status: DRAFT. No claim has been tested on real data.**
 **Updated 2026-10-26 with the G0 review amendments — see "What changed" below.**
 
+> **SUPERSEDED IN PART BY G0 AMENDMENTS 2 AND 3 (2026-10-27).** The per-card
+> four-state tables and evidence tiers below are a v1.1-era view. The CURRENT
+> review dump is `docs/CLAIM-CARDS-FULL-TEXT.md` (all 24 cards in full, with
+> **verdict states EFFICIENT/CHOPPY**, opened empirical-study URLs, card
+> relations and the standard-exit caveat). Verdicts are now decided on TWO
+> verdict states; four Map states are diagnostics. The subjective 1–4 tiers
+> were replaced by `docs/EMPIRICAL-EVIDENCE.md`. `TEST_ORDER` is unchanged.
+> See `BLUEPRINT.md` §7.11 and `docs/BLUEPRINT-AMENDMENTS.md` A4. This file is
+> kept for the historical review checklist only; where it disagrees with
+> `BLUEPRINT.md`, the blueprint wins.
+
 Source of truth: `scripts/map-compass/claim-cards.draft.mjs`.
 `verify-claims.mjs` refuses to run real verification until this is frozen.
 

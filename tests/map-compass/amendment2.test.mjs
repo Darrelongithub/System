@@ -30,7 +30,7 @@ test("Amendment 2: frozen criteria are byte-for-byte unchanged", () => {
   assertEqual(CLAIM_CRITERIA.minTradesPerCell, 100);
   assertEqual(CLAIM_CRITERIA.practicalFloorR, 0.1);
   assertEqual(CLAIM_CRITERIA.tStatMin, 2);
-  assertEqual(CLAIM_CRITERIA.absoluteNetRMin, 0);
+  assertEqual(CLAIM_CRITERIA.excessFloorR, 0);
   assertEqual(CLAIM_CRITERIA.concentrationMax, 0.5);
   assertEqual(CLAIM_CRITERIA.loyoPositiveMin, 0.75);
   assertEqual(EXIT_HARNESS.stopAtrMultiple, 1.5);
@@ -38,8 +38,15 @@ test("Amendment 2: frozen criteria are byte-for-byte unchanged", () => {
   assertEqual(EXIT_HARNESS.trailing, false);
   const projection = read("power-projection.json");
   assertEqual(projection.verdict, "UNDERPOWERED");
+  // v1.2's reportOnly block is a FROZEN HISTORICAL snapshot; its hash is the
+  // v1.2 criteria hash, not the current one (Amendment 3 changed the rule).
   assertEqual(
     projection.reportOnly.criteriaHash,
+    "788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6",
+  );
+  assertEqual(projection.reportOnly.supersededBy, "reportOnlyV13");
+  assertEqual(
+    projection.reportOnlyV13.criteriaHash,
     createHash("sha256").update(JSON.stringify(CLAIM_CRITERIA)).digest("hex"),
   );
   assertEqual(projection.reportOnly.criteriaChanged, false);
@@ -180,9 +187,11 @@ test("Amendment 2: only VAL support under the SAME frozen criteria promotes COND
   const c = CLAIM_CARDS[0];
   const stats = {
     n: 500,
-    excessVsRandomR: 0.25,
+    meanNetR: 0.25, // restored +0.10R NET floor
+    tNet: 3.5,
+    excessVsRandomR: 0.25, // control: excess > 0
     t: 3.1,
-    meanNetR: 0.05,
+    baseline: { mode: "MATCHED_CONTROL", missing: 0 },
     vetoes: [],
   };
   const weak = [
@@ -195,10 +204,14 @@ test("Amendment 2: only VAL support under the SAME frozen criteria promotes COND
     verdict: "CONFIRMED", conditional: true, stats,
   };
   assertEqual(conditionalValPromotions([val]).size, 1);
-  const barely = { ...val, stats: { ...stats, t: 1.9 } };
+  const barely = { ...val, stats: { ...stats, tNet: 1.9 } };
   assertEqual(conditionalValPromotions([barely]).size, 0, "t > 2 must not be softened");
+  const noNetFloor = { ...val, stats: { ...stats, meanNetR: 0.05 } };
+  assertEqual(conditionalValPromotions([noNetFloor]).size, 0, "+0.10R net floor must not be softened");
   const vetoed = { ...val, stats: { ...stats, vetoes: ["CONCENTRATION_0.8"] } };
   assertEqual(conditionalValPromotions([vetoed]).size, 0);
+  const noBaseline = { ...val, stats: { ...stats, baseline: { mode: "UNCONTROLLED_DRY_RUN", missing: 5 } } };
+  assertEqual(conditionalValPromotions([noBaseline]).size, 0, "NO_BASELINE row cannot promote");
 
   const verdicts = new Map([[`${c.id}|${c.strength.state}`, "CONFIRMED"]]);
   const promoted = buildRoutingTable(verdicts, CLAIM_CARDS, {

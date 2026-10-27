@@ -23,7 +23,14 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { dataLines } from "./lib/csv.mjs";
-import { ROLES, STATES, CLAIM_CRITERIA, SENSITIVITY_RULE } from "./frozen.mjs";
+import {
+  ROLES,
+  STATES,
+  CLAIM_CRITERIA,
+  SENSITIVITY_RULE,
+  REVERSION_FAMILIES,
+  EXIT_CAVEAT,
+} from "./frozen.mjs";
 import { powerAt, mde } from "./lib/verification.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -47,11 +54,14 @@ const calib = JSON.parse(readFileSync(join(OUT, "harness-calibration.json"), "ut
 const baseline = JSON.parse(readFileSync(join(OUT, "random-baseline.json"), "utf8"));
 
 // Which gates exist, and what each one costs in pass probability.
+// G0 AMENDMENT 3: restored rule = NET FLOOR + EXCESS CONTROL, a CONJUNCTION.
 const gates = [
   { id: "minTrades", label: "n >= 100", value: CLAIM_CRITERIA.minTradesPerCell },
-  { id: "excessFloor", label: "excess > +0.10R", value: CLAIM_CRITERIA.practicalFloorR },
-  { id: "tStat", label: "t > 2", value: CLAIM_CRITERIA.tStatMin },
-  { id: "absoluteR", label: "absolute net R > 0", value: CLAIM_CRITERIA.absoluteNetRMin },
+  { id: "netFloor", label: "net mean > +0.10R (ORIGINAL floor restored)", value: CLAIM_CRITERIA.practicalFloorR },
+  { id: "netT", label: "day-clustered t(net) > 2", value: CLAIM_CRITERIA.tStatMin },
+  { id: "excessControl", label: "excess over matched random > 0 (control)", value: CLAIM_CRITERIA.excessFloorR },
+  { id: "excessT", label: "day-clustered t(excess) > 2", value: CLAIM_CRITERIA.tStatMin },
+  { id: "noBaseline", label: "NO_BASELINE veto — no fine AND no coarse cell", value: CLAIM_CRITERIA.requireMatchedBaseline },
   { id: "concentration", label: "no year > 50% of R", value: CLAIM_CRITERIA.concentrationMax },
   { id: "loyo", label: ">=75% years positive", value: CLAIM_CRITERIA.loyoPositiveMin },
   { id: "placebo", label: "beat placebo p95", value: calib.placebo.p95FakeConfirms },
@@ -82,7 +92,7 @@ const report = {
   },
   gates,
   gateStackNote:
-    "Strength + weakness (old) x sweep stability (old) x power = multiplicative. Two gates removed at G0: weakness requirement and sweep veto. Neither change lowers the statistical bar; both remove redundant stacking.",
+    "G0 Amendment 3 RESTORED RULE: CONFIRMED = (net mean > +0.10R AND day-clustered t(net) > 2) AND (excess over matched random > 0 AND day-clustered t(excess) > 2) AND all vetoes. The v1.2 'excess > 0.10 and net > 0' rule is GONE. Two old multiplicative gates (weakness requirement, sweep veto) remain removed.",
   powerByState: central.map((r) => ({
     state: r.state,
     projectedTrades: r.projectedTrades,
@@ -104,20 +114,30 @@ const report = {
   },
   perClaimTemplate: {
     fields: [
+      "meanNetR",
+      "meanCi95",
+      "tNet",
       "excessVsRandomR",
       "excessCi95",
-      "meanNetR",
-      "n",
       "t",
+      "n",
+      "nEffective",
+      "baseline.mode",
+      "baseline.missing",
       "bySide.long",
       "bySide.short",
+      "byFourState.EXPANSION",
+      "byFourState.GRIND",
+      "byFourState.WHIPSAW",
+      "byFourState.QUIET",
       "years",
       "stability",
       "conditional",
+      "exitCaveat",
       "vetoes",
       "verdict",
     ],
-    rule: "A claim with verdict INCONCLUSIVE still reports its point estimate and CI. Sort the ledger by excessVsRandomR to read the evidence even when nothing ships.",
+    rule: "AMENDMENT 3: BOTH gates must pass (net mean > +0.10R with tNet > 2, AND excess > 0 with t > 2). An INCONCLUSIVE claim still reports both point estimates and CIs, its four-state diagnostics, its baseline coverage and the standard-exit caveat (reversion families). No verdict may be read from a four-state diagnostic.",
   },
   m6Readout: {
     primary: "count of CONFIRMED claims with stability != DEFINITION_SENSITIVE",
@@ -150,6 +170,32 @@ const report = {
     })),
   },
   amendment2: "2026-10-27: readout updated for clustered inference and CONDITIONAL default no. Verdict remains UNDERPOWERED.",
+  amendment3: {
+    date: "2026-10-27",
+    verdictStates: ["EFFICIENT", "CHOPPY"],
+    fourStatesAreDiagnostics: true,
+    reportOnlyPowerTable: "power-projection.json reportOnlyV13.powerTable2x3 (2 states x 3 sessions)",
+    pooledPower: Object.fromEntries(
+      (power.reportOnlyV13?.pooledByVerdictState ?? []).map((r) => [
+        r.verdictState,
+        r.jointPowerConservative,
+      ]),
+    ),
+    reversionCaveat: {
+      families: REVERSION_FAMILIES,
+      label: EXIT_CAVEAT,
+      note: "Every verdict for these families is labelled with the standard exit only; no new exit in this cycle.",
+    },
+    baselineCoverage: (() => {
+      try {
+        const cov = JSON.parse(readFileSync(join(OUT, "baseline-coverage.json"), "utf8"));
+        return cov.answer;
+      } catch {
+        return null;
+      }
+    })(),
+    note: "Restored rule, 2 verdict states, NO_BASELINE veto, reversion exit caveat, empirical-study tiers. Verdict remains UNDERPOWERED; report-only power does not change any criterion.",
+  },
 };
 writeFileSync(join(OUT, "readability.json"), JSON.stringify(report, null, 2) + "\n");
 

@@ -13,9 +13,15 @@ import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { dataLines } from "./lib/csv.mjs";
-import { STATES, ROLES, CLAIM_CRITERIA } from "./frozen.mjs";
+import {
+  STATES,
+  VERDICT_STATES,
+  verdictStateOf,
+  CLAIM_CRITERIA,
+} from "./frozen.mjs";
 import { mde, powerAt } from "./lib/verification.mjs";
 import { buildAmendment2Report } from "./lib/amend2-report.mjs";
+import { buildAmendment3Report } from "./lib/amend3-report.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const NORM = join(ROOT, "artifacts/map-compass/normalized");
@@ -27,9 +33,15 @@ if (!existsSync(mapCsv)) {
   process.exit(2);
 }
 
-// Count DEV tradeable bars by state and by state|session.
+// Count DEV tradeable bars by state, by state|session, and by the TWO verdict
+// states x 3 sessions (G0 Amendment 3), including the distinct DEV calendar
+// days per cell so the day-cluster count is real, not assumed.
 const byState = Object.fromEntries(STATES.map((s) => [s, 0]));
 const byStateSession = {};
+const verdictCells = {};
+for (const vs of VERDICT_STATES)
+  for (const ses of ["asian", "london", "ny"])
+    verdictCells[`${vs}|${ses}`] = { bars: 0, days: new Set() };
 let devBars = 0,
   flat = 0;
 for (const f of dataLines(readFileSync(mapCsv, "utf8"), { delimiter: "," })) {
@@ -46,7 +58,23 @@ for (const f of dataLines(readFileSync(mapCsv, "utf8"), { delimiter: "," })) {
   byState[state]++;
   const k = `${state}|${session}`;
   byStateSession[k] = (byStateSession[k] ?? 0) + 1;
+  const vs = verdictStateOf(state);
+  const cell = verdictCells[`${vs}|${session}`];
+  if (cell) {
+    cell.bars++;
+    cell.days.add(f[0].slice(0, 10));
+  }
 }
+const verdictStateBySession = Object.fromEntries(
+  Object.entries(verdictCells).map(([k, v]) => [
+    k,
+    {
+      bars: v.bars,
+      devDays: v.days.size,
+      barsPerDay: v.days.size ? +(v.bars / v.days.size).toFixed(2) : 0,
+    },
+  ]),
+);
 
 const cost = JSON.parse(readFileSync(join(OUT, "cost-model.json"), "utf8"));
 const baselineCostR = cost.baselineCostR;
@@ -118,6 +146,8 @@ const report = {
   flatBars: flat,
   flatPct: +((flat / devBars) * 100).toFixed(2),
   tradeableBarsByState: byState,
+  tradeableBarsByStateSession: byStateSession,
+  verdictStateBySession, // 2 verdict states x 3 sessions, with real DEV day counts
   assumptions: {
     sigmaR: SIGMA,
     variantsPerFamily: VARIANTS,
@@ -145,6 +175,9 @@ const report = {
 // calibration harness; it does not touch verdict, criteria, scenarios or the
 // kill criterion, and no threshold changes because of it.
 Object.assign(report, buildAmendment2Report(report));
+// G0 AMENDMENT 3: the report-only 2 verdict states x 3 sessions power table,
+// using day clusters + the recomputed within-family effective-N correction.
+Object.assign(report, buildAmendment3Report(report));
 writeFileSync(join(OUT, "power-projection.json"), JSON.stringify(report, null, 2) + "\n");
 
 console.log(`DEV bars ${devBars}, flat ${report.flatPct}%, tradeable by state:`, byState);

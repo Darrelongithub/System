@@ -27,7 +27,72 @@ export const MAP = Object.freeze({
   abstainBandPct: 10, // +/- around either threshold -> UNKNOWN -> flat
 });
 
+/** Four Map states. From v1.3 these are DIAGNOSTIC labels, not verdict cells. */
 export const STATES = Object.freeze(["EXPANSION", "GRIND", "WHIPSAW", "QUIET"]);
+
+/**
+ * G0 AMENDMENT 3 (2026-10-27, before any strategy result) — VERDICT STATES.
+ *
+ * The four-state Map was too fine: EXPANSION and GRIND cells had projected
+ * power 0.272 / 0.364, so most claims would land INCONCLUSIVE for lack of
+ * data rather than lack of edge. Pooling by the ER axis doubles those cells.
+ *
+ *   EFFICIENT = EXPANSION + GRIND   (ER >= 0.35 — directional)
+ *   CHOPPY    = WHIPSAW + QUIET    (ER <  0.35 — non-directional)
+ *
+ * Verdicts are decided on these TWO states. The four Map states are still
+ * reported for every claim as diagnostics, but they do not decide verdicts.
+ * The Map source hash and all Map thresholds are UNCHANGED.
+ */
+export const VERDICT_STATES = Object.freeze(["EFFICIENT", "CHOPPY"]);
+export const VERDICT_STATE_OF = Object.freeze({
+  EXPANSION: "EFFICIENT",
+  GRIND: "EFFICIENT",
+  WHIPSAW: "CHOPPY",
+  QUIET: "CHOPPY",
+});
+/** Four Map states covered by a verdict state (diagnostic breakdown order). */
+export const FOUR_STATES_OF = Object.freeze({
+  EFFICIENT: Object.freeze(["EXPANSION", "GRIND"]),
+  CHOPPY: Object.freeze(["WHIPSAW", "QUIET"]),
+});
+export function verdictStateOf(fourState) {
+  return VERDICT_STATE_OF[fourState] ?? null;
+}
+export function otherVerdictState(s) {
+  return s === "EFFICIENT" ? "CHOPPY" : "EFFICIENT";
+}
+
+/**
+ * Family -> strength verdict state. Decided at G0 Amendment 3 before results.
+ * Trend/continuation families claim EFFICIENT; reversion/compression families
+ * claim CHOPPY. vol-compression is CHOPPY because its SIGNAL is observed
+ * BEFORE the expansion (the entry bar is still a compression bar), so the
+ * claim belongs to the pre-breakout regime, not the realised EXPANSION.
+ * Weakness state = the other verdict state, for every family.
+ */
+export const FAMILY_STRENGTH_STATE = Object.freeze({
+  "channel-breakout": "EFFICIENT",
+  "ma-cross": "EFFICIENT",
+  "opening-range": "EFFICIENT",
+  "level-retest": "EFFICIENT",
+  "band-reversion": "CHOPPY",
+  "osc-fade": "CHOPPY",
+  "candlestick-reversal": "CHOPPY",
+  "vol-compression": "CHOPPY",
+});
+
+/**
+ * Reversion families: their verdict is explicitly conditional on the ONE
+ * standardised exit harness used in this cycle. No new exit is added.
+ */
+export const REVERSION_FAMILIES = Object.freeze([
+  "band-reversion",
+  "osc-fade",
+  "candlestick-reversal",
+]);
+export const EXIT_CAVEAT =
+  "under the standard exit (1.5 ATR stop, 2R target) only";
 
 /**
  * Data roles. Decision #6: preserve roles and sealed datasets, but break the
@@ -108,25 +173,38 @@ export const CONFLICT_RULE = Object.freeze({
 /**
  * Pre-registered claim-verification criteria (family level, not strategy level).
  *
- * REVISED at G0 (2026-10-26, before any real claim result) in response to the
- * review. Two changes, both made BEFORE results so neither can be laundering:
+ * G0 AMENDMENT 3 (2026-10-27, before any real claim result) — RESTORED RULE:
+ * "original floor plus the control". v1.1/v1.2 had replaced the original floor
+ * with an EXCESS floor (excess > 0.10, net > 0). That was a mistake: it let a
+ * claim ship on a strong *relative* edge while still being unprofitable in
+ * absolute terms, and it spent the whole +0.10R budget on the control.
  *
- *  1. The null is no longer zero. A claim must beat a MATCHED RANDOM-ENTRY
- *     baseline (same state, same side, same stop/target/cost) by the practical
- *     floor. DEV 2004-2011 is a bull run (mean close 414 -> 1,579), so an
- *     unconditional long with a 2R target has positive expectancy. Testing
- *     against zero would confirm drift, not skill.
- *  2. Every claim reports a continuous estimate + 95% CI regardless of verdict,
- *     so "nothing CONFIRMED" is still a readable answer.
+ * The rule is now a CONJUNCTION of two independent, day-clustered tests:
+ *
+ *   (A) NET MEAN   > +0.10R   AND  day-clustered t(net)   > 2
+ *   (B) EXCESS     >  0R      AND  day-clustered t(excess) > 2
+ *
+ * plus the existing vetoes (n >= 100, concentration, year consistency) and
+ * the NO_BASELINE veto. The +0.10R floor is back on the ABSOLUTE NET MEAN —
+ * the original v1.0 floor — while the matched random-entry control survives
+ * as a second significance gate that must be merely positive.
+ *
+ * NO numeric constant changed: 0.10, 2, 100, 0.50, 0.75 are the same values
+ * frozen at G0. Only their arrangement changed, and the SE estimator is the
+ * day-clustered CR1 one from Amendment 2. `absoluteNetRMin` is REMOVED (it
+ * was the "net > 0" half of the discarded v1.2 rule).
  */
 export const CLAIM_CRITERIA = Object.freeze({
   minTradesPerCell: 100,
-  practicalFloorR: 0.1, // EXCESS over matched random baseline, net R/trade
-  tStatMin: 2, // t of the difference vs the random baseline
-  absoluteNetRMin: 0, // a claim beating random but losing money is not tradeable
+  practicalFloorR: 0.1, // NET MEAN floor — the ORIGINAL v1.0 floor restored
+  tStatMin: 2, // day-clustered t, required for BOTH net mean and excess
+  excessFloorR: 0, // excess over matched random baseline must be > 0
   concentrationMax: 0.5, // no single year may contribute >50% of cell R
   loyoPositiveMin: 0.75, // >=75% of leave-one-year-out windows positive
-  note: "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.",
+  requireMatchedBaseline: true, // a missing fine AND coarse cell -> NO_BASELINE veto
+  baselineMinCellN: 200, // a fine cell needs >= 200 random entries to be sufficient
+  note: "CONJUNCTION: net mean > +0.10R with clustered t > 2 AND excess > 0 with clustered t > 2, plus n/concentration/year/NO_BASELINE vetoes. Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.2.1.",
+  amendedAt: "G0 Amendment 3, 2026-10-27, before any claim result",
 });
 
 /**
@@ -166,7 +244,7 @@ export const SENSITIVITY_RULE = Object.freeze({
   conditionalRequiresValSupport: true,
   conditionalReportAt: ["M9", "M10"],
   valSupportCriterion:
-    "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA (excess > 0.10R, clustered t > 2, absolute net R > 0, no vetoes), evaluated once, with the VAL role spent on promotion.",
+    "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA as amended at G0 Amendment 3 (net mean > +0.10R with day-clustered t > 2, AND excess over matched random > 0 with day-clustered t > 2, AND all vetoes clear), evaluated once, with the VAL role spent on promotion.",
   requiresM9GridReport: true,
   requiresM10SeparateReport: true,
   thresholdsImmutableAfterResults: true,
@@ -185,19 +263,98 @@ export const RANDOM_BASELINE = Object.freeze({
 });
 
 /**
- * Evidence prior. The original "assume 60% are false" was too gentle: most
- * textbook intraday rules lack peer-reviewed out-of-sample support. Cards carry
- * an evidence tier and are TESTED IN TIER ORDER (fixed sequence), so the
- * best-supported claims are examined first and weak claims cannot consume the
- * multiplicity budget before them.
+ * EVIDENCE — G0 AMENDMENT 3 (2026-10-27) REPLACED THE FOUR SUBJECTIVE TIERS.
+ *
+ * Instead of "tier 1 = peer-reviewed phenomena exist" (an uncheckable claim),
+ * each FAMILY now points at ONE empirical study that was actually located and
+ * opened, with its full URL, or is marked PRACTITIONER_ONLY. No outcome from
+ * our own data was used to build this registry — it is literature only.
+ *
+ * `evidenceTier` on a card is retained as a FROZEN ORDER RANK so the v1.2
+ * TEST_ORDER stays byte-identical; it is DIAGNOSTIC and is NOT an ordering
+ * key and NOT an evidence claim any more. The authoritative ordering is the
+ * explicit frozen list in claim-cards.draft.mjs.
  */
+export const EVIDENCE_GRADES = Object.freeze({
+  PEER_REVIEWED_TEST: "at least one empirical study tests this family; URL opened 2026-10-27",
+  PRACTITIONER_ONLY: "no empirical study found; claim rests on practitioner literature only",
+});
+
+/** One empirical study per family, opened 2026-10-27. Full URLs are literal. */
+export const EMPIRICAL_STUDIES = Object.freeze({
+  "channel-breakout": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764.",
+    url: "http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf",
+    tests: "trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986",
+    finding: "in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping",
+  }),
+  "ma-cross": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Chong, T.T.-L. & Ng, W.-K. (2008). Technical analysis and the London stock exchange: testing the MACD and RSI rules using the FT30. Applied Economics Letters 15(14), 1111-1114. DOI 10.1080/13504850600993598.",
+    url: "https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html",
+    tests: "MACD (exponential moving-average crossover) rule on 60 years of FT30",
+    finding: "MACD/RSI beat buy-and-hold in most cases (positive, single-market study)",
+  }),
+  "opening-range": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Holmberg, U., Lönnbark, C. & Lundström, C. (2013). Assessing the profitability of intraday opening range breakout strategies. Finance Research Letters 10(1), 47-53. DOI 10.1016/j.frl.2012.09.001.",
+    url: "http://www.econ.umu.se/ueslpnr/ues845.pdf",
+    tests: "opening-range breakout on US crude-oil futures, bootstrap test",
+    finding: "full-sample success is NOT robust across three sub-periods (mixed/negative)",
+  }),
+  "level-retest": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Osler, C. L. (2000). Support for Resistance: Technical Analysis and Intraday Exchange Rates. FRBNY Economic Policy Review 6(2), 53-68.",
+    url: "https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf",
+    tests: "support/resistance (level) signals from six FX firms, intraday 1996-1998",
+    finding: "levels predict intraday trend interruptions, but firms mis-rank level strength",
+  }),
+  "osc-fade": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149.",
+    url: "https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf",
+    tests: "RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002",
+    finding: "RSI(14,30/70) profitable on DJIA but not consistently across markets",
+  }),
+  "band-reversion": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Lento, C., Gradojevic, N. & Wright, C. S. (2007). Investment information content in Bollinger Bands? Applied Financial Economics Letters 3(4), 263-267. DOI 10.1080/17446540701206576.",
+    url: "https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands",
+    tests: "Bollinger Band (20,2) and variants, four markets 1995-2004, transaction costs",
+    finding: "BB underperform buy-and-hold; contrarian inversion does better (negative for the textbook fade)",
+  }),
+  "candlestick-reversal": Object.freeze({
+    grade: "PEER_REVIEWED_TEST",
+    citation:
+      "Marshall, B. R., Young, M. R. & Rose, L. C. (2006). Candlestick technical trading strategies: Can they create value for investors? Journal of Banking & Finance 30(8), 2303-2323. DOI 10.1016/j.jbankfin.2005.08.001.",
+    url: "https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf",
+    tests: "26 candlestick reversal patterns on DJIA component stocks 1992-2002, bootstrap",
+    finding: "no value; neither bullish nor bearish signals beat buy-and-hold (negative)",
+  }),
+  "vol-compression": Object.freeze({
+    grade: "PRACTITIONER_ONLY",
+    citation:
+      "Crabel, T. (1990). Day Trading with Short Term Price Patterns & Opening Range Breakout (Traders Press) — practitioner book, not a peer-reviewed test.",
+    url: "https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7",
+    tests: "NR7 / inside-bar / volatility-contraction patterns — NO academic test found",
+    finding:
+      "practitioner only. Holmberg et al. (2013) discusses Crabel's contraction-expansion principle but tests ORB, not NR7/inside-bar. This is the PLAINLY WRONG item: v1.2 ranked this family tier 1 with no empirical study.",
+  }),
+});
+
 export const EVIDENCE = Object.freeze({
   priorFalseFraction: 0.8,
-  testOrder: "evidenceTier ascending, then priority ascending (fixed sequence)",
-  tiers: Object.freeze({
-    1: "peer-reviewed momentum/trend or volatility phenomena exist",
-    2: "some academic support, mostly at daily horizon",
-    3: "practitioner literature, little rigorous evidence",
-    4: "largely anecdotal; weakest prior — tested LAST",
-  }),
+  testOrder:
+    "EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.",
+  grades: EVIDENCE_GRADES,
+  studies: EMPIRICAL_STUDIES,
+  openedAt: "2026-10-27, before any strategy result",
+  note: "Each family has one opened empirical study or is marked PRACTITIONER_ONLY. Full URLs above. No outcomes from our own data were used.",
 });
