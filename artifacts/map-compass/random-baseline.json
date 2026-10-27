@@ -1,0 +1,1035 @@
+{
+  "generatedAt": "2026-10-27T04:33:53.676Z",
+  "frozenConfig": {
+    "entriesPerCellPerSide": 4000,
+    "seed": 20261026,
+    "maxHoldBars": 96,
+    "matchOn": [
+      "state",
+      "side",
+      "session",
+      "volRegime"
+    ],
+    "reportLongAndShortSeparately": true,
+    "note": "Identical exit harness (1.5xATR stop, 2R target) and identical cost model. Only entry timing/side is random."
+  },
+  "purpose": "Matched random-entry null. A claim must beat the cell with the SAME state and side by the practical floor.",
+  "bars": 248912,
+  "devYears": [
+    2004,
+    2005,
+    2006,
+    2007,
+    2009,
+    2010,
+    2011,
+    2013,
+    2014,
+    2015,
+    2017,
+    2018
+  ],
+  "cells": {
+    "EXPANSION|long": {
+      "state": "EXPANSION",
+      "side": "long",
+      "n": 4000,
+      "poolSize": 7988,
+      "meanNetR": -0.196647,
+      "sd": 1.368605,
+      "se": 0.02164,
+      "ci95": [
+        -0.23906,
+        -0.154233
+      ],
+      "winRate": 0.2905,
+      "totalR": -786.588,
+      "byYear": {
+        "2004": {
+          "n": 137,
+          "meanR": -0.12696
+        },
+        "2005": {
+          "n": 386,
+          "meanR": -0.0208
+        },
+        "2006": {
+          "n": 340,
+          "meanR": -0.17428
+        },
+        "2007": {
+          "n": 318,
+          "meanR": -0.24965
+        },
+        "2009": {
+          "n": 324,
+          "meanR": 0.10159
+        },
+        "2010": {
+          "n": 289,
+          "meanR": -0.30227
+        },
+        "2011": {
+          "n": 280,
+          "meanR": -0.35348
+        },
+        "2013": {
+          "n": 455,
+          "meanR": -0.44561
+        },
+        "2014": {
+          "n": 402,
+          "meanR": -0.19696
+        },
+        "2015": {
+          "n": 357,
+          "meanR": -0.09479
+        },
+        "2017": {
+          "n": 345,
+          "meanR": -0.23892
+        },
+        "2018": {
+          "n": 367,
+          "meanR": -0.1932
+        }
+      }
+    },
+    "EXPANSION|short": {
+      "state": "EXPANSION",
+      "side": "short",
+      "n": 4000,
+      "poolSize": 7988,
+      "meanNetR": -0.095284,
+      "sd": 1.427468,
+      "se": 0.02257,
+      "ci95": [
+        -0.139521,
+        -0.051046
+      ],
+      "winRate": 0.3277,
+      "totalR": -381.135,
+      "byYear": {
+        "2004": {
+          "n": 111,
+          "meanR": -0.04113
+        },
+        "2005": {
+          "n": 348,
+          "meanR": -0.07885
+        },
+        "2006": {
+          "n": 369,
+          "meanR": -0.02676
+        },
+        "2007": {
+          "n": 342,
+          "meanR": -0.05424
+        },
+        "2009": {
+          "n": 292,
+          "meanR": -0.23609
+        },
+        "2010": {
+          "n": 284,
+          "meanR": -0.35308
+        },
+        "2011": {
+          "n": 306,
+          "meanR": -0.10303
+        },
+        "2013": {
+          "n": 487,
+          "meanR": 0.22786
+        },
+        "2014": {
+          "n": 420,
+          "meanR": -0.15828
+        },
+        "2015": {
+          "n": 340,
+          "meanR": -0.16659
+        },
+        "2017": {
+          "n": 341,
+          "meanR": -0.116
+        },
+        "2018": {
+          "n": 360,
+          "meanR": -0.1896
+        }
+      }
+    },
+    "GRIND|long": {
+      "state": "GRIND",
+      "side": "long",
+      "n": 4000,
+      "poolSize": 11310,
+      "meanNetR": -0.108396,
+      "sd": 1.446171,
+      "se": 0.022866,
+      "ci95": [
+        -0.153214,
+        -0.063579
+      ],
+      "winRate": 0.3425,
+      "totalR": -433.586,
+      "byYear": {
+        "2004": {
+          "n": 134,
+          "meanR": -0.08515
+        },
+        "2005": {
+          "n": 310,
+          "meanR": -0.16611
+        },
+        "2006": {
+          "n": 339,
+          "meanR": 0.14112
+        },
+        "2007": {
+          "n": 379,
+          "meanR": 0.02095
+        },
+        "2009": {
+          "n": 371,
+          "meanR": 0.02518
+        },
+        "2010": {
+          "n": 322,
+          "meanR": -0.03102
+        },
+        "2011": {
+          "n": 339,
+          "meanR": 0.07964
+        },
+        "2013": {
+          "n": 350,
+          "meanR": -0.35615
+        },
+        "2014": {
+          "n": 294,
+          "meanR": -0.33985
+        },
+        "2015": {
+          "n": 329,
+          "meanR": -0.25811
+        },
+        "2017": {
+          "n": 411,
+          "meanR": -0.16047
+        },
+        "2018": {
+          "n": 422,
+          "meanR": -0.18335
+        }
+      }
+    },
+    "GRIND|short": {
+      "state": "GRIND",
+      "side": "short",
+      "n": 4000,
+      "poolSize": 11310,
+      "meanNetR": -0.179652,
+      "sd": 1.418072,
+      "se": 0.022422,
+      "ci95": [
+        -0.223599,
+        -0.135706
+      ],
+      "winRate": 0.318,
+      "totalR": -718.609,
+      "byYear": {
+        "2004": {
+          "n": 153,
+          "meanR": -0.09875
+        },
+        "2005": {
+          "n": 323,
+          "meanR": -0.06781
+        },
+        "2006": {
+          "n": 365,
+          "meanR": -0.44062
+        },
+        "2007": {
+          "n": 370,
+          "meanR": -0.13233
+        },
+        "2009": {
+          "n": 350,
+          "meanR": -0.34707
+        },
+        "2010": {
+          "n": 272,
+          "meanR": -0.27566
+        },
+        "2011": {
+          "n": 344,
+          "meanR": -0.35106
+        },
+        "2013": {
+          "n": 339,
+          "meanR": 0.05787
+        },
+        "2014": {
+          "n": 299,
+          "meanR": -0.1806
+        },
+        "2015": {
+          "n": 343,
+          "meanR": -0.28803
+        },
+        "2017": {
+          "n": 409,
+          "meanR": -0.22806
+        },
+        "2018": {
+          "n": 433,
+          "meanR": 0.16595
+        }
+      }
+    },
+    "WHIPSAW|long": {
+      "state": "WHIPSAW",
+      "side": "long",
+      "n": 4000,
+      "poolSize": 18961,
+      "meanNetR": -0.043317,
+      "sd": 1.450797,
+      "se": 0.022939,
+      "ci95": [
+        -0.088278,
+        0.001643
+      ],
+      "winRate": 0.3468,
+      "totalR": -173.27,
+      "byYear": {
+        "2004": {
+          "n": 148,
+          "meanR": 0.05424
+        },
+        "2005": {
+          "n": 335,
+          "meanR": -0.0962
+        },
+        "2006": {
+          "n": 372,
+          "meanR": 0.00448
+        },
+        "2007": {
+          "n": 324,
+          "meanR": -0.12735
+        },
+        "2009": {
+          "n": 379,
+          "meanR": 0.07839
+        },
+        "2010": {
+          "n": 340,
+          "meanR": 0.17677
+        },
+        "2011": {
+          "n": 402,
+          "meanR": 0.10818
+        },
+        "2013": {
+          "n": 321,
+          "meanR": -0.30176
+        },
+        "2014": {
+          "n": 325,
+          "meanR": -0.24359
+        },
+        "2015": {
+          "n": 339,
+          "meanR": 0.03102
+        },
+        "2017": {
+          "n": 338,
+          "meanR": -0.11642
+        },
+        "2018": {
+          "n": 377,
+          "meanR": -0.10055
+        }
+      }
+    },
+    "WHIPSAW|short": {
+      "state": "WHIPSAW",
+      "side": "short",
+      "n": 4000,
+      "poolSize": 18961,
+      "meanNetR": -0.165227,
+      "sd": 1.411023,
+      "se": 0.02231,
+      "ci95": [
+        -0.208955,
+        -0.121499
+      ],
+      "winRate": 0.3098,
+      "totalR": -660.91,
+      "byYear": {
+        "2004": {
+          "n": 153,
+          "meanR": -0.27518
+        },
+        "2005": {
+          "n": 338,
+          "meanR": -0.32387
+        },
+        "2006": {
+          "n": 336,
+          "meanR": -0.15737
+        },
+        "2007": {
+          "n": 373,
+          "meanR": -0.1515
+        },
+        "2009": {
+          "n": 353,
+          "meanR": -0.10773
+        },
+        "2010": {
+          "n": 349,
+          "meanR": -0.31227
+        },
+        "2011": {
+          "n": 382,
+          "meanR": -0.2855
+        },
+        "2013": {
+          "n": 309,
+          "meanR": -0.12581
+        },
+        "2014": {
+          "n": 379,
+          "meanR": -0.06896
+        },
+        "2015": {
+          "n": 312,
+          "meanR": 0.03367
+        },
+        "2017": {
+          "n": 335,
+          "meanR": -0.09908
+        },
+        "2018": {
+          "n": 381,
+          "meanR": -0.14745
+        }
+      }
+    },
+    "QUIET|long": {
+      "state": "QUIET",
+      "side": "long",
+      "n": 4000,
+      "poolSize": 62961,
+      "meanNetR": -0.096559,
+      "sd": 1.447855,
+      "se": 0.022893,
+      "ci95": [
+        -0.141429,
+        -0.05169
+      ],
+      "winRate": 0.3453,
+      "totalR": -386.236,
+      "byYear": {
+        "2004": {
+          "n": 144,
+          "meanR": 0.08416
+        },
+        "2005": {
+          "n": 349,
+          "meanR": -0.11808
+        },
+        "2006": {
+          "n": 323,
+          "meanR": -0.04876
+        },
+        "2007": {
+          "n": 367,
+          "meanR": 0.08788
+        },
+        "2009": {
+          "n": 367,
+          "meanR": -0.05676
+        },
+        "2010": {
+          "n": 356,
+          "meanR": 0.00948
+        },
+        "2011": {
+          "n": 327,
+          "meanR": 0.00902
+        },
+        "2013": {
+          "n": 349,
+          "meanR": -0.1297
+        },
+        "2014": {
+          "n": 393,
+          "meanR": -0.12483
+        },
+        "2015": {
+          "n": 367,
+          "meanR": -0.25759
+        },
+        "2017": {
+          "n": 325,
+          "meanR": -0.11516
+        },
+        "2018": {
+          "n": 333,
+          "meanR": -0.39895
+        }
+      }
+    },
+    "QUIET|short": {
+      "state": "QUIET",
+      "side": "short",
+      "n": 4000,
+      "poolSize": 62961,
+      "meanNetR": -0.13273,
+      "sd": 1.46563,
+      "se": 0.023174,
+      "ci95": [
+        -0.178151,
+        -0.08731
+      ],
+      "winRate": 0.3392,
+      "totalR": -530.922,
+      "byYear": {
+        "2004": {
+          "n": 163,
+          "meanR": -0.49199
+        },
+        "2005": {
+          "n": 326,
+          "meanR": -0.31863
+        },
+        "2006": {
+          "n": 356,
+          "meanR": -0.05004
+        },
+        "2007": {
+          "n": 343,
+          "meanR": -0.21834
+        },
+        "2009": {
+          "n": 368,
+          "meanR": -0.14494
+        },
+        "2010": {
+          "n": 359,
+          "meanR": -0.18943
+        },
+        "2011": {
+          "n": 344,
+          "meanR": -0.02832
+        },
+        "2013": {
+          "n": 354,
+          "meanR": 0.03951
+        },
+        "2014": {
+          "n": 351,
+          "meanR": -0.11902
+        },
+        "2015": {
+          "n": 374,
+          "meanR": 0.12054
+        },
+        "2017": {
+          "n": 328,
+          "meanR": -0.37569
+        },
+        "2018": {
+          "n": 334,
+          "meanR": -0.05127
+        }
+      }
+    }
+  },
+  "fineCells": {
+    "EXPANSION|long|asian|high": {
+      "n": 461,
+      "meanNetR": -0.189563,
+      "sd": 1.388601,
+      "sufficient": true
+    },
+    "EXPANSION|long|asian|low": {
+      "n": 148,
+      "meanNetR": -0.158223,
+      "sd": 1.435286,
+      "sufficient": false
+    },
+    "EXPANSION|long|asian|mid": {
+      "n": 508,
+      "meanNetR": -0.411608,
+      "sd": 1.285608,
+      "sufficient": true
+    },
+    "EXPANSION|long|london|high": {
+      "n": 179,
+      "meanNetR": -0.150678,
+      "sd": 1.417125,
+      "sufficient": false
+    },
+    "EXPANSION|long|london|low": {
+      "n": 11,
+      "meanNetR": 0.701718,
+      "sd": 1.513575,
+      "sufficient": false
+    },
+    "EXPANSION|long|london|mid": {
+      "n": 63,
+      "meanNetR": 0.23886,
+      "sd": 1.514645,
+      "sufficient": false
+    },
+    "EXPANSION|long|ny|high": {
+      "n": 1658,
+      "meanNetR": -0.160535,
+      "sd": 1.36522,
+      "sufficient": true
+    },
+    "EXPANSION|long|ny|low": {
+      "n": 151,
+      "meanNetR": -0.218487,
+      "sd": 1.373979,
+      "sufficient": false
+    },
+    "EXPANSION|long|ny|mid": {
+      "n": 821,
+      "meanNetR": -0.19893,
+      "sd": 1.362107,
+      "sufficient": true
+    },
+    "EXPANSION|short|asian|high": {
+      "n": 427,
+      "meanNetR": 0.027192,
+      "sd": 1.498376,
+      "sufficient": true
+    },
+    "EXPANSION|short|asian|low": {
+      "n": 169,
+      "meanNetR": -0.256173,
+      "sd": 1.398119,
+      "sufficient": false
+    },
+    "EXPANSION|short|asian|mid": {
+      "n": 484,
+      "meanNetR": 0.032927,
+      "sd": 1.527512,
+      "sufficient": true
+    },
+    "EXPANSION|short|london|high": {
+      "n": 165,
+      "meanNetR": 0.16878,
+      "sd": 1.514235,
+      "sufficient": false
+    },
+    "EXPANSION|short|london|low": {
+      "n": 7,
+      "meanNetR": -0.778802,
+      "sd": 1.133893,
+      "sufficient": false
+    },
+    "EXPANSION|short|london|mid": {
+      "n": 49,
+      "meanNetR": 0.07641,
+      "sd": 1.489761,
+      "sufficient": false
+    },
+    "EXPANSION|short|ny|high": {
+      "n": 1636,
+      "meanNetR": -0.096229,
+      "sd": 1.396526,
+      "sufficient": true
+    },
+    "EXPANSION|short|ny|low": {
+      "n": 152,
+      "meanNetR": 0.073685,
+      "sd": 1.466505,
+      "sufficient": false
+    },
+    "EXPANSION|short|ny|mid": {
+      "n": 911,
+      "meanNetR": -0.269265,
+      "sd": 1.353144,
+      "sufficient": true
+    },
+    "GRIND|long|asian|high": {
+      "n": 511,
+      "meanNetR": -0.136877,
+      "sd": 1.407688,
+      "sufficient": true
+    },
+    "GRIND|long|asian|low": {
+      "n": 277,
+      "meanNetR": -0.544764,
+      "sd": 1.243035,
+      "sufficient": true
+    },
+    "GRIND|long|asian|mid": {
+      "n": 1010,
+      "meanNetR": -0.107039,
+      "sd": 1.471781,
+      "sufficient": true
+    },
+    "GRIND|long|london|high": {
+      "n": 627,
+      "meanNetR": -0.048989,
+      "sd": 1.442097,
+      "sufficient": true
+    },
+    "GRIND|long|london|low": {
+      "n": 67,
+      "meanNetR": 0.090471,
+      "sd": 1.587899,
+      "sufficient": false
+    },
+    "GRIND|long|london|mid": {
+      "n": 654,
+      "meanNetR": -0.112454,
+      "sd": 1.429328,
+      "sufficient": true
+    },
+    "GRIND|long|ny|high": {
+      "n": 548,
+      "meanNetR": 0.012812,
+      "sd": 1.458158,
+      "sufficient": true
+    },
+    "GRIND|long|ny|low": {
+      "n": 47,
+      "meanNetR": -0.068504,
+      "sd": 1.89686,
+      "sufficient": false
+    },
+    "GRIND|long|ny|mid": {
+      "n": 259,
+      "meanNetR": -0.039512,
+      "sd": 1.450167,
+      "sufficient": true
+    },
+    "GRIND|short|asian|high": {
+      "n": 500,
+      "meanNetR": -0.242159,
+      "sd": 1.372606,
+      "sufficient": true
+    },
+    "GRIND|short|asian|low": {
+      "n": 279,
+      "meanNetR": -0.059505,
+      "sd": 1.472521,
+      "sufficient": true
+    },
+    "GRIND|short|asian|mid": {
+      "n": 1081,
+      "meanNetR": -0.156169,
+      "sd": 1.422875,
+      "sufficient": true
+    },
+    "GRIND|short|london|high": {
+      "n": 613,
+      "meanNetR": -0.10866,
+      "sd": 1.418125,
+      "sufficient": true
+    },
+    "GRIND|short|london|low": {
+      "n": 54,
+      "meanNetR": -0.036071,
+      "sd": 1.584813,
+      "sufficient": false
+    },
+    "GRIND|short|london|mid": {
+      "n": 617,
+      "meanNetR": -0.111489,
+      "sd": 1.433431,
+      "sufficient": true
+    },
+    "GRIND|short|ny|high": {
+      "n": 556,
+      "meanNetR": -0.270574,
+      "sd": 1.358162,
+      "sufficient": true
+    },
+    "GRIND|short|ny|low": {
+      "n": 43,
+      "meanNetR": -0.34466,
+      "sd": 1.932822,
+      "sufficient": false
+    },
+    "GRIND|short|ny|mid": {
+      "n": 257,
+      "meanNetR": -0.426085,
+      "sd": 1.35055,
+      "sufficient": true
+    },
+    "QUIET|long|asian|high": {
+      "n": 559,
+      "meanNetR": -0.032477,
+      "sd": 1.443641,
+      "sufficient": true
+    },
+    "QUIET|long|asian|low": {
+      "n": 361,
+      "meanNetR": -0.202096,
+      "sd": 1.42148,
+      "sufficient": true
+    },
+    "QUIET|long|asian|mid": {
+      "n": 1173,
+      "meanNetR": -0.151741,
+      "sd": 1.448275,
+      "sufficient": true
+    },
+    "QUIET|long|london|high": {
+      "n": 528,
+      "meanNetR": -0.027104,
+      "sd": 1.44388,
+      "sufficient": true
+    },
+    "QUIET|long|london|low": {
+      "n": 66,
+      "meanNetR": -0.171557,
+      "sd": 1.448678,
+      "sufficient": false
+    },
+    "QUIET|long|london|mid": {
+      "n": 569,
+      "meanNetR": -0.152052,
+      "sd": 1.414693,
+      "sufficient": true
+    },
+    "QUIET|long|ny|high": {
+      "n": 452,
+      "meanNetR": 0.058435,
+      "sd": 1.480081,
+      "sufficient": true
+    },
+    "QUIET|long|ny|low": {
+      "n": 57,
+      "meanNetR": -0.169792,
+      "sd": 1.455753,
+      "sufficient": false
+    },
+    "QUIET|long|ny|mid": {
+      "n": 235,
+      "meanNetR": -0.092405,
+      "sd": 1.505228,
+      "sufficient": true
+    },
+    "QUIET|short|asian|high": {
+      "n": 543,
+      "meanNetR": -0.017007,
+      "sd": 1.446638,
+      "sufficient": true
+    },
+    "QUIET|short|asian|low": {
+      "n": 308,
+      "meanNetR": -0.197698,
+      "sd": 1.503179,
+      "sufficient": true
+    },
+    "QUIET|short|asian|mid": {
+      "n": 1209,
+      "meanNetR": -0.130482,
+      "sd": 1.432533,
+      "sufficient": true
+    },
+    "QUIET|short|london|high": {
+      "n": 539,
+      "meanNetR": -0.123619,
+      "sd": 1.437499,
+      "sufficient": true
+    },
+    "QUIET|short|london|low": {
+      "n": 60,
+      "meanNetR": -0.42907,
+      "sd": 1.438733,
+      "sufficient": false
+    },
+    "QUIET|short|london|mid": {
+      "n": 570,
+      "meanNetR": 0.026229,
+      "sd": 1.535506,
+      "sufficient": true
+    },
+    "QUIET|short|ny|high": {
+      "n": 475,
+      "meanNetR": -0.350086,
+      "sd": 1.420895,
+      "sufficient": true
+    },
+    "QUIET|short|ny|low": {
+      "n": 69,
+      "meanNetR": -0.247049,
+      "sd": 1.567805,
+      "sufficient": false
+    },
+    "QUIET|short|ny|mid": {
+      "n": 227,
+      "meanNetR": -0.186267,
+      "sd": 1.533316,
+      "sufficient": true
+    },
+    "WHIPSAW|long|asian|high": {
+      "n": 345,
+      "meanNetR": -0.107413,
+      "sd": 1.419295,
+      "sufficient": true
+    },
+    "WHIPSAW|long|asian|low": {
+      "n": 130,
+      "meanNetR": -0.116664,
+      "sd": 1.448303,
+      "sufficient": false
+    },
+    "WHIPSAW|long|asian|mid": {
+      "n": 503,
+      "meanNetR": -0.076443,
+      "sd": 1.453446,
+      "sufficient": true
+    },
+    "WHIPSAW|long|london|high": {
+      "n": 120,
+      "meanNetR": -0.238465,
+      "sd": 1.357301,
+      "sufficient": false
+    },
+    "WHIPSAW|long|london|low": {
+      "n": 1,
+      "meanNetR": -1.207373,
+      "sd": 0,
+      "sufficient": false
+    },
+    "WHIPSAW|long|london|mid": {
+      "n": 48,
+      "meanNetR": -0.403173,
+      "sd": 1.316226,
+      "sufficient": false
+    },
+    "WHIPSAW|long|ny|high": {
+      "n": 1617,
+      "meanNetR": -0.005073,
+      "sd": 1.441287,
+      "sufficient": true
+    },
+    "WHIPSAW|long|ny|low": {
+      "n": 180,
+      "meanNetR": 0.013111,
+      "sd": 1.474615,
+      "sufficient": false
+    },
+    "WHIPSAW|long|ny|mid": {
+      "n": 1056,
+      "meanNetR": -0.026113,
+      "sd": 1.485554,
+      "sufficient": true
+    },
+    "WHIPSAW|short|asian|high": {
+      "n": 315,
+      "meanNetR": -0.133796,
+      "sd": 1.401691,
+      "sufficient": true
+    },
+    "WHIPSAW|short|asian|low": {
+      "n": 139,
+      "meanNetR": -0.326288,
+      "sd": 1.520866,
+      "sufficient": false
+    },
+    "WHIPSAW|short|asian|mid": {
+      "n": 487,
+      "meanNetR": -0.12953,
+      "sd": 1.425637,
+      "sufficient": true
+    },
+    "WHIPSAW|short|london|high": {
+      "n": 108,
+      "meanNetR": -0.185303,
+      "sd": 1.377885,
+      "sufficient": false
+    },
+    "WHIPSAW|short|london|low": {
+      "n": 3,
+      "meanNetR": -1.207373,
+      "sd": 0,
+      "sufficient": false
+    },
+    "WHIPSAW|short|london|mid": {
+      "n": 41,
+      "meanNetR": -0.489543,
+      "sd": 1.257175,
+      "sufficient": false
+    },
+    "WHIPSAW|short|ny|high": {
+      "n": 1641,
+      "meanNetR": -0.12543,
+      "sd": 1.405688,
+      "sufficient": true
+    },
+    "WHIPSAW|short|ny|low": {
+      "n": 179,
+      "meanNetR": -0.167672,
+      "sd": 1.413549,
+      "sufficient": false
+    },
+    "WHIPSAW|short|ny|mid": {
+      "n": 1087,
+      "meanNetR": -0.212308,
+      "sd": 1.409744,
+      "sufficient": true
+    }
+  },
+  "asymmetry": {
+    "EXPANSION": {
+      "longMeanR": -0.196647,
+      "shortMeanR": -0.095284,
+      "longMinusShort": -0.101363,
+      "longWinRate": 0.2905,
+      "shortWinRate": 0.3277
+    },
+    "GRIND": {
+      "longMeanR": -0.108396,
+      "shortMeanR": -0.179652,
+      "longMinusShort": 0.071256,
+      "longWinRate": 0.3425,
+      "shortWinRate": 0.318
+    },
+    "WHIPSAW": {
+      "longMeanR": -0.043317,
+      "shortMeanR": -0.165227,
+      "longMinusShort": 0.12191,
+      "longWinRate": 0.3468,
+      "shortWinRate": 0.3098
+    },
+    "QUIET": {
+      "longMeanR": -0.096559,
+      "shortMeanR": -0.13273,
+      "longMinusShort": 0.036171,
+      "longWinRate": 0.3453,
+      "shortWinRate": 0.3392
+    }
+  },
+  "diagnostics": {
+    "TIME_EXIT": 398,
+    "TP": 10479,
+    "SL": 21123,
+    "INVALID_ATR": 0,
+    "ambiguous": 76
+  },
+  "timeExitShare": {
+    "capBars": 96,
+    "frozenIn": "EXIT_HARNESS.maxHoldBars",
+    "count": 398,
+    "resolvedTotal": 32000,
+    "share": 0.0124375,
+    "sharePct": 1.24375,
+    "note": "Trades neither stopped nor targeted by bar 96 are closed at market as TIME_EXIT. Same cap applies to real claim evaluation."
+  },
+  "verdict": "LONG_SHORT_ASYMMETRY_PRESENT — testing claims against zero would be invalid"
+}

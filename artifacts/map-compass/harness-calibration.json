@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-10-27T04:17:08.056Z",
+  "cardsFrozen": false,
+  "cardStatus": "DRAFT",
+  "mode": "DRY_RUN_CALIBRATION",
+  "criteria": {
+    "minTradesPerCell": 100,
+    "practicalFloorR": 0.1,
+    "tStatMin": 2,
+    "absoluteNetRMin": 0,
+    "concentrationMax": 0.5,
+    "loyoPositiveMin": 0.75,
+    "note": "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7."
+  },
+  "states": [
+    "EXPANSION",
+    "GRIND",
+    "WHIPSAW",
+    "QUIET"
+  ],
+  "devYears": [
+    2004,
+    2005,
+    2006,
+    2007,
+    2009,
+    2010,
+    2011,
+    2013,
+    2014,
+    2015,
+    2017,
+    2018
+  ],
+  "powerTable": [
+    {
+      "n": 100,
+      "mdeR": 0.4006,
+      "powerAt010R": 0.104,
+      "powerAt015R": 0.181
+    },
+    {
+      "n": 200,
+      "mdeR": 0.2833,
+      "powerAt010R": 0.166,
+      "powerAt015R": 0.317
+    },
+    {
+      "n": 300,
+      "mdeR": 0.2313,
+      "powerAt010R": 0.227,
+      "powerAt015R": 0.443
+    },
+    {
+      "n": 500,
+      "mdeR": 0.1792,
+      "powerAt010R": 0.346,
+      "powerAt015R": 0.65
+    },
+    {
+      "n": 750,
+      "mdeR": 0.1463,
+      "powerAt010R": 0.482,
+      "powerAt015R": 0.819
+    },
+    {
+      "n": 1000,
+      "mdeR": 0.1267,
+      "powerAt010R": 0.599,
+      "powerAt015R": 0.913
+    },
+    {
+      "n": 1600,
+      "mdeR": 0.1002,
+      "powerAt010R": 0.799,
+      "powerAt015R": 0.987
+    },
+    {
+      "n": 2400,
+      "mdeR": 0.0818,
+      "powerAt010R": 0.929,
+      "powerAt015R": 0.999
+    }
+  ],
+  "calibration": {
+    "seeds": 8,
+    "totalClaimsPerRun": 48,
+    "falsePositiveConfirms": 1,
+    "falsePositiveRate": 0.0026,
+    "knownEdgeR": 0.15,
+    "knownEdgeDetected": 45,
+    "knownEdgeDetectionRate": 0.9375
+  },
+  "placebo": {
+    "shuffles": 40,
+    "seed": 20261026,
+    "counts": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      2,
+      2,
+      2,
+      3,
+      3,
+      3,
+      5
+    ],
+    "medianFakeConfirms": 0,
+    "p95FakeConfirms": 3,
+    "maxFakeConfirms": 5,
+    "note": "A real CONFIRMED count must exceed p95FakeConfirms to be credible."
+  },
+  "real": null,
+  "baselineLoaded": true,
+  "sensitivityRule": {
+    "authoritativeCutoffs": "frozen",
+    "sweepsCanNullifyVerdict": false,
+    "robustMinPct": 80,
+    "fragileMinPct": 50,
+    "conditionalTag": "CONDITIONAL",
+    "compassCanEnableConditional": false,
+    "conditionalRequiresValSupport": true,
+    "conditionalReportAt": [
+      "M9",
+      "M10"
+    ],
+    "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA (excess > 0.10R, clustered t > 2, absolute net R > 0, no vetoes), evaluated once, with the VAL role spent on promotion.",
+    "requiresM9GridReport": true,
+    "requiresM10SeparateReport": true,
+    "thresholdsImmutableAfterResults": true,
+    "decidedAt": "G0, 2026-10-26, before any claim result",
+    "amendedAt": "G0 Amendment 2, 2026-10-27, before any claim result"
+  },
+  "evidence": {
+    "priorFalseFraction": 0.8,
+    "testOrder": "evidenceTier ascending, then priority ascending (fixed sequence)",
+    "tiers": {
+      "1": "peer-reviewed momentum/trend or volatility phenomena exist",
+      "2": "some academic support, mostly at daily horizon",
+      "3": "practitioner literature, little rigorous evidence",
+      "4": "largely anecdotal; weakest prior — tested LAST"
+    }
+  },
+  "testOrder": [
+    {
+      "id": "donchian-20",
+      "tier": 1,
+      "testOrder": 1
+    },
+    {
+      "id": "donchian-55",
+      "tier": 1,
+      "testOrder": 2
+    },
+    {
+      "id": "dual-thrust",
+      "tier": 1,
+      "testOrder": 3
+    },
+    {
+      "id": "sma-20-50",
+      "tier": 1,
+      "testOrder": 4
+    },
+    {
+      "id": "macd-cross",
+      "tier": 1,
+      "testOrder": 5
+    },
+    {
+      "id": "ichimoku-tk",
+      "tier": 1,
+      "testOrder": 6
+    },
+    {
+      "id": "atr-squeeze-break",
+      "tier": 1,
+      "testOrder": 7
+    },
+    {
+      "id": "nr7-break",
+      "tier": 1,
+      "testOrder": 8
+    },
+    {
+      "id": "inside-bar-break",
+      "tier": 1,
+      "testOrder": 9
+    },
+    {
+      "id": "asian-range-break",
+      "tier": 2,
+      "testOrder": 10
+    },
+    {
+      "id": "london-orb-30",
+      "tier": 2,
+      "testOrder": 11
+    },
+    {
+      "id": "pdh-pdl-break",
+      "tier": 2,
+      "testOrder": 12
+    },
+    {
+      "id": "bollinger-20-2",
+      "tier": 2,
+      "testOrder": 13
+    },
+    {
+      "id": "keltner-20-atr",
+      "tier": 2,
+      "testOrder": 14
+    },
+    {
+      "id": "bb-squeeze-fade",
+      "tier": 2,
+      "testOrder": 15
+    },
+    {
+      "id": "pdh-retest",
+      "tier": 3,
+      "testOrder": 16
+    },
+    {
+      "id": "pdl-retest",
+      "tier": 3,
+      "testOrder": 17
+    },
+    {
+      "id": "classic-pivot",
+      "tier": 3,
+      "testOrder": 18
+    },
+    {
+      "id": "rsi-14-30-70",
+      "tier": 3,
+      "testOrder": 19
+    },
+    {
+      "id": "williams-r-fade",
+      "tier": 3,
+      "testOrder": 20
+    },
+    {
+      "id": "stochastic-14-fade",
+      "tier": 3,
+      "testOrder": 21
+    },
+    {
+      "id": "engulfing",
+      "tier": 4,
+      "testOrder": 22
+    },
+    {
+      "id": "morning-evening-star",
+      "tier": 4,
+      "testOrder": 23
+    },
+    {
+      "id": "three-soldiers-crows",
+      "tier": 4,
+      "testOrder": 24
+    }
+  ],
+  "note": "DRY RUN: synthetic trades only. No ledger records written. This calibrates the harness (kill criterion #7)."
+}

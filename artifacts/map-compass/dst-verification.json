@@ -1,0 +1,417 @@
+{
+  "generatedAt": "2026-10-27T04:31:42.033Z",
+  "shippedRule": "two epochs: A UTC+1/+2 (pre 2011-05-09), B UTC+2/+3; both EU DST; target fixed EAT",
+  "independentSource": "Dukascopy M1 BID via kevingtlin/Market-Data-Lab (UTC, pinned git blob oids)",
+  "coverage": {
+    "from": "2010-01-01",
+    "note": "2004-06..2009-12 has no independent UTC reference; epoch A is extrapolated there"
+  },
+  "epochBoundary": "2011-05-09 01:00:00",
+  "monthsChecked": 44,
+  "winterMonths": 20,
+  "preSeamMonths": 16,
+  "postSeamMonths": 27,
+  "badErrors": [],
+  "winterNotBetterThanNoDst": [],
+  "preSeamNotBetterThanOneEpoch": [],
+  "postSeamDisagreesWithOneEpoch": [],
+  "verdict": "PASS",
+  "results": [
+    {
+      "month": "2010_01",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.321,
+      "ONE_EPOCH": 1.333,
+      "NO_DST": 1.96
+    },
+    {
+      "month": "2010_02",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.212,
+      "ONE_EPOCH": 1.502,
+      "NO_DST": 2.041
+    },
+    {
+      "month": "2010_03",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.253,
+      "ONE_EPOCH": 1.1,
+      "NO_DST": 1.401
+    },
+    {
+      "month": "2010_04",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.21,
+      "ONE_EPOCH": 1.007,
+      "NO_DST": 1.007
+    },
+    {
+      "month": "2010_05",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.271,
+      "ONE_EPOCH": 1.473,
+      "NO_DST": 1.473
+    },
+    {
+      "month": "2010_06",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.271,
+      "ONE_EPOCH": 1.2,
+      "NO_DST": 1.2
+    },
+    {
+      "month": "2010_07",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.227,
+      "ONE_EPOCH": 1.025,
+      "NO_DST": 1.025
+    },
+    {
+      "month": "2010_08",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.23,
+      "ONE_EPOCH": 0.803,
+      "NO_DST": 0.803
+    },
+    {
+      "month": "2010_09",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.242,
+      "ONE_EPOCH": 0.872,
+      "NO_DST": 0.872
+    },
+    {
+      "month": "2010_10",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.212,
+      "ONE_EPOCH": 1.342,
+      "NO_DST": 1.342
+    },
+    {
+      "month": "2010_11",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.134,
+      "ONE_EPOCH": 1.606,
+      "NO_DST": 2.305
+    },
+    {
+      "month": "2010_12",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.148,
+      "ONE_EPOCH": 1.277,
+      "NO_DST": 1.858
+    },
+    {
+      "month": "2011_01",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.175,
+      "ONE_EPOCH": 1.436,
+      "NO_DST": 1.883
+    },
+    {
+      "month": "2011_02",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.136,
+      "ONE_EPOCH": 1.15,
+      "NO_DST": 1.461
+    },
+    {
+      "month": "2011_03",
+      "season": "winter",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.144,
+      "ONE_EPOCH": 1.224,
+      "NO_DST": 1.749
+    },
+    {
+      "month": "2011_04",
+      "season": "summer",
+      "epoch": "A",
+      "straddles": false,
+      "TWO_EPOCH": 0.13,
+      "ONE_EPOCH": 1.181,
+      "NO_DST": 1.181
+    },
+    {
+      "month": "2011_05",
+      "season": "summer",
+      "epoch": "A+B",
+      "straddles": true,
+      "TWO_EPOCH": 0.132,
+      "ONE_EPOCH": 0.172,
+      "NO_DST": 0.172
+    },
+    {
+      "month": "2011_06",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.141,
+      "ONE_EPOCH": 0.141,
+      "NO_DST": 0.141
+    },
+    {
+      "month": "2011_07",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.169,
+      "ONE_EPOCH": 0.169,
+      "NO_DST": 0.169
+    },
+    {
+      "month": "2011_08",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.197,
+      "ONE_EPOCH": 0.197,
+      "NO_DST": 0.197
+    },
+    {
+      "month": "2011_09",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.123,
+      "ONE_EPOCH": 0.123,
+      "NO_DST": 0.123
+    },
+    {
+      "month": "2011_10",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.13,
+      "ONE_EPOCH": 0.13,
+      "NO_DST": 0.133
+    },
+    {
+      "month": "2011_11",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.147,
+      "ONE_EPOCH": 0.147,
+      "NO_DST": 2.329
+    },
+    {
+      "month": "2011_12",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.073,
+      "ONE_EPOCH": 0.073,
+      "NO_DST": 2.003
+    },
+    {
+      "month": "2012_01",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.037,
+      "ONE_EPOCH": 0.037,
+      "NO_DST": 1.784
+    },
+    {
+      "month": "2012_06",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.053,
+      "ONE_EPOCH": 0.053,
+      "NO_DST": 0.053
+    },
+    {
+      "month": "2012_12",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.037,
+      "ONE_EPOCH": 0.037,
+      "NO_DST": 1.087
+    },
+    {
+      "month": "2013_01",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.052,
+      "ONE_EPOCH": 0.052,
+      "NO_DST": 1.052
+    },
+    {
+      "month": "2013_04",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.052,
+      "ONE_EPOCH": 0.052,
+      "NO_DST": 0.052
+    },
+    {
+      "month": "2013_12",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.028,
+      "ONE_EPOCH": 0.028,
+      "NO_DST": 1.165
+    },
+    {
+      "month": "2014_01",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.028,
+      "ONE_EPOCH": 0.028,
+      "NO_DST": 1.117
+    },
+    {
+      "month": "2014_06",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.06,
+      "ONE_EPOCH": 0.06,
+      "NO_DST": 0.06
+    },
+    {
+      "month": "2014_12",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.083,
+      "ONE_EPOCH": 0.083,
+      "NO_DST": 1.161
+    },
+    {
+      "month": "2015_01",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.088,
+      "ONE_EPOCH": 0.088,
+      "NO_DST": 1.385
+    },
+    {
+      "month": "2015_06",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.038,
+      "ONE_EPOCH": 0.038,
+      "NO_DST": 0.038
+    },
+    {
+      "month": "2015_12",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.038,
+      "ONE_EPOCH": 0.038,
+      "NO_DST": 0.771
+    },
+    {
+      "month": "2018_08",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.019,
+      "ONE_EPOCH": 0.019,
+      "NO_DST": 0.019
+    },
+    {
+      "month": "2020_03",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.062,
+      "ONE_EPOCH": 0.062,
+      "NO_DST": 3.052
+    },
+    {
+      "month": "2021_06",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.112,
+      "ONE_EPOCH": 0.112,
+      "NO_DST": 0.112
+    },
+    {
+      "month": "2022_09",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.115,
+      "ONE_EPOCH": 0.115,
+      "NO_DST": 0.115
+    },
+    {
+      "month": "2023_10",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.105,
+      "ONE_EPOCH": 0.105,
+      "NO_DST": 0.105
+    },
+    {
+      "month": "2024_04",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.085,
+      "ONE_EPOCH": 0.085,
+      "NO_DST": 0.085
+    },
+    {
+      "month": "2025_04",
+      "season": "summer",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.225,
+      "ONE_EPOCH": 0.225,
+      "NO_DST": 0.225
+    },
+    {
+      "month": "2026_01",
+      "season": "winter",
+      "epoch": "B",
+      "straddles": false,
+      "TWO_EPOCH": 0.205,
+      "ONE_EPOCH": 0.205,
+      "NO_DST": 8.365
+    }
+  ]
+}

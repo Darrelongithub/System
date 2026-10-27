@@ -1,0 +1,397 @@
+{
+  "generatedAt": "2026-10-27T04:33:43.872Z",
+  "mapVersion": "M2-v0 (hand-defined 2x2 + abstain + hysteresis)",
+  "thresholds": {
+    "erCutoff": 0.35,
+    "erLookback": 20,
+    "atrPeriod": 14,
+    "atrPctileCutoff": 70,
+    "atrPctileLookback": 500,
+    "rangeLookback": 50,
+    "warmupBars": 1000,
+    "hysteresisBars": 3,
+    "abstainBandPct": 10
+  },
+  "bars": 248912,
+  "devYearsOnly": true,
+  "sealedYears": [
+    2008,
+    2012,
+    2016,
+    2019
+  ],
+  "coverage": {
+    "2004": {
+      "bars": 5966,
+      "warmup": 1000,
+      "EXPANSION": 257,
+      "GRIND": 443,
+      "WHIPSAW": 681,
+      "QUIET": 2494,
+      "UNKNOWN": 2091,
+      "abstain": 2089,
+      "pending": 761
+    },
+    "2005": {
+      "bars": 10946,
+      "warmup": 0,
+      "EXPANSION": 722,
+      "GRIND": 946,
+      "WHIPSAW": 1557,
+      "QUIET": 5195,
+      "UNKNOWN": 2526,
+      "abstain": 2526,
+      "pending": 1728
+    },
+    "2006": {
+      "bars": 10982,
+      "warmup": 0,
+      "EXPANSION": 678,
+      "GRIND": 1037,
+      "WHIPSAW": 1591,
+      "QUIET": 5144,
+      "UNKNOWN": 2532,
+      "abstain": 2532,
+      "pending": 1731
+    },
+    "2007": {
+      "bars": 11554,
+      "warmup": 0,
+      "EXPANSION": 713,
+      "GRIND": 1019,
+      "WHIPSAW": 1627,
+      "QUIET": 5510,
+      "UNKNOWN": 2685,
+      "abstain": 2685,
+      "pending": 1806
+    },
+    "2009": {
+      "bars": 11622,
+      "warmup": 0,
+      "EXPANSION": 589,
+      "GRIND": 957,
+      "WHIPSAW": 1732,
+      "QUIET": 5718,
+      "UNKNOWN": 2626,
+      "abstain": 2626,
+      "pending": 1757
+    },
+    "2010": {
+      "bars": 11015,
+      "warmup": 0,
+      "EXPANSION": 572,
+      "GRIND": 844,
+      "WHIPSAW": 1652,
+      "QUIET": 5399,
+      "UNKNOWN": 2548,
+      "abstain": 2548,
+      "pending": 1687
+    },
+    "2011": {
+      "bars": 11225,
+      "warmup": 0,
+      "EXPANSION": 604,
+      "GRIND": 973,
+      "WHIPSAW": 1851,
+      "QUIET": 5352,
+      "UNKNOWN": 2445,
+      "abstain": 2445,
+      "pending": 1577
+    },
+    "2013": {
+      "bars": 11727,
+      "warmup": 0,
+      "EXPANSION": 921,
+      "GRIND": 927,
+      "WHIPSAW": 1484,
+      "QUIET": 5815,
+      "UNKNOWN": 2580,
+      "abstain": 2580,
+      "pending": 1645
+    },
+    "2014": {
+      "bars": 11735,
+      "warmup": 0,
+      "EXPANSION": 809,
+      "GRIND": 797,
+      "WHIPSAW": 1716,
+      "QUIET": 5833,
+      "UNKNOWN": 2580,
+      "abstain": 2580,
+      "pending": 1709
+    },
+    "2015": {
+      "bars": 11685,
+      "warmup": 0,
+      "EXPANSION": 744,
+      "GRIND": 972,
+      "WHIPSAW": 1566,
+      "QUIET": 5667,
+      "UNKNOWN": 2736,
+      "abstain": 2736,
+      "pending": 1754
+    },
+    "2017": {
+      "bars": 11721,
+      "warmup": 0,
+      "EXPANSION": 655,
+      "GRIND": 1224,
+      "WHIPSAW": 1653,
+      "QUIET": 5497,
+      "UNKNOWN": 2692,
+      "abstain": 2692,
+      "pending": 1797
+    },
+    "2018": {
+      "bars": 11744,
+      "warmup": 0,
+      "EXPANSION": 724,
+      "GRIND": 1171,
+      "WHIPSAW": 1851,
+      "QUIET": 5337,
+      "UNKNOWN": 2661,
+      "abstain": 2661,
+      "pending": 1799
+    }
+  },
+  "coverageProblems": [],
+  "dwell": {
+    "EXPANSION": {
+      "runs": 3765,
+      "meanBars": 3.99,
+      "medianBars": 2,
+      "maxBars": 33
+    },
+    "GRIND": {
+      "runs": 6324,
+      "meanBars": 3.47,
+      "medianBars": 2,
+      "maxBars": 35
+    },
+    "WHIPSAW": {
+      "runs": 7944,
+      "meanBars": 4.55,
+      "medianBars": 2,
+      "maxBars": 61
+    },
+    "QUIET": {
+      "runs": 17161,
+      "meanBars": 6.91,
+      "medianBars": 3,
+      "maxBars": 92
+    },
+    "UNKNOWN": {
+      "runs": 22912,
+      "meanBars": 2.5,
+      "medianBars": 2,
+      "maxBars": 1002
+    }
+  },
+  "episodeDwell": {
+    "EXPANSION": {
+      "episodes": 1480,
+      "meanBars": 10.16,
+      "medianBars": 9,
+      "maxBars": 47
+    },
+    "GRIND": {
+      "episodes": 2767,
+      "meanBars": 7.94,
+      "medianBars": 6,
+      "maxBars": 49
+    },
+    "WHIPSAW": {
+      "episodes": 3072,
+      "meanBars": 11.77,
+      "medianBars": 11,
+      "maxBars": 110
+    },
+    "QUIET": {
+      "episodes": 4964,
+      "meanBars": 23.88,
+      "medianBars": 20,
+      "maxBars": 146
+    }
+  },
+  "flatBarPct": 23.27,
+  "pendingTransitionPct": 14.97,
+  "warnings": [
+    "UNKNOWN/flat bars are 23.27% of DEV (abstain band + pending transitions). This is conservative by design but reduces effective sample size — the power calculation must use post-flat counts.",
+    "Routing dwell (UNKNOWN counts as a break) has median 2-3 bars; regime-episode dwell ignoring UNKNOWN is 6-20 bars. Both are reported; do not quote one as the other.",
+    "HIGH definition-sensitivity: expect many INCONCLUSIVE claims at M6. Thresholds stay frozen."
+  ],
+  "causality": {
+    "cutoffIndex": 120000,
+    "futureMutationMismatch": 0,
+    "truncationMismatch": 0,
+    "verdict": "PASS"
+  },
+  "determinism": true,
+  "sensitivitySweep": {
+    "grid": {
+      "er": [
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "atrPctile": [
+        60,
+        65,
+        70,
+        75,
+        80
+      ]
+    },
+    "cells": 25,
+    "stableCellsOver80pct": 5,
+    "minAgreementPct": 53.92,
+    "medianAgreementPct": 71.38,
+    "vetoAtM2": false,
+    "note": "DIAGNOSTIC at M2. The blueprint's veto applies to claim VERDICTS at M6: a claim whose verdict is not identical across >=80% of this grid is INCONCLUSIVE (definition-sensitive). State labels moving with cutoffs is expected, not a Map failure. Thresholds stay frozen at G0; the sweep never selects a threshold.",
+    "results": [
+      {
+        "erCutoff": 0.25,
+        "atrPctileCutoff": 60,
+        "agreementPct": 53.92
+      },
+      {
+        "erCutoff": 0.25,
+        "atrPctileCutoff": 65,
+        "agreementPct": 62.71
+      },
+      {
+        "erCutoff": 0.25,
+        "atrPctileCutoff": 70,
+        "agreementPct": 72
+      },
+      {
+        "erCutoff": 0.25,
+        "atrPctileCutoff": 75,
+        "agreementPct": 63.14
+      },
+      {
+        "erCutoff": 0.25,
+        "atrPctileCutoff": 80,
+        "agreementPct": 55.46
+      },
+      {
+        "erCutoff": 0.3,
+        "atrPctileCutoff": 60,
+        "agreementPct": 61.81
+      },
+      {
+        "erCutoff": 0.3,
+        "atrPctileCutoff": 65,
+        "agreementPct": 71.38
+      },
+      {
+        "erCutoff": 0.3,
+        "atrPctileCutoff": 70,
+        "agreementPct": 81.73
+      },
+      {
+        "erCutoff": 0.3,
+        "atrPctileCutoff": 75,
+        "agreementPct": 71.71
+      },
+      {
+        "erCutoff": 0.3,
+        "atrPctileCutoff": 80,
+        "agreementPct": 63.11
+      },
+      {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 60,
+        "agreementPct": 76.63
+      },
+      {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 65,
+        "agreementPct": 87.71
+      },
+      {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 70,
+        "agreementPct": 100
+      },
+      {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 75,
+        "agreementPct": 87.82
+      },
+      {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 80,
+        "agreementPct": 77.51
+      },
+      {
+        "erCutoff": 0.4,
+        "atrPctileCutoff": 60,
+        "agreementPct": 65.12
+      },
+      {
+        "erCutoff": 0.4,
+        "atrPctileCutoff": 65,
+        "agreementPct": 74.78
+      },
+      {
+        "erCutoff": 0.4,
+        "atrPctileCutoff": 70,
+        "agreementPct": 85.3
+      },
+      {
+        "erCutoff": 0.4,
+        "atrPctileCutoff": 75,
+        "agreementPct": 75.08
+      },
+      {
+        "erCutoff": 0.4,
+        "atrPctileCutoff": 80,
+        "agreementPct": 66.24
+      },
+      {
+        "erCutoff": 0.45,
+        "atrPctileCutoff": 60,
+        "agreementPct": 59.33
+      },
+      {
+        "erCutoff": 0.45,
+        "atrPctileCutoff": 65,
+        "agreementPct": 68.49
+      },
+      {
+        "erCutoff": 0.45,
+        "atrPctileCutoff": 70,
+        "agreementPct": 78.3
+      },
+      {
+        "erCutoff": 0.45,
+        "atrPctileCutoff": 75,
+        "agreementPct": 68.96
+      },
+      {
+        "erCutoff": 0.45,
+        "atrPctileCutoff": 80,
+        "agreementPct": 60.79
+      }
+    ]
+  },
+  "lag": {
+    "buckets": {
+      "0-1": 12476,
+      "2-3": 10951,
+      "4-6": 14320,
+      "7+": 63473
+    },
+    "medianByState": {
+      "EXPANSION": 6,
+      "GRIND": 4,
+      "WHIPSAW": 6,
+      "QUIET": 15
+    },
+    "note": "M9 stratifies expectancy by barsSinceStateChange; if an effect lives only at 0-1 bars the claim is not tradeable under 3-bar hysteresis."
+  },
+  "verdict": "PASS"
+}

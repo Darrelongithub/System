@@ -1,0 +1,5 @@
+# Fetched raw datasets and normalised bars are regenerable from pinned blob
+# oids via scripts/map-compass/fetch-data.mjs + normalize.mjs. They are ~264MB
+# and must never enter a patchset. Only small JSON reports are committed.
+raw/
+normalized/

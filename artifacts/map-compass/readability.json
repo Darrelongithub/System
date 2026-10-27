@@ -1,0 +1,164 @@
+{
+  "generatedAt": "2026-10-27T04:33:45.391Z",
+  "purpose": "Make an empty CONFIRMED set interpretable. Continuous evidence first, binary verdict second.",
+  "reviewerArithmetic": {
+    "randomWinRate": 0.3333333333333333,
+    "costR": 0.11897,
+    "winRateToBreakEven": 0.373,
+    "winRateToClearFloor": 0.4063,
+    "note": "verified: EV = 3p - 1 - cost. p=0.406 gives +0.10R net. The reviewer's ~41% is correct."
+  },
+  "gates": [
+    {
+      "id": "minTrades",
+      "label": "n >= 100",
+      "value": 100
+    },
+    {
+      "id": "excessFloor",
+      "label": "excess > +0.10R",
+      "value": 0.1
+    },
+    {
+      "id": "tStat",
+      "label": "t > 2",
+      "value": 2
+    },
+    {
+      "id": "absoluteR",
+      "label": "absolute net R > 0",
+      "value": 0
+    },
+    {
+      "id": "concentration",
+      "label": "no year > 50% of R",
+      "value": 0.5
+    },
+    {
+      "id": "loyo",
+      "label": ">=75% years positive",
+      "value": 0.75
+    },
+    {
+      "id": "placebo",
+      "label": "beat placebo p95",
+      "value": 3
+    },
+    {
+      "id": "strengthOnly",
+      "label": "strength CONFIRMED (weakness optional)",
+      "value": "G0 revised"
+    },
+    {
+      "id": "sensitivity",
+      "label": "sweep GRADES, does not veto",
+      "value": true
+    }
+  ],
+  "gateStackNote": "Strength + weakness (old) x sweep stability (old) x power = multiplicative. Two gates removed at G0: weakness requirement and sweep veto. Neither change lowers the statistical bar; both remove redundant stacking.",
+  "powerByState": [
+    {
+      "state": "EXPANSION",
+      "projectedTrades": 375,
+      "powerAtFloor": 0.272,
+      "mdeR": 0.2069,
+      "adequate": false
+    },
+    {
+      "state": "GRIND",
+      "projectedTrades": 531,
+      "powerAtFloor": 0.364,
+      "mdeR": 0.1739,
+      "adequate": false
+    },
+    {
+      "state": "WHIPSAW",
+      "projectedTrades": 890,
+      "powerAtFloor": 0.55,
+      "mdeR": 0.1343,
+      "adequate": false
+    },
+    {
+      "state": "QUIET",
+      "projectedTrades": 2956,
+      "powerAtFloor": 0.967,
+      "mdeR": 0.0737,
+      "adequate": true
+    }
+  ],
+  "avgPower": 0.538,
+  "worstPower": 0.272,
+  "outcome": "UNDERPOWERED",
+  "interpretationGuide": {
+    "NEGATIVE_RESULT": "well-powered cells with excess near zero -> the textbook claim is genuinely absent here",
+    "UNDERPOWERED": "cannot distinguish 'no edge' from 'too little data'; do NOT claim the textbook is false",
+    "MIXED": "report per-state; do not aggregate into one verdict",
+    "POSITIVE": "CONFIRMED claims that also beat the placebo floor are eligible for the routing table"
+  },
+  "perClaimTemplate": {
+    "fields": [
+      "excessVsRandomR",
+      "excessCi95",
+      "meanNetR",
+      "n",
+      "t",
+      "bySide.long",
+      "bySide.short",
+      "years",
+      "stability",
+      "conditional",
+      "vetoes",
+      "verdict"
+    ],
+    "rule": "A claim with verdict INCONCLUSIVE still reports its point estimate and CI. Sort the ledger by excessVsRandomR to read the evidence even when nothing ships."
+  },
+  "m6Readout": {
+    "primary": "count of CONFIRMED claims with stability != DEFINITION_SENSITIVE",
+    "secondary": "count of CONDITIONAL claims (CONFIRMED + DEFINITION_SENSITIVE)",
+    "continuous": "median and IQR of excessVsRandomR across all 48 claims",
+    "control": "CONFIRMED count must exceed placebo p95 = 3",
+    "decision": "If M6 returns zero CONFIRMED, the correct readout is UNDERPOWERED, not 'textbook is false'. Escalate to the G0 power decision rather than lowering criteria."
+  },
+  "conditionalPolicy": {
+    "userDefault": "no",
+    "decidedAt": "G0 Amendment 2, 2026-10-27, before any claim result",
+    "compassCanEnableConditional": false,
+    "conditionalRequiresValSupport": true,
+    "reportAt": [
+      "M9",
+      "M10"
+    ],
+    "note": "A CONFIRMED + DEFINITION_SENSITIVE claim is reported but DOES NOT ship. Enable only if VAL independently meets the frozen support criterion. See BLUEPRINT §7.10.2."
+  },
+  "reportOnlyClusteredPower": {
+    "source": "power-projection.json reportOnly",
+    "note": "Clustered-by-day SEs and overlapping family variants reduce effective power. No criterion changed.",
+    "centralCase": [
+      {
+        "state": "EXPANSION",
+        "iidPowerAtFloor": 0.272,
+        "clusteredEffectivePower": 0.226,
+        "nEffective": 304.5
+      },
+      {
+        "state": "GRIND",
+        "iidPowerAtFloor": 0.364,
+        "clusteredEffectivePower": 0.301,
+        "nEffective": 431.1
+      },
+      {
+        "state": "WHIPSAW",
+        "iidPowerAtFloor": 0.55,
+        "clusteredEffectivePower": 0.461,
+        "nEffective": 722.6
+      },
+      {
+        "state": "QUIET",
+        "iidPowerAtFloor": 0.967,
+        "clusteredEffectivePower": 0.924,
+        "nEffective": 2400.1
+      }
+    ]
+  },
+  "amendment2": "2026-10-27: readout updated for clustered inference and CONDITIONAL default no. Verdict remains UNDERPOWERED."
+}

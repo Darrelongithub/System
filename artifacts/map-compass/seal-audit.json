@@ -1,0 +1,91 @@
+{
+  "generatedAt": "2026-10-27T04:33:52.438Z",
+  "purpose": "Quantify feature-level holdout bleed. Written down because 'harmless for outcomes' is a judgement, not a proof.",
+  "roles": {
+    "DEV": [
+      2004,
+      2005,
+      2006,
+      2007,
+      2009,
+      2010,
+      2011,
+      2013,
+      2014,
+      2015,
+      2017,
+      2018
+    ],
+    "HOLDOUT": [
+      2008,
+      2012,
+      2016,
+      2019
+    ],
+    "VAL": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "STRESS": [
+      2025,
+      2026
+    ]
+  },
+  "lookbacks": {
+    "500": {
+      "devBars": 131922,
+      "affectedBars": 1500,
+      "pct": 1.14,
+      "byDevYear": {
+        "2009": 500,
+        "2013": 500,
+        "2017": 500
+      }
+    },
+    "1000": {
+      "devBars": 131922,
+      "affectedBars": 3000,
+      "pct": 2.27,
+      "byDevYear": {
+        "2009": 1000,
+        "2013": 1000,
+        "2017": 1000
+      }
+    }
+  },
+  "boundaryDevYears": [
+    2009,
+    2013,
+    2017
+  ],
+  "natureOfBleed": "Holdout PRICES enter trailing ATR-percentile / ER / range features of the first <=lookback DEV bars after a holdout year. The Map has ZERO fitted parameters (hand-defined thresholds), so no parameter is estimated from holdout data. No holdout trade outcome enters any DEV statistic.",
+  "whyNotFatal": [
+    "Features are causal: holdout bars are in the PAST of the affected DEV bars, never the future. There is no lookahead.",
+    "The Map has no learned weights — thresholds are frozen constants. Holdout prices cannot tune anything.",
+    "Claim verification filters to DEV years BEFORE computing mean/t/totalR (a test injects +99R into holdout years to pin this).",
+    "The final holdout evaluation at M10 re-derives features on the sealed years; the bleed is one-directional (holdout -> DEV features), not DEV -> holdout."
+  ],
+  "residualRisk": "Researcher's regime intuition for 2008/2012/2016/2019 is slightly informed by adjacent DEV bars. Small: <=2.3% of DEV bars affected, confined to year prefixes. Declared, not eliminated.",
+  "mitigation": "M10 must report results BOTH including and excluding the first 1000 bars of each boundary DEV year. That is a pre-registered sensitivity, not a post-hoc choice.",
+  "valContamination": {
+    "years": [
+      2020,
+      2021,
+      2022,
+      2023,
+      2024
+    ],
+    "issue": "2020-2024 was examined in earlier project work (golden baseline, filter research, regime statistics). These specific claims were never fitted on it, but the researcher's priors about how gold behaved then are not pristine.",
+    "mitigation": "VAL results are reported as one-shot OOS but are NOT the sole confirmatory evidence. The interleaved sealed years (2008, 2012, 2016, 2019) carry the final confirmatory weight at M10. Any VAL-driven decision to change rules starts a NEW cycle."
+  },
+  "stressContamination": {
+    "years": [
+      2025,
+      2026
+    ],
+    "issue": "2025-11 -> 2026-08 was the old project's discovery window. STRESS is diagnostic only and can never promote a claim."
+  }
+}

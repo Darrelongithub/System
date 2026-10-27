@@ -11,7 +11,24 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs",
-    "test:golden": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs golden"
+    "test:golden": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs golden",
+    "mc:fetch": "node scripts/map-compass/fetch-data.mjs",
+    "mc:normalize": "node scripts/map-compass/normalize.mjs",
+    "mc:verify-dst": "node scripts/map-compass/verify-dst.mjs",
+    "mc:spread": "node scripts/map-compass/spread-table.mjs",
+    "mc:audit": "node scripts/map-compass/audit-data.mjs",
+    "mc:m1": "npm run mc:fetch && npm run mc:normalize && npm run mc:verify-dst && npm run mc:spread && npm run mc:audit",
+    "mc:map": "node scripts/map-compass/build-map.mjs",
+    "mc:cost": "node scripts/map-compass/build-cost-model.mjs",
+    "mc:compass": "node scripts/map-compass/build-compass.mjs",
+    "mc:calibrate": "node scripts/map-compass/verify-claims.mjs --dry-run",
+    "mc:power": "node scripts/map-compass/power-check.mjs",
+    "mc:verify": "node scripts/map-compass/verify-claims.mjs",
+    "mc:baseline": "node scripts/map-compass/random-baseline.mjs",
+    "mc:readability": "node scripts/map-compass/readability.mjs",
+    "mc:seal": "node scripts/map-compass/seal-audit.mjs",
+    "mc:cards": "node scripts/map-compass/print-claim-cards.mjs",
+    "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

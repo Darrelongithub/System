@@ -1,0 +1,96 @@
+{
+  "generatedAt": "2026-10-26T17:48:41.914Z",
+  "units": "R (1R = stopAtrMultiple * ATR14)",
+  "formula": "costR = (spreadOverAtr + 2 * slippageAtrFractionPerSide * stressMultiplier) / stopAtrMultiple",
+  "frozenInputs": {
+    "stopAtrMultiple": 1.5,
+    "slippage": {
+      "atrFractionPerSide": 0.02,
+      "stressMultiplier": 2
+    },
+    "volRegime": {
+      "lowMax": 0.0006,
+      "highMin": 0.0016
+    }
+  },
+  "slippageEvidence": {
+    "source": "measured |next M30 open - signal M30 close| / ATR14 over 247,910 bars",
+    "median": 0.0112,
+    "p75": 0.0402,
+    "p90": 0.14,
+    "p95": 0.2745,
+    "choice": "0.02 ATR per side — round number between median and p75, conservative"
+  },
+  "matchedMinutes": 851640,
+  "unmatchedMinutes": 467400,
+  "overallMedianSpreadOverAtr": 0.13846,
+  "overallP95SpreadOverAtr": 0.34646,
+  "baselineCostR": 0.11897,
+  "stressCostR": 0.28431,
+  "note": "Frozen at G0. Baseline = median spread + 1x slippage. Stress = p95 spread + 2x slippage. M9 uses stress as a diagnostic only; baseline is the verdict cost.",
+  "table": {
+    "asian|high": {
+      "n": 129120,
+      "medianSpreadOverAtr": 0.12623,
+      "p75SpreadOverAtr": 0.1858,
+      "p95SpreadOverAtr": 0.32099,
+      "maxSpreadOverAtr": 2.07022
+    },
+    "asian|low": {
+      "n": 35100,
+      "medianSpreadOverAtr": 0.25125,
+      "p75SpreadOverAtr": 0.33721,
+      "p95SpreadOverAtr": 0.52167,
+      "maxSpreadOverAtr": 1.16347
+    },
+    "asian|mid": {
+      "n": 181620,
+      "medianSpreadOverAtr": 0.2,
+      "p75SpreadOverAtr": 0.2667,
+      "p95SpreadOverAtr": 0.4195,
+      "maxSpreadOverAtr": 1.33233
+    },
+    "london|high": {
+      "n": 113040,
+      "medianSpreadOverAtr": 0.12511,
+      "p75SpreadOverAtr": 0.17907,
+      "p95SpreadOverAtr": 0.28932,
+      "maxSpreadOverAtr": 1.35864
+    },
+    "london|low": {
+      "n": 3060,
+      "medianSpreadOverAtr": 0.27106,
+      "p75SpreadOverAtr": 0.34093,
+      "p95SpreadOverAtr": 0.5017,
+      "maxSpreadOverAtr": 0.6239
+    },
+    "london|mid": {
+      "n": 72690,
+      "medianSpreadOverAtr": 0.18212,
+      "p75SpreadOverAtr": 0.24291,
+      "p95SpreadOverAtr": 0.36529,
+      "maxSpreadOverAtr": 1.18761
+    },
+    "ny|high": {
+      "n": 205380,
+      "medianSpreadOverAtr": 0.09163,
+      "p75SpreadOverAtr": 0.12934,
+      "p95SpreadOverAtr": 0.20022,
+      "maxSpreadOverAtr": 1.1909
+    },
+    "ny|low": {
+      "n": 14070,
+      "medianSpreadOverAtr": 0.16108,
+      "p75SpreadOverAtr": 0.21294,
+      "p95SpreadOverAtr": 0.34806,
+      "maxSpreadOverAtr": 2.65093
+    },
+    "ny|mid": {
+      "n": 97560,
+      "medianSpreadOverAtr": 0.11883,
+      "p75SpreadOverAtr": 0.1598,
+      "p95SpreadOverAtr": 0.2495,
+      "maxSpreadOverAtr": 1.56315
+    }
+  }
+}

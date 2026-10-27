@@ -1,0 +1,211 @@
+{
+  "generatedAt": "2026-10-27T04:23:10.004Z",
+  "compassVersion": "M4-v0 (binary allow-list, no learned weights)",
+  "cardStatus": "DRAFT",
+  "cardsFrozen": false,
+  "cards": 24,
+  "ledgerRecords": 0,
+  "ignoredNonDevRecords": 0,
+  "verdictKeys": 0,
+  "enabledCount": 0,
+  "conditionalIds": [],
+  "conditionalPolicy": {
+    "compassCanEnableConditional": false,
+    "conditionalRequiresValSupport": true,
+    "conditionalReportAt": [
+      "M9",
+      "M10"
+    ],
+    "conditionalIds": [],
+    "blockedConditionalIds": [],
+    "valPromotedConditionalIds": []
+  },
+  "table": {
+    "EXPANSION": [],
+    "GRIND": [],
+    "WHIPSAW": [],
+    "QUIET": []
+  },
+  "reasons": [
+    {
+      "id": "donchian-20",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "donchian-55",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "dual-thrust",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "sma-20-50",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "macd-cross",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "ichimoku-tk",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "asian-range-break",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "london-orb-30",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "pdh-pdl-break",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "pdh-retest",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "pdl-retest",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "classic-pivot",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "rsi-14-30-70",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "williams-r-fade",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "stochastic-14-fade",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "bollinger-20-2",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "keltner-20-atr",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "bb-squeeze-fade",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "engulfing",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "morning-evening-star",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "three-soldiers-crows",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "atr-squeeze-break",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "nr7-break",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    },
+    {
+      "id": "inside-bar-break",
+      "decision": "NOT_SHIPPABLE",
+      "strengthVerdict": "MISSING",
+      "weaknessVerdict": "MISSING",
+      "note": "strength not CONFIRMED"
+    }
+  ],
+  "routingHash": "3d8827f54de7526c473fc9bff269aba04a98b3d717d28e67570369daec0f9b34",
+  "plumbing": {
+    "probeSignals": 288,
+    "kept": 0,
+    "dropped": {
+      "state": 0,
+      "session": 16,
+      "unrouted": 272
+    },
+    "exact": true
+  },
+  "note": "No strategy has a CONFIRMED claim yet. Compass is flat everywhere — correct pre-verification state."
+}

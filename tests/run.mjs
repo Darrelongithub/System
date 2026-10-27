@@ -50,6 +50,14 @@ await import("./mt5-automation.test.mjs");
 await import("./mt5-bridge-auth.test.mjs");
 await import("./mt5-daemon-feed.test.mjs");
 await import("./synth.test.mjs");
+await import("./map-compass/dst.test.mjs");
+await import("./map-compass/data-contract.test.mjs");
+await import("./map-compass/map.test.mjs");
+await import("./map-compass/cost.test.mjs");
+await import("./map-compass/compass.test.mjs");
+await import("./map-compass/verification.test.mjs");
+await import("./map-compass/random-baseline.test.mjs");
+await import("./map-compass/amendment2.test.mjs");
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

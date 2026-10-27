@@ -1,0 +1,909 @@
+{
+  "generatedAt": "2026-10-27T04:33:44.654Z",
+  "purpose": "Pre-M6 go/no-go power projection. NOT a strategy result.",
+  "devBars": 131922,
+  "flatBars": 30702,
+  "flatPct": 23.27,
+  "tradeableBarsByState": {
+    "EXPANSION": 7988,
+    "GRIND": 11310,
+    "WHIPSAW": 18961,
+    "QUIET": 62961
+  },
+  "assumptions": {
+    "sigmaR": 1.43,
+    "variantsPerFamily": 3,
+    "slotSurvival": 0.6,
+    "sessionFactor": 0.3333333333333333
+  },
+  "observedDensityFromOldProject": {
+    "trades": 2286,
+    "bars": 9738,
+    "strategies": 9,
+    "perStrategyPerBar": 0.02608
+  },
+  "centralCase": [
+    {
+      "state": "EXPANSION",
+      "tradeableBars": 7988,
+      "signalDensity": 0.026083384678578764,
+      "projectedTrades": 375,
+      "mdeR": 0.2069,
+      "powerAtFloor": 0.272,
+      "grossEdgeNeededR": 0.219,
+      "meetsMinTrades": true,
+      "adequatePower": false
+    },
+    {
+      "state": "GRIND",
+      "tradeableBars": 11310,
+      "signalDensity": 0.026083384678578764,
+      "projectedTrades": 531,
+      "mdeR": 0.1739,
+      "powerAtFloor": 0.364,
+      "grossEdgeNeededR": 0.219,
+      "meetsMinTrades": true,
+      "adequatePower": false
+    },
+    {
+      "state": "WHIPSAW",
+      "tradeableBars": 18961,
+      "signalDensity": 0.026083384678578764,
+      "projectedTrades": 890,
+      "mdeR": 0.1343,
+      "powerAtFloor": 0.55,
+      "grossEdgeNeededR": 0.219,
+      "meetsMinTrades": true,
+      "adequatePower": false
+    },
+    {
+      "state": "QUIET",
+      "tradeableBars": 62961,
+      "signalDensity": 0.026083384678578764,
+      "projectedTrades": 2956,
+      "mdeR": 0.0737,
+      "powerAtFloor": 0.967,
+      "grossEdgeNeededR": 0.219,
+      "meetsMinTrades": true,
+      "adequatePower": true
+    }
+  ],
+  "criteria": {
+    "minTradesPerCell": 100,
+    "practicalFloorR": 0.1,
+    "tStatMin": 2,
+    "absoluteNetRMin": 0,
+    "concentrationMax": 0.5,
+    "loyoPositiveMin": 0.75,
+    "note": "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7."
+  },
+  "baselineCostR": 0.11897,
+  "grossEdgeNeededR": 0.219,
+  "scenarios": [
+    {
+      "signalDensity": 0.005,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.005,
+          "projectedTrades": 72,
+          "mdeR": 0.4721,
+          "powerAtFloor": 0.086,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": false,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.005,
+          "projectedTrades": 102,
+          "mdeR": 0.3967,
+          "powerAtFloor": 0.105,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.005,
+          "projectedTrades": 171,
+          "mdeR": 0.3064,
+          "powerAtFloor": 0.148,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.005,
+          "projectedTrades": 567,
+          "mdeR": 0.1682,
+          "powerAtFloor": 0.384,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.01,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.01,
+          "projectedTrades": 144,
+          "mdeR": 0.3339,
+          "powerAtFloor": 0.131,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.01,
+          "projectedTrades": 204,
+          "mdeR": 0.2805,
+          "powerAtFloor": 0.168,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.01,
+          "projectedTrades": 341,
+          "mdeR": 0.217,
+          "powerAtFloor": 0.252,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.01,
+          "projectedTrades": 1133,
+          "mdeR": 0.119,
+          "powerAtFloor": 0.653,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.02,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.02,
+          "projectedTrades": 288,
+          "mdeR": 0.2361,
+          "powerAtFloor": 0.22,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.02,
+          "projectedTrades": 407,
+          "mdeR": 0.1986,
+          "powerAtFloor": 0.291,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.02,
+          "projectedTrades": 683,
+          "mdeR": 0.1533,
+          "powerAtFloor": 0.447,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.02,
+          "projectedTrades": 2267,
+          "mdeR": 0.0841,
+          "powerAtFloor": 0.915,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": true
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.02608,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 375,
+          "mdeR": 0.2069,
+          "powerAtFloor": 0.272,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 531,
+          "mdeR": 0.1739,
+          "powerAtFloor": 0.364,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 890,
+          "mdeR": 0.1343,
+          "powerAtFloor": 0.55,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 2956,
+          "mdeR": 0.0737,
+          "powerAtFloor": 0.967,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": true
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.04,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.04,
+          "projectedTrades": 575,
+          "mdeR": 0.1671,
+          "powerAtFloor": 0.389,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.04,
+          "projectedTrades": 814,
+          "mdeR": 0.1404,
+          "powerAtFloor": 0.514,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.04,
+          "projectedTrades": 1365,
+          "mdeR": 0.1084,
+          "powerAtFloor": 0.734,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.04,
+          "projectedTrades": 4533,
+          "mdeR": 0.0595,
+          "powerAtFloor": 0.997,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": true
+        }
+      ]
+    }
+  ],
+  "sessionRestricted": [
+    {
+      "signalDensity": 0.005,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.005,
+          "projectedTrades": 24,
+          "mdeR": 0.8178,
+          "powerAtFloor": 0.053,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": false,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.005,
+          "projectedTrades": 34,
+          "mdeR": 0.6871,
+          "powerAtFloor": 0.06,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.005,
+          "projectedTrades": 57,
+          "mdeR": 0.5306,
+          "powerAtFloor": 0.076,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.005,
+          "projectedTrades": 189,
+          "mdeR": 0.2914,
+          "powerAtFloor": 0.159,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.01,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.01,
+          "projectedTrades": 48,
+          "mdeR": 0.5783,
+          "powerAtFloor": 0.07,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.01,
+          "projectedTrades": 68,
+          "mdeR": 0.4858,
+          "powerAtFloor": 0.083,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.01,
+          "projectedTrades": 114,
+          "mdeR": 0.3752,
+          "powerAtFloor": 0.112,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.01,
+          "projectedTrades": 378,
+          "mdeR": 0.2061,
+          "powerAtFloor": 0.274,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.02,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.02,
+          "projectedTrades": 96,
+          "mdeR": 0.4089,
+          "powerAtFloor": 0.101,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.02,
+          "projectedTrades": 136,
+          "mdeR": 0.3435,
+          "powerAtFloor": 0.126,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.02,
+          "projectedTrades": 228,
+          "mdeR": 0.2653,
+          "powerAtFloor": 0.183,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.02,
+          "projectedTrades": 756,
+          "mdeR": 0.1457,
+          "powerAtFloor": 0.485,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.026083384678578764,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 125,
+          "mdeR": 0.3583,
+          "powerAtFloor": 0.119,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 177,
+          "mdeR": 0.3011,
+          "powerAtFloor": 0.152,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 297,
+          "mdeR": 0.2325,
+          "powerAtFloor": 0.225,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.026083384678578764,
+          "projectedTrades": 985,
+          "mdeR": 0.1277,
+          "powerAtFloor": 0.593,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    },
+    {
+      "signalDensity": 0.04,
+      "cells": [
+        {
+          "state": "EXPANSION",
+          "tradeableBars": 7988,
+          "signalDensity": 0.04,
+          "projectedTrades": 192,
+          "mdeR": 0.2891,
+          "powerAtFloor": 0.161,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "GRIND",
+          "tradeableBars": 11310,
+          "signalDensity": 0.04,
+          "projectedTrades": 271,
+          "mdeR": 0.2434,
+          "powerAtFloor": 0.209,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "WHIPSAW",
+          "tradeableBars": 18961,
+          "signalDensity": 0.04,
+          "projectedTrades": 455,
+          "mdeR": 0.1878,
+          "powerAtFloor": 0.32,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        },
+        {
+          "state": "QUIET",
+          "tradeableBars": 62961,
+          "signalDensity": 0.04,
+          "projectedTrades": 1511,
+          "mdeR": 0.1031,
+          "powerAtFloor": 0.776,
+          "grossEdgeNeededR": 0.219,
+          "meetsMinTrades": true,
+          "adequatePower": false
+        }
+      ]
+    }
+  ],
+  "verdict": "UNDERPOWERED",
+  "killCriterion": "BLUEPRINT §11: if the harness fails synthetic power calibration, the test battery is not measuring anything. If this projection says UNDERPOWERED at realistic densities, M6 needs a NEW cycle (larger DEV or lower sigma), not threshold tuning.",
+  "reportOnly": {
+    "id": "G0-AMENDMENT-2-POWER-REPORT-ONLY",
+    "date": "2026-10-27",
+    "decidedBeforeResults": true,
+    "criteriaChanged": false,
+    "thresholdChanged": false,
+    "verdictChanged": false,
+    "verdictUnchangedFrom": "UNDERPOWERED",
+    "criteria": {
+      "minTradesPerCell": 100,
+      "practicalFloorR": 0.1,
+      "tStatMin": 2,
+      "absoluteNetRMin": 0,
+      "concentrationMax": 0.5,
+      "loyoPositiveMin": 0.75,
+      "note": "Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7."
+    },
+    "criteriaHash": "788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6",
+    "purpose": "Show how clustered-by-day SEs and overlapping family-variant entry bars reduce effective power. This is a readout, NOT a new go/no-go gate and NOT a licence to relax criteria.",
+    "inference": {
+      "tAndCiMethod": "CR1 cluster-robust SE clustered by calendar day",
+      "implementedIn": "scripts/map-compass/lib/cluster.mjs + lib/verification.mjs",
+      "appliesTo": [
+        "aggregate t",
+        "95% CIs",
+        "by-side CIs",
+        "per-year CIs"
+      ],
+      "effectiveNMethod": "Kish effective N over entry-bar clusters, per family cell",
+      "note": "The t/CI already absorb within-day correlation, so the effective-N correction is applied to POWER only — no double inflation of the SE."
+    },
+    "measuredDependence": {
+      "n": 43200,
+      "distinctEntryBars": 38558,
+      "nEffective": 35075.74,
+      "overlapFraction": 0.2071,
+      "multiTradeBars": 4306,
+      "designEffect": 1.2316,
+      "dayClusters": 4032,
+      "plainSe": 0.006926,
+      "clusteredSe": 0.006989,
+      "seInflation": 1.009
+    },
+    "overlapSensitivity": {
+      "overlapFractions": [
+        0,
+        0.25,
+        0.5,
+        0.75
+      ],
+      "designEffectFormula": "n_effective = n / (1 + overlapFraction)",
+      "source": "Pre-registered sensitivity range. Real overlap CANNOT be measured until claim cards are frozen; no strategy has been run."
+    },
+    "centralCaseAdjusted": [
+      {
+        "state": "EXPANSION",
+        "projectedTrades": 375,
+        "iidPowerAtFloor": 0.272,
+        "measuredOverlap": {
+          "nRaw": 375,
+          "nEffective": 304.5,
+          "designEffect": 1.2316,
+          "seInflation": 1.009,
+          "sigmaEffectiveR": 1.4429,
+          "mdeR": 0.2317,
+          "powerAtFloor": 0.226,
+          "adequatePower": false
+        },
+        "sensitivityByOverlap": [
+          {
+            "overlapFraction": 0,
+            "nRaw": 375,
+            "nEffective": 375,
+            "designEffect": 1,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2087,
+            "powerAtFloor": 0.268,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.25,
+            "nRaw": 375,
+            "nEffective": 300,
+            "designEffect": 1.25,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2334,
+            "powerAtFloor": 0.224,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.5,
+            "nRaw": 375,
+            "nEffective": 250,
+            "designEffect": 1.5,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2557,
+            "powerAtFloor": 0.194,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.75,
+            "nRaw": 375,
+            "nEffective": 214.3,
+            "designEffect": 1.75,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2761,
+            "powerAtFloor": 0.172,
+            "adequatePower": false
+          }
+        ]
+      },
+      {
+        "state": "GRIND",
+        "projectedTrades": 531,
+        "iidPowerAtFloor": 0.364,
+        "measuredOverlap": {
+          "nRaw": 531,
+          "nEffective": 431.1,
+          "designEffect": 1.2316,
+          "seInflation": 1.009,
+          "sigmaEffectiveR": 1.4429,
+          "mdeR": 0.1947,
+          "powerAtFloor": 0.301,
+          "adequatePower": false
+        },
+        "sensitivityByOverlap": [
+          {
+            "overlapFraction": 0,
+            "nRaw": 531,
+            "nEffective": 531,
+            "designEffect": 1,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.1754,
+            "powerAtFloor": 0.358,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.25,
+            "nRaw": 531,
+            "nEffective": 424.8,
+            "designEffect": 1.25,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.1961,
+            "powerAtFloor": 0.298,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.5,
+            "nRaw": 531,
+            "nEffective": 354,
+            "designEffect": 1.5,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2148,
+            "powerAtFloor": 0.256,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.75,
+            "nRaw": 531,
+            "nEffective": 303.4,
+            "designEffect": 1.75,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.2321,
+            "powerAtFloor": 0.226,
+            "adequatePower": false
+          }
+        ]
+      },
+      {
+        "state": "WHIPSAW",
+        "projectedTrades": 890,
+        "iidPowerAtFloor": 0.55,
+        "measuredOverlap": {
+          "nRaw": 890,
+          "nEffective": 722.6,
+          "designEffect": 1.2316,
+          "seInflation": 1.009,
+          "sigmaEffectiveR": 1.4429,
+          "mdeR": 0.1504,
+          "powerAtFloor": 0.461,
+          "adequatePower": false
+        },
+        "sensitivityByOverlap": [
+          {
+            "overlapFraction": 0,
+            "nRaw": 890,
+            "nEffective": 890,
+            "designEffect": 1,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.1355,
+            "powerAtFloor": 0.543,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.25,
+            "nRaw": 890,
+            "nEffective": 712,
+            "designEffect": 1.25,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.1515,
+            "powerAtFloor": 0.456,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.5,
+            "nRaw": 890,
+            "nEffective": 593.3,
+            "designEffect": 1.5,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.166,
+            "powerAtFloor": 0.393,
+            "adequatePower": false
+          },
+          {
+            "overlapFraction": 0.75,
+            "nRaw": 890,
+            "nEffective": 508.6,
+            "designEffect": 1.75,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.1792,
+            "powerAtFloor": 0.346,
+            "adequatePower": false
+          }
+        ]
+      },
+      {
+        "state": "QUIET",
+        "projectedTrades": 2956,
+        "iidPowerAtFloor": 0.967,
+        "measuredOverlap": {
+          "nRaw": 2956,
+          "nEffective": 2400.1,
+          "designEffect": 1.2316,
+          "seInflation": 1.009,
+          "sigmaEffectiveR": 1.4429,
+          "mdeR": 0.0825,
+          "powerAtFloor": 0.924,
+          "adequatePower": true
+        },
+        "sensitivityByOverlap": [
+          {
+            "overlapFraction": 0,
+            "nRaw": 2956,
+            "nEffective": 2956,
+            "designEffect": 1,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.0744,
+            "powerAtFloor": 0.965,
+            "adequatePower": true
+          },
+          {
+            "overlapFraction": 0.25,
+            "nRaw": 2956,
+            "nEffective": 2364.8,
+            "designEffect": 1.25,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.0831,
+            "powerAtFloor": 0.921,
+            "adequatePower": true
+          },
+          {
+            "overlapFraction": 0.5,
+            "nRaw": 2956,
+            "nEffective": 1970.7,
+            "designEffect": 1.5,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.0911,
+            "powerAtFloor": 0.868,
+            "adequatePower": true
+          },
+          {
+            "overlapFraction": 0.75,
+            "nRaw": 2956,
+            "nEffective": 1689.1,
+            "designEffect": 1.75,
+            "seInflation": 1.009,
+            "sigmaEffectiveR": 1.4429,
+            "mdeR": 0.0984,
+            "powerAtFloor": 0.813,
+            "adequatePower": true
+          }
+        ]
+      }
+    ],
+    "readout": "EXPANSION/GRIND were already underpowered under i.i.d. assumptions. Clustering by day and overlapping variants make them WORSE, not better. If M6 returns zero CONFIRMED claims, the correct readout is 'too little independent data', not 'textbook false'.",
+    "permittedResponses": [
+      "accept fewer surviving families",
+      "start a NEW cycle with a different DEV/HOLDOUT allocation",
+      "pre-register more pooling across variants BEFORE any result"
+    ],
+    "forbiddenResponses": [
+      "lower the +0.10R practical floor",
+      "soften the t > 2 statistic",
+      "re-fit the cost model after results",
+      "unfreeze or edit thresholds after seeing outcomes"
+    ],
+    "conditional": {
+      "userDefault": "no",
+      "compassCanEnableConditional": false,
+      "conditionalRequiresValSupport": true,
+      "conditionalReportAt": [
+        "M9",
+        "M10"
+      ],
+      "valSupportCriterion": "The claim's VAL-window cell must independently reach CONFIRMED under the SAME frozen CLAIM_CRITERIA (excess > 0.10R, clustered t > 2, absolute net R > 0, no vetoes), evaluated once, with the VAL role spent on promotion."
+    },
+    "timeExit": {
+      "maxHoldBars": 96,
+      "label": "TIME_EXIT",
+      "frozenIn": "EXIT_HARNESS (G0 Amendment 2)",
+      "baselineShare": 0.0124375,
+      "baselineCount": 398,
+      "baselineResolvedTotal": 32000,
+      "note": "Same cap now applies to real claim evaluation by default in lib/trade.mjs."
+    }
+  }
+}
