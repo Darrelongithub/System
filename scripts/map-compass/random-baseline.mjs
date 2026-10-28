@@ -150,6 +150,7 @@ for (const state of STATES) {
         vol: pick.vol,
         year: pick.year,
         barIndex: pick.i,
+        day: bars[pick.i].datetime.slice(0, 10), // canonical EAT calendar day, not an inferred bar-index cluster
         barsHeld: t.barsHeld,
         outcome: t.outcome,
         netR: t.netR,
@@ -239,6 +240,7 @@ for (const vs of VERDICT_STATES) {
             vol: pick.vol,
             year: pick.year,
             barIndex: pick.i,
+            day: bars[pick.i].datetime.slice(0, 10), // canonical EAT calendar day
             barsHeld: t.barsHeld,
             outcome: t.outcome,
             netR: t.netR,
@@ -434,7 +436,7 @@ const dailySe = {};
 const dailySums = {};
 for (const vs of VERDICT_STATES) {
   const rows = samples.filter((s) => s.vs === vs);
-  const dayKeyOf = (s) => `${s.year}-${String(s.barIndex).slice(-4)}`;
+  const dayKeyOf = (s) => s.day;
   const r = cr1Se(
     rows.map((s) => s.netR),
     rows.map(dayKeyOf),

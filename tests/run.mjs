@@ -60,6 +60,7 @@ await import("./map-compass/random-baseline.test.mjs");
 await import("./map-compass/amendment2.test.mjs");
 await import("./map-compass/amendment3.test.mjs");
 await import("./map-compass/amendment4.test.mjs");
+await import("./map-compass/amendment5.test.mjs");
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

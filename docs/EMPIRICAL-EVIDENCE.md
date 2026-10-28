@@ -113,3 +113,14 @@ is consistent with `EVIDENCE.priorFalseFraction = 0.80`.
   (no peer-reviewed NR7/inside-bar test exists); the criticism above is a
   pre-registered backtest of Crabel's *other* patterns, which is the closest
   thing published.
+
+---
+
+## Amendment 5 — Dual Thrust source audit (opened 2026-10-28)
+
+| Status | Source | Verified content | Use / limitation |
+|---|---|---|---|
+| VERIFIED | FMZ Quant, “Implement a Dual Thrust Digital Currency Quantitative Trading Strategy in Python,” https://www.fmz.com/digest-topic/9872 | Formula Range=max(HH−LC, HC−LL); upper=open+K1×Range; lower=open−K2×Range; K1/K2 described as adjustable; demonstration uses K1=K2=0.5. | Opened implementation tutorial; supports formula and a demo setting, not universal canonical N/K parameters. |
+| VERIFIED | ProRealCode, “Dual Thrust Strategy indicator,” https://www.prorealcode.com/prorealtime-indicators/dual-thrust-strategy-indicator/ | Same four-extreme range and K1/K2 rails; strategy reverses on opposite rail. | Opened indicator description; it does not prescribe a fixed N/K pair. |
+
+The existing DRAFT card is not equivalent to that published formulation: it sets k=0, computes a prior-day high/open/low range, and enters on intrabar rail touches. That discrepancy is expressly left DRAFT and proposed for owner review; no current card parameter or signal was changed.

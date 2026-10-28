@@ -1,222 +1,83 @@
 #!/usr/bin/env node
-/**
- * G0 AMENDMENT 4 TASK 4 — SLOT MODEL (one position per slot).
- *
- * Decision #10: one position per slot, frozen numeric priority. The old engine
- * dropped signals that arrived while a slot was occupied rather than queueing
- * them — that is what turned a +16.0R offline estimate into -3.63R in the old
- * project.
- *
- * This script EMULATES that blocking using the random-entry baseline's own
- * distribution of bars-to-exit (the `barsHeldStats` histogram), applied to the
- * MEASURED DEV signal bars of each card. No strategy outcome is used: the hold
- * duration is sampled from the baseline's realised exit-times, not from any
- * strategy.
- *
- * *** THIS IS AN ASSUMPTION ***
- *   - the hold duration is drawn from the RANDOM baseline's bars-to-exit
- *     distribution, not from the strategy's own exits;
- *   - a single global slot is modelled (the conservative reading of decision
- *     #10). If the book were per-state, survival would be higher;
- *   - signals are processed in bar order and priority is not re-applied here
- *     (all signals in a family are pooled anyway).
- *
- * Output: artifacts/map-compass/slot-model.json
+/** G0 Amendment 5 — reconcile the slot unit before any strategy result.
+ * Each claim card gets an independent one-position slot for measurement. The
+ * combined Compass book is a different, one-slot execution model: simultaneous
+ * signals are resolved by frozen card priority. Holds are baseline-sampled,
+ * not strategy outcomes. No P&L or claim result is read here.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { dataLines, num } from "./lib/csv.mjs";
 import { emitSignals, signalLibrarySelfCheck } from "./lib/signals.mjs";
 import { CLAIM_CARDS, FAMILIES, FROZEN_TEST_SEQUENCE, validateClaimCards } from "./claim-cards.draft.mjs";
-import {
-  VERDICT_STATES,
-  VERDICT_STATE_OF,
-  STATES,
-  FAMILY_STRENGTH_STATE,
-  otherVerdictState,
-  CLAIM_CRITERIA,
-} from "./frozen.mjs";
+import { VERDICT_STATES, STATES, CLAIM_CRITERIA } from "./frozen.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const NORM = join(ROOT, "artifacts/map-compass/normalized");
 const OUT = join(ROOT, "artifacts/map-compass");
-
 const BASELINE = JSON.parse(readFileSync(join(OUT, "random-baseline.json"), "utf8"));
-if (!BASELINE.barsHeldStats) {
-  console.error("run random-baseline.mjs first");
-  process.exit(2);
-}
-if (validateClaimCards().length || signalLibrarySelfCheck().length) {
-  console.error("validation errors");
-  process.exit(1);
-}
-
+if (!BASELINE.barsHeldStats || validateClaimCards().length || signalLibrarySelfCheck().length) throw new Error("slot-model inputs invalid; run baseline and validate cards/signals");
 const bars = [];
 for (const f of dataLines(readFileSync(join(NORM, "xauusd-m30-eat.csv"), "utf8"), { delimiter: "," })) {
   if (f[0] === "datetime") continue;
-  const o = num(f[1]), h = num(f[2]), l = num(f[3]), c = num(f[4]);
-  if (o === undefined || h === undefined || l === undefined || c === undefined) continue;
-  bars.push({ datetime: f[0], o, h, l, c });
+  const [o,h,l,c] = f.slice(1,5).map(num);
+  if ([o,h,l,c].every(Number.isFinite)) bars.push({ datetime:f[0],o,h,l,c });
 }
-const mapLines = readFileSync(join(NORM, "xauusd-m30-map.csv"), "utf8")
-  .split("\n")
-  .filter((l) => l && !l.startsWith("datetime"));
-const states = new Array(bars.length).fill(null);
-const DEV_IDX = new Set();
-let bi = 0;
-for (const line of mapLines) {
-  const f = line.split(",");
-  while (bi < bars.length && bars[bi].datetime !== f[0]) bi++;
-  if (bi >= bars.length) break;
-  states[bi] = f[1];
-  if (f[12] === "DEV") DEV_IDX.add(bi);
-  bi++;
+const map = new Map();
+for (const line of readFileSync(join(NORM, "xauusd-m30-map.csv"), "utf8").split("\n").slice(1).filter(Boolean)) {
+  const f=line.split(","); map.set(f[0], { state:f[1], session:f[11], role:f[12] });
 }
-const signalStates = states.map((s) => (s && STATES.includes(s) ? s : null));
-
-/** Empirical hold-duration sampler from the baseline's barsHeld histogram. */
-function makeHoldSampler(histogram, seed) {
-  const entries = Object.entries(histogram)
-    .map(([h, c]) => [Number(h), c])
-    .sort((a, b) => a[0] - b[0]);
-  const total = entries.reduce((s, [, c]) => s + c, 0);
-  const cum = [];
-  let acc = 0;
-  for (const [h, c] of entries) {
-    acc += c;
-    cum.push([h, acc / total]);
-  }
-  let s = seed >>> 0;
-  const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
-  return () => {
-    const u = rnd();
-    for (const [h, c] of cum) if (u <= c) return h;
-    return entries.length ? entries[entries.length - 1][0] : 0;
-  };
+const states = bars.map(b => { const s=map.get(b.datetime)?.state; return STATES.includes(s) ? s : null; });
+const dev = new Set(bars.map((b,i)=>map.get(b.datetime)?.role === "DEV" ? i : -1).filter(i=>i>=0));
+function sampler(seed) {
+  const hist=Object.entries(BASELINE.barsHeldStats.histogram).map(([h,n])=>[+h,n]).sort((a,b)=>a[0]-b[0]);
+  const total=hist.reduce((s,x)=>s+x[1],0); let cum=0; const cdf=hist.map(([h,n])=>[h,(cum+=n)/total]); let s=seed>>>0;
+  return ()=>{s=(s*1664525+1013904223)>>>0; const u=s/4294967296; return cdf.find(([,p])=>u<=p)?.[0] ?? hist.at(-1)[0];};
 }
-
-const holdSampler = makeHoldSampler(BASELINE.barsHeldStats.histogram, 20261027);
-
-/** Run the one-slot book over an ordered list of signals. */
-function runBook(signals, sampler) {
-  let occupiedUntil = -1;
-  const kept = [];
-  let droppedOccupied = 0;
-  for (const s of signals) {
-    if (s.index >= occupiedUntil) {
-      kept.push(s);
-      occupiedUntil = s.index + sampler();
-    } else droppedOccupied++;
-  }
-  return { kept, droppedOccupied };
-}
-
-const perCard = {};
+const cardById=new Map(CLAIM_CARDS.map(c=>[c.id,c]));
+const signalsByCard={}, emissionsByCard={};
 for (const id of FROZEN_TEST_SEQUENCE) {
-  const rows = emitSignals(bars, id, { states: signalStates }).filter((r) => DEV_IDX.has(r.index));
-  rows.sort((a, b) => a.index - b.index);
-  const { kept, droppedOccupied } = runBook(rows, holdSampler);
-  const c = CLAIM_CARDS.find((x) => x.id === id);
-  perCard[id] = {
-    cardId: id,
-    family: c.family,
-    priority: c.priority,
-    verdictStrength: c.strength.state,
-    verdictWeakness: c.weakness.state,
-    rawSignals: rows.length,
-    kept: kept.length,
-    droppedOccupied,
-    survival: rows.length ? +(kept.length / rows.length).toFixed(4) : 0,
-    keptStrength: kept.filter((r) => r.verdictState === c.strength.state).length,
-    keptWeakness: kept.filter((r) => r.verdictState === c.weakness.state).length,
-    keptByVerdictState: Object.fromEntries(
-      VERDICT_STATES.map((vs) => [vs, kept.filter((r) => r.verdictState === vs).length]),
-    ),
-  };
+  emissionsByCard[id]=emitSignals(bars,id,{states}).filter(x=>dev.has(x.index));
+  signalsByCard[id]=emissionsByCard[id].filter(x=>VERDICT_STATES.includes(x.verdictState)).map(x=>({...x,priority:cardById.get(id).priority,session:map.get(x.datetime)?.session,year:Number(x.datetime.slice(0,4)),day:x.datetime.slice(0,10)})).sort((a,b)=>a.index-b.index);
 }
-
-const perFamily = FAMILIES.map((f) => {
-  const cards = CLAIM_CARDS.filter((c) => c.family === f).map((c) => c.id);
-  // Re-run the book over the pooled family signals (the real book is global).
-  const rows = cards
-    .flatMap((id) => emitSignals(bars, id, { states: signalStates }))
-    .filter((r) => DEV_IDX.has(r.index))
-    .sort((a, b) => a.index - b.index);
-  const { kept } = runBook(rows, holdSampler);
-  const strengthState = FAMILY_STRENGTH_STATE[f];
-  return {
-    family: f,
-    strengthState,
-    weaknessState: otherVerdictState(strengthState),
-    rawSignals: rows.length,
-    kept: kept.length,
-    survival: rows.length ? +(kept.length / rows.length).toFixed(4) : 0,
-    keptStrength: kept.filter((r) => r.verdictState === strengthState).length,
-    keptWeakness: kept.filter((r) => r.verdictState === otherVerdictState(strengthState)).length,
-    expectedStrengthN: kept.filter((r) => r.verdictState === strengthState).length,
-    expectedWeaknessN: kept.filter((r) => r.verdictState === otherVerdictState(strengthState)).length,
-  };
-});
-
-const pooled = FROZEN_TEST_SEQUENCE.flatMap((id) => emitSignals(bars, id, { states: signalStates })).filter((r) => DEV_IDX.has(r.index));
-const pooledRows = pooled.sort((a, b) => a.index - b.index);
-const { kept: pooledKept } = runBook(pooledRows, holdSampler);
-
-const report = {
-  generatedAt: new Date().toISOString(),
-  id: "AMENDMENT-4-SLOT-MODEL",
-  date: "2026-10-27",
-  decidedBeforeResults: true,
-  purpose: "Emulate one-position-per-slot blocking on the measured DEV signals, using the baseline's bars-to-exit distribution.",
-  isAssumption: true,
-  assumption: {
-    holdDuration:
-      "Drawn from the RANDOM-ENTRY BASELINE's own bars-to-exit histogram, not from any strategy's realised exits.",
-    singleGlobalSlot:
-      "One slot for the whole book (the conservative reading of decision #10). A per-state book would raise survival.",
-    noOutcomes:
-      "No strategy P&L, R value, verdict or trade record is used. Only signal bars and the baseline's exit-time distribution.",
-    priorityNotReapplied:
-      "Signals are processed in bar order; the frozen numeric priority is not re-applied here because a family's variants are pooled anyway.",
-  },
-  input: {
-    baseline: "artifacts/map-compass/random-baseline.json#barsHeldStats",
-    baselineHoldStats: {
-      mean: BASELINE.barsHeldStats.mean,
-      median: BASELINE.barsHeldStats.median,
-      p90: BASELINE.barsHeldStats.p90,
-      max: BASELINE.barsHeldStats.max,
-      histogramBins: Object.keys(BASELINE.barsHeldStats.histogram).length,
-    },
-    samplerSeed: 20261027,
-  },
-  perCard,
-  perFamily,
-  pooled: {
-    rawSignals: pooledRows.length,
-    kept: pooledKept.length,
-    survival: +(pooledKept.length / pooledRows.length).toFixed(4),
-  },
-  minTradesPerCell: CLAIM_CRITERIA.minTradesPerCell,
-  note:
-    "Survival is the share of raw signals that survive the one-slot book. It is NOT a strategy result and does not change any criterion.",
-};
-writeFileSync(join(OUT, "slot-model.json"), JSON.stringify(report, null, 2) + "\n");
-
-console.log(`card                         raw      kept  survival  keptStr keptWeak`);
-for (const r of Object.values(perCard)) {
-  console.log(
-    `${r.cardId.padEnd(26)} ${String(r.rawSignals).padStart(6)} ${String(r.kept).padStart(6)} ${String(r.survival).padStart(8)} ${String(r.keptStrength).padStart(8)} ${String(r.keptWeakness).padStart(8)}`,
-  );
+function runOneSlot(rows,seed) {
+  const draw=sampler(seed); let until=-1; const kept=[]; let dropped=0; let holds=0;
+  for(const x of rows) { if(x.index>=until) { const h=draw(); kept.push({...x,barsHeldModel:h}); until=x.index+h; holds+=h; } else dropped++; }
+  return {kept,dropped,meanSampledHold:kept.length?holds/kept.length:0};
 }
-console.log("\nfamily                       raw       kept  survival  strengthN  weakN");
-for (const r of perFamily) {
-  console.log(
-    `${r.family.padEnd(26)} ${String(r.rawSignals).padStart(7)} ${String(r.kept).padStart(7)} ${String(r.survival).padStart(8)} ${String(r.expectedStrengthN).padStart(9)} ${String(r.expectedWeaknessN).padStart(6)}`,
-  );
+const perCard={};
+for(const id of FROZEN_TEST_SEQUENCE) {
+  const rows=signalsByCard[id], seed=20261027 + [...id].reduce((a,c)=>a+c.charCodeAt(0),0);
+  const result=runOneSlot(rows,seed), c=cardById.get(id), kept=result.kept;
+  perCard[id]={cardId:id,family:c.family,priority:c.priority,devSignalEmissions:emissionsByCard[id].length,excludedOutsideVerdictStates:emissionsByCard[id].length-rows.length,rawSignals:rows.length,kept:kept.length,droppedOccupied:result.dropped,survival:rows.length?kept.length/rows.length:0,meanSampledHoldBars:result.meanSampledHold,byVerdictState:Object.fromEntries(VERDICT_STATES.map(v=>[v,kept.filter(x=>x.verdictState===v).length])),bySession:Object.fromEntries(["asian","london","ny"].map(s=>[s,kept.filter(x=>x.session===s).length])),byVerdictStateSession:Object.fromEntries(VERDICT_STATES.flatMap(v=>["asian","london","ny"].map(s=>[`${v}|${s}`,kept.filter(x=>x.verdictState===v&&x.session===s).length]))),_kept:kept};
 }
-console.log(
-  `\npooled: ${report.pooled.rawSignals} raw -> ${report.pooled.kept} kept (survival ${report.pooled.survival})`,
-);
-console.log("ASSUMPTION: hold durations come from the random baseline, not from any strategy.");
+// Family counts are sums of independently-slot-tested card observations, not a pooled family slot.
+const perFamily=FAMILIES.map(f=>{const cards=CLAIM_CARDS.filter(c=>c.family===f),strengthState=cards[0].strength.state,weaknessState=cards[0].weakness.state,rawSignals=cards.reduce((s,c)=>s+perCard[c.id].rawSignals,0),kept=cards.reduce((s,c)=>s+perCard[c.id].kept,0),byVerdictState=Object.fromEntries(VERDICT_STATES.map(v=>[v,cards.reduce((s,c)=>s+perCard[c.id].byVerdictState[v],0)]));return {family:f,cardCount:cards.length,strengthState,weaknessState,rawSignals,kept,survival:rawSignals?kept/rawSignals:0,expectedStrengthN:byVerdictState[strengthState],expectedWeaknessN:byVerdictState[weaknessState],byVerdictState,byVerdictStateSession:Object.fromEntries(VERDICT_STATES.flatMap(v=>["asian","london","ny"].map(se=>[`${v}|${se}`,cards.reduce((s,c)=>s+perCard[c.id].byVerdictStateSession[`${v}|${se}`],0)])))}});
+// Combined one-position Compass book: priority selects among same-bar candidates.
+const candidates=FROZEN_TEST_SEQUENCE.flatMap(id=>signalsByCard[id]);
+candidates.sort((a,b)=>a.index-b.index||a.priority-b.priority);
+const byBar=new Map(); for(const x of candidates){if(!byBar.has(x.index))byBar.set(x.index,[]);byBar.get(x.index).push(x);}
+const selected=[...byBar.values()].map(a=>a.sort((x,y)=>x.priority-y.priority)[0]).sort((a,b)=>a.index-b.index);
+const combined=runOneSlot(selected,20261027);
+const powerStructure={};
+for(const vs of VERDICT_STATES) for(const se of ["asian","london","ny"]) {
+  const rows=Object.values(perCard).flatMap(x=>x._kept).filter(x=>x.verdictState===vs&&x.session===se);
+  const byDay=new Map(),byYear=new Map();
+  for(const x of rows){byDay.set(x.day,(byDay.get(x.day)||0)+1);byYear.set(String(x.year),(byYear.get(String(x.year))||0)+1);}
+  const barCounts=new Map(); for(const x of rows) barCounts.set(x.index,(barCounts.get(x.index)||0)+1); const sumSq=[...barCounts.values()].reduce((a,n)=>a+n*n,0); const nEffective=sumSq?rows.length*rows.length/sumSq:0;
+  powerStructure[`${vs}|${se}`]={n:rows.length,distinctEntryBars:barCounts.size,nEffective:+nEffective.toFixed(2),designEffect:nEffective?+(rows.length/nEffective).toFixed(4):null,dayTradeCounts:[...byDay.values()],tradesByYear:Object.fromEntries(byYear)};
+}
+for(const vs of VERDICT_STATES) {
+  const rows=Object.values(perCard).flatMap(x=>x._kept).filter(x=>x.verdictState===vs);
+  const byDay=new Map(),byYear=new Map(),barCounts=new Map();
+  for(const x of rows){byDay.set(x.day,(byDay.get(x.day)||0)+1);byYear.set(String(x.year),(byYear.get(String(x.year))||0)+1);barCounts.set(x.index,(barCounts.get(x.index)||0)+1);}
+  const sumSq=[...barCounts.values()].reduce((a,n)=>a+n*n,0),nEffective=sumSq?rows.length*rows.length/sumSq:0;
+  powerStructure[`${vs}|POOLED`]={n:rows.length,distinctEntryBars:barCounts.size,nEffective:+nEffective.toFixed(2),designEffect:nEffective?+(rows.length/nEffective).toFixed(4):null,dayTradeCounts:[...byDay.values()],tradesByYear:Object.fromEntries(byYear)};
+}
+for(const x of Object.values(perCard)) delete x._kept;
+const report={generatedAt:new Date().toISOString(),id:"G0-AMENDMENT-5-SLOT-MODEL",date:"2026-10-28",reportOnly:true,isAssumption:true,decidedBeforeResults:true,criteriaChanged:false,assumption:{holdDuration:"Drawn from the RANDOM-ENTRY BASELINE barsHeldStats histogram, not strategy outcomes.",singleGlobalSlot:"The separate combined Compass execution illustration uses one conservative global slot; claim validation counts use independent per-card slots.",noOutcomes:"No strategy P&L or result enters this emulation."},slotArchitecture:{cardMeasurement:"Each card is tested in its own independent one-position slot; another card cannot block its measured card-level count.",familyReporting:"Family totals are sums of the three card-specific slot survivors; variants do not block each other for this measurement.",compassValidation:"Separate combined book has one position total. At a shared bar, lowest frozen numeric priority wins; only that candidate may enter. This book is not the per-card validation sample.",ownerApproval:"This architecture is the recommended reconciliation, not yet owner-approved; do not freeze cards on this basis without approval."},powerStructure,inputs:{bars:bars.length,devBars:dev.size,rawSignalInstances:Object.values(emissionsByCard).reduce((s,a)=>s+a.length,0),eligibleVerdictStateSignalInstances:Object.values(signalsByCard).reduce((s,a)=>s+a.length,0),excludedOutsideVerdictStates:Object.values(perCard).reduce((s,x)=>s+x.excludedOutsideVerdictStates,0),baselineHoldHistogram:"random-baseline.json#barsHeldStats.histogram",baselineHoldMean:BASELINE.barsHeldStats.mean,holdSampling:"one independent deterministic baseline-hold sampler per card, seed 20261027 + sum of card-id character codes; same baseline histogram, not strategy exits",noStrategyOutcomes:true},perCard,perFamily,combinedBook:{priorityRule:"same-bar winner = smallest frozen numeric priority; one global slot afterwards",rawSignals:candidates.length,sameBarCandidates:selected.length,kept:combined.kept.length,droppedOccupied:combined.dropped,meanSampledHoldBars:combined.meanSampledHold,byVerdictState:Object.fromEntries(VERDICT_STATES.map(v=>[v,combined.kept.filter(x=>x.verdictState===v).length])),byVerdictStateSession:Object.fromEntries(VERDICT_STATES.flatMap(v=>["asian","london","ny"].map(s=>[`${v}|${s}`,combined.kept.filter(x=>x.verdictState===v&&x.session===s).length]))),note:"This is Compass/validation capacity illustration only, not the claim-level power denominator."},realHarnessAudit:{harness:"verify-claims.mjs runBattery currently receives externally produced trades; it groups variants at family|verdictState and does not apply card priorities or enforce a card-specific slot itself.",crossCardBlocking:"No strategy-signal-to-trade M6 producer exists; therefore cross-card blocking in the real harness is neither performed nor measured. The earlier global 7,401-kept model incorrectly conflated claim-specific samples with a portfolio execution slot.",requiredBeforeRealVerification:"M6 must produce per-card slot-constrained DEV trades for claim-level validation, and a separate priority-resolved single-book stream for Compass; reject a batch lacking that distinction."},minTradesPerCell:CLAIM_CRITERIA.minTradesPerCell,note:"Counts are signal-survival model counts only; baseline-sampled duration is an assumption. No P&L, verdict, threshold, Map, exit, cost or criterion is changed."};
+writeFileSync(join(OUT,"slot-model.json"),JSON.stringify(report,null,2)+"\n");
+for(const x of Object.values(perCard)) console.log(`${x.cardId.padEnd(25)} ${String(x.rawSignals).padStart(6)} raw ${String(x.kept).padStart(6)} kept`);
+for(const x of perFamily) console.log(`${x.family.padEnd(25)} ${String(x.rawSignals).padStart(7)} raw ${String(x.kept).padStart(7)} kept`);
+console.log(`combined one-slot priority book: ${candidates.length} signal instances -> ${selected.length} same-bar candidates -> ${combined.kept.length} kept`);

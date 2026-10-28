@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T14:15:17.245Z",
+  "generatedAt": "2026-10-28T09:25:22.799Z",
   "id": "AMENDMENT-4-MEASURED-OVERLAP",
   "date": "2026-10-27",
   "decidedBeforeResults": true,
@@ -358,31 +358,52 @@
     "overlapFraction": 0.925211,
     "designEffect": 4.047
   },
+  "amendment5": {
+    "allCardPairCount": 276,
+    "crossFamilyPairsJaccardAboveHalf": [
+      {
+        "a": "dual-thrust",
+        "familyA": "channel-breakout",
+        "b": "pdh-pdl-break",
+        "familyB": "opening-range",
+        "jaccard": 1,
+        "sharedBars": 49228
+      }
+    ],
+    "dualThrustVsPdhPdlBreak": {
+      "a": "dual-thrust",
+      "familyA": "channel-breakout",
+      "b": "pdh-pdl-break",
+      "familyB": "opening-range",
+      "jaccard": 1,
+      "sharedBars": 49228
+    }
+  },
   "seInflation": {
     "EFFICIENT": {
       "n": 16268,
-      "dayClusters": 10758,
+      "dayClusters": 2026,
       "plainSe": 0.011117,
-      "cr1Se": 0.012357,
-      "inflation": 1.1115
+      "cr1Se": 0.014699,
+      "inflation": 1.3222
     },
     "CHOPPY": {
       "n": 16270,
-      "dayClusters": 14086,
+      "dayClusters": 2913,
       "plainSe": 0.011339,
-      "cr1Se": 0.011743,
-      "inflation": 1.0356
+      "cr1Se": 0.012703,
+      "inflation": 1.1202
     }
   },
   "seInflationVerifiedFromDailySums": {
     "EFFICIENT": {
-      "publishedInflation": 1.1115,
-      "recomputationInflation": 1.1115,
+      "publishedInflation": 1.3222,
+      "recomputationInflation": 1.3222,
       "match": true
     },
     "CHOPPY": {
-      "publishedInflation": 1.0356,
-      "recomputationInflation": 1.0356,
+      "publishedInflation": 1.1202,
+      "recomputationInflation": 1.1202,
       "match": true
     }
   },

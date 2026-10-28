@@ -20,7 +20,8 @@ Claim cards are still `DRAFT`; `verify-claims.mjs` refuses real verification.
 | **v1.1** | 2026-10-26 | `docs/BLUEPRINT-v1.1.md` | `72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480` | superseded by v1.2; **preserved** |
 | **v1.2** | 2026-10-27 | `docs/BLUEPRINT-v1.2.md` | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` | superseded by v1.3; **preserved** |
 | **v1.3** | 2026-10-27 | `docs/BLUEPRINT-v1.3.md` | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` | superseded by v1.4; **preserved** |
-| **v1.4** | 2026-10-27 | `docs/BLUEPRINT-v1.4.md` | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` | current; `BLUEPRINT.md` |
+| **v1.4** | 2026-10-27 | `docs/BLUEPRINT-v1.4.md` | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` | superseded by v1.5; **preserved** |
+| **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | current; `BLUEPRINT.md` byte-identical |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -271,3 +272,95 @@ bytes (`sha256sum` equivalent). Machine-readable copy:
    v1.1 → v1.2 → v1.3 edit is enumerated above with a date, so the auditable
    chain is intact from v1.1 onward. This uncertainty is declared in
    `BLUEPRINT.md` §15.19 and §7.11.7.
+
+
+---
+
+## E — G0 Amendment 5 (2026-10-28, before any strategy result)
+
+**Scope/guard:** report-only. No state assignment, card parameter, priority,
+Map rule, cost, exit, frozen threshold, or CONFIRMED criterion changed. All 24
+cards remain DRAFT (`approvedBy=null`, `approvedAt=null`); `verify-claims`
+remains blocked. No real strategy result was generated and no claim-result file
+was created.
+
+### E.1 Slot reconciliation
+
+A single one-slot book cannot have both 7,401 kept trades and 37.9 mean held
+bars over 131,922 DEV bars: 7,401×37.9=280,297 bars. Amendment 5 separates
+claim validation (one independent slot per card) from the combined Compass
+execution book (one position total; same-bar winner is smallest frozen numeric
+priority). Family survivors are sums of the three card-specific slots. This is
+a recommended architecture, explicitly **not owner-approved**.
+
+The rebuilt model sees 291,501 raw DEV signal emissions; 215,099 have one of
+the two recognized verdict states and enter claim-slot counting, while 76,402
+out-of-state emissions are excluded. Per-card and family kept/raw counts are in
+`docs/G0-AMENDMENT-5-REPORT.md` and `artifacts/map-compass/slot-model.json`.
+The combined priority book retains 6,903 of 74,886 eligible same-bar
+candidates, using a baseline-resampled mean hold of 17.897 bars. This is only a
+capacity emulation. Current `runBattery` consumes supplied trades and pools
+variants family×verdict-state; it does not apply priority or enforce card slots.
+No M6 producer exists, so cross-card blocking is neither enforced nor measured;
+separate claim and Compass trade streams are required before real verification.
+
+### E.2 Power correction and calendar day keys
+
+Random-entry samples now store their actual EAT calendar day and CR1 uses that
+date rather than the invalid year-plus-bar-index-suffix proxy. EFFICIENT baseline
+CR1/plain-SE inflation is 1.3222 over 2,026 day clusters (n=16,268); CHOPPY is
+1.1202 over 2,913 clusters (n=16,270). The random seed, sampling, coverage,
+costs and exits are unchanged.
+
+The corrected report uses measured per-session post-slot n and exact pooled
+n=sum(session n), curves are monotone at true edges 0/.05/.10/.15/.20/.30R,
+and each cell reports full CONFIRMED probability, failure shares by veto, and
+analytic P(mean net > .10R AND tNet > 2). The v1.4 pooled .33 probability at
+.05R is withdrawn: with n≈6,170, SD≈1.42, SE≈.02, a true .05R mean is 2.5 SE
+below the frozen +.10R floor; the old simulation independently generated net
+and excess and misattributed pooled counts.
+
+The user's pooled-power ≥ every-session constraint is mathematically
+incompatible for true edges below the +.10R floor: as pooled SE shrinks, the
+chance of a false crossing of +.10R tends to zero, while finite session cells
+retain a positive noise-crossing probability. This failure is openly recorded
+in the report/artifact; no threshold was loosened. At/above .10R, pooled
+probability is ≥ each component for the computed cells.
+
+### E.3 Signal spec, overlap, DRAFT-only cleanup
+
+`docs/CLAIM-SIGNAL-SPECIFICATIONS.md` prints all 24 cards, current priority,
+verdict states, session restrictions, exact registered parameter strings, and
+pseudo-code from the actual evaluator. It exposes that current Dual Thrust uses
+k=0 and does not match the textbook four-extreme K-scaled construction; the
+stored `priorDayBars=48` field is unused by the prior-date evaluators; and the
+six M30 bars in `london-orb-30` equal three hours, not 30 minutes.
+
+The 276-pair audit finds one cross-family Jaccard >.5: `dual-thrust` /
+`pdh-pdl-break` = **1.000** (49,228 shared DEV bars). `williams-r-fade` /
+`stochastic-14-fade` is also **1.000**. DRAFT proposals only: drop/merge or
+re-spec the current Dual Thrust card; retain Williams %R and consider dropping
+Stochastic. Neither is applied. A drop removes one card and two verdict cells,
+leaves surviving priorities unchanged (3 or 15 vacant), and requires all
+counts/power artifacts be regenerated before freeze.
+
+Dual Thrust sources opened on 2026-10-28 and marked VERIFIED:
+- FMZ Quant implementation tutorial: https://www.fmz.com/digest-topic/9872
+  (formula and adjustable K1/K2; demonstration K1=K2=.5; not universal params).
+- ProRealCode indicator description:
+  https://www.prorealcode.com/prorealtime-indicators/dual-thrust-strategy-indicator/
+  (formula, no one fixed N/K pair).
+Both full URLs and source limitations are recorded in `docs/EMPIRICAL-EVIDENCE.md`.
+
+The eight family criticism sources remain VERIFIED, with full citations and
+URLs in `docs/EMPIRICAL-EVIDENCE.md` and the A5 report.
+
+### E.4 Snapshot/push status
+
+This log entry is complete. v1.0–v1.4 snapshots remain unchanged. v1.5 is
+`BLUEPRINT.md` copied byte-for-byte to `docs/BLUEPRINT-v1.5.md`; its full SHA-256
+is in the snapshot register and `artifacts/map-compass/blueprint-hashes.json`.
+The A5 commit is pushed only to `arena/072665f9-system`; `git ls-remote` equals
+local HEAD. The exact commit ID is recorded in the final handoff (kept out of
+this self-contained snapshot log to avoid making the snapshot depend on its own
+commit hash).

@@ -153,6 +153,20 @@ for (const f of FAMILIES) {
 
 const pooledAll = kishOverBars(FAMILIES.flatMap((f) => perFamily[f].cards.map((id) => devSignalBars(id))));
 
+// Amendment 5: all 24-card pairs, including cross-family pairs.
+const allCardSets = new Map(CLAIM_CARDS.map((c) => [c.id, devSignalBars(c.id)]));
+const allPairs = [];
+for (let i = 0; i < CLAIM_CARDS.length; i++) {
+  for (let j = i + 1; j < CLAIM_CARDS.length; j++) {
+    const a = CLAIM_CARDS[i], b = CLAIM_CARDS[j];
+    const sa = allCardSets.get(a.id), sb = allCardSets.get(b.id);
+    const ja = jaccard(sa, sb);
+    allPairs.push({ a: a.id, familyA: a.family, b: b.id, familyB: b.family, jaccard: ja, sharedBars: [...sa].filter(x => sb.has(x)).length });
+  }
+}
+const crossFamilyPairsOverHalf = allPairs.filter(p => p.familyA !== p.familyB && p.jaccard !== null && p.jaccard > 0.5).sort((a,b)=>b.jaccard-a.jaccard);
+const dualThrustPdhPdl = allPairs.find(p => (p.a === "dual-thrust" && p.b === "pdh-pdl-break") || (p.b === "dual-thrust" && p.a === "pdh-pdl-break"));
+
 // ---- day-clustered SE inflation, per verdict state, from the BASELINE -----
 function cr1Se(values, keys) {
   const N = values.length;
@@ -249,6 +263,7 @@ const report = {
   },
   byFamily: perFamily,
   pooled: pooledAll,
+  amendment5: { allCardPairCount: allPairs.length, crossFamilyPairsJaccardAboveHalf: crossFamilyPairsOverHalf, dualThrustVsPdhPdlBreak: dualThrustPdhPdl },
   seInflation: dailySeRecomputed,
   seInflationVerifiedFromDailySums: dailySeVerified,
   seInflationNote:

@@ -1,13 +1,13 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.4 — 2026-10-27; G0 AMENDMENT 4 applied**
+**Version 1.5 — 2026-10-28; G0 AMENDMENT 5 applied before any strategy result**
 **Status: G0 FROZEN (amended before any claim result). M1–M5 machinery COMPLETE. Claim cards DRAFT — awaiting human review/freeze.**
 **Branch:** `arena/072665f9-system`
 
-> **Version history is immutable.** Four byte-preserving snapshots exist:
+> **Version history is immutable.** Five byte-preserving snapshots exist:
 > `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
 > `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md` and
-> `docs/BLUEPRINT-v1.4.md`. The full 64-character
+> `docs/BLUEPRINT-v1.4.md`, and `docs/BLUEPRINT-v1.5.md`. The full 64-character
 > SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
@@ -33,6 +33,12 @@
 >   SE inflation; a **one-slot book model**; a **report-only power curve** at
 >   0.05/0.10/0.20/0.30R; a **baseline top-up** to ≥200 per verdict-state fine
 >   cell; and a **criticism registry** whose URLs were all opened 2026-10-27.
+> - **v1.5 / G0 Amendment 5 (2026-10-28)** — reconciled per-card validation slots
+>   with the separate priority-resolved Compass one-slot book; corrected baseline
+>   calendar-day clustering and per-session power counts; repaired report-only
+>   power simulation and exposed an impossible pooled-power constraint below the
+>   frozen +0.10R floor; audited all 24 exact signal specifications and opened
+>   Dual Thrust sources. Cards remain DRAFT; no real verification.
 >
 > **Every amendment was applied before any real strategy result exists.** Claim
 > cards are still `DRAFT`; `verify-claims.mjs` still refuses real verification.
@@ -1178,7 +1184,9 @@ plain-SE ratio computed on the random-entry baseline trades, per verdict state**
   SD, not a fitted parameter; the day-correlation factor (0.55 × SD) used by
   the power curve.
 
-#### 7.12.4 Slot model (task 4)
+#### 7.12.4 Slot model (Amendment 4 historical; superseded by Amendment 5)
+
+> **Superseded by G0 Amendment 5 / v1.5.** The figures below are retained only as the A4 snapshot. They are not current denominators: 7,401 × 37.9 bars = 280,297 bars, which cannot fit in a 131,922-bar DEV single slot. Current slot units and survivor tables are in §7.13.1 and `docs/G0-AMENDMENT-5-REPORT.md`.
 
 `scripts/map-compass/slot-model.mjs` → `slot-model.json`. Decision #10 is one
 position per slot. The old engine **dropped** signals arriving while a slot was
@@ -1212,7 +1220,9 @@ cell is `ma-cross` strength at 721, `opening-range` strength at 897). This is
 the single most important pre-M6 finding: the *measured* signal counts look
 healthy, but the book — not the signal — is what limits the sample.
 
-#### 7.12.5 Power curve, report-only (task 5)
+#### 7.12.5 Power curve (Amendment 4 historical; superseded by Amendment 5)
+
+> **Superseded by G0 Amendment 5 / v1.5.** The equal session splits, independent net/excess draws, and pooled .33 at .05R are retired. Current actual session counts, corrected Monte Carlo, analytic cross-check, and veto failure shares are in §7.13.2 and `artifacts/map-compass/power-curve.json`.
 
 `scripts/map-compass/power-curve.mjs` → `power-curve.json`.
 
@@ -1324,6 +1334,106 @@ frozen rule.
 | 6 | Baseline top-up to ≥200 per verdict-state fine cell, fixed seed, identical harness | Coverage only — no criterion |
 | 7 | Criticism registry, all URLs opened 2026-10-27, marked VERIFIED | No |
 | 8 | Push and `git ls-remote` verification | No |
+
+## 7.13 G0 AMENDMENT 5 (2026-10-28) — slot reconciliation and report repair
+
+**State:** pre-result, report-only. `FREEZE.status` remains `DRAFT`; no real
+strategy verification was performed. `verify-claims` remains blocked and no
+claim ledger/result files were created. The Map, state assignments, registered
+card parameters, frozen priorities, costs, exits, thresholds and CONFIRMED rule
+are unchanged. Detailed printable report: `docs/G0-AMENDMENT-5-REPORT.md`;
+all 24 exact registered parameters and signal pseudo-code:
+`docs/CLAIM-SIGNAL-SPECIFICATIONS.md`.
+
+### 7.13.1 Slot model: separate validation from portfolio execution
+
+The recommendation (not yet owner-approved) is: **one independent one-position
+slot per card when measuring a claim; one combined one-position book with frozen
+numeric priority only for Compass/validation execution.** Family survivor totals
+are sums of the three independently measured card slots, not a family-pooled
+slot. The combined book chooses the smallest frozen priority among same-bar
+signals and then holds one slot. Its sampled hold duration is illustrative,
+using only the random baseline's bars-held histogram; it is not a strategy
+outcome.
+
+The A4 arithmetic is impossible if interpreted as one slot: 7,401 kept trades
+× 37.9 average held bars = 280,297 bars, >131,922 DEV bars. A5 also limits the
+claim-slot denominator to signal instances in the two recognized verdict
+states; out-of-state emissions do not enter claim counts. Current count,
+per-card/per-family survivors, and combined-book result are tabulated in the
+A5 report and `slot-model.json`. The current combined illustration has 215,099
+eligible signal instances, 74,886 unique-bar candidates, and 6,903 kept; its
+mean sampled hold is ~17.9 bars. This reconciles a separate portfolio book but
+does not approve the recommendation.
+
+**Harness defect disclosed:** `verify-claims.mjs` consumes externally supplied
+trade records and `runBattery` pools variants at family×verdict-state; neither
+applies a card-level slot or frozen-priority filtering. No M6 signal-to-trade
+producer exists, so another card's blocking effect is not yet enforced or
+measured. Before any real verification, M6 must supply separate per-card
+slot-constrained claim trades and a priority-resolved one-slot Compass stream.
+
+### 7.13.2 Calendar-day baseline and corrected report-only power curve
+
+Amendment 5 replaces the proxy cluster key built from year and bar-index digits
+with the actual EAT calendar date derived from each sampled entry bar. The
+random baseline's CR1/plain-SE ratios are now 1.3222 (EFFICIENT; 16,268 samples,
+2,026 day clusters) and 1.1202 (CHOPPY; 16,270 samples, 2,913 day clusters).
+The baseline entry samples still use the exact same random seed, costs, exit and
+coverage protocol; only their day identity used for cluster aggregation changed.
+
+The corrected power artifact reports true net edges **0, .05, .10, .15, .20,
+.30R**, two verdict states × three measured sessions plus pooled. Session n is
+measured from the kept signal records, not evenly divided. Pooled n is exactly
+the sum of session n. It uses one common simulated net/excess observation,
+actual overlap Kish n-effective, measured CR1 inflation and year counts; it
+reports full-CONFIRMED probability, analytic `P(meanNetR > .10R AND tNet > 2)`
+cross-check, and marginal/exclusive simulated failure shares for net floor,
+tNet, excess floor, tExcess, concentration, LOYO, min n and NO_BASELINE.
+
+**An explicit requested-constraint conflict:** pooled power cannot be required
+to be ≥ every session at every true edge while preserving the frozen +.10R
+absolute-mean floor. For true edge μ < .10R, as pooled SE tends to zero,
+`P(mean estimate > .10R)` tends to zero; a smaller session has a strictly
+positive chance of crossing that threshold by noise. The report measures and
+flags the conflict rather than changing the threshold or fabricating a curve.
+The pooled ≥ session condition is checked separately by edge; it holds in the
+simulated cells for .10R and above and fails at sub-floor edges in some cells.
+All cell values and the corrected explanation of v1.4's impossible .33 at .05R
+are in the report/artifact.
+
+### 7.13.3 All-card signal spec, overlap, and DRAFT proposals
+
+The full table prints all 24 cards, their current priority, strength/weakness
+verdict states, session restriction, exact registered parameters and pseudo-code.
+No state, parameter, priority or card was edited. The Dual Thrust versus
+PDH/PDL-break measured DEV entry-bar Jaccard is **1.000** (49,228 shared bars);
+it is the only cross-family pair above .5 among all 276 pairs. Williams %R /
+Stochastic Jaccard is also **1.000**. The only actions are DRAFT proposals:
+consider merging/dropping the current misimplemented Dual Thrust card or
+re-specifying it from a sourced formula; consider merging/dropping Stochastic
+while retaining Williams %R. Neither proposal is applied. Consequences of a
+drop (24→23, two claim cells removed, no renumbering of surviving priorities)
+and source audit status/URLs are printed in the signal-spec report.
+
+The source audit opened FMZ Quant, https://www.fmz.com/digest-topic/9872, and
+ProRealCode, https://www.prorealcode.com/prorealtime-indicators/dual-thrust-strategy-indicator/;
+both are marked VERIFIED in `docs/EMPIRICAL-EVIDENCE.md`. These sources describe
+Range=max(HH−LC,HC−LL) and K-scaled rails; FMZ's worked example uses K1=K2=.5,
+but neither prescribes one universal parameter pair. The current DRAFT signal
+uses k=0, a previous-day high/open/low range and intrabar touches, so it is
+not represented as the textbook rule. The signal dump also exposes unused
+`priorDayBars=48` fields and `london-orb-30`'s six M30 bars (=3 hours).
+
+### 7.13.4 Frozen-state and snapshot invariants
+
+`FREEZE.status = "DRAFT"`, `approvedBy = null`, and `approvedAt = null` remain.
+No real verification, claim result, freeze, threshold change, Map change, cost
+change or exit change occurred. The `CONFIRMED` conjunction remains
+`meanNetR > +.10R AND day-clustered tNet > 2 AND excess > 0 AND t > 2`, plus the
+existing n, concentration, LOYO and NO_BASELINE vetoes. A5 is report-only.
+
+---
 
 ## 8. Cost model (M3 — COMPLETE)
 
@@ -1543,11 +1653,11 @@ data-availability failures, not logic failures; the full suite passes once
 | `routing-table.json`       | M4 Compass table + `conditionalPolicy`      |
 | `seal-audit.json`          | measured holdout feature bleed              |
 | `baseline-coverage.json`   | NO_BASELINE cell audit (Amendment 3)        |
-| `blueprint-hashes.json`    | full SHA-256 of v1.0–v1.4                     |
+| `blueprint-hashes.json`    | full SHA-256 of v1.0–v1.5                     |
 | `signal-counts.json`       | measured DEV signal counts (Amendment 4)      |
 | `measured-overlap.json`    | measured Jaccard / Kish overlap + SE inflation|
-| `slot-model.json`          | one-slot book emulation (assumption)          |
-| `power-curve.json`         | report-only power curve at 4 true edges       |
+| `slot-model.json`          | per-card slots + separate priority-resolved Compass slot |
+| `power-curve.json`         | report-only power curve at 6 true edges (Amendment 5) |
 | `claim-ledger.jsonl`       | append-only verdicts (currently empty)      |
 
 ---
@@ -1636,19 +1746,20 @@ data-availability failures, not logic failures; the full suite passes once
     `state|side` cells exist (n=4000), so the shipped rule yields 0
     NO_BASELINE cells. 648 of 1,632 trade-level lookups rely on the coarse
     fallback; forbidding it would create 648 NO_BASELINE holes.
-25. **The one-slot book is an EMULATION, not the engine.** Hold durations are
-    sampled from the RANDOM baseline's bars-to-exit distribution, a single global
-    slot is modelled, and priority is not re-applied. Real M6 book behaviour will
-    differ; the model is a pre-M6 order-of-magnitude, not a forecast.
-26. **The power curve's per-session trade counts are an approximation.** Each
-    per-session cell uses the family's slot-model kept trades divided evenly
-    across the three sessions. Per-session signal splits are not yet measured.
-27. **The measured overlap is an UPPER bound on independent information.** It
-    assumes variants firing on the same bar would be taken as separate trades;
-    the one-slot book is what actually decides that, and it is modelled separately.
-28. **The signal library is a SPECIFICATION, not a tested strategy.** Its
-    parameters are the published settings; no signal has been evaluated for
-    P&L. Amendment 4 deliberately stops at entry bars and sides.
+25. **The slot output is an EMULATION, not the engine.** Amendment 5 separates
+    independent per-card validation slots from a priority-resolved one-slot
+    Compass book; holds are still sampled from baseline exit-times, not strategy
+    outcomes. The architecture is recommended but awaits owner approval.
+26. **Power is a report-only parametric model.** Amendment 5 uses measured actual
+    session counts, but draws synthetic outcomes under stated baseline SD/CR1
+    assumptions. It is not strategy evidence; the pooled-power dominance request
+    is mathematically incompatible below the unchanged +0.10R floor.
+27. **Overlap is a dependence diagnostic, not portfolio execution.** Jaccard and
+    Kish quantify entry-bar duplication; the future M6 producer must separately
+    enforce per-card validation and frozen-priority Compass execution.
+28. **The signal library is a DRAFT specification, not a tested strategy.**
+    The source audit found Dual Thrust and London ORB card/spec mismatches; all
+    pseudo-code is printed for review. No P&L was evaluated.
 24. **Empirical studies are literature, not evidence about our data.** They
     motivate the claims and set the test order; they do not pre-confirm
     anything. `vol-compression` has no peer-reviewed test and is marked
@@ -1660,17 +1771,20 @@ data-availability failures, not logic failures; the full suite passes once
 
 | Document                                      | Role                                                   |
 | --------------------------------------------- | ------------------------------------------------------ |
-| **`BLUEPRINT.md`** (this file, v1.4)          | Canonical pre-registration — wins on conflict          |
+| **`BLUEPRINT.md`** (this file, v1.5)          | Canonical pre-registration — wins on conflict          |
 | `docs/BLUEPRINT-v1.0.md`                      | Immutable v1.0 snapshot (reconstructed)                |
 | `docs/BLUEPRINT-v1.1.md`                      | Immutable v1.1 snapshot, SHA-256 `72c078f3…`           |
 | `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot                                  |
 | `docs/BLUEPRINT-v1.3.md`                      | Immutable v1.3 snapshot                                  |
-| `docs/BLUEPRINT-v1.4.md`                      | Immutable v1.4 snapshot (this version)                   |
+| `docs/BLUEPRINT-v1.4.md`                      | Immutable v1.4 snapshot (superseded)                     |
+| `docs/BLUEPRINT-v1.5.md`                      | Immutable v1.5 snapshot (this version)                   |
 | `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies + eight VERIFIED criticisms        |
 | `scripts/map-compass/signal-params.mjs`       | The 24 exact signal parameters (card source of truth)  |
 | `scripts/map-compass/lib/signals.mjs`         | The 24 pure causal entry-signal functions               |
-| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.4) |
+| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.5) |
 | `docs/CLAIM-CARDS-FULL-TEXT.md`               | All 24 cards in full text, in TEST_ORDER (DRAFT)       |
+| `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`          | All 24 exact DRAFT parameters and signal pseudo-code    |
+| `docs/G0-AMENDMENT-5-REPORT.md`                 | Slot, power, overlap, source, and survivor report       |
 | `docs/MAP-COMPASS-DATA-CONTRACT.md`           | G1 detail: provenance, timezone epochs, schema, holes  |
 | `docs/ENGINE-BIAS-REGISTER.md`                | G1.5 detail: D1–D4, resolution strategy, sign-off      |
 | `docs/CLAIM-CARDS-REVIEW.md`                  | The 24 draft cards + review checklist + power decision |
