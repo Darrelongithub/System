@@ -1,0 +1,284 @@
+/**
+ * M4 — Compass v0: binary allow-list routing table.
+ *
+ * Input: Map state (+ session). Output: sorted list of ENABLED strategy IDs.
+ *
+ * Rule (blueprint §6, REVISED at G0): enable S in verdict state B iff its
+ * STRENGTH claim is CONFIRMED for B. Strength alone is sufficient. A
+ * CONFIRMED weakness still adds an explicit hard block in the OTHER verdict
+ * state. No learned weights, no scoring, no optimizer — a fixed table is
+ * falsifiable, a learned policy is not.
+ *
+ * G0 AMENDMENT 3: the table is keyed by the TWO VERDICT STATES
+ * (EFFICIENT / CHOPPY), not the four Map states. A bar's four-state Map label
+ * is mapped through verdictStateOf() at lookup time. The four Map states
+ * remain diagnostics. UNKNOWN -> flat. Session gates on top.
+ */
+import {
+  VERDICT_STATES,
+  verdictStateOf,
+  SENSITIVITY_RULE,
+  CLAIM_CRITERIA,
+} from "../frozen.mjs";
+import { CLAIM_CARDS } from "../claim-cards.draft.mjs";
+
+export const VERDICTS = Object.freeze(["CONFIRMED", "REFUTED", "INCONCLUSIVE"]);
+export const NOT_SHIPPABLE = "NOT_SHIPPABLE";
+export const CONDITIONAL_NOT_ENABLED = "CONDITIONAL_NOT_ENABLED";
+export const DRIFT_DEPENDENT_NOT_ENABLED = "DRIFT_DEPENDENT_NOT_ENABLED";
+
+/** Accept either a verdict state or a four-state Map label. */
+export function routingStateOf(state) {
+  return VERDICT_STATES.includes(state) ? state : verdictStateOf(state);
+}
+
+/**
+ * G0 AMENDMENT 2 (user default "no"): CONDITIONAL claims do not enable the
+ * Compass. They may be promoted ONLY by VAL support under the criterion frozen
+ * in SENSITIVITY_RULE.valSupportCriterion. AMENDMENT 3: that criterion is now
+ * the RESTORED rule (net floor + excess control + vetoes), not the v1.2 rule.
+ * This is a pure predicate over ledger records; it never loosens a threshold.
+ */
+export function conditionalValPromotions(records = []) {
+  const promoted = new Set();
+  const cfg = CLAIM_CRITERIA;
+  for (const r of records) {
+    if (r.windowKind !== "VAL") continue;
+    if (r.kind !== "strength") continue;
+    if (!r.conditional && r.stability !== "DEFINITION_SENSITIVE") continue;
+    const s = r.stats ?? {};
+    const ok =
+      r.verdict === "CONFIRMED" &&
+      s.n >= cfg.minTradesPerCell &&
+      s.meanNetR > cfg.practicalFloorR &&
+      s.tNet > cfg.tStatMin &&
+      s.excessVsRandomR > cfg.excessFloorR &&
+      s.t > cfg.tStatMin &&
+      s.baseline?.mode === "MATCHED_CONTROL" &&
+      s.baseline?.missing === 0 &&
+      Array.isArray(s.vetoes) &&
+      s.vetoes.length === 0;
+    if (ok) promoted.add(r.claimId);
+  }
+  return promoted;
+}
+
+/** A year-drift-dependent claim needs a separate, fully passing VAL confirmation. */
+export function valDriftPromotions(records = []) {
+  const promoted = new Set();
+  const cfg = CLAIM_CRITERIA;
+  for (const r of records) {
+    if (r.windowKind !== "VAL" || r.kind !== "strength" || r.verdict !== "CONFIRMED") continue;
+    const s = r.stats ?? {};
+    const ym = s.yearMatchedControl ?? {};
+    const ok =
+      s.n >= cfg.minTradesPerCell &&
+      s.meanNetR > cfg.practicalFloorR &&
+      s.tNet > cfg.tStatMin &&
+      s.excessVsRandomR > cfg.excessFloorR &&
+      s.t > cfg.tStatMin &&
+      s.baseline?.mode === "MATCHED_CONTROL" &&
+      s.baseline?.missing === 0 &&
+      Array.isArray(s.vetoes) &&
+      s.vetoes.length === 0 &&
+      ym.completeForCell === true &&
+      Number.isFinite(ym.t) &&
+      ym.t > cfg.tStatMin;
+    if (ok) promoted.add(r.claimId);
+  }
+  return promoted;
+}
+
+/**
+ * Build the routing table from a claim ledger.
+ *
+ * `verdicts`: Map or object keyed `${strategyId}|${verdictState}` -> verdict.
+ * Only CONFIRMED strengths enable. A CONFIRMED weakness adds a hard block for
+ * the other verdict state. REFUTED/INCONCLUSIVE never enable anything.
+ */
+export function buildRoutingTable(
+  verdicts,
+  cards = CLAIM_CARDS,
+  { conditionalIds = new Set(), valPromotedIds = new Set(), records = [] } = {},
+) {
+  const get = verdicts instanceof Map ? (k) => verdicts.get(k) : (k) => verdicts[k];
+  const table = Object.fromEntries(VERDICT_STATES.map((s) => [s, []]));
+  const reasons = [];
+  const conditional = conditionalIds instanceof Set ? conditionalIds : new Set(conditionalIds);
+  const valPromotions = new Set([
+    ...(valPromotedIds instanceof Set ? valPromotedIds : new Set(valPromotedIds)),
+    ...[...conditionalValPromotions(records)].filter((id) => conditional.has(id)),
+  ]);
+  const driftDependent = new Set(
+    records.filter((r) => r.windowKind === "DEV" && (r.stats?.driftDependent === true ||
+      r.stats?.yearMatchedControl?.tag === "DRIFT_DEPENDENT" || r.stats?.tags?.includes("DRIFT_DEPENDENT")))
+      .map((r) => r.claimId),
+  );
+  const driftValPromotions = valDriftPromotions(records);
+
+  for (const c of cards) {
+    const strengthKey = `${c.id}|${c.strength.state}`;
+    const weaknessKey = `${c.id}|${c.weakness.state}`;
+    const sv = get(strengthKey);
+    const wv = get(weaknessKey);
+
+    // AMENDMENT 2 (user default "no"): CONDITIONAL claims cannot enable Compass.
+    const isConditional = conditional.has(c.id);
+    const valBacked = valPromotions.has(c.id);
+    if (isConditional && !SENSITIVITY_RULE.compassCanEnableConditional && !valBacked) {
+      reasons.push({
+        id: c.id,
+        decision: CONDITIONAL_NOT_ENABLED,
+        strengthVerdict: sv ?? "MISSING",
+        weaknessVerdict: wv ?? "MISSING",
+        conditional: true,
+        valSupport: false,
+        note: `CONDITIONAL (DEFINITION_SENSITIVE). User default "no": reported at M9/M10, enabled only if VAL supports it. See SENSITIVITY_RULE.`,
+      });
+      continue;
+    }
+
+    const isDriftDependent = driftDependent.has(c.id);
+    const driftValBacked = driftValPromotions.has(c.id);
+    if (isDriftDependent && !driftValBacked) {
+      reasons.push({
+        id: c.id,
+        decision: DRIFT_DEPENDENT_NOT_ENABLED,
+        strengthVerdict: sv ?? "MISSING",
+        weaknessVerdict: wv ?? "MISSING",
+        driftDependent: true,
+        validationSupport: false,
+        note: "DEV year-matched excess t<=2; Compass remains disabled unless an independent VAL record confirms the strength under the frozen gates and has year-matched excess t>2.",
+      });
+      continue;
+    }
+
+    // STRENGTH ALONE is sufficient (G0 revision).
+    if (sv !== "CONFIRMED") {
+      reasons.push({
+        id: c.id,
+        decision: NOT_SHIPPABLE,
+        strengthVerdict: sv ?? "MISSING",
+        weaknessVerdict: wv ?? "MISSING",
+        note: "strength not CONFIRMED",
+      });
+      continue;
+    }
+
+    // Hard block from the confirmed weakness (the OTHER verdict state).
+    if (table[c.weakness.state]?.includes(c.id)) {
+      table[c.weakness.state] = table[c.weakness.state].filter((x) => x !== c.id);
+    }
+    if (!table[c.strength.state].includes(c.id)) table[c.strength.state].push(c.id);
+    reasons.push({
+      id: c.id,
+      decision: "ENABLED",
+      state: c.strength.state,
+      blocked: wv === "CONFIRMED" ? c.weakness.state : null,
+      weaknessVerdict: wv ?? "MISSING",
+      conditional: isConditional,
+      valSupport: isConditional && valBacked,
+      driftDependent: isDriftDependent,
+      driftValidationSupport: isDriftDependent && driftValBacked,
+      note: isConditional
+        ? "CONDITIONAL enabled ONLY because VAL met the frozen support criterion (G0 Amendment 2)"
+        : isDriftDependent
+          ? "DRIFT_DEPENDENT enabled only after independent VAL confirmation cleared the year-matched excess t>2 requirement"
+          : wv === "CONFIRMED"
+          ? "strength CONFIRMED; weakness CONFIRMED adds hard block"
+          : "strength CONFIRMED alone; weakness not required (G0 revision)",
+    });
+  }
+
+  // Frozen numeric priority order (decision #10).
+  const priority = new Map(cards.map((c) => [c.id, c.priority]));
+  for (const s of VERDICT_STATES)
+    table[s].sort((a, b) => (priority.get(a) ?? 1e9) - (priority.get(b) ?? 1e9));
+
+  return {
+    table,
+    reasons,
+    verdictStates: VERDICT_STATES,
+    conditionalPolicy: {
+      compassCanEnableConditional: SENSITIVITY_RULE.compassCanEnableConditional,
+      conditionalRequiresValSupport: SENSITIVITY_RULE.conditionalRequiresValSupport,
+      conditionalReportAt: SENSITIVITY_RULE.conditionalReportAt,
+      conditionalIds: [...conditional],
+      blockedConditionalIds: [...conditional].filter((id) => !valPromotions.has(id)),
+      valPromotedConditionalIds: [...conditional].filter((id) => valPromotions.has(id)),
+    },
+    driftDependentPolicy: {
+      validationRequired: true,
+      validationCriterion: "independent VAL strength CONFIRMED under frozen gates and year-matched excess t>2",
+      driftDependentIds: [...driftDependent],
+      blockedDriftDependentIds: [...driftDependent].filter((id) => !driftValPromotions.has(id)),
+      valPromotedDriftDependentIds: [...driftDependent].filter((id) => driftValPromotions.has(id)),
+    },
+    builtFrom: Object.keys(verdicts instanceof Map ? Object.fromEntries(verdicts) : verdicts)
+      .length,
+  };
+}
+
+/** Active strategy IDs for one bar. Accepts a four-state or verdict state. */
+export function activeStrategies(state, session, routing, cards = CLAIM_CARDS) {
+  const vs = routingStateOf(state);
+  if (!vs) return [];
+  const allowed = routing.table?.[vs] ?? [];
+  const byId = new Map(cards.map((c) => [c.id, c]));
+  return allowed.filter((id) => {
+    const c = byId.get(id);
+    if (!c) return false;
+    return !c.sessionRestriction || c.sessionRestriction === session;
+  });
+}
+
+/** Is a single strategy allowed to fire on this bar? */
+export function isAllowed(strategyId, state, session, routing, cards = CLAIM_CARDS) {
+  return activeStrategies(state, session, routing, cards).includes(strategyId);
+}
+
+/**
+ * Apply the Compass to a signal stream. `signals[i].state` may be a four-state
+ * Map label or a verdict state. Uses activeStrategies for gating, then the
+ * frozen priority for tie-break.
+ */
+export function routeSignals(signals, routing, cards = CLAIM_CARDS) {
+  const priority = new Map(cards.map((c) => [c.id, c.priority]));
+  const allowedByBar = new Map();
+  const kept = [];
+  let droppedState = 0,
+    droppedSession = 0,
+    droppedUnrouted = 0;
+
+  for (const s of signals) {
+    const vs = routingStateOf(s.state);
+    if (!vs) {
+      droppedState++;
+      continue;
+    }
+    const key = `${vs}|${s.session}`;
+    if (!allowedByBar.has(key))
+      allowedByBar.set(key, activeStrategies(vs, s.session, routing, cards));
+    const allowed = allowedByBar.get(key);
+    const card = cards.find((c) => c.id === s.strategyId);
+    if (card?.sessionRestriction && card.sessionRestriction !== s.session) {
+      droppedSession++;
+      continue;
+    }
+    if (!allowed.includes(s.strategyId)) {
+      droppedUnrouted++;
+      continue;
+    }
+    kept.push({ ...s, priority: priority.get(s.strategyId) ?? 1e9 });
+  }
+  kept.sort((a, b) => a.index - b.index || a.priority - b.priority);
+  return {
+    kept,
+    dropped: { state: droppedState, session: droppedSession, unrouted: droppedUnrouted },
+  };
+}
+
+/** Hash the table so G4 can freeze it and detect any later edit. */
+export function routingFingerprint(routing) {
+  return JSON.stringify({ table: routing.table });
+}

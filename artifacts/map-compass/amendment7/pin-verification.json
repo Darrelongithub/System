@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-11-02T12:44:57.829Z",
+  "algorithm": "Git blob SHA-1 for immutable raw pins; SHA-256 for normalized outputs versus data-manifest.json",
+  "pinnedFiles": 76,
+  "matched": 76,
+  "missing": 0,
+  "mismatched": 0,
+  "failures": [],
+  "normalizedFiles": 3,
+  "normalizedMatched": 3,
+  "normalizedFailures": []
+}

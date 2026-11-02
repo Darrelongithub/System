@@ -1,0 +1,69 @@
+{
+  "generatedAt": "2026-11-02T12:00:00.000Z",
+  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot (G0 Amendment 7).",
+  "algorithm": "SHA-256 over the raw file bytes (sha256sum equivalent)",
+  "note": "Earlier versions are preserved byte-for-byte. BLUEPRINT.md is byte-identical to docs/BLUEPRINT-v1.7.md at v1.7.",
+  "v10": {
+    "file": "docs/BLUEPRINT-v1.0.md",
+    "bytes": 28232,
+    "lines": 596,
+    "sha256": "420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe",
+    "full": "420a420851f5a666da3db70aaf46b1206c43e9b46159ee8d7c40c86df2daefbe"
+  },
+  "v11": {
+    "file": "docs/BLUEPRINT-v1.1.md",
+    "bytes": 40483,
+    "lines": 692,
+    "sha256": "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480",
+    "full": "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480"
+  },
+  "v12": {
+    "file": "docs/BLUEPRINT-v1.2.md",
+    "bytes": 58249,
+    "lines": 978,
+    "sha256": "cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543",
+    "full": "cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543"
+  },
+  "v13": {
+    "file": "docs/BLUEPRINT-v1.3.md",
+    "bytes": 82493,
+    "lines": 1342,
+    "sha256": "acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd",
+    "full": "acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd"
+  },
+  "current": {
+    "file": "BLUEPRINT.md",
+    "sha256": "045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281",
+    "matchesV17": true,
+    "matchesV16": false,
+    "matchesV15": false
+  },
+  "v14": {
+    "file": "docs/BLUEPRINT-v1.4.md",
+    "bytes": 103632,
+    "lines": 1678,
+    "sha256": "4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a",
+    "full": "4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a"
+  },
+  "v15": {
+    "file": "docs/BLUEPRINT-v1.5.md",
+    "bytes": 111438,
+    "lines": 1792,
+    "sha256": "f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce",
+    "full": "f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce"
+  },
+  "v16": {
+    "file": "docs/BLUEPRINT-v1.6.md",
+    "bytes": 119281,
+    "lines": 1915,
+    "sha256": "4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d",
+    "full": "4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d"
+  },
+  "v17": {
+    "file": "docs/BLUEPRINT-v1.7.md",
+    "bytes": 126276,
+    "lines": 1955,
+    "sha256": "045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281",
+    "full": "045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281"
+  }
+}

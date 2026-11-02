@@ -1,0 +1,4042 @@
+{
+  "generatedAt": "2026-11-02T09:51:41.064Z",
+  "purpose": "Signals-only, pre-outcome DEV diagnostics for G0 Amendment 7; no strategy outcomes, exits, costs, or verification run.",
+  "sourceArtifacts": [
+    "artifacts/map-compass/normalized/xauusd-m30-eat.csv",
+    "artifacts/map-compass/normalized/xauusd-m30-map.csv",
+    "artifacts/map-compass/amendment6/signal-counts.json"
+  ],
+  "devYears": [
+    2004,
+    2005,
+    2006,
+    2007,
+    2009,
+    2010,
+    2011,
+    2013,
+    2014,
+    2015,
+    2017,
+    2018
+  ],
+  "barsAndRangeDiagnostics": {
+    "asianClockWindowEat": "01:00–10:59",
+    "londonOpeningRangeEat": "11:00–11:29 (timestamps [11:00,11:30)); entry eligibility from 11:30",
+    "validRangeDefinition": "At least one observed M30 bar in the specified clock window on that DEV EAT calendar date; no range outcomes are evaluated.",
+    "years": {
+      "2004": {
+        "year": 2004,
+        "devBars": 5966,
+        "devDays": 143,
+        "asianBars": 2314,
+        "asianBarsPerDevDay": 16.18,
+        "barsPerDevDay": 41.72,
+        "asianValidRangeDays": 141,
+        "londonOrbValidRangeDays": 140,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2005": {
+        "year": 2005,
+        "devBars": 10946,
+        "devDays": 263,
+        "asianBars": 4274,
+        "asianBarsPerDevDay": 16.25,
+        "barsPerDevDay": 41.62,
+        "asianValidRangeDays": 253,
+        "londonOrbValidRangeDays": 249,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2006": {
+        "year": 2006,
+        "devBars": 10982,
+        "devDays": 262,
+        "asianBars": 4209,
+        "asianBarsPerDevDay": 16.06,
+        "barsPerDevDay": 41.92,
+        "asianValidRangeDays": 250,
+        "londonOrbValidRangeDays": 247,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2007": {
+        "year": 2007,
+        "devBars": 11554,
+        "devDays": 276,
+        "asianBars": 4501,
+        "asianBarsPerDevDay": 16.31,
+        "barsPerDevDay": 41.86,
+        "asianValidRangeDays": 257,
+        "londonOrbValidRangeDays": 256,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2009": {
+        "year": 2009,
+        "devBars": 11622,
+        "devDays": 277,
+        "asianBars": 4546,
+        "asianBarsPerDevDay": 16.41,
+        "barsPerDevDay": 41.96,
+        "asianValidRangeDays": 257,
+        "londonOrbValidRangeDays": 256,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2010": {
+        "year": 2010,
+        "devBars": 11015,
+        "devDays": 271,
+        "asianBars": 4391,
+        "asianBarsPerDevDay": 16.2,
+        "barsPerDevDay": 40.65,
+        "asianValidRangeDays": 257,
+        "londonOrbValidRangeDays": 255,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 18
+      },
+      "2011": {
+        "year": 2011,
+        "devBars": 11225,
+        "devDays": 274,
+        "asianBars": 4552,
+        "asianBarsPerDevDay": 16.61,
+        "barsPerDevDay": 40.97,
+        "asianValidRangeDays": 255,
+        "londonOrbValidRangeDays": 254,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      },
+      "2013": {
+        "year": 2013,
+        "devBars": 11727,
+        "devDays": 273,
+        "asianBars": 4926,
+        "asianBarsPerDevDay": 18.04,
+        "barsPerDevDay": 42.96,
+        "asianValidRangeDays": 258,
+        "londonOrbValidRangeDays": 258,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      },
+      "2014": {
+        "year": 2014,
+        "devBars": 11735,
+        "devDays": 275,
+        "asianBars": 4896,
+        "asianBarsPerDevDay": 17.8,
+        "barsPerDevDay": 42.67,
+        "asianValidRangeDays": 258,
+        "londonOrbValidRangeDays": 258,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      },
+      "2015": {
+        "year": 2015,
+        "devBars": 11685,
+        "devDays": 274,
+        "asianBars": 4901,
+        "asianBarsPerDevDay": 17.89,
+        "barsPerDevDay": 42.65,
+        "asianValidRangeDays": 258,
+        "londonOrbValidRangeDays": 257,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      },
+      "2017": {
+        "year": 2017,
+        "devBars": 11721,
+        "devDays": 274,
+        "asianBars": 4918,
+        "asianBarsPerDevDay": 17.95,
+        "barsPerDevDay": 42.78,
+        "asianValidRangeDays": 257,
+        "londonOrbValidRangeDays": 257,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      },
+      "2018": {
+        "year": 2018,
+        "devBars": 11744,
+        "devDays": 275,
+        "asianBars": 4925,
+        "asianBarsPerDevDay": 17.91,
+        "barsPerDevDay": 42.71,
+        "asianValidRangeDays": 258,
+        "londonOrbValidRangeDays": 258,
+        "minAsianBarsPerDevDay": 0,
+        "maxAsianBarsPerDevDay": 20
+      }
+    },
+    "causeOfPriorAsianZeroSignals": "A6 required the first 20 observed Asian-session bars. The observed Asian window averaged fewer than 20 bars/day in each pre-2011 DEV year (yearly means are recorded below), so the guard skipped every entry; the corrected A7 evaluator ranges all observed bars in Asian clock window 01:00–10:59 and no longer requires 20 bars."
+  },
+  "cards": [
+    {
+      "id": "donchian-20",
+      "family": "channel-breakout",
+      "variant": "Donchian 20-bar high/low break",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "lookback": 20,
+        "breakAt": "prior-high/low",
+        "entryAt": "close"
+      },
+      "parametersString": "lookback=20, breakAt=prior-high/low, entryAt=close",
+      "oldDevSignalsA6": 25237,
+      "newDevSignalsA7": 25237,
+      "oldDevSignalsBySideA6": {
+        "long": 13476,
+        "short": 11761
+      },
+      "newDevSignalsBySideA7": {
+        "long": 13476,
+        "short": 11761
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 972,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 139,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.972028,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 1948,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 251,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.954373,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 2146,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 249,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.950382,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 2176,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 257,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.931159,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 2275,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 257,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.927798,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 2201,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 256,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.944649,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 2331,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 255,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.930657,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 2137,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 260,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.952381,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 2025,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 260,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.945455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 2132,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 259,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.945255,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 2363,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 259,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.945255,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 2531,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 260,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.945455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "donchian-55",
+      "family": "channel-breakout",
+      "variant": "Donchian 55-bar high/low break",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "lookback": 55,
+        "breakAt": "prior-high/low",
+        "entryAt": "close"
+      },
+      "parametersString": "lookback=55, breakAt=prior-high/low, entryAt=close",
+      "oldDevSignalsA6": 12790,
+      "newDevSignalsA7": 12790,
+      "oldDevSignalsBySideA6": {
+        "long": 7199,
+        "short": 5591
+      },
+      "newDevSignalsBySideA7": {
+        "long": 7199,
+        "short": 5591
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 455,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-15",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 112,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.783217,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 1040,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-28",
+          "signalDays": 220,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.836502,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 1164,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 227,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.866412,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 1027,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 214,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.775362,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 1179,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 225,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.812274,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 1183,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 223,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.822878,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 1322,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 232,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.846715,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 968,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 226,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.827839,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 942,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-30",
+          "signalDays": 219,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.796364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 1028,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 225,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.821168,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 1261,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 236,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.861314,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 1221,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 229,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.832727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "sma-20-50",
+      "family": "ma-cross",
+      "variant": "SMA20 x SMA50 crossover",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "fast": 20,
+        "slow": 50,
+        "entryAt": "close"
+      },
+      "parametersString": "fast=20, slow=50, entryAt=close",
+      "oldDevSignalsA6": 2876,
+      "newDevSignalsA7": 2876,
+      "oldDevSignalsBySideA6": {
+        "long": 1439,
+        "short": 1437
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1439,
+        "short": 1437
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 140,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-28",
+          "signalDays": 101,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.706294,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 213,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-05",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 163,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.619772,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 230,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-04",
+          "lastSignalDate": "2006-12-22",
+          "signalDays": 166,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.633588,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 245,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-03",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 187,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.677536,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 237,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 170,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.613718,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 259,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-31",
+          "signalDays": 185,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.682657,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 217,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 164,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.59854,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 252,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-03",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 190,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.695971,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 275,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-07",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 189,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.687273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 267,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-05",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 183,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.667883,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 251,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-22",
+          "signalDays": 185,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.675182,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 290,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-03",
+          "lastSignalDate": "2018-12-27",
+          "signalDays": 197,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.716364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "macd-cross",
+      "family": "ma-cross",
+      "variant": "MACD signal-line cross",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "fast": 12,
+        "slow": 26,
+        "signal": 9,
+        "entryAt": "close"
+      },
+      "parametersString": "fast=12, slow=26, signal=9, entryAt=close",
+      "oldDevSignalsA6": 10068,
+      "newDevSignalsA7": 10068,
+      "oldDevSignalsBySideA6": {
+        "long": 5033,
+        "short": 5035
+      },
+      "newDevSignalsBySideA7": {
+        "long": 5033,
+        "short": 5035
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 456,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 136,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.951049,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 840,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 252,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.958175,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 818,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-04",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 249,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.950382,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 867,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 256,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.927536,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 963,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 259,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.935018,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 848,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 249,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.918819,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 892,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 257,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.937956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 838,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 253,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.92674,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 925,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-30",
+          "signalDays": 259,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.941818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 873,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 259,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.945255,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 876,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 257,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.937956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 872,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 256,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.930909,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "ichimoku-tk",
+      "family": "ma-cross",
+      "variant": "Ichimoku Tenkan/Kijun cross",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "tenkan": 9,
+        "kijun": 26,
+        "entryAt": "close"
+      },
+      "parametersString": "tenkan=9, kijun=26, entryAt=close",
+      "oldDevSignalsA6": 6764,
+      "newDevSignalsA7": 6764,
+      "oldDevSignalsBySideA6": {
+        "long": 3403,
+        "short": 3361
+      },
+      "newDevSignalsBySideA7": {
+        "long": 3403,
+        "short": 3361
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 311,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 131,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.916084,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 559,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 240,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.912548,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 544,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-04",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 237,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.90458,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 595,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-03",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 246,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.891304,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 584,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 242,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.873646,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 576,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 233,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.859779,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 571,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-31",
+          "signalDays": 242,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.883212,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 586,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-03",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 242,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.886447,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 623,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 247,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.898182,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 650,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 252,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.919708,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 568,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-28",
+          "signalDays": 237,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.864964,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 597,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-03",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 244,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.887273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "atr-squeeze-break",
+      "family": "vol-compression",
+      "variant": "ATR-squeeze breakout",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "atrPeriod": 14,
+        "squeezeFactor": 0.8,
+        "lookback": 50,
+        "breakRel": 0.5
+      },
+      "parametersString": "atrPeriod=14, squeezeFactor=0.8, lookback=50, breakRel=0.5",
+      "oldDevSignalsA6": 824,
+      "newDevSignalsA7": 824,
+      "oldDevSignalsBySideA6": {
+        "long": 537,
+        "short": 287
+      },
+      "newDevSignalsBySideA7": {
+        "long": 537,
+        "short": 287
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 41,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-29",
+          "lastSignalDate": "2004-12-20",
+          "signalDays": 23,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.160839,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 83,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-12",
+          "lastSignalDate": "2005-12-28",
+          "signalDays": 44,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.1673,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 90,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-02-02",
+          "lastSignalDate": "2006-12-28",
+          "signalDays": 51,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.194656,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 59,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-17",
+          "lastSignalDate": "2007-12-18",
+          "signalDays": 43,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.155797,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 97,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-16",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 59,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.212996,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 106,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-05",
+          "lastSignalDate": "2010-12-21",
+          "signalDays": 66,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.243542,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 93,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-07",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 58,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.211679,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 65,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-07",
+          "lastSignalDate": "2013-12-13",
+          "signalDays": 46,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.168498,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 28,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-03",
+          "lastSignalDate": "2014-12-15",
+          "signalDays": 22,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.08,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 38,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-06",
+          "lastSignalDate": "2015-12-23",
+          "signalDays": 29,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.105839,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 57,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-27",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 40,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.145985,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 67,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-12",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 46,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.167273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "nr7-break",
+      "family": "vol-compression",
+      "variant": "NR7 narrowest-range breakout",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "lookback": 7,
+        "breakRel": 0.25
+      },
+      "parametersString": "lookback=7, breakRel=0.25",
+      "oldDevSignalsA6": 14553,
+      "newDevSignalsA7": 14553,
+      "oldDevSignalsBySideA6": {
+        "long": 7689,
+        "short": 6864
+      },
+      "newDevSignalsBySideA7": {
+        "long": 7689,
+        "short": 6864
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 845,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-11",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 142,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.993007,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 1538,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 252,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.958175,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 1441,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 253,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.965649,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 1390,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 260,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.942029,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 1222,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 259,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.935018,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 1078,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-31",
+          "signalDays": 255,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.940959,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 1155,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 256,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.934307,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 1197,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 259,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.948718,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 1173,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 259,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.941818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 1112,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 260,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.948905,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 1173,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 258,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.941606,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 1229,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 260,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.945455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "inside-bar-break",
+      "family": "vol-compression",
+      "variant": "Inside-bar break",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "lookback": 1
+      },
+      "parametersString": "lookback=1",
+      "oldDevSignalsA6": 23976,
+      "newDevSignalsA7": 23976,
+      "oldDevSignalsBySideA6": {
+        "long": 13958,
+        "short": 10018
+      },
+      "newDevSignalsBySideA7": {
+        "long": 13958,
+        "short": 10018
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 1483,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-11",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 141,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.986014,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 2611,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 255,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.969582,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 2246,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 254,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.969466,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 2341,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 263,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.952899,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 1966,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 264,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.953069,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 1825,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-31",
+          "signalDays": 261,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.9631,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 1779,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-31",
+          "signalDays": 261,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.952555,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 2124,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 263,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.96337,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 2027,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 265,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.963636,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 1968,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 260,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.948905,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 1877,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-30",
+          "signalDays": 264,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.963504,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 1729,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 263,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.956364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "asian-range-break",
+      "family": "opening-range",
+      "variant": "Asian-session range breakout",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "rangeSession": "asian",
+        "entrySession": "london",
+        "entryAt": "close"
+      },
+      "parametersString": "rangeSession=asian, entrySession=london, entryAt=close",
+      "oldDevSignalsA6": 3856,
+      "newDevSignalsA7": 13948,
+      "oldDevSignalsBySideA6": {
+        "long": 1762,
+        "short": 2094
+      },
+      "newDevSignalsBySideA7": {
+        "long": 6858,
+        "short": 7090
+      },
+      "sideSignalDeltas": {
+        "long": 5096,
+        "short": 4996
+      },
+      "totalSignalDelta": 10092,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 730,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 127,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.888112,
+          "validRangeDays": 141,
+          "signalDayShareOfValidRangeDays": 0.900709
+        },
+        {
+          "year": 2005,
+          "signals": 1086,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-04",
+          "lastSignalDate": "2005-12-29",
+          "signalDays": 209,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.794677,
+          "validRangeDays": 253,
+          "signalDayShareOfValidRangeDays": 0.826087
+        },
+        {
+          "year": 2006,
+          "signals": 1024,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 205,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.782443,
+          "validRangeDays": 250,
+          "signalDayShareOfValidRangeDays": 0.82
+        },
+        {
+          "year": 2007,
+          "signals": 1281,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 228,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.826087,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.88716
+        },
+        {
+          "year": 2009,
+          "signals": 1345,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-05",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 231,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.833935,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.898833
+        },
+        {
+          "year": 2010,
+          "signals": 1258,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 228,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.841328,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.88716
+        },
+        {
+          "year": 2011,
+          "signals": 1232,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 219,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.79927,
+          "validRangeDays": 255,
+          "signalDayShareOfValidRangeDays": 0.858824
+        },
+        {
+          "year": 2013,
+          "signals": 1317,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 215,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.787546,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.833333
+        },
+        {
+          "year": 2014,
+          "signals": 1160,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 223,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.810909,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.864341
+        },
+        {
+          "year": 2015,
+          "signals": 1118,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 210,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.766423,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.813953
+        },
+        {
+          "year": 2017,
+          "signals": 1159,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 218,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.79562,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.848249
+        },
+        {
+          "year": 2018,
+          "signals": 1238,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 202,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.734545,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.782946
+        }
+      ]
+    },
+    {
+      "id": "london-orb-30",
+      "family": "opening-range",
+      "variant": "London first-30m ORB",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "rangeStart": "11:00",
+        "rangeMinutes": 30,
+        "entrySession": "london",
+        "entryAt": "close"
+      },
+      "parametersString": "rangeStart=11:00, rangeMinutes=30, entrySession=london, entryAt=close",
+      "oldDevSignalsA6": 6442,
+      "newDevSignalsA7": 23115,
+      "oldDevSignalsBySideA6": {
+        "long": 3273,
+        "short": 3169
+      },
+      "newDevSignalsBySideA7": {
+        "long": 11590,
+        "short": 11525
+      },
+      "sideSignalDeltas": {
+        "long": 8317,
+        "short": 8356
+      },
+      "totalSignalDelta": 16673,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 1045,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-11",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 140,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.979021,
+          "validRangeDays": 140,
+          "signalDayShareOfValidRangeDays": 1
+        },
+        {
+          "year": 2005,
+          "signals": 1835,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 248,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.942966,
+          "validRangeDays": 249,
+          "signalDayShareOfValidRangeDays": 0.995984
+        },
+        {
+          "year": 2006,
+          "signals": 1923,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 247,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.942748,
+          "validRangeDays": 247,
+          "signalDayShareOfValidRangeDays": 1
+        },
+        {
+          "year": 2007,
+          "signals": 2026,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 256,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.927536,
+          "validRangeDays": 256,
+          "signalDayShareOfValidRangeDays": 1
+        },
+        {
+          "year": 2009,
+          "signals": 2082,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-05",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 255,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.920578,
+          "validRangeDays": 256,
+          "signalDayShareOfValidRangeDays": 0.996094
+        },
+        {
+          "year": 2010,
+          "signals": 2050,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 255,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.940959,
+          "validRangeDays": 255,
+          "signalDayShareOfValidRangeDays": 1
+        },
+        {
+          "year": 2011,
+          "signals": 1998,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 253,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.923358,
+          "validRangeDays": 254,
+          "signalDayShareOfValidRangeDays": 0.996063
+        },
+        {
+          "year": 2013,
+          "signals": 2010,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 257,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.941392,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.996124
+        },
+        {
+          "year": 2014,
+          "signals": 2075,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 258,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.938182,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 1
+        },
+        {
+          "year": 2015,
+          "signals": 2022,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 256,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.934307,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.996109
+        },
+        {
+          "year": 2017,
+          "signals": 2027,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 255,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.930657,
+          "validRangeDays": 257,
+          "signalDayShareOfValidRangeDays": 0.992218
+        },
+        {
+          "year": 2018,
+          "signals": 2022,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 257,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.934545,
+          "validRangeDays": 258,
+          "signalDayShareOfValidRangeDays": 0.996124
+        }
+      ]
+    },
+    {
+      "id": "pdh-pdl-break",
+      "family": "opening-range",
+      "variant": "Prior-day high/low break",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "priorDayBars": 48,
+        "entryAt": "close"
+      },
+      "parametersString": "priorDayBars=48, entryAt=close",
+      "oldDevSignalsA6": 49228,
+      "newDevSignalsA7": 49228,
+      "oldDevSignalsBySideA6": {
+        "long": 28277,
+        "short": 20951
+      },
+      "newDevSignalsBySideA7": {
+        "long": 28277,
+        "short": 20951
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 1733,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 106,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.741259,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 4085,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-28",
+          "signalDays": 221,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.840304,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 4077,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 222,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.847328,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 4036,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 208,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.753623,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 4471,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 213,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.768953,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 4355,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 219,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.808118,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 4617,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 227,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.828467,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 4095,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 214,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.783883,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 4192,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-30",
+          "signalDays": 212,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.770909,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 4169,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 214,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.781022,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 5104,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 226,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.824818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 4294,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 219,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.796364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "bollinger-20-2",
+      "family": "band-reversion",
+      "variant": "Bollinger 20/2 band fade",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "period": 20,
+        "numerStd": 2
+      },
+      "parametersString": "period=20, numerStd=2",
+      "oldDevSignalsA6": 8436,
+      "newDevSignalsA7": 8436,
+      "oldDevSignalsBySideA6": {
+        "long": 4178,
+        "short": 4258
+      },
+      "newDevSignalsBySideA7": {
+        "long": 4178,
+        "short": 4258
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 403,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 138,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.965035,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 708,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 249,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.946768,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 701,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 249,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.950382,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 752,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 257,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.931159,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 734,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 256,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.924188,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 724,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 252,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.929889,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 728,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 250,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.912409,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 725,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 257,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.941392,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 726,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 255,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.927273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 726,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 257,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.937956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 759,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 255,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.930657,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 750,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 255,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.927273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "keltner-20-atr",
+      "family": "band-reversion",
+      "variant": "Keltner 20/ATR band fade",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "period": 20,
+        "atrPeriod": 20,
+        "atrMultiple": 2
+      },
+      "parametersString": "period=20, atrPeriod=20, atrMultiple=2",
+      "oldDevSignalsA6": 6404,
+      "newDevSignalsA7": 6404,
+      "oldDevSignalsBySideA6": {
+        "long": 3037,
+        "short": 3367
+      },
+      "newDevSignalsBySideA7": {
+        "long": 3037,
+        "short": 3367
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 267,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-15",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 117,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.818182,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 584,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 223,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.847909,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 642,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 242,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.923664,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 609,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 243,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.880435,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 554,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 233,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.841155,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 552,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 234,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.863469,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 554,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 228,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.832117,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 539,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 231,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.846154,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 504,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 229,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.832727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 503,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 229,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.835766,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 577,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 230,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.839416,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 519,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 229,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.832727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "bb-squeeze-fade",
+      "family": "band-reversion",
+      "variant": "Bollinger squeeze fade",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "period": 20,
+        "numerStd": 2,
+        "squeezeFactor": 0.9
+      },
+      "parametersString": "period=20, numerStd=2, squeezeFactor=0.9",
+      "oldDevSignalsA6": 2835,
+      "newDevSignalsA7": 2835,
+      "oldDevSignalsBySideA6": {
+        "long": 1430,
+        "short": 1405
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1430,
+        "short": 1405
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 133,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-17",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 88,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.615385,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 229,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-27",
+          "signalDays": 143,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.543726,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 220,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-27",
+          "signalDays": 147,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.561069,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 266,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 163,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.59058,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 248,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 156,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.563177,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 235,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-28",
+          "signalDays": 155,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.571956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 271,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 156,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.569343,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 250,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 156,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.571429,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 240,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-26",
+          "signalDays": 150,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.545455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 218,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-30",
+          "signalDays": 139,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.507299,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 275,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-27",
+          "signalDays": 169,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.616788,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 250,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 156,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.567273,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "pdh-retest",
+      "family": "level-retest",
+      "variant": "Prior-day high retest long",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "side": "long"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, side=long",
+      "oldDevSignalsA6": 1829,
+      "newDevSignalsA7": 1829,
+      "oldDevSignalsBySideA6": {
+        "long": 1829,
+        "short": 0
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1829,
+        "short": 0
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 61,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-15",
+          "lastSignalDate": "2004-12-27",
+          "signalDays": 39,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.272727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 147,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-10",
+          "lastSignalDate": "2005-12-27",
+          "signalDays": 75,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.285171,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 156,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-04",
+          "lastSignalDate": "2006-12-20",
+          "signalDays": 72,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.274809,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 157,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-08",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 86,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.311594,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 174,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-28",
+          "signalDays": 80,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.288809,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 188,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-29",
+          "signalDays": 85,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.313653,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 201,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-10",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 99,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.361314,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 119,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-09",
+          "signalDays": 58,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.212454,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 146,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-03",
+          "lastSignalDate": "2014-12-30",
+          "signalDays": 62,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.225455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 109,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-05",
+          "lastSignalDate": "2015-12-24",
+          "signalDays": 53,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.193431,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 214,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 89,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.324818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 157,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-03",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 69,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.250909,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "pdl-retest",
+      "family": "level-retest",
+      "variant": "Prior-day low retest short",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "side": "short"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, side=short",
+      "oldDevSignalsA6": 1483,
+      "newDevSignalsA7": 1483,
+      "oldDevSignalsBySideA6": {
+        "long": 0,
+        "short": 1483
+      },
+      "newDevSignalsBySideA7": {
+        "long": 0,
+        "short": 1483
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 38,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 27,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.188811,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 107,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-04",
+          "lastSignalDate": "2005-12-16",
+          "signalDays": 49,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.186312,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 106,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-05",
+          "lastSignalDate": "2006-12-21",
+          "signalDays": 59,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.225191,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 106,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-04",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 55,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.199275,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 126,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-05",
+          "lastSignalDate": "2009-12-30",
+          "signalDays": 65,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.234657,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 99,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-12",
+          "lastSignalDate": "2010-12-16",
+          "signalDays": 56,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.206642,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 132,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-05",
+          "lastSignalDate": "2011-12-29",
+          "signalDays": 60,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.218978,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 129,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-07",
+          "lastSignalDate": "2013-12-23",
+          "signalDays": 63,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.230769,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 142,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-06",
+          "lastSignalDate": "2014-12-29",
+          "signalDays": 63,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.229091,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 161,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-28",
+          "signalDays": 69,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.251825,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 151,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-11",
+          "lastSignalDate": "2017-12-18",
+          "signalDays": 70,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.255474,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 186,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-04",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 83,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.301818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "classic-pivot",
+      "family": "level-retest",
+      "variant": "Classic floor-pivot bounce",
+      "status": "DRAFT",
+      "strengthState": "EFFICIENT",
+      "weaknessState": "CHOPPY",
+      "parameters": {
+        "priorDayBars": 48,
+        "touchRel": 0.25,
+        "levels": "PP,S1,R1"
+      },
+      "parametersString": "priorDayBars=48, touchRel=0.25, levels=PP,S1,R1",
+      "oldDevSignalsA6": 6532,
+      "newDevSignalsA7": 6443,
+      "oldDevSignalsBySideA6": {
+        "long": 3144,
+        "short": 3388
+      },
+      "newDevSignalsBySideA7": {
+        "long": 3080,
+        "short": 3363
+      },
+      "sideSignalDeltas": {
+        "long": -64,
+        "short": -25
+      },
+      "totalSignalDelta": -89,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 289,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 92,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.643357,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 533,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-04",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 155,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.589354,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 490,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-06",
+          "lastSignalDate": "2006-12-28",
+          "signalDays": 151,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.576336,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 481,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-03",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 153,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.554348,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 526,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 154,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.555957,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 597,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-06",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 159,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.586716,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 598,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-05",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 169,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.616788,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 573,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-03",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 148,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.542125,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 478,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 146,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.530909,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 593,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-29",
+          "signalDays": 161,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.587591,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 612,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 159,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.580292,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 673,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-03",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 175,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.636364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "rsi-14-30-70",
+      "family": "osc-fade",
+      "variant": "RSI14 fade at 30/70",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "period": 14,
+        "oversold": 30,
+        "overbought": 70
+      },
+      "parametersString": "period=14, oversold=30, overbought=70",
+      "oldDevSignalsA6": 4020,
+      "newDevSignalsA7": 4020,
+      "oldDevSignalsBySideA6": {
+        "long": 1834,
+        "short": 2186
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1834,
+        "short": 2186
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 163,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 90,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.629371,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 337,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-29",
+          "signalDays": 176,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.669202,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 345,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-28",
+          "signalDays": 189,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.721374,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 371,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 184,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.666667,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 348,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-05",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 176,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.635379,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 327,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 177,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.653137,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 338,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 170,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.620438,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 377,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 180,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.659341,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 334,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-30",
+          "signalDays": 182,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.661818,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 344,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 197,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.718978,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 378,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 189,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.689781,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 358,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 186,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.676364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "williams-r-fade",
+      "family": "osc-fade",
+      "variant": "Williams %R extreme fade",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "period": 14,
+        "oversold": -80,
+        "overbought": -20
+      },
+      "parametersString": "period=14, oversold=-80, overbought=-20",
+      "oldDevSignalsA6": 18216,
+      "newDevSignalsA7": 18216,
+      "oldDevSignalsBySideA6": {
+        "long": 9325,
+        "short": 8891
+      },
+      "newDevSignalsBySideA7": {
+        "long": 9325,
+        "short": 8891
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 866,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-11",
+          "lastSignalDate": "2004-12-30",
+          "signalDays": 140,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.979021,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 1574,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 256,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.973384,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 1538,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-02",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 252,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.961832,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 1600,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 260,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.942029,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 1648,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 258,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.931408,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 1611,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-31",
+          "signalDays": 257,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.948339,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 1529,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 257,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.937956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 1586,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 258,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.945055,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 1591,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 262,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.952727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 1532,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 263,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.959854,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 1555,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 259,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.945255,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 1586,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 261,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.949091,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "engulfing",
+      "family": "candlestick-reversal",
+      "variant": "Bull/bear engulfing reversal",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "bodyRatio": 0.6
+      },
+      "parametersString": "bodyRatio=0.6",
+      "oldDevSignalsA6": 2071,
+      "newDevSignalsA7": 2071,
+      "oldDevSignalsBySideA6": {
+        "long": 1061,
+        "short": 1010
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1061,
+        "short": 1010
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 120,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-15",
+          "lastSignalDate": "2004-12-22",
+          "signalDays": 82,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.573427,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 265,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 161,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.612167,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 205,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-27",
+          "signalDays": 137,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.522901,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 182,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-03",
+          "lastSignalDate": "2007-12-26",
+          "signalDays": 121,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.438406,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 158,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 119,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.429603,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 156,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-30",
+          "signalDays": 119,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.439114,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 161,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-05",
+          "lastSignalDate": "2011-12-28",
+          "signalDays": 123,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.448905,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 149,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-03",
+          "lastSignalDate": "2013-12-26",
+          "signalDays": 110,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.40293,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 172,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-07",
+          "lastSignalDate": "2014-12-17",
+          "signalDays": 131,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.476364,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 161,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-06",
+          "lastSignalDate": "2015-12-28",
+          "signalDays": 114,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.416058,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 166,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-06",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 121,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.441606,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 176,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-04",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 128,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.465455,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "morning-evening-star",
+      "family": "candlestick-reversal",
+      "variant": "Morning/evening star",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "bodyRatio": 0.4
+      },
+      "parametersString": "bodyRatio=0.4",
+      "oldDevSignalsA6": 13449,
+      "newDevSignalsA7": 13449,
+      "oldDevSignalsBySideA6": {
+        "long": 6832,
+        "short": 6617
+      },
+      "newDevSignalsBySideA7": {
+        "long": 6832,
+        "short": 6617
+      },
+      "sideSignalDeltas": {
+        "long": 0,
+        "short": 0
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 271,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-14",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 118,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.825175,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 657,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-30",
+          "signalDays": 224,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.851711,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 1013,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 246,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.938931,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 1116,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-02",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 258,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.934783,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 1331,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-02",
+          "lastSignalDate": "2009-12-31",
+          "signalDays": 261,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.942238,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 1328,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-31",
+          "signalDays": 259,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.95572,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 1280,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-03",
+          "lastSignalDate": "2011-12-31",
+          "signalDays": 258,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.941606,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 1262,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-02",
+          "lastSignalDate": "2013-12-31",
+          "signalDays": 258,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.945055,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 1261,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-31",
+          "signalDays": 261,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.949091,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 1294,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-31",
+          "signalDays": 260,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.948905,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 1308,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-29",
+          "signalDays": 257,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.937956,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 1328,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-31",
+          "signalDays": 258,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.938182,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    },
+    {
+      "id": "three-soldiers-crows",
+      "family": "candlestick-reversal",
+      "variant": "Three white soldiers LONG / black crows SHORT (textbook direction)",
+      "status": "DRAFT",
+      "strengthState": "CHOPPY",
+      "weaknessState": "EFFICIENT",
+      "parameters": {
+        "bodyRatio": 0.5
+      },
+      "parametersString": "bodyRatio=0.5",
+      "oldDevSignalsA6": 2168,
+      "newDevSignalsA7": 2168,
+      "oldDevSignalsBySideA6": {
+        "long": 1039,
+        "short": 1129
+      },
+      "newDevSignalsBySideA7": {
+        "long": 1129,
+        "short": 1039
+      },
+      "sideSignalDeltas": {
+        "long": 90,
+        "short": -90
+      },
+      "totalSignalDelta": 0,
+      "zeroSignalYears": [],
+      "byYear": [
+        {
+          "year": 2004,
+          "signals": 92,
+          "zeroSignal": false,
+          "firstSignalDate": "2004-06-18",
+          "lastSignalDate": "2004-12-29",
+          "signalDays": 65,
+          "devDays": 143,
+          "signalDayShareOfDevDays": 0.454545,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2005,
+          "signals": 212,
+          "zeroSignal": false,
+          "firstSignalDate": "2005-01-03",
+          "lastSignalDate": "2005-12-29",
+          "signalDays": 118,
+          "devDays": 263,
+          "signalDayShareOfDevDays": 0.448669,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2006,
+          "signals": 366,
+          "zeroSignal": false,
+          "firstSignalDate": "2006-01-03",
+          "lastSignalDate": "2006-12-29",
+          "signalDays": 181,
+          "devDays": 262,
+          "signalDayShareOfDevDays": 0.69084,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2007,
+          "signals": 239,
+          "zeroSignal": false,
+          "firstSignalDate": "2007-01-03",
+          "lastSignalDate": "2007-12-31",
+          "signalDays": 146,
+          "devDays": 276,
+          "signalDayShareOfDevDays": 0.528986,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2009,
+          "signals": 194,
+          "zeroSignal": false,
+          "firstSignalDate": "2009-01-05",
+          "lastSignalDate": "2009-12-29",
+          "signalDays": 126,
+          "devDays": 277,
+          "signalDayShareOfDevDays": 0.454874,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2010,
+          "signals": 169,
+          "zeroSignal": false,
+          "firstSignalDate": "2010-01-04",
+          "lastSignalDate": "2010-12-28",
+          "signalDays": 112,
+          "devDays": 271,
+          "signalDayShareOfDevDays": 0.413284,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2011,
+          "signals": 171,
+          "zeroSignal": false,
+          "firstSignalDate": "2011-01-04",
+          "lastSignalDate": "2011-12-30",
+          "signalDays": 112,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.408759,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2013,
+          "signals": 148,
+          "zeroSignal": false,
+          "firstSignalDate": "2013-01-03",
+          "lastSignalDate": "2013-12-30",
+          "signalDays": 102,
+          "devDays": 273,
+          "signalDayShareOfDevDays": 0.373626,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2014,
+          "signals": 148,
+          "zeroSignal": false,
+          "firstSignalDate": "2014-01-02",
+          "lastSignalDate": "2014-12-29",
+          "signalDays": 108,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.392727,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2015,
+          "signals": 146,
+          "zeroSignal": false,
+          "firstSignalDate": "2015-01-02",
+          "lastSignalDate": "2015-12-24",
+          "signalDays": 103,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.375912,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2017,
+          "signals": 127,
+          "zeroSignal": false,
+          "firstSignalDate": "2017-01-03",
+          "lastSignalDate": "2017-12-30",
+          "signalDays": 81,
+          "devDays": 274,
+          "signalDayShareOfDevDays": 0.29562,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        },
+        {
+          "year": 2018,
+          "signals": 156,
+          "zeroSignal": false,
+          "firstSignalDate": "2018-01-02",
+          "lastSignalDate": "2018-12-27",
+          "signalDays": 114,
+          "devDays": 275,
+          "signalDayShareOfDevDays": 0.414545,
+          "validRangeDays": null,
+          "signalDayShareOfValidRangeDays": null
+        }
+      ]
+    }
+  ],
+  "zeroSignalCardYears": []
+}
