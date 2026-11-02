@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-10-27T07:32:17.230Z",
+  "generatedAt": "2026-11-02T09:08:58.396Z",
   "compassVersion": "M4-v0 (binary allow-list, no learned weights)",
   "cardStatus": "DRAFT",
   "cardsFrozen": false,
-  "cards": 24,
+  "cards": 22,
   "ledgerRecords": 0,
   "ignoredNonDevRecords": 0,
   "verdictKeys": 0,
@@ -44,13 +44,6 @@
     },
     {
       "id": "donchian-55",
-      "decision": "NOT_SHIPPABLE",
-      "strengthVerdict": "MISSING",
-      "weaknessVerdict": "MISSING",
-      "note": "strength not CONFIRMED"
-    },
-    {
-      "id": "dual-thrust",
       "decision": "NOT_SHIPPABLE",
       "strengthVerdict": "MISSING",
       "weaknessVerdict": "MISSING",
@@ -134,13 +127,6 @@
       "note": "strength not CONFIRMED"
     },
     {
-      "id": "stochastic-14-fade",
-      "decision": "NOT_SHIPPABLE",
-      "strengthVerdict": "MISSING",
-      "weaknessVerdict": "MISSING",
-      "note": "strength not CONFIRMED"
-    },
-    {
       "id": "bollinger-20-2",
       "decision": "NOT_SHIPPABLE",
       "strengthVerdict": "MISSING",
@@ -206,12 +192,12 @@
   ],
   "routingHash": "1ea36e1b4c91752411f1d1b0a75a8afa0682807596bd61e8757f2b57773e8b06",
   "plumbing": {
-    "probeSignals": 288,
+    "probeSignals": 264,
     "kept": 0,
     "dropped": {
       "state": 0,
       "session": 16,
-      "unrouted": 272
+      "unrouted": 248
     },
     "exact": true
   },

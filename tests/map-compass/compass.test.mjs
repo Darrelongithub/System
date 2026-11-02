@@ -39,11 +39,11 @@ import {
 
 const A = (p) => new URL(`../../artifacts/map-compass/${p}`, import.meta.url);
 
-test("24 claim cards across 8 families, structurally valid", () => {
+test("22 current claim cards across 8 families, structurally valid", () => {
   assertEqual(validateClaimCards().length, 0, validateClaimCards().join("; "));
-  assertEqual(CLAIM_CARDS.length, 24);
+  assertEqual(CLAIM_CARDS.length, 22);
   assertEqual(FAMILIES.length, 8);
-  for (const f of FAMILIES) assertEqual(CLAIM_CARDS.filter((c) => c.family === f).length, 3);
+  for (const f of FAMILIES) assert([2,3].includes(CLAIM_CARDS.filter((c) => c.family === f).length));
 });
 
 test("claim cards are DRAFT — real verification must be BLOCKED", () => {
@@ -59,10 +59,10 @@ test("claim cards are DRAFT — real verification must be BLOCKED", () => {
   assertCardsFrozen(approved); // no throw
 });
 
-test("every card has a frozen numeric priority, all distinct 1..24", () => {
+test("every card has a frozen numeric priority, all distinct 1..22", () => {
   const p = CLAIM_CARDS.map((c) => c.priority).sort((a, b) => a - b);
-  assertEqual(new Set(p).size, 24);
-  for (let i = 0; i < 24; i++) assertEqual(p[i], i + 1);
+  assertEqual(new Set(p).size, 22);
+  for (let i = 0; i < 22; i++) assertEqual(p[i], i + 1);
   assertEqual(CONFLICT_RULE.onePositionPerSlot, true);
 });
 
@@ -79,7 +79,7 @@ test("claims are written from literature, with real rationales", () => {
 test("Compass with NO confirmed claims is flat everywhere", () => {
   const r = buildRoutingTable(new Map());
   for (const s of VERDICT_STATES) assertEqual(r.table[s].length, 0, `${s} must be empty`);
-  assertEqual(r.reasons.filter((x) => x.decision === "NOT_SHIPPABLE").length, 24);
+  assertEqual(r.reasons.filter((x) => x.decision === "NOT_SHIPPABLE").length, 22);
   for (const s of VERDICT_STATES) assertEqual(activeStrategies(s, "london", r).length, 0);
   assertEqual(activeStrategies("UNKNOWN", "london", r).length, 0);
 });
@@ -207,7 +207,7 @@ test("evidence tiers are assigned and the prior is honestly low", () => {
 });
 
 test("FIXED-SEQUENCE test order puts best evidence first and candlestick LAST", () => {
-  assertEqual(TEST_ORDER.length, 24);
+  assertEqual(TEST_ORDER.length, 22);
   const tiers = TEST_ORDER.map((t) => t.tier);
   assertEqual(
     JSON.stringify(tiers),
@@ -220,5 +220,5 @@ test("FIXED-SEQUENCE test order puts best evidence first and candlestick LAST", 
     "candlesticks tested last",
   );
   assertEqual(TEST_ORDER[0].testOrder, 1);
-  assertEqual(TEST_ORDER[23].testOrder, 24);
+  assertEqual(TEST_ORDER[21].testOrder, 22);
 });

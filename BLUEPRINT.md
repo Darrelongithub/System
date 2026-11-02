@@ -1,13 +1,13 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.5 — 2026-10-28; G0 AMENDMENT 5 applied before any strategy result**
+**Version 1.6 — 2026-11-02; G0 AMENDMENT 6 applied before any strategy result**
 **Status: G0 FROZEN (amended before any claim result). M1–M5 machinery COMPLETE. Claim cards DRAFT — awaiting human review/freeze.**
 **Branch:** `arena/072665f9-system`
 
-> **Version history is immutable.** Five byte-preserving snapshots exist:
+> **Version history is immutable.** Seven byte-preserving snapshots exist:
 > `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
-> `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md` and
-> `docs/BLUEPRINT-v1.4.md`, and `docs/BLUEPRINT-v1.5.md`. The full 64-character
+> `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md`, `docs/BLUEPRINT-v1.4.md`,
+> `docs/BLUEPRINT-v1.5.md`, and `docs/BLUEPRINT-v1.6.md`. The full 64-character
 > SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
@@ -20,7 +20,7 @@
 >   ordered by evidence; holdout bleed measured; VAL contamination declared.
 > - **v1.2 / G0 Amendment 2 (2026-10-27)** — CONDITIONAL default NO; CR1
 >   day-clustered SEs + Kish effective N (report-only power); TIME_EXIT at 96
->   bars frozen; full CONFIRMED rule printed; all 24 cards printed in full.
+>   bars frozen; full CONFIRMED rule printed; all 24 cards printed in full at v1.2 (historical v1.5 set).
 > - **v1.3 / G0 Amendment 3 (2026-10-27)** — **restored CONFIRMED rule**
 >   (the original +0.10R NET floor PLUS the matched-baseline control); **two
 >   VERDICT STATES** (EFFICIENT / CHOPPY) with four Map states as diagnostics;
@@ -39,6 +39,13 @@
 >   power simulation and exposed an impossible pooled-power constraint below the
 >   frozen +0.10R floor; audited all 24 exact signal specifications and opened
 >   Dual Thrust sources. Cards remain DRAFT; no real verification.
+> - **v1.6 / G0 Amendment 6 (2026-11-02)** — owner-approved, pre-result deletion
+>   of `dual-thrust` and `stochastic-14-fade` only; 22 cards remain. All other
+>   states/parameters and relative TEST_ORDER are unchanged; priorities are
+>   renumbered by deletion only. Recomputed per-family overlap, per-card slots,
+>   signal/day frequency, and family×verdict power with measured Kish overlap and
+>   calendar-day CR1. The pooled-power “never below” comparison is scoped to
+>   edges ≥ +0.10R. Cards remain DRAFT; verification remains blocked.
 >
 > **Every amendment was applied before any real strategy result exists.** Claim
 > cards are still `DRAFT`; `verify-claims.mjs` still refuses real verification.
@@ -771,7 +778,7 @@ share **398/32,000 = 1.24375%** is reported in `random-baseline.json` under
 
 #### 7.10.4 Full-text claim card dump
 
-`docs/CLAIM-CARDS-FULL-TEXT.md` prints **all 24 cards in full text** in
+`docs/CLAIM-CARDS-FULL-TEXT-v1.5.md` preserves **all 24 v1.5 cards** in
 `TEST_ORDER` (id, family, variant, tier, priority, strength claim/state,
 weakness claim/state, rationale, session restriction, sources). It is generated
 mechanically from `claim-cards.draft.mjs` by `print-claim-cards.mjs`.
@@ -998,7 +1005,7 @@ discrepancy is recorded here and in the amendment log rather than silently
 reshuffling a frozen sequence. Two diagnostic four-state labels were also
 fixed (§7.11.3).
 
-**Near-duplicate and mirror-image cards** — all 24 within-family pairs are
+**Near-duplicate and mirror-image cards** — all within-family pairs in the then-current 24-card set are
 listed in `CARD_RELATIONS` and printed in the full-text dump: **11
 NEAR_DUPLICATE** (e.g. `donchian-20`/`donchian-55`, `sma-20-50`/`macd-cross`,
 `rsi-14-30-70`/`williams-r-fade`, `bollinger-20-2`/`keltner-20-atr`,
@@ -1100,7 +1107,7 @@ restriction or `TEST_ORDER` position — `validateClaimCards()` and the
 
 #### 7.12.2 Signal counts on DEV (task 2)
 
-`scripts/map-compass/signal-counts.mjs` → `signal-counts.json`. It runs all 24
+`scripts/map-compass/signal-counts.mjs` → `signal-counts.json`. It runs the then-current 24-card set
 signals on the **DEV window** (131,922 of 248,912 bars) and counts, per card and
 per family: signals by side, by verdict state, by four Map state, by session,
 and **by the verdict state 20 bars BEFORE the signal** (a diagnostic only — it
@@ -1154,7 +1161,7 @@ three variants of each family, using the real DEV signal bars. Both
 | candlestick-reversal | 17,688 | 17,472 | 17,266.30 | 1.0244 | 0.014 / 0.000 / 0.000 |
 | vol-compression | 39,353 | 32,008 | 28,614.74 | 1.3753 | 0.005 / 0.005 / 0.229 |
 
-Pooled across all 24 cards: n = 291,501, distinct bars 99,125, n_eff 72,028.76,
+Historical v1.4 pooled across 24 cards: n = 291,501, distinct bars 99,125, n_eff 72,028.76,
 design effect **4.047**. Two measured findings stand out: **`osc-fade`'s
 `williams-r-fade` and `stochastic-14-fade` have Jaccard 1.000** — they fire on
 exactly the same bars (Williams %R is a linear transform of the raw stochastic);
@@ -1337,12 +1344,18 @@ frozen rule.
 
 ## 7.13 G0 AMENDMENT 5 (2026-10-28) — slot reconciliation and report repair
 
+**Historical A5 record:** this section is retained as the v1.5 account
+and is superseded by §7.14 for current card count/design. At v1.5, the proposed
+cleanup had not yet been owner-approved. The A6 deletions are recorded only in
+§7.14; the v1.5 snapshot remains immutable.
+
 **State:** pre-result, report-only. `FREEZE.status` remains `DRAFT`; no real
 strategy verification was performed. `verify-claims` remains blocked and no
 claim ledger/result files were created. The Map, state assignments, registered
 card parameters, frozen priorities, costs, exits, thresholds and CONFIRMED rule
 are unchanged. Detailed printable report: `docs/G0-AMENDMENT-5-REPORT.md`;
-all 24 exact registered parameters and signal pseudo-code:
+the exact 24-card v1.5 parameters and pseudo-code are preserved in
+`docs/CLAIM-SIGNAL-SPECIFICATIONS-v1.5.md`; current A6 specifications are in
 `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`.
 
 ### 7.13.1 Slot model: separate validation from portfolio execution
@@ -1409,12 +1422,8 @@ verdict states, session restriction, exact registered parameters and pseudo-code
 No state, parameter, priority or card was edited. The Dual Thrust versus
 PDH/PDL-break measured DEV entry-bar Jaccard is **1.000** (49,228 shared bars);
 it is the only cross-family pair above .5 among all 276 pairs. Williams %R /
-Stochastic Jaccard is also **1.000**. The only actions are DRAFT proposals:
-consider merging/dropping the current misimplemented Dual Thrust card or
-re-specifying it from a sourced formula; consider merging/dropping Stochastic
-while retaining Williams %R. Neither proposal is applied. Consequences of a
-drop (24→23, two claim cells removed, no renumbering of surviving priorities)
-and source audit status/URLs are printed in the signal-spec report.
+Stochastic Jaccard is also **1.000**. At A5 these were DRAFT proposals only. A6 later applied only the owner-approved
+deletions; see §7.14 for the current set and deletion-only priority remapping.
 
 The source audit opened FMZ Quant, https://www.fmz.com/digest-topic/9872, and
 ProRealCode, https://www.prorealcode.com/prorealtime-indicators/dual-thrust-strategy-indicator/;
@@ -1432,6 +1441,103 @@ No real verification, claim result, freeze, threshold change, Map change, cost
 change or exit change occurred. The `CONFIRMED` conjunction remains
 `meanNetR > +.10R AND day-clustered tNet > 2 AND excess > 0 AND t > 2`, plus the
 existing n, concentration, LOYO and NO_BASELINE vetoes. A5 is report-only.
+
+---
+
+## 7.14 G0 AMENDMENT 6 (2026-11-02) — owner-approved deletions, exact slot units, and family power
+
+**Pre-result guard:** the owner approved only two card deletions: `dual-thrust`
+(former priority 3) and `stochastic-14-fade` (former priority 15). The first
+was an exact 1.000 DEV-bar duplicate of `pdh-pdl-break`, using k=0 prior-day
+high/low bounds; the opened Dual Thrust sources did not establish universal
+textbook defaults. The second exactly duplicated `williams-r-fade` (Jaccard
+1.000). No card is added. The current DRAFT set is 22 cards: each deleted card
+removes its two claim halves and card-level diagnostics.
+
+**Deletion-only invariants:** every surviving card, strength/weakness state,
+registered parameter, family assignment and relative `TEST_ORDER` position is
+unchanged. `TEST_ORDER` is the v1.2 sequence with those two IDs removed, not
+re-sorted by tier or renumbered priority. The priority mapping is old 1–2 →
+unchanged; old 4–14 → minus one; old 16–24 → minus two. The resulting priorities
+are exactly 1–22. The remaining set has 44 claim halves and eight families;
+channel-breakout and osc-fade each now have two variants.
+
+### 7.14.1 Measured overlap changes
+
+All 231 card pairs are recomputed from the current 22 causal signal streams.
+In channel-breakout, the Donchian20/55 Jaccard remains 0.506796 (12,790 shared
+bars); both pairs involving the deleted Dual Thrust card leave family overlap.
+In osc-fade, RSI/Williams remains 0.115649 (2,305 bars); both Stochastic pairs
+leave, including the exact Williams/Stochastic duplicate. The other six
+families' surviving signal sets and within-family pair Jaccards are unchanged.
+No cross-family pair exceeds 0.5 in the current set. Before/after pair sets,
+Kish nEff and family totals are in `measured-overlap.json`;
+`artifacts/map-compass/amendment5/` preserves the A5 outputs for comparison.
+
+### 7.14.2 Slots and book reconciliation
+
+The claim-verification design is **exactly one independent position slot per
+card** (22 card slots), one position maximum per card, either long or short;
+a long and short cannot coexist within one card. The combined Compass/validation
+book has **exactly one slot total**, also long OR short, with same-bar conflicts
+resolved by the lowest renumbered priority. A long and short cannot coexist in
+the combined book. This DRAFT design is implemented by the report-only slot
+model; no verification was run.
+
+For clarity, “eligible same-bar candidates 74,886” means unique signal-bar
+events after the same-bar priority winner is chosen and before signals arriving
+while the global slot is occupied are dropped. This remains 74,886 after A6
+because both deleted cards were exact duplicates of surviving signals. The
+22-card combined stream has 165,865 recognized-state signal instances,
+74,886 unique-bar candidates, and 6,903 kept modeled entries. The sampled mean
+hold is 17.89671157 bars: 6,903 × 17.89671157 = 123,541 modeled bar-units,
+versus 131,922 DEV bars (93.65%; 8,381 bar-units of headroom). Hold durations
+are sampled from the random-entry baseline histogram, not measured strategy
+exits. The combined book is capacity-only, not claim evidence.
+
+### 7.14.3 Signal frequency and final DRAFT registry
+
+The current library has 22 evaluators and 22 exact parameter records. `signal-counts.json`
+reports each card's mean signals per actual DEV EAT calendar day, five busiest
+and five quietest nonzero days, and zero-signal day count. `CLAIM-SIGNAL-SPECIFICATIONS.md`
+prints every surviving ID, family, priority, strength/weakness state, exact
+parameters and actual evaluator pseudo-code; `G0-AMENDMENT-6-REPORT.md` prints
+the final 22-card registry with study URL or `PRACTITIONER_ONLY` status. The
+prior-day breakout `pdh-pdl-break` uses the previous EAT date's observed high
+and low; neither rail is measured from that day's open. `dual-thrust` is no
+longer a current signal. The complete A5 24-card table remains archived as
+`CLAIM-SIGNAL-SPECIFICATIONS-v1.5.md` and `CLAIM-CARDS-FULL-TEXT-v1.5.md`.
+
+### 7.14.4 Report-only family × verdict power
+
+The decision unit is each family × verdict state (16 cells). Each denominator
+sums the per-card one-slot survivors; nEffective is the measured Kish count
+from duplicate kept entry bars in that exact family/state cell. The standard
+error uses matched-control baseline SD weighted by that cell's actual session
+mix, multiplied by measured calendar-day CR1 inflation (1.3222 EFFICIENT;
+1.1202 CHOPPY), divided by sqrt(Kish nEffective). Actual day/year survivor
+counts are retained in `slot-model.json`. Power is estimated at true net edges
+0, .05, .10, .15, .20 and .30R with the frozen full conjunction; the analytic
+net-gate expression is `Φ((edge−max(.10,2·SE))/SE)`. Marginal and exclusive
+veto shares are report-only. `THIN-POWER` means power below .5 at +.20R only;
+it is a diagnostic label, not a changed criterion. Current set: no family×state
+cell is THIN-POWER.
+
+The corrected pooled-power comparison is **not** “never below” at all edges.
+Below the frozen +.10R floor, pooled power can be below a component cell because
+a smaller sample has a larger chance of noisy threshold crossing. The
+“never below” comparison applies only for true edges at or above +.10R. The
+floor, all t thresholds, excess rule and vetoes remain unchanged.
+
+### 7.14.5 Freeze and result guard
+
+`FREEZE.status = "DRAFT"`, `approvedBy = null`, `approvedAt = null`. `verify-claims`
+remains blocked; no `claim-verification.json` or `claimed-trades.jsonl` exists.
+No strategy verification was run. Map/state, costs, exit, parameters of all
+surviving cards and the CONFIRMED rule are unchanged. Full arithmetic, overlap,
+card-day frequency, power/veto and analytic cross-check tables are in
+`docs/G0-AMENDMENT-6-REPORT.md`; code/tests are in the A6 slot/power/report
+scripts and `tests/map-compass/amendment6.test.mjs`.
 
 ---
 
@@ -1564,10 +1670,15 @@ breakdowns, and the 2× slippage / p95-spread cost stress variant.
 | M10 | Final holdout (one run on sealed years)                       | —                                           |
 | M11 | Decision: paper / live / kill / new cycle                     | —                                           |
 
-### 13.1 What YOU need to decide before M6
+### 13.1 Historical v1.4 decision checklist (superseded by A6 where noted)
+
+> This list records the open decisions as they stood in v1.4, not current work.
+> Amendment 6 records owner approval of the two deletions and the one-slot
+> pre-registration; cards still remain DRAFT and verification is blocked.
 
 1. **Review and freeze the 24 claim cards** (decision #13) — STILL OPEN. Use
-   `docs/CLAIM-CARDS-FULL-TEXT.md` (all 24 in full, with opened study URLs,
+   `docs/CLAIM-CARDS-FULL-TEXT-v1.5.md` (the historical 24-card set) and
+   `docs/CLAIM-CARDS-FULL-TEXT.md` (current 22-card set, with opened study URLs,
    verdict states, relations, signal parameters and criticisms). Change any
    state assignment NOW — after results exist, changing a claim is the
    laundering this project forbids.
@@ -1595,6 +1706,9 @@ breakdowns, and the 2× slippage / p95-spread cost stress variant.
 
 ## 14. Reproducing everything
 
+The commands below are a historical v1.5 checklist; current Amendment 6
+outputs and report regeneration are included in the updated commands.
+
 ```bash
 npm install                         # if node_modules is absent
 npm run mc:m1          # fetch (pinned oids) -> normalise -> verify DST -> spread -> audit
@@ -1604,9 +1718,10 @@ npm run mc:compass     # M4 -> routing-table.json
 npm run mc:calibrate   # M5 dry-run -> harness-calibration.json (NO real claims)
 npm run mc:power       # M5 -> power-projection.json (needs normalised data)
 npm run mc:amend2      # Amendments 2+3: recompute reportOnly + reportOnlyV13 (no raw data needed)
-npm run mc:cards       # print all 24 DRAFT cards in full text, in TEST_ORDER
-npm run mc:coverage   # NO_BASELINE coverage audit + 48 verdict labels
-npm run mc:signals    # Amendment 4: measured DEV signal counts
+npm run mc:cards       # print current 22 DRAFT cards in full text, in TEST_ORDER
+npm run mc:coverage   # NO_BASELINE coverage audit + 44 verdict labels
+npm run mc:signals    # current 22-card measured DEV signal counts
+npm run mc:amend6-report # regenerate current Amendment 6 report
 node scripts/map-compass/measure-overlap.mjs   # Amendment 4: measured overlap + SE inflation
 node scripts/map-compass/slot-model.mjs         # Amendment 4: one-slot book model
 node scripts/map-compass/power-curve.mjs        # Amendment 4: report-only power curve
@@ -1621,8 +1736,8 @@ the same block via the shared `lib/amend2-report.mjs` helper.
 
 Raw and normalised data are gitignored (264MB, fully regenerable from the
 pinned oids). Only the small JSON reports are committed. Tests live in
-`tests/map-compass/*.test.mjs`, including 13 Amendment-2 tests in
-`amendment2.test.mjs`.
+`tests/map-compass/*.test.mjs`, including Amendment 6 regression coverage in
+`amendment6.test.mjs`.
 
 **Known failures (unrelated to this project):** one test in
 `tests/synth.test.mjs` expects `MapGenerator.tsx` to say "28/32 ... EAT
@@ -1631,8 +1746,8 @@ pinned oids). Only the small JSON reports are committed. Tests live in
 `tests/map-compass/data-contract.test.mjs` tests fail when the gitignored
 `raw/` and `normalized/` data have not been regenerated with `mc:m1` (they
 check pin hashes and normalised-schema properties on disk). These are
-data-availability failures, not logic failures; the full suite passes once
-`mc:m1` has run.
+data-availability failures, not logic failures; run `mc:m1` before judging
+those three tests. The separate pre-existing synth test mismatch remains.
 
 ### 14.1 Artifact index
 
@@ -1653,11 +1768,11 @@ data-availability failures, not logic failures; the full suite passes once
 | `routing-table.json`       | M4 Compass table + `conditionalPolicy`      |
 | `seal-audit.json`          | measured holdout feature bleed              |
 | `baseline-coverage.json`   | NO_BASELINE cell audit (Amendment 3)        |
-| `blueprint-hashes.json`    | full SHA-256 of v1.0–v1.5                     |
+| `blueprint-hashes.json`    | full SHA-256 of v1.0–v1.6                     |
 | `signal-counts.json`       | measured DEV signal counts (Amendment 4)      |
 | `measured-overlap.json`    | measured Jaccard / Kish overlap + SE inflation|
 | `slot-model.json`          | per-card slots + separate priority-resolved Compass slot |
-| `power-curve.json`         | report-only power curve at 6 true edges (Amendment 5) |
+| `power-curve.json`         | report-only power curve at 6 true edges (Amendment 6) |
 | `claim-ledger.jsonl`       | append-only verdicts (currently empty)      |
 
 ---
@@ -1705,12 +1820,13 @@ data-availability failures, not logic failures; the full suite passes once
     2016, 2019) carry the final confirmatory weight at M10. Any VAL-driven rule
     change starts a NEW cycle. STRESS (2025–2026) includes the old discovery
     window and can never promote a claim.
-15. **Real family-variant overlap is UNKNOWN (Amendment 2).** The 24 strategies
-    are still DRAFT and must not be run, so the Kish effective-N in
+15. **Historical A2 overlap estimate (superseded for current diagnostics by A6).**
+    The 24 strategies were DRAFT, so the Kish effective-N in
     `power-projection.json` is estimated from the calibration harness
     (overlap 0.2071, design effect 1.2316) and bracketed by a 0 → 0.75
-    sensitivity sweep. It is **report-only**. Once M6 runs, the real overlap
-    must be reported; it must not be used to relax any criterion.
+    sensitivity sweep. It was **report-only**. A6 now records measured 22-card
+    signal-bar overlap and Kish nEff for report-only diagnostics; it is never
+    used to relax a criterion. No strategy verification has run.
 16. **Day-clustered SEs reduce calibration detection (Amendment 2).** Known
     +0.15R edge detection fell from 100% to 93.75% and placebo p95 from 5 to 3.
     This is the honest cost of not pretending same-day trades are independent.
@@ -1729,38 +1845,43 @@ data-availability failures, not logic failures; the full suite passes once
     the original v1.0 blob cannot be certified, but v1.1's snapshot is the
     original committed file (`72c078f3…`) and every v1.1→v1.2 edit is listed.
 
-20. **Real family-variant overlap is an ASSUMPTION (Amendment 3).** The
-    relation-aware design effect 2.2948 comes from `CARD_RELATIONS` metadata
-    plus a seeded RNG, not from measured signals — the 24 strategies are still
-    DRAFT and MUST NOT be run. A 0 → 1 share-scale sensitivity sweep is in
-    `reportOnlyV13`. It is report-only; no criterion depends on it.
-21. **The 2×3 power table is a FINER partition than the verdict cell.** Verdicts
-    are decided on the POOLED verdict state, so the pooled rows (0.280 / 0.810)
-    are the operative numbers; the six per-session rows are a conservative
-    diagnostic. Splitting by session reduces n in each row.
+20. **Historical A3 relation-aware overlap assumption (superseded by A6).** The
+    v1.3 design effect 2.2948 used `CARD_RELATIONS` and a seeded RNG. Current
+    22-card measured Jaccard/Kish diagnostics are in `measured-overlap.json`;
+    both historical and current power estimates are report-only, and neither
+    changes a criterion.
+21. **Historical A5 2×3 power table.** That table partitioned by session more
+    finely than verdict cells and its pooled rows were operative for that report.
+    Current A6 report-only power is family × verdict state (16 cells); six-edge
+    values and measured dependence are in `power-curve.json`.
 22. **The UNCONTROLLED calibration mode is not a real result.** It exists so
     the harness can be calibrated on pure noise before any strategy exists.
     Every real verification row must have `baseline.mode = MATCHED_CONTROL`;
     `verifyReal()` hard-fails otherwise.
-23. **NO_BASELINE coverage depends on the coarse fallback.** All 8 coarse
-    `state|side` cells exist (n=4000), so the shipped rule yields 0
-    NO_BASELINE cells. 648 of 1,632 trade-level lookups rely on the coarse
-    fallback; forbidding it would create 648 NO_BASELINE holes.
-25. **The slot output is an EMULATION, not the engine.** Amendment 5 separates
-    independent per-card validation slots from a priority-resolved one-slot
-    Compass book; holds are still sampled from baseline exit-times, not strategy
-    outcomes. The architecture is recommended but awaits owner approval.
-26. **Power is a report-only parametric model.** Amendment 5 uses measured actual
-    session counts, but draws synthetic outcomes under stated baseline SD/CR1
-    assumptions. It is not strategy evidence; the pooled-power dominance request
-    is mathematically incompatible below the unchanged +0.10R floor.
+23. **Historical A3 NO_BASELINE coverage and coarse fallback.** The 8 coarse
+    `state|side` cells (n=4000) and 648 of 1,632 fallback lookups describe the
+    earlier 24-card universe. The current 22-card coverage audit is in
+    `baseline-coverage.json`; it reports zero missing trade, verdict, and
+    four-state cells. No A6 criterion or fallback rule changed.
+25. **The slot output is an EMULATION, not an execution engine.** A6 records
+    owner approval of the pre-registered design: one position slot per card
+    (either side) and a separate priority-resolved one-slot combined book.
+    Holds remain baseline samples, not strategy outcomes; cards are DRAFT and
+    verification is blocked.
+26. **Power is a report-only parametric model.** A6 uses measured 22-card
+    family/state overlap and actual session counts, but draws synthetic outcomes
+    under baseline SD/CR1 assumptions. It is not strategy evidence. Pooled-power
+    dominance applies only at/above the unchanged +0.10R floor; below it the
+    pooled value can be less than a component cell.
 27. **Overlap is a dependence diagnostic, not portfolio execution.** Jaccard and
-    Kish quantify entry-bar duplication; the future M6 producer must separately
-    enforce per-card validation and frozen-priority Compass execution.
+    Kish quantify entry-bar duplication. The A6 slot report separately emulates
+    per-card slots and the priority-resolved combined book; it does not execute
+    trades or produce strategy evidence.
 28. **The signal library is a DRAFT specification, not a tested strategy.**
-    The source audit found Dual Thrust and London ORB card/spec mismatches; all
-    pseudo-code is printed for review. No P&L was evaluated.
-24. **Empirical studies are literature, not evidence about our data.** They
+    A6 deleted the owner-approved Dual Thrust card; the remaining London ORB
+    duration/specification caveat is disclosed. The current 22-card pseudo-code
+    is printed for review. No P&L was evaluated.
+29. **Empirical studies are literature, not evidence about our data.** They
     motivate the claims and set the test order; they do not pre-confirm
     anything. `vol-compression` has no peer-reviewed test and is marked
     PRACTITIONER_ONLY; its tier-1 v1.2 rank was plainly wrong.
@@ -1771,20 +1892,22 @@ data-availability failures, not logic failures; the full suite passes once
 
 | Document                                      | Role                                                   |
 | --------------------------------------------- | ------------------------------------------------------ |
-| **`BLUEPRINT.md`** (this file, v1.5)          | Canonical pre-registration — wins on conflict          |
+| **`BLUEPRINT.md`** (this file, v1.6)          | Canonical pre-registration — wins on conflict          |
 | `docs/BLUEPRINT-v1.0.md`                      | Immutable v1.0 snapshot (reconstructed)                |
 | `docs/BLUEPRINT-v1.1.md`                      | Immutable v1.1 snapshot, SHA-256 `72c078f3…`           |
 | `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot                                  |
 | `docs/BLUEPRINT-v1.3.md`                      | Immutable v1.3 snapshot                                  |
 | `docs/BLUEPRINT-v1.4.md`                      | Immutable v1.4 snapshot (superseded)                     |
-| `docs/BLUEPRINT-v1.5.md`                      | Immutable v1.5 snapshot (this version)                   |
+| `docs/BLUEPRINT-v1.5.md`                      | Immutable v1.5 snapshot (superseded)                     |
+| `docs/BLUEPRINT-v1.6.md`                      | Immutable v1.6 snapshot (this version)                   |
 | `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies + eight VERIFIED criticisms        |
-| `scripts/map-compass/signal-params.mjs`       | The 24 exact signal parameters (card source of truth)  |
-| `scripts/map-compass/lib/signals.mjs`         | The 24 pure causal entry-signal functions               |
-| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.5) |
-| `docs/CLAIM-CARDS-FULL-TEXT.md`               | All 24 cards in full text, in TEST_ORDER (DRAFT)       |
-| `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`          | All 24 exact DRAFT parameters and signal pseudo-code    |
-| `docs/G0-AMENDMENT-5-REPORT.md`                 | Slot, power, overlap, source, and survivor report       |
+| `scripts/map-compass/signal-params.mjs`       | The 22 exact signal parameters (card source of truth)  |
+| `scripts/map-compass/lib/signals.mjs`         | The 22 pure causal entry-signal functions               |
+| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.6) |
+| `docs/CLAIM-CARDS-FULL-TEXT.md`               | Current 22 cards in full text, in TEST_ORDER (DRAFT)  |
+| `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`          | Current 22 exact DRAFT parameters and pseudo-code      |
+| `docs/G0-AMENDMENT-5-REPORT.md`                 | Historical v1.5 slot, power, overlap, source report    |
+| `docs/G0-AMENDMENT-6-REPORT.md`                 | Current 22-card overlap, slots, daily frequencies, power |
 | `docs/MAP-COMPASS-DATA-CONTRACT.md`           | G1 detail: provenance, timezone epochs, schema, holes  |
 | `docs/ENGINE-BIAS-REGISTER.md`                | G1.5 detail: D1–D4, resolution strategy, sign-off      |
 | `docs/CLAIM-CARDS-REVIEW.md`                  | The 24 draft cards + review checklist + power decision |

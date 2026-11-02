@@ -184,5 +184,5 @@ test("G0 decisions are frozen in code, not just prose", () => {
 test("candlestick cards are the LAST three in test order", () => {
   const last3 = TEST_ORDER.slice(-3).map((t) => CLAIM_CARDS.find((c) => c.id === t.id).family);
   assert(last3.every((f) => f === "candlestick-reversal"));
-  assertEqual(new Set(TEST_ORDER.map((t) => t.testOrder)).size, 24);
+  assertEqual(new Set(TEST_ORDER.map((t) => t.testOrder)).size, 22);
 });

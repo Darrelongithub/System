@@ -215,7 +215,7 @@ const report = {
     label: EXIT_CAVEAT,
     note: "Every verdict row for these families carries this label. No new exit is added in this cycle.",
   },
-  // TASK 4 — enumerate ALL 48 verdict slots and label the reversion ones.
+  // TASK 4 — enumerate ALL 44 verdict slots and label the reversion ones.
   // No verdict exists yet (cards are DRAFT); these are the LABELS that every
   // future verdict for that slot must carry.
   verdictLabels: CLAIM_CARDS.flatMap((c) =>

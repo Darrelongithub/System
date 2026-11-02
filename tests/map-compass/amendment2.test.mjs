@@ -275,7 +275,7 @@ test("Amendment 2: version snapshots, amendment log, and full-text card dump exi
 test("Amendment 2: claim cards are STILL DRAFT and no real verification was run", () => {
   assertEqual(FREEZE.status, "DRAFT");
   assertEqual(FREEZE.approvedBy, null);
-  assertEqual(CLAIM_CARDS.length, 24);
+  assertEqual(CLAIM_CARDS.length, 22);
   assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
   const routing = read("routing-table.json");
   assertEqual(routing.enabledCount, 0);

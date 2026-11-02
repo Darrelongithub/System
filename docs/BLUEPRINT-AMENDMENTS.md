@@ -7,8 +7,9 @@ and are never edited. A superseded decision is struck by a **later dated
 entry**, not by deleting the old text.
 
 **One invariant dominates this log:** *no amendment has been made after a real
-strategy result, because there has never been one.* All dates below precede M6.
-Claim cards are still `DRAFT`; `verify-claims.mjs` refuses real verification.
+strategy result, because there has never been one.* Amendment 6 is pre-result;
+no M6 strategy verification has run. Claim cards remain `DRAFT` and
+`verify-claims.mjs` refuses real verification.
 
 ---
 
@@ -21,7 +22,8 @@ Claim cards are still `DRAFT`; `verify-claims.mjs` refuses real verification.
 | **v1.2** | 2026-10-27 | `docs/BLUEPRINT-v1.2.md` | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` | superseded by v1.3; **preserved** |
 | **v1.3** | 2026-10-27 | `docs/BLUEPRINT-v1.3.md` | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` | superseded by v1.4; **preserved** |
 | **v1.4** | 2026-10-27 | `docs/BLUEPRINT-v1.4.md` | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` | superseded by v1.5; **preserved** |
-| **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | current; `BLUEPRINT.md` byte-identical |
+| **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | superseded by v1.6; **preserved** |
+| **v1.6** | 2026-11-02 | `docs/BLUEPRINT-v1.6.md` | `4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d` | current; `BLUEPRINT.md` byte-identical |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -228,9 +230,9 @@ the whole point of this log.
 
 ---
 
-## D — Full SHA-256 of every snapshot (Amendments 3 and 4, tasks 6 and 8)
+## D — Full SHA-256 of every snapshot (updated through Amendment 6)
 
-All five values are the complete **64-character** SHA-256 of the raw file
+All seven values are the complete **64-character** SHA-256 of the raw file
 bytes (`sha256sum` equivalent). Machine-readable copy:
 `artifacts/map-compass/blueprint-hashes.json`.
 
@@ -241,9 +243,11 @@ bytes (`sha256sum` equivalent). Machine-readable copy:
 | v1.2 | `docs/BLUEPRINT-v1.2.md` | 58,249 | 978 | `cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543` |
 | v1.3 | `docs/BLUEPRINT-v1.3.md` | 82,493 | 1,342 | `acf0fa73c6a567fdf4ba9723f35737cd83077b25661bb9bb6fb29394783962cd` |
 | v1.4 | `docs/BLUEPRINT-v1.4.md` | 103,632 | 1,678 | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` |
+| v1.5 | `docs/BLUEPRINT-v1.5.md` | 111,438 | 1,792 | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` |
+| v1.6 | `docs/BLUEPRINT-v1.6.md` | 119,281 | 1,915 | `4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d` |
 
-`BLUEPRINT.md` at v1.4 is byte-identical to `docs/BLUEPRINT-v1.4.md`
-(same `c1433249…` hash). Earlier snapshots were never edited.
+`BLUEPRINT.md` at v1.6 is byte-identical to `docs/BLUEPRINT-v1.6.md`
+(hash shown above). Earlier snapshots were never edited.
 
 ### Exactly how v1.0 was reconstructed
 
@@ -329,20 +333,16 @@ probability is ≥ each component for the computed cells.
 
 ### E.3 Signal spec, overlap, DRAFT-only cleanup
 
-`docs/CLAIM-SIGNAL-SPECIFICATIONS.md` prints all 24 cards, current priority,
-verdict states, session restrictions, exact registered parameter strings, and
-pseudo-code from the actual evaluator. It exposes that current Dual Thrust uses
-k=0 and does not match the textbook four-extreme K-scaled construction; the
-stored `priorDayBars=48` field is unused by the prior-date evaluators; and the
-six M30 bars in `london-orb-30` equal three hours, not 30 minutes.
+`docs/CLAIM-SIGNAL-SPECIFICATIONS-v1.5.md` preserves the 24-card A5 dump,
+including the then-current Dual Thrust k=0 evaluator and its unused
+`priorDayBars=48` field. The six M30 bars in `london-orb-30` equal three hours,
+not 30 minutes. Amendment 6 removes Dual Thrust; current specifications are in
+`docs/CLAIM-SIGNAL-SPECIFICATIONS.md`.
 
-The 276-pair audit finds one cross-family Jaccard >.5: `dual-thrust` /
-`pdh-pdl-break` = **1.000** (49,228 shared DEV bars). `williams-r-fade` /
-`stochastic-14-fade` is also **1.000**. DRAFT proposals only: drop/merge or
-re-spec the current Dual Thrust card; retain Williams %R and consider dropping
-Stochastic. Neither is applied. A drop removes one card and two verdict cells,
-leaves surviving priorities unchanged (3 or 15 vacant), and requires all
-counts/power artifacts be regenerated before freeze.
+The historical A5 276-pair audit found `dual-thrust` / `pdh-pdl-break`
+Jaccard **1.000** (49,228 shared DEV bars) and `williams-r-fade` /
+`stochastic-14-fade` **1.000**. The owner later approved only those two
+deletions in A6; see section F for remapped priorities and recomputed artifacts.
 
 Dual Thrust sources opened on 2026-10-28 and marked VERIFIED:
 - FMZ Quant implementation tutorial: https://www.fmz.com/digest-topic/9872
@@ -364,3 +364,61 @@ The A5 commit is pushed only to `arena/072665f9-system`; `git ls-remote` equals
 local HEAD. The exact commit ID is recorded in the final handoff (kept out of
 this self-contained snapshot log to avoid making the snapshot depend on its own
 commit hash).
+
+
+---
+
+## F — G0 Amendment 6 (2026-11-02, before any strategy result)
+
+**Scope and guard.** The owner approved deletion of exactly `dual-thrust`
+(former priority 3) and `stochastic-14-fade` (former priority 15). No other
+card, parameter, family, strength/weakness state, Map, cost, exit, frozen
+threshold, verdict state, or CONFIRMED rule changed. No card was added. The 22
+remaining cards retain their relative TEST_ORDER; priority numbers were
+renumbered by deletion only. All cards remain DRAFT with null approver/date.
+`verify-claims` remains blocked. No strategy verification, outcome calculation,
+or verification/trade-result artifact was created.
+
+**Reason/source scope.** `dual-thrust` was a k=0 prior-day high/low duplicate
+of `pdh-pdl-break` (Jaccard 1.000); the opened sources did not provide
+universal canonical numeric defaults. `stochastic-14-fade` duplicated
+`williams-r-fade` exactly (Jaccard 1.000). No Dual-Thrust-like card remains.
+The retained `pdh-pdl-break` rails use the previous EAT trading day's observed
+high and low, not that day's open.
+
+**Overlap.** The 22-card universe has 231 total pairs, 45 fewer than A5; four
+within-family pairs involving the deleted cards leave the family calculations.
+Channel-breakout retains Donchian20/55 Jaccard 0.506796; osc-fade retains
+RSI/Williams Jaccard 0.115649. Per-family before/after Jaccards and Kish nEff
+are in `docs/G0-AMENDMENT-6-REPORT.md` and
+`artifacts/map-compass/measured-overlap.json`.
+
+**Slots/capacity.** The pre-registered claim model has exactly one slot per
+card (22 total), one position at a time, either side; opposite sides cannot
+coexist in a card. The combined Compass/validation book has one global slot,
+also either side, with same-bar ties resolved by the lowest renumbered
+priority. “Eligible same-bar candidates 74,886” means unique candidate bars
+after same-bar priority resolution and before dropping arrivals during an
+occupied slot. The book holds 6,903 modeled entries; at mean baseline-sampled
+hold 17.89671157 bars this is approximately 123,541 bar-equivalents, 8,381
+under 131,922 DEV bars. This is capacity arithmetic only, not strategy
+evidence.
+
+**Signals/power.** Per-card DEV-calendar-day counts, five busiest/quietest days,
+all 22 exact pseudocodes and the final study/practitioner-only registry are in
+`docs/G0-AMENDMENT-6-REPORT.md` and
+`docs/CLAIM-SIGNAL-SPECIFICATIONS.md`. Report-only power is recalculated for
+all 16 family × verdict-state cells at net edges 0, .05, .10, .15, .20, and
+.30R using measured Kish overlap and calendar-day CR1. All cells exceed .5 at
++.20R; none is THIN-POWER, and the minimum is 0.7571 (level-retest ×
+EFFICIENT). Veto failure shares and analytic net-gate cross-checks are recorded
+for every cell. The pooled-power comparison is constrained to edges ≥ +.10R;
+below +.10R pooled power may be less than a component cell. This is a report
+interpretation only; no threshold changed.
+
+**Preservation.** `docs/BLUEPRINT-v1.0.md` through `docs/BLUEPRINT-v1.5.md`
+remain byte-preserved. The new v1.6 snapshot
+`docs/BLUEPRINT-v1.6.md` has SHA-256
+`4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d`; the
+register is `artifacts/map-compass/blueprint-hashes.json`. This v1.6 update is
+logged before any strategy result.

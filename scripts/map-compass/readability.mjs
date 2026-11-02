@@ -142,7 +142,7 @@ const report = {
   m6Readout: {
     primary: "count of CONFIRMED claims with stability != DEFINITION_SENSITIVE",
     secondary: "count of CONDITIONAL claims (CONFIRMED + DEFINITION_SENSITIVE)",
-    continuous: "median and IQR of excessVsRandomR across all 48 claims",
+    continuous: "median and IQR of excessVsRandomR across all 44 claim halves",
     control: "CONFIRMED count must exceed placebo p95 = " + calib.placebo.p95FakeConfirms,
     decision:
       outcome === "UNDERPOWERED"

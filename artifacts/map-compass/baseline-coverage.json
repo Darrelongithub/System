@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-27T13:59:08.461Z",
+  "generatedAt": "2026-11-02T09:00:44.853Z",
   "purpose": "G0 Amendment 3 task 2b: how many claim / state / session cells would hit NO_BASELINE (no fine AND no coarse matched random cell)?",
   "decidedBeforeResults": true,
   "noStrategyOutcomesUsed": true,
@@ -7,7 +7,7 @@
     "baseline": "artifacts/map-compass/random-baseline.json",
     "cards": "claim-cards.draft.mjs (DRAFT)",
     "baselineMinCellN": 200,
-    "baselineHash": "669836a1f3b71dd3e5e4894198602dfc0cd53144aba5ab9209bd1ac40d9e51ca"
+    "baselineHash": "12cbe7ae07359adb001e3dd8ddb81d910ff371a5db220c98ae1c5d6ce79d8dde"
   },
   "rule": {
     "resolution": "fine (sufficient) -> coarse (n >= minN) -> NO_BASELINE",
@@ -15,8 +15,8 @@
     "note": "matchedBaseline() returns mean: null (never 0) when both levels are missing; verifyClaim then returns INCONCLUSIVE with a NO_BASELINE veto."
   },
   "universe": {
-    "cards": 24,
-    "claimHalves": 48,
+    "cards": 22,
+    "claimHalves": 44,
     "verdictStates": [
       "EFFICIENT",
       "CHOPPY"
@@ -45,13 +45,13 @@
       "asian-range-break",
       "london-orb-30"
     ],
-    "tradeLevelLookupCells": 1632,
-    "claimVerdictStateSessionCells": 136,
-    "claimFourStateSessionCells": 272,
-    "distinctClaimStateSessionKeys": 136
+    "tradeLevelLookupCells": 1488,
+    "claimVerdictStateSessionCells": 124,
+    "claimFourStateSessionCells": 248,
+    "distinctClaimStateSessionKeys": 124
   },
   "resolutionCounts": {
-    "FINE_VERDICT_STATE": 1632,
+    "FINE_VERDICT_STATE": 1488,
     "FINE_FOUR_STATE": 0,
     "COARSE_FALLBACK": 0,
     "NO_BASELINE": 0
@@ -765,48 +765,6 @@
       "coarseFallback": 0
     },
     {
-      "cell": "dual-thrust|strength|EFFICIENT|asian",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "dual-thrust|strength|EFFICIENT|london",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "dual-thrust|strength|EFFICIENT|ny",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "dual-thrust|weakness|CHOPPY|asian",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "dual-thrust|weakness|CHOPPY|london",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "dual-thrust|weakness|CHOPPY|ny",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
       "cell": "engulfing|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
@@ -1325,48 +1283,6 @@
       "coarseFallback": 0
     },
     {
-      "cell": "stochastic-14-fade|strength|CHOPPY|asian",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "stochastic-14-fade|strength|CHOPPY|london",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "stochastic-14-fade|strength|CHOPPY|ny",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "stochastic-14-fade|weakness|EFFICIENT|asian",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "stochastic-14-fade|weakness|EFFICIENT|london",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
-      "cell": "stochastic-14-fade|weakness|EFFICIENT|ny",
-      "lookups": 12,
-      "noBaseline": 0,
-      "fine": 0,
-      "coarseFallback": 0
-    },
-    {
       "cell": "three-soldiers-crows|strength|CHOPPY|asian",
       "lookups": 12,
       "noBaseline": 0,
@@ -1514,34 +1430,6 @@
       ],
       "exitCaveat": null,
       "verdictLabel": "donchian-55 weakness in CHOPPY",
-      "reversionFamily": false,
-      "verdictExists": false
-    },
-    {
-      "claimId": "dual-thrust",
-      "kind": "strength",
-      "family": "channel-breakout",
-      "verdictState": "EFFICIENT",
-      "fourStates": [
-        "EXPANSION",
-        "GRIND"
-      ],
-      "exitCaveat": null,
-      "verdictLabel": "dual-thrust strength in EFFICIENT",
-      "reversionFamily": false,
-      "verdictExists": false
-    },
-    {
-      "claimId": "dual-thrust",
-      "kind": "weakness",
-      "family": "channel-breakout",
-      "verdictState": "CHOPPY",
-      "fourStates": [
-        "WHIPSAW",
-        "QUIET"
-      ],
-      "exitCaveat": null,
-      "verdictLabel": "dual-thrust weakness in CHOPPY",
       "reversionFamily": false,
       "verdictExists": false
     },
@@ -1854,34 +1742,6 @@
       "verdictExists": false
     },
     {
-      "claimId": "stochastic-14-fade",
-      "kind": "strength",
-      "family": "osc-fade",
-      "verdictState": "CHOPPY",
-      "fourStates": [
-        "WHIPSAW",
-        "QUIET"
-      ],
-      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "stochastic-14-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
-      "reversionFamily": true,
-      "verdictExists": false
-    },
-    {
-      "claimId": "stochastic-14-fade",
-      "kind": "weakness",
-      "family": "osc-fade",
-      "verdictState": "EFFICIENT",
-      "fourStates": [
-        "EXPANSION",
-        "GRIND"
-      ],
-      "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "stochastic-14-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
-      "reversionFamily": true,
-      "verdictExists": false
-    },
-    {
       "claimId": "bollinger-20-2",
       "kind": "strength",
       "family": "band-reversion",
@@ -2135,8 +1995,8 @@
     }
   ],
   "verdictLabelSummary": {
-    "totalVerdictSlots": 48,
-    "labelledReversionSlots": 18,
+    "totalVerdictSlots": 44,
+    "labelledReversionSlots": 16,
     "label": "under the standard exit (1.5 ATR stop, 2R target) only",
     "note": "Cards are DRAFT, so no verdict has been produced. These are the pre-registered labels; every future verdict for a reversion-family slot MUST be printed with this suffix. No new exit in this cycle."
   }

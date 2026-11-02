@@ -4,7 +4,7 @@
  * Pure data, no imports, no side effects. This registry is the EXACT parameter
  * set written on each claim card (attached to the card as `parameters`), and it
  * is the single source of truth for lib/signals.mjs. The task requires the
- * 24 entry-signal functions to run "with the exact parameters written on the
+ * 22 entry-signal functions to run "with the exact parameters written on the
  * cards (print them)", so a mismatch here is a freeze-gate violation.
  *
  * The parameters are the PUBLISHED settings for each known strategy. Nothing
@@ -15,10 +15,6 @@ export const SIGNAL_PARAMS = Object.freeze({
   // --- F1 channel breakout ------------------------------------------------
   "donchian-20": Object.freeze({ lookback: 20, breakAt: "prior-high/low", entryAt: "close" }),
   "donchian-55": Object.freeze({ lookback: 55, breakAt: "prior-high/low", entryAt: "close" }),
-  "dual-thrust": Object.freeze({
-    priorDayBars: 48, // one full EAT day of M30 bars
-    k: 0, // offset = k * prior-day range (k=0 = break of the prior-day extreme)
-  }),
   // --- F2 moving averages ------------------------------------------------
   "sma-20-50": Object.freeze({ fast: 20, slow: 50, entryAt: "close" }),
   "macd-cross": Object.freeze({ fast: 12, slow: 26, signal: 9, entryAt: "close" }),
@@ -47,7 +43,6 @@ export const SIGNAL_PARAMS = Object.freeze({
   // --- F5 oscillator fade ------------------------------------------------
   "rsi-14-30-70": Object.freeze({ period: 14, oversold: 30, overbought: 70 }),
   "williams-r-fade": Object.freeze({ period: 14, oversold: -80, overbought: -20 }),
-  "stochastic-14-fade": Object.freeze({ period: 14, kSmooth: 1, dSmooth: 3, low: 20, high: 80 }),
   // --- F6 band reversion -------------------------------------------------
   "bollinger-20-2": Object.freeze({ period: 20, numerStd: 2 }),
   "keltner-20-atr": Object.freeze({ period: 20, atrPeriod: 20, atrMultiple: 2 }),
@@ -65,7 +60,7 @@ export const SIGNAL_PARAMS = Object.freeze({
 /** Every id in the registry, in the frozen TEST_ORDER sequence. */
 export const SIGNAL_IDS = Object.freeze(Object.keys(SIGNAL_PARAMS));
 
-/** Human-readable parameter string, for the 24-card table and the dump. */
+/** Human-readable parameter string, for the 22-card table and the dump. */
 export function paramsToString(id) {
   const p = SIGNAL_PARAMS[id];
   return Object.entries(p)

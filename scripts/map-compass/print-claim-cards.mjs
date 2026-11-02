@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * G0 Amendment 2 / updated at Amendment 3 — print ALL 24 claim cards IN FULL
- * TEXT, in TEST_ORDER. READ-ONLY dump for human review; does NOT freeze, edit,
+ * G0 Amendments 2–6 — print all current 22 claim cards in full text, in the
+ * A6 deletion-only TEST_ORDER. READ-ONLY dump; it does NOT freeze, edit,
  * reorder or evaluate any card. `FREEZE.status` stays DRAFT.
  */
 import { writeFileSync } from "node:fs";
@@ -42,7 +42,7 @@ if (errors.length) {
 
 const byId = new Map(CLAIM_CARDS.map((c) => [c.id, c]));
 const lines = [];
-lines.push("# Claim cards — FULL TEXT (all 24, in TEST_ORDER)");
+lines.push("# Claim cards — FULL TEXT (all 22, in TEST_ORDER)");
 lines.push("");
 lines.push(`**Generated:** ${new Date().toISOString()}`);
 lines.push(`**Card status:** \`${FREEZE.status}\` — NOT FROZEN. NOT TESTED.`);

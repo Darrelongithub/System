@@ -65,11 +65,11 @@ function syntheticBars(n = 1500, seed = 7) {
 // ---------------------------------------------------------------------------
 // TASK 1 — signal-only library
 // ---------------------------------------------------------------------------
-test("A4 1: the signal library has 24 evaluators with the exact card parameters", () => {
+test("A4 1: the signal library has the retained 22 evaluators with exact card parameters", () => {
   assertEqual(validateClaimCards().length, 0, validateClaimCards().join("; "));
   assertEqual(signalLibrarySelfCheck().length, 0, signalLibrarySelfCheck().join("; "));
-  assertEqual(signalCardIds().length, 24);
-  assertEqual(SIGNAL_IDS.length, 24);
+  assertEqual(signalCardIds().length, 22);
+  assertEqual(SIGNAL_IDS.length, 22);
   assertEqual(
     JSON.stringify([...signalCardIds()].sort()),
     JSON.stringify([...SIGNAL_IDS].sort()),
@@ -81,8 +81,8 @@ test("A4 1: the signal library has 24 evaluators with the exact card parameters"
     assert(paramsToString(c.id).length > 0, `${c.id} must have a printable parameter string`);
   }
   // Adding `parameters` did not change any claim, state, priority or order.
-  assertEqual(CLAIM_CARDS.length, 24);
-  assertEqual(TEST_ORDER.length, 24);
+  assertEqual(CLAIM_CARDS.length, 22);
+  assertEqual(TEST_ORDER.length, 22);
   assertEqual(JSON.stringify(TEST_ORDER.map((t) => t.id)), JSON.stringify(FROZEN_TEST_SEQUENCE));
   assertEqual(FREEZE.status, "DRAFT");
 });
@@ -181,7 +181,7 @@ test("A4 1: on the REAL bars, deleting the future never changes earlier signals"
     bi++;
   }
   // Two cards that use the prior-day and session-range machinery, at two cuts.
-  for (const id of ["dual-thrust", "asian-range-break", "london-orb-30", "pdh-retest", "classic-pivot"]) {
+  for (const id of ["asian-range-break", "london-orb-30", "pdh-retest", "classic-pivot"]) {
     const full = emitSignals(bars, id, { states });
     for (const cut of [80000, 150000]) {
       const part = emitSignals(bars.slice(0, cut), id, { states: states.slice(0, cut) });
@@ -226,7 +226,7 @@ test("A4 2: signal counts cover every card and every requested dimension", () =>
   const r = read("signal-counts.json");
   assertEqual(r.decidedBeforeResults, true);
   assertEqual(r.noStrategyOutcomesUsed, true);
-  assertEqual(r.cards.length, 24);
+  assertEqual(r.cards.length, 22);
   assertEqual(r.families.length, 8);
   assertEqual(r.forbiddenSignalFields.length, 0, "no signal row may carry outcome fields");
   for (const c of r.cards) {
@@ -244,7 +244,7 @@ test("A4 2: signal counts cover every card and every requested dimension", () =>
     assert(f.strengthState !== f.weaknessState);
     assert(f.strengthShare >= 0 && f.strengthShare <= 1);
   }
-  assertEqual(r.cells.length, 48);
+  assertEqual(r.cells.length, 44);
   assertEqual(r.familyCells.length, 16);
 });
 
@@ -283,7 +283,7 @@ test("A4 2: the report states how many families would lack any testable cell", (
 // TASK 3 — overlap measured from data
 // ---------------------------------------------------------------------------
 test("A4 3: overlap is MEASURED from the real DEV signal bars, not label-driven", () => {
-  const r = read("measured-overlap.json");
+  const r = read("amendment5/measured-overlap.json");
   assertEqual(r.decidedBeforeResults, true);
   assertEqual(Object.keys(r.byFamily).length, 8);
   for (const [f, v] of Object.entries(r.byFamily)) {
@@ -303,7 +303,7 @@ test("A4 3: overlap is MEASURED from the real DEV signal bars, not label-driven"
 });
 
 test("A4 3: the day-clustered SE inflation is measured on the baseline trades", () => {
-  const r = read("measured-overlap.json");
+  const r = read("amendment5/measured-overlap.json");
   const b = read("random-baseline.json");
   for (const vs of VERDICT_STATES) {
     assert(r.seInflation[vs], `${vs} must have a measured SE inflation`);
@@ -323,7 +323,7 @@ test("A4 3: the day-clustered SE inflation is measured on the baseline trades", 
 // TASK 4 — slot model
 // ---------------------------------------------------------------------------
 test("A4 4: the slot model is explicitly flagged as an ASSUMPTION", () => {
-  const r = read("slot-model.json");
+  const r = read("amendment5/slot-model.json");
   assertEqual(r.isAssumption, true);
   assertEqual(r.decidedBeforeResults, true);
   assert(r.assumption.holdDuration.includes("RANDOM-ENTRY BASELINE"));
@@ -350,7 +350,7 @@ test("A4 4: the slot model is explicitly flagged as an ASSUMPTION", () => {
 // TASK 5 — power curve
 // ---------------------------------------------------------------------------
 test("A4 5: the power curve states its definition and is report-only", () => {
-  const r = read("power-curve.json");
+  const r = read("amendment5/power-curve.json");
   assertEqual(r.reportOnly, true);
   assertEqual(r.criteriaChanged, false);
   assertEqual(r.thresholdChanged, false);
@@ -381,7 +381,7 @@ test("A4 5: the power curve states its definition and is report-only", () => {
 });
 
 test("A4 5: power is monotone in the true edge and zero at/below the floor", () => {
-  const r = read("power-curve.json");
+  const r = read("amendment5/power-curve.json");
   for (const c of r.cells) {
     const p = (e) => c.powerCurve[e].probability;
     assert(p(0.05) <= p(0.1) + 0.02, `${c.cell} power must not decrease from 0.05R to 0.10R`);

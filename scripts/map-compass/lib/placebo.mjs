@@ -1,8 +1,8 @@
 /**
  * M5 — multiplicity / false-discovery control.
  *
- * 24 strategies x 2 claims = 48 tests, and the three variants inside a family
- * are NOT independent (they fire on overlapping conditions). A naive
+ * 22 strategies x 2 claims = 44 tests after Amendment 6. Up to three variants
+ * inside a family are NOT independent (they fire on overlapping conditions). A naive
  * Bonferroni correction is therefore wrong in both directions. Instead we
  * measure the actual null distribution of OUR specific test battery by
  * shuffling the state labels.

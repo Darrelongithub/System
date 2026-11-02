@@ -223,15 +223,16 @@ test("claimHash is deterministic", () => {
 });
 
 test("groupByFamilyState pools 3 variants; strategy level stays separate", () => {
+  const familyCards = CLAIM_CARDS.filter((c) => c.family === "ma-cross");
   const cards = new Map(CLAIM_CARDS.map((c) => [c.id, c.family]));
-  const trades = CLAIM_CARDS.slice(0, 3).flatMap((c) => [
+  const trades = familyCards.flatMap((c) => [
     { strategyId: c.id, state: "QUIET", netR: 0.2, year: 2004 },
     { strategyId: c.id, state: "QUIET", netR: 0.3, year: 2005 },
   ]);
   const fam = groupByFamilyState(trades, cards);
   const strat = groupByStrategyState(trades);
-  assertEqual(fam.get(`${CLAIM_CARDS[0].family}|QUIET`).length, 6, "pooled across 3 variants");
-  assertEqual(strat.get(`${CLAIM_CARDS[0].id}|QUIET`).length, 2);
+  assertEqual(fam.get(`${familyCards[0].family}|QUIET`).length, 6, "pooled across 3 variants");
+  assertEqual(strat.get(`${familyCards[0].id}|QUIET`).length, 2);
 });
 
 test("M5 dry-run calibration report exists and passes the harness kill criterion", () => {

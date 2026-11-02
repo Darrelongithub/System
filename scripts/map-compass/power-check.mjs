@@ -2,7 +2,7 @@
 /**
  * M5 — FEASIBILITY PROJECTION (pre-M6 go/no-go).
  *
- * Before writing 24 strategies, answer: with the REAL Map state distribution
+ * Before using the 22-card DRAFT battery, answer: with the REAL Map state distribution
  * and REAL costs, can any claim clear the frozen criteria? This uses the
  * actual DEV bar counts by state/session from the M2 output and the observed
  * baseline cost, then projects trades per cell at plausible signal densities.

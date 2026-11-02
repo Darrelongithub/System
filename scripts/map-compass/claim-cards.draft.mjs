@@ -11,6 +11,12 @@
  * rationale for each strategy family, BEFORE looking at any result on our
  * data. The entire point of M5 is to falsify most of them.
  *
+ * G0 AMENDMENT 6 (2026-11-02, owner-approved before any result): removed only
+ * dual-thrust and stochastic-14-fade (the latter is identical to Williams %R).
+ * All other cards, states and parameters stay unchanged; priorities are
+ * renumbered by deletion only; TEST_ORDER is the prior relative sequence with
+ * those two IDs removed. The remaining 22 cards stay DRAFT.
+ *
  * G0 AMENDMENT 3 (2026-10-27, before any result) — VERDICT STATES:
  * strength/weakness `state` is now one of TWO verdict states, EFFICIENT or
  * CHOPPY (see frozen.mjs VERDICT_STATES). The old four Map states are kept as
@@ -19,7 +25,7 @@
  * EVIDENCE: the old subjective 1-4 tiers were REPLACED by one opened empirical
  * study per family (full URL in frozen.mjs EMPIRICAL_STUDIES) or the label
  * PRACTITIONER_ONLY. `evidenceTier` survives only as a frozen ORDER RANK.
- * TEST_ORDER is an EXPLICIT frozen list, byte-identical to v1.2.
+ * TEST_ORDER is explicit; Amendment 6 removes only the two owner-approved cards while preserving all surviving relative positions.
  *
  * Priority is a FROZEN number (decision #10), assigned by family/variant
  * order, NOT by performance — nothing here has been evaluated yet.
@@ -100,7 +106,7 @@ const card = (id, family, variant, textbookStrength, textbookWeakness, rationale
 };
 
 /**
- * 8 families x 3 variants = 24 known strategies.
+ * 8 families; six have 3 variants and two have 2 = 22 DRAFT strategies.
  * States: EXPANSION (trending+high vol), GRIND (trending+normal vol),
  *         WHIPSAW (choppy+high vol), QUIET (choppy+normal vol).
  */
@@ -124,15 +130,6 @@ export const CLAIM_CARDS = Object.freeze([
     "The classic Turtle long-term channel needs a genuine expansion; a slow channel in a range produces late, mean-reverting fills.",
     { tier: 1, priority: 2, sources: ["Turtle Trading (Dennis/Eckhardt)"] },
   ),
-  card(
-    "dual-thrust",
-    "channel-breakout",
-    "Dual Thrust opening range break",
-    "EXPANSION",
-    "QUIET",
-    "Uses the prior day's range to set a breakout band; needs volatility expansion to travel beyond the band.",
-    { tier: 1, priority: 3, sources: ["Dual Thrust (Chalek)"] },
-  ),
 
   // --- F2 MA / MACD / Ichimoku cross --------------------------------------
   card(
@@ -142,7 +139,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "Moving-average crossovers need a persistent, low-noise trend; high-volatility chop generates repeated false crosses.",
-    { tier: 1, priority: 4, sources: ["Standard trend-following literature"] },
+    { tier: 1, priority: 3, sources: ["Standard trend-following literature"] },
   ),
   card(
     "macd-cross",
@@ -151,7 +148,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "MACD is a smoothed trend filter; it lags and whipsaws when volatility is high but direction is absent.",
-    { tier: 1, priority: 5, sources: ["Appel, MACD"] },
+    { tier: 1, priority: 4, sources: ["Appel, MACD"] },
   ),
   card(
     "ichimoku-tk",
@@ -160,7 +157,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "Ichimoku is designed for persistent trends; its equilibrium lines produce noise signals in choppy high-volatility conditions.",
-    { tier: 1, priority: 6, sources: ["Hosoda, Ichimoku Kinko Hyo"] },
+    { tier: 1, priority: 5, sources: ["Hosoda, Ichimoku Kinko Hyo"] },
   ),
 
   // --- F3 opening range / session range breakout ---------------------------
@@ -171,7 +168,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "QUIET",
     "The Asian range is a compression box; London/NY expansion is claimed to resolve it directionally.",
-    { tier: 2, priority: 7, session: "london", sources: ["Opening-range breakout literature"] },
+    { tier: 2, priority: 6, session: "london", sources: ["Opening-range breakout literature"] },
   ),
   card(
     "london-orb-30",
@@ -180,7 +177,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "QUIET",
     "The first 30 minutes of London set the day's directional tone; quiet days fail to extend.",
-    { tier: 2, priority: 8, session: "london", sources: ["Crabel, Open Range Breakout"] },
+    { tier: 2, priority: 7, session: "london", sources: ["Crabel, Open Range Breakout"] },
   ),
   card(
     "pdh-pdl-break",
@@ -189,7 +186,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "QUIET",
     "A break of the prior day's extremes signals new participation; in a range it is a fade trap.",
-    { tier: 2, priority: 9, sources: ["Classic price-action literature"] },
+    { tier: 2, priority: 8, sources: ["Classic price-action literature"] },
   ),
 
   // --- F4 level retest / pivots -------------------------------------------
@@ -200,7 +197,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "A broken level turning into support is a trend-continuation entry; high-vol chop destroys the level's meaning.",
-    { tier: 3, priority: 10, sources: ["Support/resistance retest literature"] },
+    { tier: 3, priority: 9, sources: ["Support/resistance retest literature"] },
   ),
   card(
     "pdl-retest",
@@ -209,7 +206,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "Mirror of the high retest; same dependence on persistent direction.",
-    { tier: 3, priority: 11, sources: ["Support/resistance retest literature"] },
+    { tier: 3, priority: 10, sources: ["Support/resistance retest literature"] },
   ),
   card(
     "classic-pivot",
@@ -218,7 +215,7 @@ export const CLAIM_CARDS = Object.freeze([
     "GRIND",
     "WHIPSAW",
     "Pivot levels act as intraday support/resistance in an ordered market; they are run through in volatile chop.",
-    { tier: 3, priority: 12, sources: ["Floor-trader pivots"] },
+    { tier: 3, priority: 11, sources: ["Floor-trader pivots"] },
   ),
 
   // --- F5 oscillator fade -------------------------------------------------
@@ -229,7 +226,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "In a range, overbought/oversold readings revert; in a strong trend RSI stays extreme and fading catches a knife.",
-    { tier: 3, priority: 13, sources: ["Wilder, RSI"] },
+    { tier: 3, priority: 12, sources: ["Wilder, RSI"] },
   ),
   card(
     "williams-r-fade",
@@ -238,16 +235,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "Williams %R assumes mean reversion from extremes, which holds only in a non-trending market.",
-    { tier: 3, priority: 14, sources: ["Williams, %R"] },
-  ),
-  card(
-    "stochastic-14-fade",
-    "osc-fade",
-    "Stochastic 14 extreme fade",
-    "QUIET",
-    "EXPANSION",
-    "Stochastic extremes signal exhaustion in a range but persist during a directional expansion.",
-    { tier: 3, priority: 15, sources: ["Lane, Stochastic"] },
+    { tier: 3, priority: 13, sources: ["Williams, %R"] },
   ),
 
   // --- F6 band reversion --------------------------------------------------
@@ -258,7 +246,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "Bands contain ~95% of range-bound prices; a strong trend walks the band instead of reverting.",
-    { tier: 2, priority: 16, sources: ["Bollinger, Bollinger Bands"] },
+    { tier: 2, priority: 14, sources: ["Bollinger, Bollinger Bands"] },
   ),
   card(
     "keltner-20-atr",
@@ -267,7 +255,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "ATR-based envelope fade assumes stable volatility; expansion breaks the envelope legitimately.",
-    { tier: 2, priority: 17, sources: ["Keltner channel literature"] },
+    { tier: 2, priority: 15, sources: ["Keltner channel literature"] },
   ),
   card(
     "bb-squeeze-fade",
@@ -280,7 +268,7 @@ export const CLAIM_CARDS = Object.freeze([
     // wrong. Corrected to EXPANSION (EFFICIENT). Verdict was already CHOPPY/EFFICIENT.
     "EXPANSION",
     "A squeeze precedes expansion, so fading the first move is claimed to work only while volatility stays compressed.",
-    { tier: 2, priority: 18, sources: ["Bollinger, squeeze"] },
+    { tier: 2, priority: 16, sources: ["Bollinger, squeeze"] },
   ),
 
   // --- F7 candlestick reversal --------------------------------------------
@@ -291,7 +279,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "Reversal candles need a low-noise backdrop to be readable; in an expansion they are continuation noise.",
-    { tier: 4, priority: 19, sources: ["Nison, Japanese Candlestick Charting"] },
+    { tier: 4, priority: 17, sources: ["Nison, Japanese Candlestick Charting"] },
   ),
   card(
     "morning-evening-star",
@@ -300,7 +288,7 @@ export const CLAIM_CARDS = Object.freeze([
     "QUIET",
     "EXPANSION",
     "Three-candle reversal patterns assume exhaustion; a strong trend absorbs them.",
-    { tier: 4, priority: 20, sources: ["Nison, Japanese Candlestick Charting"] },
+    { tier: 4, priority: 18, sources: ["Nison, Japanese Candlestick Charting"] },
   ),
   card(
     "three-soldiers-crows",
@@ -311,7 +299,7 @@ export const CLAIM_CARDS = Object.freeze([
     // conflict as bb-squeeze-fade. Corrected to EXPANSION (EFFICIENT).
     "EXPANSION",
     "A three-bar directional run in a quiet market is claimed to be exhausted; in high-vol chop it is meaningless.",
-    { tier: 4, priority: 21, sources: ["Nison, Japanese Candlestick Charting"] },
+    { tier: 4, priority: 19, sources: ["Nison, Japanese Candlestick Charting"] },
   ),
 
   // --- F8 volatility compression -> expansion ------------------------------
@@ -322,7 +310,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "WHIPSAW",
     "Compression stores energy; the resolution is a directional expansion. High-vol chop produces false resolutions.",
-    { tier: 1, priority: 22, sources: ["Volatility-contraction pattern literature"] },
+    { tier: 1, priority: 20, sources: ["Volatility-contraction pattern literature"] },
   ),
   card(
     "nr7-break",
@@ -331,7 +319,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "WHIPSAW",
     "The narrowest range of 7 bars marks compression; the breakout should travel. In chop it reverses.",
-    { tier: 1, priority: 23, sources: ["Toby Crabel, NR7"] },
+    { tier: 1, priority: 21, sources: ["Toby Crabel, NR7"] },
   ),
   card(
     "inside-bar-break",
@@ -340,7 +328,7 @@ export const CLAIM_CARDS = Object.freeze([
     "EXPANSION",
     "QUIET",
     "An inside bar is single-bar compression; its break needs follow-through that a quiet market cannot supply.",
-    { tier: 1, priority: 24, sources: ["Price-action literature"] },
+    { tier: 1, priority: 22, sources: ["Price-action literature"] },
   ),
 ]);
 
@@ -352,14 +340,11 @@ export const FAMILIES = Object.freeze([...new Set(CLAIM_CARDS.map((c) => c.famil
  * Near-duplicates are two variants of essentially the SAME signal (different
  * lookback or parameter), so they fire on overlapping entry bars. Mirror
  * images are the long/short versions of one pattern. Both reduce the
- * effective sample of a pooled family cell. Listed exhaustively for all
- * 8 families x 3 pairs = 24 within-family pairs.
+ * effective sample of a pooled family cell. Listed exhaustively for all remaining within-family card pairs.
  */
 export const CARD_RELATIONS = Object.freeze([
   // F1 channel-breakout
   { family: "channel-breakout", a: "donchian-20", b: "donchian-55", type: "NEAR_DUPLICATE", why: "same Donchian rule, 20 vs 55-bar lookback" },
-  { family: "channel-breakout", a: "donchian-20", b: "dual-thrust", type: "RELATED", why: "both range breakouts, different range definition" },
-  { family: "channel-breakout", a: "donchian-55", b: "dual-thrust", type: "RELATED", why: "both range breakouts, different range definition" },
   // F2 ma-cross
   { family: "ma-cross", a: "sma-20-50", b: "macd-cross", type: "NEAR_DUPLICATE", why: "MACD is an EMA crossover of the same family" },
   { family: "ma-cross", a: "sma-20-50", b: "ichimoku-tk", type: "NEAR_DUPLICATE", why: "both two-moving-average crosses" },
@@ -374,8 +359,6 @@ export const CARD_RELATIONS = Object.freeze([
   { family: "level-retest", a: "pdl-retest", b: "classic-pivot", type: "RELATED", why: "both retest a reference level" },
   // F5 osc-fade
   { family: "osc-fade", a: "rsi-14-30-70", b: "williams-r-fade", type: "NEAR_DUPLICATE", why: "Williams %R is a normalised stochastic/RSI-family oscillator" },
-  { family: "osc-fade", a: "rsi-14-30-70", b: "stochastic-14-fade", type: "NEAR_DUPLICATE", why: "both 14-period bounded oscillators with 30/70-style extremes" },
-  { family: "osc-fade", a: "williams-r-fade", b: "stochastic-14-fade", type: "NEAR_DUPLICATE", why: "Williams %R is a linear transform of the raw stochastic" },
   // F6 band-reversion
   { family: "band-reversion", a: "bollinger-20-2", b: "keltner-20-atr", type: "NEAR_DUPLICATE", why: "both 20-bar envelope fades, sigma vs ATR width" },
   { family: "band-reversion", a: "bollinger-20-2", b: "bb-squeeze-fade", type: "RELATED", why: "both Bollinger-based, different trigger (band vs squeeze)" },
@@ -409,18 +392,18 @@ export const CROSS_FAMILY_MIRRORS = Object.freeze([
 ]);
 
 /**
- * EXPLICIT FROZEN TEST SEQUENCE — byte-identical to v1.2 (tier ascending,
- * then priority). G0 Amendment 3 replaced the tier DEFINITIONS but deliberately
- * did NOT re-sort this sequence. Any change here is a new cycle.
+ * EXPLICIT DRAFT TEST SEQUENCE — v1.2 relative order with only the two A6
+ * owner-approved deletions applied. Remaining cards are not re-sorted by tier
+ * or by their renumbered priorities. Any other reorder would be a new cycle.
  */
 export const FROZEN_TEST_SEQUENCE = Object.freeze([
-  "donchian-20", "donchian-55", "dual-thrust",
+  "donchian-20", "donchian-55",
   "sma-20-50", "macd-cross", "ichimoku-tk",
   "atr-squeeze-break", "nr7-break", "inside-bar-break",
   "asian-range-break", "london-orb-30", "pdh-pdl-break",
   "bollinger-20-2", "keltner-20-atr", "bb-squeeze-fade",
   "pdh-retest", "pdl-retest", "classic-pivot",
-  "rsi-14-30-70", "williams-r-fade", "stochastic-14-fade",
+  "rsi-14-30-70", "williams-r-fade",
   "engulfing", "morning-evening-star", "three-soldiers-crows",
 ]);
 
@@ -472,16 +455,20 @@ export function validateClaimCards() {
     if (![1, 2, 3, 4].includes(c.evidenceTier)) errors.push(`${c.id}: bad frozen order rank`);
     if (!c.parameters) errors.push(`${c.id}: missing Amendment 4 signal parameters`);
   }
-  if (CLAIM_CARDS.length !== 24) errors.push(`expected 24 cards, got ${CLAIM_CARDS.length}`);
+  if (CLAIM_CARDS.length !== 22) errors.push(`expected 22 cards, got ${CLAIM_CARDS.length}`);
+  const orderedPriorities = [...priorities].sort((a, b) => a - b);
+  if (orderedPriorities.some((p, i) => p !== i + 1)) errors.push("A6 deletion-only priorities must be exactly 1..22");
   if (FAMILIES.length !== 8) errors.push(`expected 8 families, got ${FAMILIES.length}`);
-  if (CARD_RELATIONS.length !== 24) errors.push("expected 24 within-family card pairs");
+  const expectedPairs = FAMILIES.reduce((n, f) => { const m = CLAIM_CARDS.filter((c) => c.family === f).length; return n + m * (m - 1) / 2; }, 0);
+  if (CARD_RELATIONS.length !== expectedPairs) errors.push(`expected ${expectedPairs} within-family card pairs`);
   for (const f of FAMILIES) {
-    if (CARD_RELATIONS.filter((r) => r.family === f).length !== 3)
-      errors.push(`${f}: expected 3 within-family pairs`);
+    const m = CLAIM_CARDS.filter((c) => c.family === f).length;
+    if (CARD_RELATIONS.filter((r) => r.family === f).length !== m * (m - 1) / 2)
+      errors.push(`${f}: wrong within-family pair count`);
   }
   // TEST_ORDER is EXACTLY the frozen sequence — no re-sorting by new tiers.
   if (JSON.stringify(TEST_ORDER.map((t) => t.id)) !== JSON.stringify(FROZEN_TEST_SEQUENCE))
-    errors.push("TEST_ORDER is not the frozen v1.2 sequence");
+    errors.push("TEST_ORDER is not the A6 deletion-only sequence");
   // Candlestick must be LAST in evidence order (explicit review decision).
   const lastTier = TEST_ORDER[TEST_ORDER.length - 1];
   const lastCard = CLAIM_CARDS.find((c) => c.id === lastTier.id);

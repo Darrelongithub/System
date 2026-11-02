@@ -217,11 +217,11 @@ test("A3 2b: coverage audit reports exactly how many claim/state/session cells h
   assertEqual(cov.decidedBeforeResults, true);
   assertEqual(cov.noStrategyOutcomesUsed, true);
   assertEqual(cov.rule.zeroFallback, false);
-  assertEqual(cov.universe.cards, 24);
-  assertEqual(cov.universe.claimHalves, 48);
-  assertEqual(cov.universe.claimVerdictStateSessionCells, 136);
-  assertEqual(cov.universe.claimFourStateSessionCells, 272);
-  assertEqual(cov.universe.tradeLevelLookupCells, 1632);
+  assertEqual(cov.universe.cards, 22);
+  assertEqual(cov.universe.claimHalves, 44);
+  assertEqual(cov.universe.claimVerdictStateSessionCells, 124);
+  assertEqual(cov.universe.claimFourStateSessionCells, 248);
+  assertEqual(cov.universe.tradeLevelLookupCells, 1488);
   assertEqual(cov.answer.noBaselineTradeLevelCells, 0);
   assertEqual(cov.answer.noBaselineClaimVerdictStateSessionCells, 0);
   assertEqual(cov.answer.noBaselineClaimFourStateSessionCells, 0);
@@ -311,7 +311,7 @@ test("A3 the four Map states are reported for every claim as diagnostics only", 
 
 test("A3 runBattery decides on verdict states and carries four-state diagnostics + exit caveat", () => {
   const rows = runBattery(syntheticTradesV12({ seed: 3, perCell: 30, trueEdgeR: 0 }));
-  assertEqual(rows.length, 48);
+  assertEqual(rows.length, 44);
   for (const row of rows) {
     assert(VERDICT_STATES.includes(row.state), `${row.claimId} state ${row.state}`);
     assert(row.fourStateDiagnostics !== undefined, "four-state diagnostics must be reported");
@@ -321,13 +321,13 @@ test("A3 runBattery decides on verdict states and carries four-state diagnostics
   }
 });
 
-test("A3 0.2071 overlap provenance is reproducible and used NO outcomes", () => {
+test("A6 remaining-card overlap provenance is reproducible and uses NO outcomes", () => {
   const dep = measureDependence();
-  assertEqual(dep.overlapFraction, 0.2071);
-  assertEqual(dep.designEffect, 1.2316);
-  assertEqual(dep.seInflation, 1.009);
+  assertEqual(dep.overlapFraction, 0.1919);
+  assertEqual(dep.designEffect, 1.216);
+  assertEqual(dep.seInflation, 1.0076);
   assertEqual(dep.dayClusters, 4032);
-  assertEqual(syntheticTradesV12({ seed: 7, perCell: 900, trueEdgeR: 0 }).length, 43200);
+  assertEqual(syntheticTradesV12({ seed: 7, perCell: 900, trueEdgeR: 0 }).length, 39600);
   const v13 = read("power-projection.json").reportOnlyV13;
   assert(v13.overlapProvenance.v12.v12Source.includes("trueEdgeR:0"), "provenance must name the zero-edge data");
   assert(v13.overlapProvenance.v12.v12Source.includes("NOT used"));
@@ -339,16 +339,16 @@ test("A3 recomputed within-family overlap uses only card relations + a seeded RN
   const o = recomputeWithinFamilyOverlap();
   assertEqual(o.usesOutcomes, false);
   assertEqual(o.decidedBeforeResults, true);
-  assertEqual(o.nearDuplicatePairs.length, 11);
+  assertEqual(o.nearDuplicatePairs.length, 9);
   assertEqual(o.mirrorImagePairs.length, 1);
-  assertEqual(o.relatedPairs.length, 12);
+  assertEqual(o.relatedPairs.length, 10);
   assertEqual(Object.keys(o.byFamily).length, 8);
   assert(o.pooled.designEffect > 1.2316, "near-duplicates must raise the design effect");
   assert(o.pooled.overlapFraction > 0.2071);
   const sweep = sweepShareScale([0, 0.5, 1]);
   assertEqual(sweep.length, 3);
   assert(sweep[2].designEffect >= sweep[0].designEffect, "more sharing -> higher design effect");
-  assertEqual(CARD_RELATIONS.length, 24);
+  assertEqual(CARD_RELATIONS.length, 20);
   assert(NEAR_DUPLICATES.some((p) => p.includes("donchian-20") && p.includes("donchian-55")));
   assert(MIRROR_IMAGES.some((p) => p.includes("pdh-retest") && p.includes("pdl-retest")));
 });
@@ -386,7 +386,7 @@ test("A3 4: reversion families carry the standard-exit caveat; no new exit exist
   assertEqual(EXIT_CAVEAT, "under the standard exit (1.5 ATR stop, 2R target) only");
   for (const f of REVERSION_FAMILIES) {
     const cards = CLAIM_CARDS.filter((c) => c.family === f);
-    assertEqual(cards.length, 3);
+    assert(cards.length === 2 || cards.length === 3, `${f} retains two or three cards after approved deletions`);
     for (const c of cards) assertEqual(c.exitCaveat, EXIT_CAVEAT);
   }
   const v = read("power-projection.json").reportOnlyV13;
@@ -394,9 +394,9 @@ test("A3 4: reversion families carry the standard-exit caveat; no new exit exist
   assert(v.reversionCaveat.note.includes("No new exit") || v.reversionCaveat.note.includes("NO new exit"));
   const cov = read("baseline-coverage.json");
   assertEqual(cov.reversionCaveat.label, EXIT_CAVEAT);
-  assertEqual(cov.verdictLabelSummary.totalVerdictSlots, 48);
-  assertEqual(cov.verdictLabelSummary.labelledReversionSlots, 18); // 3 families x 3 cards x 2 halves
-  assertEqual(cov.verdictLabels.length, 48);
+  assertEqual(cov.verdictLabelSummary.totalVerdictSlots, 44);
+  assertEqual(cov.verdictLabelSummary.labelledReversionSlots, 16); // 8 retained reversion cards x 2 halves
+  assertEqual(cov.verdictLabels.length, 44);
   for (const l of cov.verdictLabels) {
     assertEqual(l.verdictExists, false, "no real verdict may exist yet");
     if (l.reversionFamily) assert(l.verdictLabel.endsWith(EXIT_CAVEAT), `${l.claimId} ${l.kind} must be labelled`);
@@ -425,9 +425,12 @@ test("A3 5: one opened empirical study per family (full URL) or PRACTITIONER_ONL
   assert(EVIDENCE.studies !== undefined);
 });
 
-test("A3 5: TEST_ORDER is byte-identical to v1.2 (explicit frozen sequence)", () => {
-  assertEqual(TEST_ORDER.length, 24);
-  assertEqual(FROZEN_TEST_SEQUENCE.length, 24);
+test("A3 5/A6: relative TEST_ORDER is preserved after only owner-approved deletions", () => {
+  const v12 = ["donchian-20","donchian-55","dual-thrust","sma-20-50","macd-cross","ichimoku-tk","atr-squeeze-break","nr7-break","inside-bar-break","asian-range-break","london-orb-30","pdh-pdl-break","bollinger-20-2","keltner-20-atr","bb-squeeze-fade","pdh-retest","pdl-retest","classic-pivot","rsi-14-30-70","williams-r-fade","stochastic-14-fade","engulfing","morning-evening-star","three-soldiers-crows"];
+  const deleted = new Set(["dual-thrust","stochastic-14-fade"]);
+  assertEqual(TEST_ORDER.length, 22);
+  assertEqual(FROZEN_TEST_SEQUENCE.length, 22);
+  assertEqual(JSON.stringify(TEST_ORDER.map((t) => t.id)), JSON.stringify(v12.filter(id => !deleted.has(id))));
   assertEqual(JSON.stringify(TEST_ORDER.map((t) => t.id)), JSON.stringify(FROZEN_TEST_SEQUENCE));
   const tiers = TEST_ORDER.map((t) => t.tier);
   assertEqual(JSON.stringify(tiers), JSON.stringify([...tiers].sort((a, b) => a - b)));

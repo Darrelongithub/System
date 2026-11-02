@@ -45,6 +45,11 @@ const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const NORM = join(ROOT, "artifacts/map-compass/normalized");
 const OUT = join(ROOT, "artifacts/map-compass");
 const BASELINE = JSON.parse(readFileSync(join(OUT, "random-baseline.json"), "utf8"));
+const A5_OVERLAP = existsSync(join(OUT, "amendment5/measured-overlap.json"))
+  ? JSON.parse(readFileSync(join(OUT, "amendment5/measured-overlap.json"), "utf8"))
+  : existsSync(join(OUT, "measured-overlap.json"))
+    ? JSON.parse(readFileSync(join(OUT, "measured-overlap.json"), "utf8"))
+    : null;
 const DAILY_SUMS = JSON.parse(
   readFileSync(join(OUT, "random-baseline-daily-sums.json"), "utf8"),
 ).byVerdictState;
@@ -153,7 +158,7 @@ for (const f of FAMILIES) {
 
 const pooledAll = kishOverBars(FAMILIES.flatMap((f) => perFamily[f].cards.map((id) => devSignalBars(id))));
 
-// Amendment 5: all 24-card pairs, including cross-family pairs.
+// Amendment 6: all 22-card pairs, including cross-family pairs.
 const allCardSets = new Map(CLAIM_CARDS.map((c) => [c.id, devSignalBars(c.id)]));
 const allPairs = [];
 for (let i = 0; i < CLAIM_CARDS.length; i++) {
@@ -165,7 +170,6 @@ for (let i = 0; i < CLAIM_CARDS.length; i++) {
   }
 }
 const crossFamilyPairsOverHalf = allPairs.filter(p => p.familyA !== p.familyB && p.jaccard !== null && p.jaccard > 0.5).sort((a,b)=>b.jaccard-a.jaccard);
-const dualThrustPdhPdl = allPairs.find(p => (p.a === "dual-thrust" && p.b === "pdh-pdl-break") || (p.b === "dual-thrust" && p.a === "pdh-pdl-break"));
 
 // ---- day-clustered SE inflation, per verdict state, from the BASELINE -----
 function cr1Se(values, keys) {
@@ -227,8 +231,8 @@ for (const vs of VERDICT_STATES) {
 
 const report = {
   generatedAt: new Date().toISOString(),
-  id: "AMENDMENT-4-MEASURED-OVERLAP",
-  date: "2026-10-27",
+  id: "G0-AMENDMENT-6-MEASURED-OVERLAP",
+  date: "2026-11-02",
   decidedBeforeResults: true,
   purpose:
     "Replace the v1.3 label-driven overlap and synthetic SE inflation with MEASURED values from the real DEV signal bars and the random-entry baseline trades.",
@@ -247,7 +251,7 @@ const report = {
     },
   },
   measuredInputs: {
-    signalBars: "emitSignals() output on the real DEV bars for all 24 cards (lib/signals.mjs)",
+    signalBars: "emitSignals() output on the real DEV bars for all 22 current DRAFT cards (lib/signals.mjs)",
     overlap: "Jaccard and Kish effective N over the measured entry-bar sets",
     seInflation: "CR1 vs plain SE on the random-entry baseline netR values, grouped by verdict state and calendar day",
     baselineSamples: "artifacts/map-compass/random-baseline.json (top-up included)",
@@ -263,7 +267,28 @@ const report = {
   },
   byFamily: perFamily,
   pooled: pooledAll,
-  amendment5: { allCardPairCount: allPairs.length, crossFamilyPairsJaccardAboveHalf: crossFamilyPairsOverHalf, dualThrustVsPdhPdlBreak: dualThrustPdhPdl },
+  amendment5: A5_OVERLAP?.amendment5 ?? null,
+  amendment6: {
+    cardCount: CLAIM_CARDS.length,
+    allCardPairCount: allPairs.length,
+    crossFamilyPairsJaccardAboveHalf: crossFamilyPairsOverHalf,
+    perFamily: perFamily,
+    changesFromA5: ["channel-breakout", "osc-fade"].map((family) => {
+      const before = A5_OVERLAP?.byFamily?.[family];
+      const after = perFamily[family];
+      const retained = new Set(after.cards);
+      return {
+        family,
+        beforeCardIds: before?.cards ?? [],
+        afterCardIds: after.cards,
+        removedCardIds: (before?.cards ?? []).filter((id) => !retained.has(id)),
+        beforePairwiseJaccard: before?.pairwiseJaccard ?? [],
+        afterPairwiseJaccard: after.pairwiseJaccard,
+        beforePooled: before?.pooled ?? null,
+        afterPooled: after.pooled,
+      };
+    }),
+  },
   seInflation: dailySeRecomputed,
   seInflationVerifiedFromDailySums: dailySeVerified,
   seInflationNote:
@@ -281,5 +306,5 @@ for (const [f, v] of Object.entries(perFamily)) {
     `${f.padEnd(26)} ${String(v.pooled.n).padStart(7)} ${String(v.pooled.distinctBars).padStart(10)} ${String(v.pooled.nEffective).padStart(7)} ${String(v.pooled.designEffect).padStart(6)}    ${j}`,
   );
 }
-console.log(`\npooled across all 24 cards: n=${pooledAll.n} distinctBars=${pooledAll.distinctBars} nEff=${pooledAll.nEffective} DE=${pooledAll.designEffect}`);
+console.log(`\npooled across all 22 cards: n=${pooledAll.n} distinctBars=${pooledAll.distinctBars} nEff=${pooledAll.nEffective} DE=${pooledAll.designEffect}`);
 console.log("SE inflation (measured on the baseline):", JSON.stringify(dailySeRecomputed));

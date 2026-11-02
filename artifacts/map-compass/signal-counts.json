@@ -1,6 +1,6 @@
 {
-  "generatedAt": "2026-10-27T13:58:34.012Z",
-  "purpose": "G0 Amendment 4 task 2: signal counts on DEV for the 24 entry-signal functions. NO outcomes, NO exits, NO R.",
+  "generatedAt": "2026-11-02T09:00:44.592Z",
+  "purpose": "G0 Amendment 6: signal counts on DEV for the 22 remaining entry-signal functions. NO outcomes, NO exits, NO R.",
   "decidedBeforeResults": true,
   "noStrategyOutcomesUsed": true,
   "inputs": {
@@ -28,10 +28,10 @@
     "mapHash": "7ecb861e8a5c8cd1635cc49376400d96bc424e5abf508f439e7e7b70a0d6313a",
     "signalLibrarySelfCheck": []
   },
-  "cardCount": 24,
+  "cardCount": 22,
   "familyCount": 8,
-  "totalSignalsAllCards": 557958,
-  "totalDevSignalsAllCards": 291501,
+  "totalSignalsAllCards": 428805,
+  "totalDevSignalsAllCards": 224057,
   "forbiddenSignalFields": [],
   "minTradesPerCell": 100,
   "cards": [
@@ -54,6 +54,53 @@
       "parametersString": "lookback=20, breakAt=prior-high/low, entryAt=close",
       "allSignals": 50349,
       "devSignals": 25237,
+      "signalsPerDevDay": 8.04495,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 175,
+      "busiestDevDays": [
+        {
+          "date": "2006-06-13",
+          "count": 25
+        },
+        {
+          "date": "2011-11-07",
+          "count": 22
+        },
+        {
+          "date": "2017-07-03",
+          "count": 22
+        },
+        {
+          "date": "2011-05-11",
+          "count": 21
+        },
+        {
+          "date": "2018-11-01",
+          "count": 21
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-25",
+          "count": 1
+        },
+        {
+          "date": "2004-11-26",
+          "count": 1
+        },
+        {
+          "date": "2005-02-04",
+          "count": 1
+        },
+        {
+          "date": "2005-09-06",
+          "count": 1
+        },
+        {
+          "date": "2006-12-21",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 11761,
@@ -108,6 +155,53 @@
       "parametersString": "lookback=55, breakAt=prior-high/low, entryAt=close",
       "allSignals": 25927,
       "devSignals": 12790,
+      "signalsPerDevDay": 4.07714,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 549,
+      "busiestDevDays": [
+        {
+          "date": "2011-11-07",
+          "count": 21
+        },
+        {
+          "date": "2017-07-03",
+          "count": 21
+        },
+        {
+          "date": "2009-07-20",
+          "count": 20
+        },
+        {
+          "date": "2006-06-13",
+          "count": 19
+        },
+        {
+          "date": "2009-11-25",
+          "count": 19
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-14",
+          "count": 1
+        },
+        {
+          "date": "2004-07-19",
+          "count": 1
+        },
+        {
+          "date": "2004-07-22",
+          "count": 1
+        },
+        {
+          "date": "2004-07-28",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 5591,
@@ -144,63 +238,10 @@
       "strengthShareOfCard": 0.2704
     },
     {
-      "cardId": "dual-thrust",
-      "family": "channel-breakout",
-      "variant": "Dual Thrust opening range break",
-      "priority": 3,
-      "evidenceTier": 1,
-      "verdictStrength": "EFFICIENT",
-      "verdictWeakness": "CHOPPY",
-      "fourStateTextbookStrength": "EXPANSION",
-      "fourStateTextbookWeakness": "QUIET",
-      "sessionRestriction": null,
-      "parameters": {
-        "priorDayBars": 48,
-        "k": 0
-      },
-      "parametersString": "priorDayBars=48, k=0",
-      "allSignals": 94874,
-      "devSignals": 49228,
-      "buckets": {
-        "side": {
-          "short": 20951,
-          "long": 28277
-        },
-        "verdictState": {
-          "CHOPPY": 22711,
-          "EFFICIENT": 12507
-        },
-        "fourState": {
-          "QUIET": 15584,
-          "GRIND": 6926,
-          "EXPANSION": 5581,
-          "WHIPSAW": 7127
-        },
-        "session": {
-          "asian": 12460,
-          "london": 11719,
-          "ny": 25049
-        },
-        "verdictStateLag20": {
-          "CHOPPY": 31040,
-          "EFFICIENT": 7855
-        },
-        "lagFourState": {
-          "QUIET": 25380,
-          "WHIPSAW": 5660,
-          "GRIND": 5417,
-          "EXPANSION": 2438
-        }
-      },
-      "strengthExpectedN": 12507,
-      "weaknessExpectedN": 22711,
-      "strengthShareOfCard": 0.2541
-    },
-    {
       "cardId": "sma-20-50",
       "family": "ma-cross",
       "variant": "SMA20 x SMA50 crossover",
-      "priority": 4,
+      "priority": 3,
       "evidenceTier": 1,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -215,6 +256,53 @@
       "parametersString": "fast=20, slow=50, entryAt=close",
       "allSignals": 5486,
       "devSignals": 2876,
+      "signalsPerDevDay": 0.9168,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1057,
+      "busiestDevDays": [
+        {
+          "date": "2004-07-16",
+          "count": 7
+        },
+        {
+          "date": "2017-11-29",
+          "count": 7
+        },
+        {
+          "date": "2004-08-26",
+          "count": 6
+        },
+        {
+          "date": "2010-04-29",
+          "count": 6
+        },
+        {
+          "date": "2005-08-03",
+          "count": 5
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 1
+        },
+        {
+          "date": "2004-06-16",
+          "count": 1
+        },
+        {
+          "date": "2004-06-17",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        },
+        {
+          "date": "2004-06-24",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1439,
@@ -254,7 +342,7 @@
       "cardId": "macd-cross",
       "family": "ma-cross",
       "variant": "MACD signal-line cross",
-      "priority": 5,
+      "priority": 4,
       "evidenceTier": 1,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -270,6 +358,53 @@
       "parametersString": "fast=12, slow=26, signal=9, entryAt=close",
       "allSignals": 19042,
       "devSignals": 10068,
+      "signalsPerDevDay": 3.20944,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 195,
+      "busiestDevDays": [
+        {
+          "date": "2005-06-10",
+          "count": 12
+        },
+        {
+          "date": "2011-06-21",
+          "count": 12
+        },
+        {
+          "date": "2013-03-15",
+          "count": 11
+        },
+        {
+          "date": "2014-07-29",
+          "count": 10
+        },
+        {
+          "date": "2004-09-17",
+          "count": 9
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 1
+        },
+        {
+          "date": "2004-06-16",
+          "count": 1
+        },
+        {
+          "date": "2004-06-30",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-27",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 5035,
@@ -309,7 +444,7 @@
       "cardId": "ichimoku-tk",
       "family": "ma-cross",
       "variant": "Ichimoku Tenkan/Kijun cross",
-      "priority": 6,
+      "priority": 5,
       "evidenceTier": 1,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -324,6 +459,53 @@
       "parametersString": "tenkan=9, kijun=26, entryAt=close",
       "allSignals": 12706,
       "devSignals": 6764,
+      "signalsPerDevDay": 2.1562,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 344,
+      "busiestDevDays": [
+        {
+          "date": "2014-02-28",
+          "count": 10
+        },
+        {
+          "date": "2011-11-09",
+          "count": 9
+        },
+        {
+          "date": "2014-01-22",
+          "count": 8
+        },
+        {
+          "date": "2005-07-08",
+          "count": 7
+        },
+        {
+          "date": "2006-10-06",
+          "count": 7
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-16",
+          "count": 1
+        },
+        {
+          "date": "2004-06-17",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-07",
+          "count": 1
+        },
+        {
+          "date": "2004-07-13",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 3361,
@@ -363,7 +545,7 @@
       "cardId": "atr-squeeze-break",
       "family": "vol-compression",
       "variant": "ATR-squeeze breakout",
-      "priority": 22,
+      "priority": 20,
       "evidenceTier": 1,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -379,6 +561,53 @@
       "parametersString": "atrPeriod=14, squeezeFactor=0.8, lookback=50, breakRel=0.5",
       "allSignals": 1517,
       "devSignals": 824,
+      "signalsPerDevDay": 0.26267,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 2610,
+      "busiestDevDays": [
+        {
+          "date": "2010-10-25",
+          "count": 8
+        },
+        {
+          "date": "2005-08-15",
+          "count": 5
+        },
+        {
+          "date": "2009-06-26",
+          "count": 5
+        },
+        {
+          "date": "2009-09-22",
+          "count": 5
+        },
+        {
+          "date": "2004-09-28",
+          "count": 4
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-07-20",
+          "count": 1
+        },
+        {
+          "date": "2004-07-21",
+          "count": 1
+        },
+        {
+          "date": "2004-07-27",
+          "count": 1
+        },
+        {
+          "date": "2004-07-29",
+          "count": 1
+        },
+        {
+          "date": "2004-07-30",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 287,
@@ -418,7 +647,7 @@
       "cardId": "nr7-break",
       "family": "vol-compression",
       "variant": "NR7 narrowest-range breakout",
-      "priority": 23,
+      "priority": 21,
       "evidenceTier": 1,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -432,6 +661,53 @@
       "parametersString": "lookback=7, breakRel=0.25",
       "allSignals": 26316,
       "devSignals": 14553,
+      "signalsPerDevDay": 4.63915,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 164,
+      "busiestDevDays": [
+        {
+          "date": "2007-08-07",
+          "count": 12
+        },
+        {
+          "date": "2004-09-15",
+          "count": 11
+        },
+        {
+          "date": "2005-06-21",
+          "count": 11
+        },
+        {
+          "date": "2005-10-11",
+          "count": 11
+        },
+        {
+          "date": "2007-04-06",
+          "count": 11
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-10-08",
+          "count": 1
+        },
+        {
+          "date": "2004-12-03",
+          "count": 1
+        },
+        {
+          "date": "2004-12-11",
+          "count": 1
+        },
+        {
+          "date": "2005-07-04",
+          "count": 1
+        },
+        {
+          "date": "2005-11-30",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 7689,
@@ -471,7 +747,7 @@
       "cardId": "inside-bar-break",
       "family": "vol-compression",
       "variant": "Inside-bar break",
-      "priority": 24,
+      "priority": 22,
       "evidenceTier": 1,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -484,6 +760,53 @@
       "parametersString": "lookback=1",
       "allSignals": 41607,
       "devSignals": 23976,
+      "signalsPerDevDay": 7.64297,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 123,
+      "busiestDevDays": [
+        {
+          "date": "2004-09-08",
+          "count": 16
+        },
+        {
+          "date": "2005-08-23",
+          "count": 16
+        },
+        {
+          "date": "2004-08-11",
+          "count": 15
+        },
+        {
+          "date": "2004-09-09",
+          "count": 15
+        },
+        {
+          "date": "2004-11-16",
+          "count": 15
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2005-01-17",
+          "count": 1
+        },
+        {
+          "date": "2005-02-12",
+          "count": 1
+        },
+        {
+          "date": "2005-03-05",
+          "count": 1
+        },
+        {
+          "date": "2005-11-30",
+          "count": 1
+        },
+        {
+          "date": "2006-07-05",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 10018,
@@ -523,7 +846,7 @@
       "cardId": "asian-range-break",
       "family": "opening-range",
       "variant": "Asian-session range breakout",
-      "priority": 7,
+      "priority": 6,
       "evidenceTier": 2,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -539,6 +862,53 @@
       "parametersString": "rangeSession=asian, rangeBars=20, entrySession=london, entryAt=close",
       "allSignals": 10225,
       "devSignals": 3856,
+      "signalsPerDevDay": 1.2292,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 2396,
+      "busiestDevDays": [
+        {
+          "date": "2011-05-24",
+          "count": 10
+        },
+        {
+          "date": "2011-05-26",
+          "count": 10
+        },
+        {
+          "date": "2011-08-16",
+          "count": 10
+        },
+        {
+          "date": "2011-08-25",
+          "count": 10
+        },
+        {
+          "date": "2011-09-09",
+          "count": 10
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2011-05-13",
+          "count": 1
+        },
+        {
+          "date": "2011-05-18",
+          "count": 1
+        },
+        {
+          "date": "2011-05-27",
+          "count": 1
+        },
+        {
+          "date": "2011-05-31",
+          "count": 1
+        },
+        {
+          "date": "2011-06-14",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1762,
@@ -576,7 +946,7 @@
       "cardId": "london-orb-30",
       "family": "opening-range",
       "variant": "London first-30m ORB",
-      "priority": 8,
+      "priority": 7,
       "evidenceTier": 2,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -591,6 +961,53 @@
       "parametersString": "rangeBars=6, entrySession=london, entryAt=close",
       "allSignals": 12128,
       "devSignals": 6442,
+      "signalsPerDevDay": 2.05355,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 691,
+      "busiestDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 4
+        },
+        {
+          "date": "2004-06-15",
+          "count": 4
+        },
+        {
+          "date": "2004-06-16",
+          "count": 4
+        },
+        {
+          "date": "2004-06-25",
+          "count": 4
+        },
+        {
+          "date": "2004-07-12",
+          "count": 4
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-11",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        },
+        {
+          "date": "2004-07-13",
+          "count": 1
+        },
+        {
+          "date": "2004-07-15",
+          "count": 1
+        },
+        {
+          "date": "2004-07-21",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 3273,
@@ -628,7 +1045,7 @@
       "cardId": "pdh-pdl-break",
       "family": "opening-range",
       "variant": "Prior-day high/low break",
-      "priority": 9,
+      "priority": 8,
       "evidenceTier": 2,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -642,6 +1059,53 @@
       "parametersString": "priorDayBars=48, entryAt=close",
       "allSignals": 94874,
       "devSignals": 49228,
+      "signalsPerDevDay": 15.6927,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 636,
+      "busiestDevDays": [
+        {
+          "date": "2011-07-18",
+          "count": 46
+        },
+        {
+          "date": "2011-07-25",
+          "count": 46
+        },
+        {
+          "date": "2011-08-08",
+          "count": 46
+        },
+        {
+          "date": "2011-08-09",
+          "count": 46
+        },
+        {
+          "date": "2013-04-01",
+          "count": 46
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-08-10",
+          "count": 1
+        },
+        {
+          "date": "2004-08-30",
+          "count": 1
+        },
+        {
+          "date": "2004-09-16",
+          "count": 1
+        },
+        {
+          "date": "2004-12-07",
+          "count": 1
+        },
+        {
+          "date": "2005-01-28",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 20951,
@@ -681,7 +1145,7 @@
       "cardId": "bollinger-20-2",
       "family": "band-reversion",
       "variant": "Bollinger 20/2 band fade",
-      "priority": 16,
+      "priority": 14,
       "evidenceTier": 2,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -695,6 +1159,53 @@
       "parametersString": "period=20, numerStd=2",
       "allSignals": 15934,
       "devSignals": 8436,
+      "signalsPerDevDay": 2.68919,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 207,
+      "busiestDevDays": [
+        {
+          "date": "2006-10-20",
+          "count": 7
+        },
+        {
+          "date": "2007-10-26",
+          "count": 7
+        },
+        {
+          "date": "2011-01-18",
+          "count": 7
+        },
+        {
+          "date": "2017-09-18",
+          "count": 7
+        },
+        {
+          "date": "2018-04-02",
+          "count": 7
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-25",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-07",
+          "count": 1
+        },
+        {
+          "date": "2004-07-09",
+          "count": 1
+        },
+        {
+          "date": "2004-08-06",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 4178,
@@ -734,7 +1245,7 @@
       "cardId": "keltner-20-atr",
       "family": "band-reversion",
       "variant": "Keltner 20/ATR band fade",
-      "priority": 17,
+      "priority": 15,
       "evidenceTier": 2,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -749,6 +1260,53 @@
       "parametersString": "period=20, atrPeriod=20, atrMultiple=2",
       "allSignals": 11933,
       "devSignals": 6404,
+      "signalsPerDevDay": 2.04144,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 469,
+      "busiestDevDays": [
+        {
+          "date": "2006-06-22",
+          "count": 8
+        },
+        {
+          "date": "2007-06-01",
+          "count": 8
+        },
+        {
+          "date": "2004-12-02",
+          "count": 7
+        },
+        {
+          "date": "2009-01-16",
+          "count": 7
+        },
+        {
+          "date": "2009-06-01",
+          "count": 7
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-23",
+          "count": 1
+        },
+        {
+          "date": "2004-06-25",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-07",
+          "count": 1
+        },
+        {
+          "date": "2004-07-08",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 3367,
@@ -788,7 +1346,7 @@
       "cardId": "bb-squeeze-fade",
       "family": "band-reversion",
       "variant": "Bollinger squeeze fade",
-      "priority": 18,
+      "priority": 16,
       "evidenceTier": 2,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -803,6 +1361,53 @@
       "parametersString": "period=20, numerStd=2, squeezeFactor=0.9",
       "allSignals": 5332,
       "devSignals": 2835,
+      "signalsPerDevDay": 0.90373,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1359,
+      "busiestDevDays": [
+        {
+          "date": "2011-09-16",
+          "count": 6
+        },
+        {
+          "date": "2004-07-13",
+          "count": 5
+        },
+        {
+          "date": "2006-05-17",
+          "count": 5
+        },
+        {
+          "date": "2006-08-09",
+          "count": 5
+        },
+        {
+          "date": "2007-10-26",
+          "count": 5
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-21",
+          "count": 1
+        },
+        {
+          "date": "2004-06-22",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        },
+        {
+          "date": "2004-07-02",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 1405,
@@ -842,7 +1447,7 @@
       "cardId": "pdh-retest",
       "family": "level-retest",
       "variant": "Prior-day high retest long",
-      "priority": 10,
+      "priority": 9,
       "evidenceTier": 3,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -857,6 +1462,53 @@
       "parametersString": "priorDayBars=48, touchRel=0.25, side=long",
       "allSignals": 3639,
       "devSignals": 1829,
+      "signalsPerDevDay": 0.58304,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 2270,
+      "busiestDevDays": [
+        {
+          "date": "2014-10-09",
+          "count": 9
+        },
+        {
+          "date": "2017-06-05",
+          "count": 8
+        },
+        {
+          "date": "2006-08-02",
+          "count": 7
+        },
+        {
+          "date": "2009-12-21",
+          "count": 7
+        },
+        {
+          "date": "2005-07-07",
+          "count": 6
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-15",
+          "count": 1
+        },
+        {
+          "date": "2004-06-16",
+          "count": 1
+        },
+        {
+          "date": "2004-07-08",
+          "count": 1
+        },
+        {
+          "date": "2004-07-27",
+          "count": 1
+        },
+        {
+          "date": "2004-08-02",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1829
@@ -895,7 +1547,7 @@
       "cardId": "pdl-retest",
       "family": "level-retest",
       "variant": "Prior-day low retest short",
-      "priority": 11,
+      "priority": 10,
       "evidenceTier": 3,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -910,6 +1562,53 @@
       "parametersString": "priorDayBars=48, touchRel=0.25, side=short",
       "allSignals": 2884,
       "devSignals": 1483,
+      "signalsPerDevDay": 0.47274,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 2418,
+      "busiestDevDays": [
+        {
+          "date": "2014-11-17",
+          "count": 8
+        },
+        {
+          "date": "2005-01-24",
+          "count": 7
+        },
+        {
+          "date": "2006-11-17",
+          "count": 7
+        },
+        {
+          "date": "2011-12-19",
+          "count": 7
+        },
+        {
+          "date": "2017-01-27",
+          "count": 7
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 1
+        },
+        {
+          "date": "2004-06-28",
+          "count": 1
+        },
+        {
+          "date": "2004-06-29",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-13",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 1483
@@ -948,7 +1647,7 @@
       "cardId": "classic-pivot",
       "family": "level-retest",
       "variant": "Classic floor-pivot bounce",
-      "priority": 12,
+      "priority": 11,
       "evidenceTier": 3,
       "verdictStrength": "EFFICIENT",
       "verdictWeakness": "CHOPPY",
@@ -963,6 +1662,53 @@
       "parametersString": "priorDayBars=48, touchRel=0.25, levels=PP,S1,R1",
       "allSignals": 12563,
       "devSignals": 6532,
+      "signalsPerDevDay": 2.08224,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1308,
+      "busiestDevDays": [
+        {
+          "date": "2005-01-24",
+          "count": 25
+        },
+        {
+          "date": "2010-02-08",
+          "count": 21
+        },
+        {
+          "date": "2005-05-17",
+          "count": 20
+        },
+        {
+          "date": "2018-01-08",
+          "count": 19
+        },
+        {
+          "date": "2006-12-04",
+          "count": 17
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 1
+        },
+        {
+          "date": "2004-06-24",
+          "count": 1
+        },
+        {
+          "date": "2004-07-06",
+          "count": 1
+        },
+        {
+          "date": "2004-07-07",
+          "count": 1
+        },
+        {
+          "date": "2004-07-13",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "short": 3388,
@@ -1002,7 +1748,7 @@
       "cardId": "rsi-14-30-70",
       "family": "osc-fade",
       "variant": "RSI14 fade at 30/70",
-      "priority": 13,
+      "priority": 12,
       "evidenceTier": 3,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -1017,6 +1763,53 @@
       "parametersString": "period=14, oversold=30, overbought=70",
       "allSignals": 7587,
       "devSignals": 4020,
+      "signalsPerDevDay": 1.28148,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1041,
+      "busiestDevDays": [
+        {
+          "date": "2005-02-22",
+          "count": 7
+        },
+        {
+          "date": "2006-03-27",
+          "count": 7
+        },
+        {
+          "date": "2006-06-30",
+          "count": 7
+        },
+        {
+          "date": "2013-04-15",
+          "count": 7
+        },
+        {
+          "date": "2018-08-15",
+          "count": 7
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-14",
+          "count": 1
+        },
+        {
+          "date": "2004-06-17",
+          "count": 1
+        },
+        {
+          "date": "2004-06-18",
+          "count": 1
+        },
+        {
+          "date": "2004-06-21",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1834,
@@ -1056,7 +1849,7 @@
       "cardId": "williams-r-fade",
       "family": "osc-fade",
       "variant": "Williams %R extreme fade",
-      "priority": 14,
+      "priority": 13,
       "evidenceTier": 3,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -1071,6 +1864,53 @@
       "parametersString": "period=14, oversold=-80, overbought=-20",
       "allSignals": 34279,
       "devSignals": 18216,
+      "signalsPerDevDay": 5.80682,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 154,
+      "busiestDevDays": [
+        {
+          "date": "2004-06-15",
+          "count": 13
+        },
+        {
+          "date": "2009-06-19",
+          "count": 12
+        },
+        {
+          "date": "2011-07-01",
+          "count": 12
+        },
+        {
+          "date": "2017-10-11",
+          "count": 12
+        },
+        {
+          "date": "2018-04-10",
+          "count": 12
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-11",
+          "count": 1
+        },
+        {
+          "date": "2005-01-17",
+          "count": 1
+        },
+        {
+          "date": "2005-01-22",
+          "count": 1
+        },
+        {
+          "date": "2005-03-05",
+          "count": 1
+        },
+        {
+          "date": "2005-07-04",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 9325,
@@ -1107,66 +1947,10 @@
       "strengthShareOfCard": 0.6212
     },
     {
-      "cardId": "stochastic-14-fade",
-      "family": "osc-fade",
-      "variant": "Stochastic 14 extreme fade",
-      "priority": 15,
-      "evidenceTier": 3,
-      "verdictStrength": "CHOPPY",
-      "verdictWeakness": "EFFICIENT",
-      "fourStateTextbookStrength": "QUIET",
-      "fourStateTextbookWeakness": "EXPANSION",
-      "sessionRestriction": null,
-      "parameters": {
-        "period": 14,
-        "kSmooth": 1,
-        "dSmooth": 3,
-        "low": 20,
-        "high": 80
-      },
-      "parametersString": "period=14, kSmooth=1, dSmooth=3, low=20, high=80",
-      "allSignals": 34279,
-      "devSignals": 18216,
-      "buckets": {
-        "side": {
-          "short": 9325,
-          "long": 8891
-        },
-        "verdictState": {
-          "CHOPPY": 11316,
-          "EFFICIENT": 2700
-        },
-        "fourState": {
-          "QUIET": 9344,
-          "EXPANSION": 922,
-          "WHIPSAW": 1972,
-          "GRIND": 1778
-        },
-        "session": {
-          "ny": 6113,
-          "asian": 7253,
-          "london": 4850
-        },
-        "verdictStateLag20": {
-          "CHOPPY": 11227,
-          "EFFICIENT": 2746
-        },
-        "lagFourState": {
-          "WHIPSAW": 2776,
-          "QUIET": 8451,
-          "GRIND": 1532,
-          "EXPANSION": 1214
-        }
-      },
-      "strengthExpectedN": 11316,
-      "weaknessExpectedN": 2700,
-      "strengthShareOfCard": 0.6212
-    },
-    {
       "cardId": "engulfing",
       "family": "candlestick-reversal",
       "variant": "Bull/bear engulfing reversal",
-      "priority": 19,
+      "priority": 17,
       "evidenceTier": 4,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -1179,6 +1963,53 @@
       "parametersString": "bodyRatio=0.6",
       "allSignals": 3883,
       "devSignals": 2071,
+      "signalsPerDevDay": 0.66018,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1671,
+      "busiestDevDays": [
+        {
+          "date": "2018-10-22",
+          "count": 6
+        },
+        {
+          "date": "2015-12-17",
+          "count": 5
+        },
+        {
+          "date": "2017-02-01",
+          "count": 5
+        },
+        {
+          "date": "2004-07-01",
+          "count": 4
+        },
+        {
+          "date": "2004-07-30",
+          "count": 4
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-15",
+          "count": 1
+        },
+        {
+          "date": "2004-06-17",
+          "count": 1
+        },
+        {
+          "date": "2004-06-18",
+          "count": 1
+        },
+        {
+          "date": "2004-06-22",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1061,
@@ -1218,7 +2049,7 @@
       "cardId": "morning-evening-star",
       "family": "candlestick-reversal",
       "variant": "Morning/evening star",
-      "priority": 20,
+      "priority": 18,
       "evidenceTier": 4,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -1231,6 +2062,53 @@
       "parametersString": "bodyRatio=0.4",
       "allSignals": 26563,
       "devSignals": 13449,
+      "signalsPerDevDay": 4.28722,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 219,
+      "busiestDevDays": [
+        {
+          "date": "2009-11-30",
+          "count": 15
+        },
+        {
+          "date": "2014-05-28",
+          "count": 14
+        },
+        {
+          "date": "2009-02-17",
+          "count": 13
+        },
+        {
+          "date": "2015-05-07",
+          "count": 13
+        },
+        {
+          "date": "2018-01-18",
+          "count": 13
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-17",
+          "count": 1
+        },
+        {
+          "date": "2004-06-18",
+          "count": 1
+        },
+        {
+          "date": "2004-06-21",
+          "count": 1
+        },
+        {
+          "date": "2004-07-01",
+          "count": 1
+        },
+        {
+          "date": "2004-07-07",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 6832,
@@ -1270,7 +2148,7 @@
       "cardId": "three-soldiers-crows",
       "family": "candlestick-reversal",
       "variant": "Three white soldiers / black crows fade",
-      "priority": 21,
+      "priority": 19,
       "evidenceTier": 4,
       "verdictStrength": "CHOPPY",
       "verdictWeakness": "EFFICIENT",
@@ -1283,6 +2161,53 @@
       "parametersString": "bodyRatio=0.5",
       "allSignals": 4031,
       "devSignals": 2168,
+      "signalsPerDevDay": 0.69111,
+      "devCalendarDays": 3137,
+      "zeroSignalDevDays": 1769,
+      "busiestDevDays": [
+        {
+          "date": "2006-09-07",
+          "count": 8
+        },
+        {
+          "date": "2005-09-19",
+          "count": 6
+        },
+        {
+          "date": "2006-02-09",
+          "count": 6
+        },
+        {
+          "date": "2006-04-20",
+          "count": 6
+        },
+        {
+          "date": "2006-09-06",
+          "count": 6
+        }
+      ],
+      "quietestActiveDevDays": [
+        {
+          "date": "2004-06-18",
+          "count": 1
+        },
+        {
+          "date": "2004-06-23",
+          "count": 1
+        },
+        {
+          "date": "2004-06-24",
+          "count": 1
+        },
+        {
+          "date": "2004-06-28",
+          "count": 1
+        },
+        {
+          "date": "2004-07-14",
+          "count": 1
+        }
+      ],
       "buckets": {
         "side": {
           "long": 1039,
@@ -1324,39 +2249,39 @@
       "family": "channel-breakout",
       "strengthState": "EFFICIENT",
       "weaknessState": "CHOPPY",
-      "strengthExpectedN": 20264,
-      "weaknessExpectedN": 42588,
-      "strengthShare": 0.2322,
-      "totalDevSignals": 87255,
+      "strengthExpectedN": 7757,
+      "weaknessExpectedN": 19877,
+      "strengthShare": 0.204,
+      "totalDevSignals": 38027,
       "buckets": {
         "side": {
-          "short": 38303,
-          "long": 48952
+          "short": 17352,
+          "long": 20675
         },
         "verdictState": {
-          "CHOPPY": 42588,
-          "EFFICIENT": 20264
+          "CHOPPY": 19877,
+          "EFFICIENT": 7757
         },
         "fourState": {
-          "QUIET": 32318,
-          "GRIND": 12101,
-          "WHIPSAW": 10270,
-          "EXPANSION": 8163
+          "QUIET": 16734,
+          "GRIND": 5175,
+          "WHIPSAW": 3143,
+          "EXPANSION": 2582
         },
         "session": {
-          "asian": 24310,
-          "london": 22833,
-          "ny": 40112
+          "asian": 11850,
+          "london": 11114,
+          "ny": 15063
         },
         "verdictStateLag20": {
-          "CHOPPY": 55744,
-          "EFFICIENT": 13064
+          "CHOPPY": 24704,
+          "EFFICIENT": 5209
         },
         "lagFourState": {
-          "WHIPSAW": 10899,
-          "QUIET": 44845,
-          "EXPANSION": 4498,
-          "GRIND": 8566
+          "WHIPSAW": 5239,
+          "QUIET": 19465,
+          "EXPANSION": 2060,
+          "GRIND": 3149
         }
       }
     },
@@ -1484,39 +2409,39 @@
       "family": "osc-fade",
       "strengthState": "CHOPPY",
       "weaknessState": "EFFICIENT",
-      "strengthExpectedN": 23637,
-      "weaknessExpectedN": 6952,
-      "strengthShare": 0.5843,
-      "totalDevSignals": 40452,
+      "strengthExpectedN": 12321,
+      "weaknessExpectedN": 4252,
+      "strengthShare": 0.5541,
+      "totalDevSignals": 22236,
       "buckets": {
         "side": {
-          "long": 20050,
-          "short": 20402
+          "long": 11159,
+          "short": 11077
         },
         "verdictState": {
-          "EFFICIENT": 6952,
-          "CHOPPY": 23637
+          "EFFICIENT": 4252,
+          "CHOPPY": 12321
         },
         "fourState": {
-          "EXPANSION": 2529,
-          "WHIPSAW": 4136,
-          "QUIET": 19501,
-          "GRIND": 4423
+          "EXPANSION": 1607,
+          "WHIPSAW": 2164,
+          "QUIET": 10157,
+          "GRIND": 2645
         },
         "session": {
-          "asian": 15627,
-          "ny": 14104,
-          "london": 10721
+          "asian": 8374,
+          "ny": 7991,
+          "london": 5871
         },
         "verdictStateLag20": {
-          "CHOPPY": 25070,
-          "EFFICIENT": 6104
+          "CHOPPY": 13843,
+          "EFFICIENT": 3358
         },
         "lagFourState": {
-          "QUIET": 19155,
-          "WHIPSAW": 5915,
-          "EXPANSION": 2663,
-          "GRIND": 3441
+          "QUIET": 10704,
+          "WHIPSAW": 3139,
+          "EXPANSION": 1449,
+          "GRIND": 1909
         }
       }
     },
@@ -1672,22 +2597,6 @@
       "kind": "weakness",
       "verdictState": "CHOPPY",
       "expectedN": 5565,
-      "structurallyThin": false
-    },
-    {
-      "cardId": "dual-thrust",
-      "family": "channel-breakout",
-      "kind": "strength",
-      "verdictState": "EFFICIENT",
-      "expectedN": 12507,
-      "structurallyThin": false
-    },
-    {
-      "cardId": "dual-thrust",
-      "family": "channel-breakout",
-      "kind": "weakness",
-      "verdictState": "CHOPPY",
-      "expectedN": 22711,
       "structurallyThin": false
     },
     {
@@ -1963,22 +2872,6 @@
       "structurallyThin": false
     },
     {
-      "cardId": "stochastic-14-fade",
-      "family": "osc-fade",
-      "kind": "strength",
-      "verdictState": "CHOPPY",
-      "expectedN": 11316,
-      "structurallyThin": false
-    },
-    {
-      "cardId": "stochastic-14-fade",
-      "family": "osc-fade",
-      "kind": "weakness",
-      "verdictState": "EFFICIENT",
-      "expectedN": 2700,
-      "structurallyThin": false
-    },
-    {
       "cardId": "engulfing",
       "family": "candlestick-reversal",
       "kind": "strength",
@@ -2033,14 +2926,14 @@
       "family": "channel-breakout",
       "kind": "strength",
       "verdictState": "EFFICIENT",
-      "expectedN": 20264,
+      "expectedN": 7757,
       "structurallyThin": false
     },
     {
       "family": "channel-breakout",
       "kind": "weakness",
       "verdictState": "CHOPPY",
-      "expectedN": 42588,
+      "expectedN": 19877,
       "structurallyThin": false
     },
     {
@@ -2089,14 +2982,14 @@
       "family": "osc-fade",
       "kind": "strength",
       "verdictState": "CHOPPY",
-      "expectedN": 23637,
+      "expectedN": 12321,
       "structurallyThin": false
     },
     {
       "family": "osc-fade",
       "kind": "weakness",
       "verdictState": "EFFICIENT",
-      "expectedN": 6952,
+      "expectedN": 4252,
       "structurallyThin": false
     },
     {
@@ -2146,7 +3039,7 @@
   "structurallyThinSummary": {
     "thinCellCount": 0,
     "thinFamilyCellCount": 0,
-    "totalCells": 48,
+    "totalCells": 44,
     "totalFamilyCells": 16,
     "familiesWithAnyTestableCell": [
       "channel-breakout",

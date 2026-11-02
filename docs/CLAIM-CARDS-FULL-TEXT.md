@@ -1,8 +1,8 @@
-# Claim cards — FULL TEXT (all 24, in TEST_ORDER)
+# Claim cards — FULL TEXT (all 22, in TEST_ORDER)
 
-**Generated:** 2026-10-27T14:04:37.624Z
+**Generated:** 2026-11-02T09:02:50.332Z
 **Card status:** `DRAFT` — NOT FROZEN. NOT TESTED.
-**Cards:** 24 | **Families:** 8 | **Prior false fraction:** 0.8
+**Cards:** 22 | **Families:** 8 | **Prior false fraction:** 0.8
 **Order:** EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.
 **Verdict states:** EFFICIENT / CHOPPY — EFFICIENT = EXPANSION+GRIND (ER >= 0.35), CHOPPY = WHIPSAW+QUIET.
 
@@ -69,13 +69,11 @@ author or year is invented. A family with no openable criticism is marked as suc
 
 ## Card relations (near-duplicates and mirror images)
 
-Within-family pairs: 24 (11 near-duplicate, 1 mirror-image, 12 related).
+Within-family pairs: 20 (9 near-duplicate, 1 mirror-image, 10 related).
 
 | Type | Pair | Family | Why |
 | ---- | ---- | ------ | --- |
 | NEAR_DUPLICATE | `donchian-20` / `donchian-55` | channel-breakout | same Donchian rule, 20 vs 55-bar lookback |
-| RELATED | `donchian-20` / `dual-thrust` | channel-breakout | both range breakouts, different range definition |
-| RELATED | `donchian-55` / `dual-thrust` | channel-breakout | both range breakouts, different range definition |
 | NEAR_DUPLICATE | `sma-20-50` / `macd-cross` | ma-cross | MACD is an EMA crossover of the same family |
 | NEAR_DUPLICATE | `sma-20-50` / `ichimoku-tk` | ma-cross | both two-moving-average crosses |
 | NEAR_DUPLICATE | `macd-cross` / `ichimoku-tk` | ma-cross | both EMA-based crosses |
@@ -86,8 +84,6 @@ Within-family pairs: 24 (11 near-duplicate, 1 mirror-image, 12 related).
 | RELATED | `pdh-retest` / `classic-pivot` | level-retest | both retest a reference level |
 | RELATED | `pdl-retest` / `classic-pivot` | level-retest | both retest a reference level |
 | NEAR_DUPLICATE | `rsi-14-30-70` / `williams-r-fade` | osc-fade | Williams %R is a normalised stochastic/RSI-family oscillator |
-| NEAR_DUPLICATE | `rsi-14-30-70` / `stochastic-14-fade` | osc-fade | both 14-period bounded oscillators with 30/70-style extremes |
-| NEAR_DUPLICATE | `williams-r-fade` / `stochastic-14-fade` | osc-fade | Williams %R is a linear transform of the raw stochastic |
 | NEAR_DUPLICATE | `bollinger-20-2` / `keltner-20-atr` | band-reversion | both 20-bar envelope fades, sigma vs ATR width |
 | RELATED | `bollinger-20-2` / `bb-squeeze-fade` | band-reversion | both Bollinger-based, different trigger (band vs squeeze) |
 | RELATED | `keltner-20-atr` / `bb-squeeze-fade` | band-reversion | envelope fade vs volatility-squeeze fade |
@@ -110,28 +106,26 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | -: | -- | ------ | ---: | -------: | -------------- | -------------- | ------------------- |
 | 1 | `donchian-20` | channel-breakout | 1 | 1 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
 | 2 | `donchian-55` | channel-breakout | 1 | 2 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
-| 3 | `dual-thrust` | channel-breakout | 1 | 3 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
-| 4 | `sma-20-50` | ma-cross | 1 | 4 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 5 | `macd-cross` | ma-cross | 1 | 5 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 6 | `ichimoku-tk` | ma-cross | 1 | 6 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 7 | `atr-squeeze-break` | vol-compression | 1 | 22 | CHOPPY | EFFICIENT | EXPANSION / WHIPSAW |
-| 8 | `nr7-break` | vol-compression | 1 | 23 | CHOPPY | EFFICIENT | EXPANSION / WHIPSAW |
-| 9 | `inside-bar-break` | vol-compression | 1 | 24 | CHOPPY | EFFICIENT | EXPANSION / QUIET |
-| 10 | `asian-range-break` | opening-range | 2 | 7 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
-| 11 | `london-orb-30` | opening-range | 2 | 8 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
-| 12 | `pdh-pdl-break` | opening-range | 2 | 9 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
-| 13 | `bollinger-20-2` | band-reversion | 2 | 16 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 14 | `keltner-20-atr` | band-reversion | 2 | 17 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 15 | `bb-squeeze-fade` | band-reversion | 2 | 18 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 16 | `pdh-retest` | level-retest | 3 | 10 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 17 | `pdl-retest` | level-retest | 3 | 11 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 18 | `classic-pivot` | level-retest | 3 | 12 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
-| 19 | `rsi-14-30-70` | osc-fade | 3 | 13 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 20 | `williams-r-fade` | osc-fade | 3 | 14 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 21 | `stochastic-14-fade` | osc-fade | 3 | 15 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 22 | `engulfing` | candlestick-reversal | 4 | 19 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 23 | `morning-evening-star` | candlestick-reversal | 4 | 20 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
-| 24 | `three-soldiers-crows` | candlestick-reversal | 4 | 21 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 3 | `sma-20-50` | ma-cross | 1 | 3 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 4 | `macd-cross` | ma-cross | 1 | 4 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 5 | `ichimoku-tk` | ma-cross | 1 | 5 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 6 | `atr-squeeze-break` | vol-compression | 1 | 20 | CHOPPY | EFFICIENT | EXPANSION / WHIPSAW |
+| 7 | `nr7-break` | vol-compression | 1 | 21 | CHOPPY | EFFICIENT | EXPANSION / WHIPSAW |
+| 8 | `inside-bar-break` | vol-compression | 1 | 22 | CHOPPY | EFFICIENT | EXPANSION / QUIET |
+| 9 | `asian-range-break` | opening-range | 2 | 6 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
+| 10 | `london-orb-30` | opening-range | 2 | 7 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
+| 11 | `pdh-pdl-break` | opening-range | 2 | 8 | EFFICIENT | CHOPPY | EXPANSION / QUIET |
+| 12 | `bollinger-20-2` | band-reversion | 2 | 14 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 13 | `keltner-20-atr` | band-reversion | 2 | 15 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 14 | `bb-squeeze-fade` | band-reversion | 2 | 16 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 15 | `pdh-retest` | level-retest | 3 | 9 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 16 | `pdl-retest` | level-retest | 3 | 10 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 17 | `classic-pivot` | level-retest | 3 | 11 | EFFICIENT | CHOPPY | GRIND / WHIPSAW |
+| 18 | `rsi-14-30-70` | osc-fade | 3 | 12 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 19 | `williams-r-fade` | osc-fade | 3 | 13 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 20 | `engulfing` | candlestick-reversal | 4 | 17 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 21 | `morning-evening-star` | candlestick-reversal | 4 | 18 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
+| 22 | `three-soldiers-crows` | candlestick-reversal | 4 | 19 | CHOPPY | EFFICIENT | QUIET / EXPANSION |
 
 ---
 
@@ -139,7 +133,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 1 of 24 (original index 0) |
+| **Test order** | 1 of 22 (original index 0) |
 | **ID** | `donchian-20` |
 | **Family** | channel-breakout |
 | **Variant** | Donchian 20-bar high/low break |
@@ -195,7 +189,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 2 of 24 (original index 1) |
+| **Test order** | 2 of 22 (original index 1) |
 | **ID** | `donchian-55` |
 | **Family** | channel-breakout |
 | **Variant** | Donchian 55-bar high/low break |
@@ -247,67 +241,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 3. `dual-thrust`
+## 3. `sma-20-50`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 3 of 24 (original index 2) |
-| **ID** | `dual-thrust` |
-| **Family** | channel-breakout |
-| **Variant** | Dual Thrust opening range break |
-| **Evidence grade** | PEER_REVIEWED_TEST |
-| **Empirical study** | Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764. |
-| **Study full URL** | http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf |
-| **What the study tests** | trading range break (channel/resistance-support breakout) rules on DJIA 1897-1986 |
-| **Study finding** | in-sample support; later work (Sullivan, Timmermann & White 1999) warns of data-snooping |
-| **Strongest criticism** | Sullivan, R., Timmermann, A. & White, H. (1999). Data-Snooping, Technical Trading Rule Performance, and the Bootstrap. Journal of Finance 54(5), 1647-1691. |
-| **Criticism URL** | https://www.kevinsheppard.com/files/teaching/mfe/advanced-econometrics/Sullivan_Timmermann_White.pdf |
-| **Criticism status** | VERIFIED (opened 2026-10-27) |
-| **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 3 (frozen numeric, decision #10) |
-| **Trade direction** | both (decision #11) |
-| **Session restriction** | none (all sessions) |
-| **Status** | DRAFT (approvedBy: null, approvedAt: null) |
-| **Exit caveat** | none |
-
-**STRENGTH claim**
-
-- Verdict state: **EFFICIENT** (DECIDES the verdict)
-- Four Map states in this cell (diagnostics): EXPANSION, GRIND
-- Textbook four-state label (diagnostic): EXPANSION
-- Direction: +1 (expect POSITIVE net R)
-- Claim: positive net R in EFFICIENT
-
-**WEAKNESS claim**
-
-- Verdict state: **CHOPPY** (the other one)
-- Four Map states in this cell (diagnostics): WHIPSAW, QUIET
-- Textbook four-state label (diagnostic): QUIET
-- Direction: -1 (expect NEGATIVE net R)
-- Claim: negative net R in CHOPPY
-
-**Rationale (as written, pre-results)**
-
-> Uses the prior day's range to set a breakout band; needs volatility expansion to travel beyond the band.
-
-**Source(s)**
-
-- Dual Thrust (Chalek)
-- Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764.
-- http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf
-
-**Review fields (leave blank until the human freeze)**
-
-- Reviewer decision: _keep / edit / remove — `_
-- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
-
----
-
-## 4. `sma-20-50`
-
-| Field | Value |
-| ----- | ----- |
-| **Test order** | 4 of 24 (original index 3) |
+| **Test order** | 3 of 22 (original index 2) |
 | **ID** | `sma-20-50` |
 | **Family** | ma-cross |
 | **Variant** | SMA20 x SMA50 crossover |
@@ -320,7 +258,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 4 (frozen numeric, decision #10) |
+| **Priority** | 3 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -359,11 +297,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 5. `macd-cross`
+## 4. `macd-cross`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 5 of 24 (original index 4) |
+| **Test order** | 4 of 22 (original index 3) |
 | **ID** | `macd-cross` |
 | **Family** | ma-cross |
 | **Variant** | MACD signal-line cross |
@@ -376,7 +314,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 5 (frozen numeric, decision #10) |
+| **Priority** | 4 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -415,11 +353,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 6. `ichimoku-tk`
+## 5. `ichimoku-tk`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 6 of 24 (original index 5) |
+| **Test order** | 5 of 22 (original index 4) |
 | **ID** | `ichimoku-tk` |
 | **Family** | ma-cross |
 | **Variant** | Ichimoku Tenkan/Kijun cross |
@@ -432,7 +370,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://www.cs.montana.edu/courses/spring2007/536/materials/Lopez/genetic.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 6 (frozen numeric, decision #10) |
+| **Priority** | 5 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -471,11 +409,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 7. `atr-squeeze-break`
+## 6. `atr-squeeze-break`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 7 of 24 (original index 21) |
+| **Test order** | 6 of 22 (original index 19) |
 | **ID** | `atr-squeeze-break` |
 | **Family** | vol-compression |
 | **Variant** | ATR-squeeze breakout |
@@ -488,7 +426,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 22 (frozen numeric, decision #10) |
+| **Priority** | 20 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -527,11 +465,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 8. `nr7-break`
+## 7. `nr7-break`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 8 of 24 (original index 22) |
+| **Test order** | 7 of 22 (original index 20) |
 | **ID** | `nr7-break` |
 | **Family** | vol-compression |
 | **Variant** | NR7 narrowest-range breakout |
@@ -544,7 +482,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 23 (frozen numeric, decision #10) |
+| **Priority** | 21 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -583,11 +521,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 9. `inside-bar-break`
+## 8. `inside-bar-break`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 9 of 24 (original index 23) |
+| **Test order** | 8 of 22 (original index 21) |
 | **ID** | `inside-bar-break` |
 | **Family** | vol-compression |
 | **Variant** | Inside-bar break |
@@ -600,7 +538,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://statoasis.com/overfit/research/unveiling-toby-crabel-s-up-down-thrust-trading-patterns |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 1 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 24 (frozen numeric, decision #10) |
+| **Priority** | 22 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -639,11 +577,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 10. `asian-range-break`
+## 9. `asian-range-break`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 10 of 24 (original index 6) |
+| **Test order** | 9 of 22 (original index 5) |
 | **ID** | `asian-range-break` |
 | **Family** | opening-range |
 | **Variant** | Asian-session range breakout |
@@ -656,7 +594,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 7 (frozen numeric, decision #10) |
+| **Priority** | 6 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | london |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -695,11 +633,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 11. `london-orb-30`
+## 10. `london-orb-30`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 11 of 24 (original index 7) |
+| **Test order** | 10 of 22 (original index 6) |
 | **ID** | `london-orb-30` |
 | **Family** | opening-range |
 | **Variant** | London first-30m ORB |
@@ -712,7 +650,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 8 (frozen numeric, decision #10) |
+| **Priority** | 7 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | london |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -751,11 +689,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 12. `pdh-pdl-break`
+## 11. `pdh-pdl-break`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 12 of 24 (original index 8) |
+| **Test order** | 11 of 22 (original index 7) |
 | **ID** | `pdh-pdl-break` |
 | **Family** | opening-range |
 | **Variant** | Prior-day high/low break |
@@ -768,7 +706,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7428398 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 9 (frozen numeric, decision #10) |
+| **Priority** | 8 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -807,11 +745,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 13. `bollinger-20-2`
+## 12. `bollinger-20-2`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 13 of 24 (original index 15) |
+| **Test order** | 12 of 22 (original index 13) |
 | **ID** | `bollinger-20-2` |
 | **Family** | band-reversion |
 | **Variant** | Bollinger 20/2 band fade |
@@ -824,7 +762,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 16 (frozen numeric, decision #10) |
+| **Priority** | 14 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -863,11 +801,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 14. `keltner-20-atr`
+## 13. `keltner-20-atr`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 14 of 24 (original index 16) |
+| **Test order** | 13 of 22 (original index 14) |
 | **ID** | `keltner-20-atr` |
 | **Family** | band-reversion |
 | **Variant** | Keltner 20/ATR band fade |
@@ -880,7 +818,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 17 (frozen numeric, decision #10) |
+| **Priority** | 15 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -919,11 +857,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 15. `bb-squeeze-fade`
+## 14. `bb-squeeze-fade`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 15 of 24 (original index 17) |
+| **Test order** | 14 of 22 (original index 15) |
 | **ID** | `bb-squeeze-fade` |
 | **Family** | band-reversion |
 | **Variant** | Bollinger squeeze fade |
@@ -936,7 +874,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://acfr.aut.ac.nz/__data/assets/pdf_file/0007/29896/100009-Popularity-vs-Profitability-BB-August-Final.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 2 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 18 (frozen numeric, decision #10) |
+| **Priority** | 16 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -975,11 +913,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 16. `pdh-retest`
+## 15. `pdh-retest`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 16 of 24 (original index 9) |
+| **Test order** | 15 of 22 (original index 8) |
 | **ID** | `pdh-retest` |
 | **Family** | level-retest |
 | **Variant** | Prior-day high retest long |
@@ -992,7 +930,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 10 (frozen numeric, decision #10) |
+| **Priority** | 9 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1031,11 +969,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 17. `pdl-retest`
+## 16. `pdl-retest`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 17 of 24 (original index 10) |
+| **Test order** | 16 of 22 (original index 9) |
 | **ID** | `pdl-retest` |
 | **Family** | level-retest |
 | **Variant** | Prior-day low retest short |
@@ -1048,7 +986,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 11 (frozen numeric, decision #10) |
+| **Priority** | 10 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1087,11 +1025,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 18. `classic-pivot`
+## 17. `classic-pivot`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 18 of 24 (original index 11) |
+| **Test order** | 17 of 22 (original index 10) |
 | **ID** | `classic-pivot` |
 | **Family** | level-retest |
 | **Variant** | Classic floor-pivot bounce |
@@ -1104,7 +1042,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | http://support-and-resistance.technicalanalysis.org.uk/Curcio-etal1997.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 12 (frozen numeric, decision #10) |
+| **Priority** | 11 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1143,11 +1081,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 19. `rsi-14-30-70`
+## 18. `rsi-14-30-70`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 19 of 24 (original index 12) |
+| **Test order** | 18 of 22 (original index 11) |
 | **ID** | `rsi-14-30-70` |
 | **Family** | osc-fade |
 | **Variant** | RSI14 fade at 30/70 |
@@ -1160,7 +1098,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 13 (frozen numeric, decision #10) |
+| **Priority** | 12 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1199,11 +1137,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 20. `williams-r-fade`
+## 19. `williams-r-fade`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 20 of 24 (original index 13) |
+| **Test order** | 19 of 22 (original index 12) |
 | **ID** | `williams-r-fade` |
 | **Family** | osc-fade |
 | **Variant** | Williams %R extreme fade |
@@ -1216,7 +1154,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 14 (frozen numeric, decision #10) |
+| **Priority** | 13 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1255,67 +1193,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 21. `stochastic-14-fade`
+## 20. `engulfing`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 21 of 24 (original index 14) |
-| **ID** | `stochastic-14-fade` |
-| **Family** | osc-fade |
-| **Variant** | Stochastic 14 extreme fade |
-| **Evidence grade** | PEER_REVIEWED_TEST |
-| **Empirical study** | Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149. |
-| **Study full URL** | https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf |
-| **What the study tests** | RSI(14,30/70) and RSI(21,50) oscillator rules on five OECD indices 1976-2002 |
-| **Study finding** | RSI(14,30/70) profitable on DJIA but not consistently across markets |
-| **Strongest criticism** | Muruganandan, S. (2020). Testing the profitability of technical trading rules across market cycles: Evidence from India. Colombo Business Journal 11(1), 24-46. |
-| **Criticism URL** | https://mgmt.cmb.ac.lk/cbj/wp-content/uploads/2020/06/2.-Technical-trading-rules.pdf |
-| **Criticism status** | VERIFIED (opened 2026-10-27) |
-| **Frozen order rank** | 3 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 15 (frozen numeric, decision #10) |
-| **Trade direction** | both (decision #11) |
-| **Session restriction** | none (all sessions) |
-| **Status** | DRAFT (approvedBy: null, approvedAt: null) |
-| **Exit caveat** | under the standard exit (1.5 ATR stop, 2R target) only |
-
-**STRENGTH claim**
-
-- Verdict state: **CHOPPY** (DECIDES the verdict)
-- Four Map states in this cell (diagnostics): WHIPSAW, QUIET
-- Textbook four-state label (diagnostic): QUIET
-- Direction: +1 (expect POSITIVE net R)
-- Claim: positive net R in CHOPPY
-
-**WEAKNESS claim**
-
-- Verdict state: **EFFICIENT** (the other one)
-- Four Map states in this cell (diagnostics): EXPANSION, GRIND
-- Textbook four-state label (diagnostic): EXPANSION
-- Direction: -1 (expect NEGATIVE net R)
-- Claim: negative net R in EFFICIENT
-
-**Rationale (as written, pre-results)**
-
-> Stochastic extremes signal exhaustion in a range but persist during a directional expansion.
-
-**Source(s)**
-
-- Lane, Stochastic
-- Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149.
-- https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf
-
-**Review fields (leave blank until the human freeze)**
-
-- Reviewer decision: _keep / edit / remove — `_
-- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
-
----
-
-## 22. `engulfing`
-
-| Field | Value |
-| ----- | ----- |
-| **Test order** | 22 of 24 (original index 18) |
+| **Test order** | 20 of 22 (original index 16) |
 | **ID** | `engulfing` |
 | **Family** | candlestick-reversal |
 | **Variant** | Bull/bear engulfing reversal |
@@ -1328,7 +1210,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 19 (frozen numeric, decision #10) |
+| **Priority** | 17 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1367,11 +1249,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 23. `morning-evening-star`
+## 21. `morning-evening-star`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 23 of 24 (original index 19) |
+| **Test order** | 21 of 22 (original index 17) |
 | **ID** | `morning-evening-star` |
 | **Family** | candlestick-reversal |
 | **Variant** | Morning/evening star |
@@ -1384,7 +1266,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 20 (frozen numeric, decision #10) |
+| **Priority** | 18 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |
@@ -1423,11 +1305,11 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ---
 
-## 24. `three-soldiers-crows`
+## 22. `three-soldiers-crows`
 
 | Field | Value |
 | ----- | ----- |
-| **Test order** | 24 of 24 (original index 20) |
+| **Test order** | 22 of 22 (original index 18) |
 | **ID** | `three-soldiers-crows` |
 | **Family** | candlestick-reversal |
 | **Variant** | Three white soldiers / black crows fade |
@@ -1440,7 +1322,7 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 | **Criticism URL** | https://link.springer.com/article/10.1007/s11156-007-0068-1 |
 | **Criticism status** | VERIFIED (opened 2026-10-27) |
 | **Frozen order rank** | 4 (diagnostic only; NOT an evidence claim) |
-| **Priority** | 21 (frozen numeric, decision #10) |
+| **Priority** | 19 (frozen numeric, decision #10) |
 | **Trade direction** | both (decision #11) |
 | **Session restriction** | none (all sessions) |
 | **Status** | DRAFT (approvedBy: null, approvedAt: null) |

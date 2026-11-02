@@ -2,7 +2,7 @@
 /**
  * G0 AMENDMENT 4 TASK 2 — SIGNAL COUNTS ON DEV (no outcomes).
  *
- * Runs the 24 entry-signal functions (lib/signals.mjs) on the DEV window and
+ * Runs the 22 current entry-signal functions (lib/signals.mjs) on the DEV window and
  * counts, per card and per family: signals by side, by verdict state, by the
  * four Map states, by session, and by the verdict state 20 bars BEFORE the
  * signal (a diagnostic only). It also reports the share of each family's
@@ -86,10 +86,11 @@ const SESSIONS = ["asian", "london", "ny"];
 const DEV_IDX = new Set();
 for (let i = 0; i < bars.length; i++) if (roles[i] === "DEV") DEV_IDX.add(i);
 const devBars = DEV_IDX.size;
+const devDays = [...new Set([...DEV_IDX].map((i) => bars[i].datetime.slice(0, 10)))].sort();
 
 const signalStates = states.map((s) => (s && STATES.includes(s) ? s : null));
 
-// Run all 24 signals once, keeping every emitted row.
+// Run all 22 signals once, keeping every emitted row.
 const perCard = {};
 for (const id of FROZEN_TEST_SEQUENCE) {
   perCard[id] = emitSignals(bars, id, { states: signalStates });
@@ -123,6 +124,14 @@ const cardRows = FROZEN_TEST_SEQUENCE.map((id) => {
   const c = CLAIM_CARDS.find((x) => x.id === id);
   const rows = perCard[id];
   const devRows = rows.filter((r) => DEV_IDX.has(r.index));
+  const dayCounts = new Map(devDays.map((day) => [day, 0]));
+  for (const r of devRows) {
+    const day = bars[r.index].datetime.slice(0, 10);
+    dayCounts.set(day, (dayCounts.get(day) ?? 0) + 1);
+  }
+  const dayRows = [...dayCounts].map(([date, count]) => ({ date, count }));
+  const busiestDevDays = [...dayRows].sort((a, b) => b.count - a.count || a.date.localeCompare(b.date)).slice(0, 5);
+  const quietestActiveDevDays = dayRows.filter((x) => x.count > 0).sort((a, b) => a.count - b.count || a.date.localeCompare(b.date)).slice(0, 5);
   return {
     cardId: id,
     family: c.family,
@@ -138,6 +147,11 @@ const cardRows = FROZEN_TEST_SEQUENCE.map((id) => {
     parametersString: paramsToString(id),
     allSignals: rows.length,
     devSignals: devRows.length,
+    signalsPerDevDay: +(devRows.length / devDays.length).toFixed(5),
+    devCalendarDays: devDays.length,
+    zeroSignalDevDays: dayRows.filter((x) => x.count === 0).length,
+    busiestDevDays,
+    quietestActiveDevDays,
     buckets: bucket(rows),
     // expected n per claim half, measured on DEV bars in that verdict state
     strengthExpectedN: devRows.filter((r) => r.verdictState === c.strength.state).length,
@@ -218,7 +232,7 @@ for (const id of FROZEN_TEST_SEQUENCE) {
 const report = {
   generatedAt: new Date().toISOString(),
   purpose:
-    "G0 Amendment 4 task 2: signal counts on DEV for the 24 entry-signal functions. NO outcomes, NO exits, NO R.",
+    "G0 Amendment 6: signal counts on DEV for the 22 remaining entry-signal functions. NO outcomes, NO exits, NO R.",
   decidedBeforeResults: true,
   noStrategyOutcomesUsed: true,
   inputs: {

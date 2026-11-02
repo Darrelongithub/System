@@ -82,7 +82,7 @@ const M = (a) => a.reduce((x, y) => x + y, 0) / (a.length || 1);
 /**
  * Memo caches for the O(n) indicator series. Each card recomputes a series it
  * needs, and several cards need the same ATR(14) series — caching keeps the
- * whole 24-card run linear instead of quadratic.
+ * whole 22-card run linear instead of quadratic.
  */
 const SERIES_CACHE = new Map();
 function cached(key, fn) {
@@ -193,33 +193,6 @@ function williamsRSeries(bars, p) {
     out[i] = ((hi - bars[i].c) / (hi - lo)) * 100 - 100;
   }
   return out;
-}
-function stochSeries(bars, p, kSmooth, dSmooth) {
-  const n = bars.length;
-  const raw = new Array(n).fill(NaN);
-  for (let i = 0; i < n; i++) {
-    if (i < p - 1) continue;
-    const hi = roll(bars, i, p, (b) => b.h);
-    const lo = rollMin(bars, i, p, (b) => b.l);
-    if (hi - lo <= 0) continue;
-    raw[i] = ((bars[i].c - lo) / (hi - lo)) * 100;
-  }
-  const k = new Array(n).fill(NaN);
-  for (let i = 0; i < n; i++) if (Number.isFinite(raw[i])) k[i] = smaOfRaw(raw, i, kSmooth);
-  const d = new Array(n).fill(NaN);
-  for (let i = 0; i < n; i++) if (Number.isFinite(k[i])) d[i] = smaOfRaw(k, i, dSmooth);
-  return { k, d };
-}
-function smaOfRaw(arr, i, p) {
-  const lo = Math.max(0, i - p + 1);
-  let n = 0, s = 0;
-  for (let j = lo; j <= i; j++) {
-    if (Number.isFinite(arr[j])) {
-      s += arr[j];
-      n++;
-    }
-  }
-  return n ? s / n : NaN;
 }
 function bandsSeries(bars, period, numerStd) {
   const n = bars.length;
@@ -373,16 +346,6 @@ const SIGNAL_EVALUATORS = Object.freeze({
   // --- F1 channel breakout -------------------------------------------------
   "donchian-20": channelBreakout,
   "donchian-55": channelBreakout,
-  "dual-thrust": (bars, p, { lo, hi, priorDay, push }) => {
-    for (let i = Math.max(lo, 2); i < hi; i++) {
-      const prev = priorDay[i];
-      if (!prev || !Number.isFinite(prev.hi) || !Number.isFinite(prev.lo)) continue;
-      const range = Math.abs(prev.hi - prev.open) + Math.abs(prev.open - prev.lo);
-      const band = p.k * range;
-      if (bars[i].h > prev.hi + band) push(i, "long");
-      else if (bars[i].l < prev.lo - band) push(i, "short");
-    }
-  },
   // --- F2 moving averages -------------------------------------------------
   "sma-20-50": crossoverSma,
   "macd-cross": (bars, p, { lo, hi, push }) => {
@@ -525,14 +488,6 @@ const SIGNAL_EVALUATORS = Object.freeze({
       if (!Number.isFinite(wr[i]) || !Number.isFinite(wr[i - 1])) continue;
       if (wr[i - 1] <= p.oversold && wr[i] > p.oversold) push(i, "long");
       else if (wr[i - 1] >= p.overbought && wr[i] < p.overbought) push(i, "short");
-    }
-  },
-  "stochastic-14-fade": (bars, p, { lo, hi, push }) => {
-    const { k, d } = stochSeries(bars, p.period, p.kSmooth, p.dSmooth);
-    for (let i = Math.max(lo, p.period + p.dSmooth + 1); i < hi; i++) {
-      if (!Number.isFinite(k[i]) || !Number.isFinite(d[i]) || !Number.isFinite(k[i - 1])) continue;
-      if (k[i - 1] <= p.low && k[i] > p.low) push(i, "long");
-      else if (k[i - 1] >= p.high && k[i] < p.high) push(i, "short");
     }
   },
   // --- F6 band reversion -------------------------------------------------
@@ -725,7 +680,7 @@ function sessionRangeBreak(bars, p, { lo, hi, sessionArr, dayArr, push }) {
   }
 }
 
-/** All 24 ids, in the frozen TEST_ORDER sequence. */
+/** All current ids, in the A6 deletion-only TEST_ORDER sequence. */
 export function signalCardIds() {
   return Object.keys(SIGNAL_EVALUATORS);
 }
@@ -734,12 +689,12 @@ export function signalCardIds() {
 export function signalLibrarySelfCheck() {
   const errors = [];
   const ids = signalCardIds();
-  if (ids.length !== 24) errors.push(`expected 24 signal evaluators, got ${ids.length}`);
+  if (ids.length !== 22) errors.push(`expected 22 signal evaluators, got ${ids.length}`);
   for (const id of ids) {
     if (!SIGNAL_PARAMS[id]) errors.push(`${id}: no parameters`);
     if (!SIGNAL_EVALUATORS[id]) errors.push(`${id}: no evaluator`);
   }
-  if (Object.keys(SIGNAL_PARAMS).length !== 24)
+  if (Object.keys(SIGNAL_PARAMS).length !== 22)
     errors.push(`parameter registry has ${Object.keys(SIGNAL_PARAMS).length} entries`);
   return errors;
 }

@@ -3,9 +3,15 @@
 **Status: DRAFT. No claim has been tested on real data.**
 **Updated 2026-10-26 with the G0 review amendments — see "What changed" below.**
 
+> **CURRENT OWNER-APPROVED A6 UPDATE (2026-11-02):** the current DRAFT battery
+> contains 22 cards after deleting only `dual-thrust` and `stochastic-14-fade`;
+> see `docs/CLAIM-CARDS-FULL-TEXT.md`, `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`
+> and `docs/G0-AMENDMENT-6-REPORT.md`. This older review table below remains a
+> historical 24-card view. No result was inspected and no card is frozen.
+>
 > **SUPERSEDED IN PART BY G0 AMENDMENTS 2 AND 3 (2026-10-27).** The per-card
 > four-state tables and evidence tiers below are a v1.1-era view. The CURRENT
-> review dump is `docs/CLAIM-CARDS-FULL-TEXT.md` (all 24 cards in full, with
+> review dump is `docs/CLAIM-CARDS-FULL-TEXT.md` (the current 22 cards in full, with
 > **verdict states EFFICIENT/CHOPPY**, opened empirical-study URLs, card
 > relations and the standard-exit caveat). Verdicts are now decided on TWO
 > verdict states; four Map states are diagnostics. The subjective 1–4 tiers
