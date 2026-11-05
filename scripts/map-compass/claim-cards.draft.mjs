@@ -1,11 +1,11 @@
 /**
- * M4/M6 — CLAIM CARDS (DRAFT).
+ * M4/M6 — CLAIM CARDS (FROZEN before outcomes by owner approval).
  *
- * STATUS: DRAFT. NOT FROZEN. NOT TESTED. (G0 Amendment 3 did NOT freeze them.)
+ * STATUS: FROZEN on 2026-11-05 by Darrel. NOT TESTED.
  *
- * Decision #13: "Draft, review, freeze before testing." This file is the
- * DRAFT. `verify-claims.mjs` REFUSES to run against DRAFT cards unless a
- * reviewer explicitly flips `status` to FROZEN and records the approval.
+ * Decision #13: "Draft, review, freeze before testing." This file records the
+ * unchanged card text and parameters plus the owner's approval. No strategy
+ * result exists at freeze time; execution remains gated by the staged pipeline.
  *
  * These are TEXTBOOK CLAIMS, not findings. They are written from the published
  * rationale for each strategy family, BEFORE looking at any result on our
@@ -15,7 +15,7 @@
  * dual-thrust and stochastic-14-fade (the latter is identical to Williams %R).
  * All other cards, states and parameters stay unchanged; priorities are
  * renumbered by deletion only; TEST_ORDER is the prior relative sequence with
- * those two IDs removed. The remaining 22 cards stay DRAFT.
+ * those two IDs removed. At that historical point, the remaining 22 cards stayed DRAFT.
  *
  * G0 AMENDMENT 7 (2026-11-02, owner-authorized before any result): DRAFT-only
  * signal corrections are recorded in the variant/rationale for
@@ -23,6 +23,10 @@
  * Signal evaluators separately adopt EAT clock-window ranges for Asian and
  * London ORB and prior-close PP for `classic-pivot`. No other card, state,
  * Map, cost, exit, frozen threshold, priority, or CONFIRMED rule changed.
+ *
+ * G0 AMENDMENT 8 (2026-11-05, owner-approved before any result): all 22
+ * surviving cards are FROZEN as-is; approvedBy=Darrel, approvedAt=2026-11-05.
+ * No card text, state, parameter, priority or order changed.
  *
  * G0 AMENDMENT 3 (2026-10-27, before any result) — VERDICT STATES:
  * strength/weakness `state` is now one of TWO verdict states, EFFICIENT or
@@ -51,14 +55,14 @@ import {
   EVIDENCE,
 } from "./frozen.mjs";
 
-export const CLAIM_CARD_STATUS = "DRAFT";
+export const CLAIM_CARD_STATUS = "FROZEN";
 
-/** Freeze metadata — filled in only by an explicit review step. */
+/** G0 Amendment 8 owner approval metadata; all card contents remain unchanged. */
 export const FREEZE = Object.freeze({
   status: CLAIM_CARD_STATUS,
-  approvedBy: null,
-  approvedAt: null,
-  note: "DRAFT only. Set status=FROZEN with approver + date after human review.",
+  approvedBy: "Darrel",
+  approvedAt: "2026-11-05",
+  note: "Owner approved all 22 existing cards unchanged before any strategy result (G0 Amendment 8).",
 });
 
 /**

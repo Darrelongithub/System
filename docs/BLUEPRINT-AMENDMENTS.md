@@ -7,9 +7,10 @@ and are never edited. A superseded decision is struck by a **later dated
 entry**, not by deleting the old text.
 
 **One invariant dominates this log:** *no amendment has been made after a real
-strategy result, because there has never been one.* Amendment 7 is pre-result;
-no strategy verification has run. Claim cards remain `DRAFT` and
-`verify-claims.mjs` refuses real verification.
+strategy result, because there has never been one.* Amendment 8 and the card
+freeze were recorded before any strategy outcome. At v1.7 cards were DRAFT;
+under v1.8 they are frozen by Darrel (2026-11-05), while implementation and
+synthetic dress rehearsal remain prerequisites to the one-time DEV run.
 
 ---
 
@@ -24,7 +25,8 @@ no strategy verification has run. Claim cards remain `DRAFT` and
 | **v1.4** | 2026-10-27 | `docs/BLUEPRINT-v1.4.md` | `4cc12d78266f120ddb9c80c7035ac3b134094309700d01d4adac3c9d3f0c435a` | superseded by v1.5; **preserved** |
 | **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | superseded by v1.6; **preserved** |
 | **v1.6** | 2026-11-02 | `docs/BLUEPRINT-v1.6.md` | `4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d` | superseded by v1.7; **preserved** |
-| **v1.7** | 2026-11-02 | `docs/BLUEPRINT-v1.7.md` | `1e3842da3412adfa1a32e562652e8f6b90f87e4819ce52afdb8d6ce0ef6e44f4` | current; `BLUEPRINT.md` byte-identical |
+| **v1.7** | 2026-11-02 | `docs/BLUEPRINT-v1.7.md` | `045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281` | superseded by v1.8; **preserved** |
+| **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | current; `BLUEPRINT.md` byte-identical |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -446,3 +448,57 @@ The verification diagnostic now tags `DRIFT_DEPENDENT` when year-matched excess 
 **Data and tests.** M1 and Map completed. Raw source pins: 76/76 Git blob SHA-1 matches; normalized outputs: 3/3 SHA-256 matches their data manifest. Map-validation remains deterministic/PASS, zero coverage problems. Focused A7 tests: 6/6 pass; the A6 regression group: 8/8 pass. Full suite: **399 passed, 1 failed**; its sole failure is the unchanged `synth UI` test expecting 28/32 D1 checks while the unchanged `src/pages/MapGenerator.tsx` correctly displays its recorded 26/32 result and the six failed hours. The test and UI files are unchanged from the base commit; this mismatch is unrelated to A7. No strategy verification was run.
 
 **Thresholds changed?** No. **Map/cost/exit changed?** No. **Cards frozen?** No. A7 report and pseudocode: `docs/G0-AMENDMENT-7-REPORT.md`; `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`.
+
+
+## H — G0 Amendment 8 (2026-11-05, before any strategy result)
+
+**Owner approval.** Darrel approved all 22 extant cards unchanged on
+2026-11-05: `approvedBy="Darrel"`, `approvedAt="2026-11-05"`,
+`status="FROZEN"`. No card was removed or edited; card text, states, parameters,
+priorities and order remain unchanged. No real strategy result existed.
+
+**v1.8 preservation.** `docs/BLUEPRINT-v1.8.md` is byte-identical to
+`BLUEPRINT.md`; its full SHA-256 is `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` (recorded in the version
+register and `artifacts/map-compass/blueprint-hashes.json`). v1.0–v1.7 remain
+preserved. The prior v1.7 hash entry in earlier reports is corrected here to
+the hash of the preserved snapshot: `045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281`.
+
+**Method 1 — DEV-only segments.** Non-DEV gaps split the data into four
+inclusive segments: 2004–2007, 2009–2011, 2013–2015, and 2017–2018. Recompute
+the unchanged Map rules per segment using only that segment's bars; signal
+indicators and warm-up also use that segment only. A claim or random-baseline
+entry is eligible only at local index ≥1,000 and with at least 96 bars after
+the entry inside the same segment. The entry year determines trade year. Each
+card has an independent unconditional one-slot book: all otherwise eligible
+signals may enter regardless of state; outcomes are reported by the verdict
+state at entry. Rebuild the matched random-entry control with the same
+segment boundaries, entry eligibility, frozen costs and exits. No Map feature,
+signal warm-up, baseline entry, or exit may read across a segment boundary. Old
+baseline, power and signal-count artifacts are retained as history and marked
+superseded for the A8 verification.
+
+**Method 2 — matched sweep.** ER grid `{0.25,0.30,0.35,0.40,0.45}` × ATR
+percentile grid `{60,65,70,75,80}` (25 cells). Re-bin card trades and the same
+common random-entry candidates, using deterministic seeds, under each pair;
+apply the unchanged CONFIRMED rule against the pair-matched baseline. Missing
+baseline means not CONFIRMED and never zero. The center (0.35,70) remains the
+authoritative verdict. Only a claim CONFIRMED at the center receives a
+sensitivity grade: share of 25 grid cells CONFIRMED; ROBUST ≥80%, FRAGILE ≥50%,
+otherwise DEFINITION_SENSITIVE. Other claims' sweep cells are informational.
+Verdict cells use the efficiency axis only; the volatility cutoff acts through
+the abstain band and 3-bar confirmation/hysteresis, not as another verdict
+axis. No threshold or CONFIRMED criterion changed.
+
+**Staged gates.** Stage 2 builds the producer, segmented Map/signals/control,
+sweep and unit tests (gap-free Map equivalence after warm-up; hole sentinel
+never read; hand-computed long/short, stop, target, time exit, gap-through, and
+slot-blocking cases; causality). Stage 2 prints segment/year bar counts,
+warm-up/tail losses, old-vs-segment Map agreement (report only), and identifies
+spread months in sealed years (cost-only). Stage 3 is a 60-world synthetic
+rehearsal with the exact preregistered three conditions and pass criteria; any
+failure blocks Stage 4. Stage 4 is one real DEV-only run, with no VAL, HOLDOUT,
+or STRESS outcomes; no rerun or post-result changes to cards, rules, states, or
+thresholds.
+
+**Threshold changed?** No. **Map/cost/exit changed?** No. **Any result existed?**
+No.

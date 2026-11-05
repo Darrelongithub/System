@@ -1,3 +1,5 @@
+> **Status update (2026-11-05):** G0 Amendment 8 records Darrel's approval of all 22 existing cards unchanged (`approvedBy=Darrel`, `approvedAt=2026-11-05`). This file is retained as the historical review checklist; no card text or parameters were edited at freeze.
+
 # Claim Cards — REVIEW REQUIRED (decision #13)
 
 **Status: DRAFT. No claim has been tested on real data.**

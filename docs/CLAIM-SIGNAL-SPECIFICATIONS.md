@@ -1,10 +1,10 @@
-# Signal specifications — all 22 DRAFT cards
+# Signal specifications — all 22 FROZEN cards
 
-**Status:** DRAFT; not frozen, not strategy-tested. Generated from signal-params.mjs, lib/signals.mjs, and claim cards.
+**Status:** FROZEN by Darrel on 2026-11-05; not strategy-tested. Generated from signal-params.mjs, lib/signals.mjs, and claim cards.
 **Common:** input bars are M30, EAT chronological order. Each evaluator emits a directional signal and attaches the Map verdict-state label; claim cells later partition those emissions into EFFICIENT/CHOPPY. All indicators are causal (no future bars). Evaluator uses bar high/low intrabar for range breaks and close crossings as stated below. No trade outcome, exit, cost or P&L is produced.
-**Important exactness caveats:** priorDayBars=48 is stored for PDH/PDL cards but not read by those evaluators; they instead use the previous contiguous date's observed bars. The A7 corrections use the EAT clock windows Asian 01:00–10:59 and London opening range 11:00–11:29, with breakout eligibility from 11:30. Several entryAt=close fields are metadata only: channel/range evaluators actually trigger from current high/low. This dump records actual current DRAFT code.
+**Important exactness caveats:** priorDayBars=48 is stored for PDH/PDL cards but not read by those evaluators; they instead use the previous contiguous date's observed bars. The A7 corrections use the EAT clock windows Asian 01:00–10:59 and London opening range 11:00–11:29, with breakout eligibility from 11:30. Several entryAt=close fields are metadata only: channel/range evaluators actually trigger from current high/low. This dump records actual pre-result signal code at freeze.
 
-| # | Card | Family | Priority | Strength / weakness verdict states | Session restriction | DRAFT parameters exactly as registered | Pseudo-code (actual evaluator) |
+| # | Card | Family | Priority | Strength / weakness verdict states | Session restriction | frozen parameters exactly as registered | Pseudo-code (actual evaluator) |
 |--:|---|---|--:|---|---|---|---|
 | 1 | donchian-20 | channel-breakout | 1 | EFFICIENT / CHOPPY | none | lookback=20, breakAt=prior-high/low, entryAt=close | for i>=20: HH=max(high[i-20..i-1]); LL=min(low[i-20..i-1]); if high[i]>HH emit LONG else if low[i]<LL emit SHORT. |
 | 2 | donchian-55 | channel-breakout | 2 | EFFICIENT / CHOPPY | none | lookback=55, breakAt=prior-high/low, entryAt=close | for i>=55: HH=max(high[i-55..i-1]); LL=min(low[i-55..i-1]); if high[i]>HH emit LONG else if low[i]<LL emit SHORT. |
@@ -39,4 +39,4 @@ There is no Dual Thrust card in the A6 22-card DRAFT set. The deleted A5 Dual Th
 - `stochastic-14-fade` removed (former priority 15), because its measured DEV signal bars duplicate `williams-r-fade` exactly (Jaccard 1.000). Williams %R remains.
 - These are deletions only: 24→22, each removed card's two claim cells and strategy-level diagnostics are gone; priorities are renumbered by deletion only; every surviving state/parameter and the relative TEST_ORDER is unchanged. The eight families remain; channel-breakout and osc-fade each now have two variants. See `docs/G0-AMENDMENT-6-REPORT.md` for the before/after overlap comparison and all changed counts.
 
-Beyond the explicitly authorized A7 signal corrections, no other state, parameter, priority, card, Map rule, cost, exit or criterion was altered. The three-soldiers-crows state pair remains unchanged. FREEZE remains DRAFT. See `docs/G0-AMENDMENT-7-REPORT.md` for yearly diagnostics, source timeframes and controls.
+Beyond the explicitly authorized A7 signal corrections, no other state, parameter, priority, card, Map rule, cost, exit or criterion was altered. The three-soldiers-crows state pair remains unchanged. G0 Amendment 8 freezes all 22 cards unchanged; no strategy outcomes exist. See `docs/G0-AMENDMENT-7-REPORT.md` for yearly diagnostics, source timeframes and controls.

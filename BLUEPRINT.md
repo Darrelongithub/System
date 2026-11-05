@@ -1,13 +1,13 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.7 — 2026-11-02; G0 AMENDMENT 7 applied before any strategy result**
-**Status: G0 FROZEN (amended before any claim result). M1–M5 machinery COMPLETE. Claim cards DRAFT — awaiting human review/freeze.**
+**Version 1.8 — 2026-11-05; G0 AMENDMENT 8 applied before any strategy result**
+**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. No strategy result exists.**
 **Branch:** `arena/072665f9-system`
 
 > **Version history is immutable.** Eight byte-preserving snapshots exist:
 > `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
 > `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md`, `docs/BLUEPRINT-v1.4.md`,
-> `docs/BLUEPRINT-v1.5.md`, `docs/BLUEPRINT-v1.6.md`, and `docs/BLUEPRINT-v1.7.md`. The full 64-character
+> `docs/BLUEPRINT-v1.5.md`, `docs/BLUEPRINT-v1.6.md`, and `docs/BLUEPRINT-v1.7.md`; the v1.8 snapshot is listed in the version register. The full 64-character
 > SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
@@ -46,17 +46,15 @@
 >   signal/day frequency, and family×verdict power with measured Kish overlap and
 >   calendar-day CR1. The pooled-power “never below” comparison is scoped to
 >   edges ≥ +0.10R. Cards remain DRAFT; verification remains blocked.
-> - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards remain DRAFT; verification remains blocked.
+> - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards were DRAFT at this historical version.
+> - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No strategy result exists.
 >
-> **Every amendment was applied before any real strategy result exists.** Claim
-> cards are still `DRAFT`; `verify-claims.mjs` still refuses real verification.
-> **No MAP, cost, exit, stop, target, floor or t numeric threshold changed at any
-> version.** Amendment 3 explicitly rewrote the verification RULE (task 1) but
-> every numeric constant inside it is an original frozen value; Amendment 4
-> changed no criterion at all. See §7.11 (rule) and §7.12 (measurement).
-> The verification RULE was explicitly rewritten (task 1) but every numeric
-> constant inside it is an original frozen value. See §7.11 for the full dated
-> diff against v1.2.
+> **Every amendment was applied before any real strategy result exists.** At
+> v1.7 the cards were DRAFT and verification was blocked; G0 Amendment 8 now
+> records their unchanged owner-approved freeze and the staged pre-result
+> pipeline. **No MAP, cost, exit, stop, target, floor or t numeric threshold
+> changed at any version.** Amendment 3 explicitly rewrote the verification
+> RULE, but every numeric constant inside it remains an original frozen value.
 
 This is the single pre-registration for the replacement of the old Signal
 Finder Pro research line. It is frozen **before any strategy result exists**.
@@ -311,15 +309,21 @@ Map and is downgraded. This risk is explicit, not a VAL surprise.
 
 ### 5.4 Definition-sensitivity and the sweep
 
-The **threshold sweep is a DIAGNOSTIC at M2, not a veto**. State labels are
-_expected_ to move when cutoffs move — that is what a threshold is. Only 5/25
-sweep cells reach ≥80% label agreement with the frozen cutoffs. The blueprint's
-veto applies to **claim verdicts at M6**: a claim whose verdict is not stable
-across ≥80% of the grid is `INCONCLUSIVE (definition-sensitive)`. Thresholds
-stay frozen at G0 regardless — the sweep never selects one.
+The existing 5×5 cutoff grid is diagnostic only and never selects cutoffs.
+For claim sensitivity, G0 Amendment 8 freezes a separate, fully matched
+re-binning: for each of the 25 ER × ATR-percentile pairs, re-bin card trades and
+the same deterministic random-entry candidates, apply the unchanged CONFIRMED
+rule with the corresponding cell baseline, and record each result. Missing
+baseline means not CONFIRMED. For claims CONFIRMED at the authoritative center
+(ER 0.35, ATR percentile 70), the grade is the percentage of all 25 grid cells
+that are CONFIRMED: ROBUST ≥80%, FRAGILE ≥50%, otherwise
+DEFINITION_SENSITIVE. The grade never changes the authoritative center verdict.
+Other claims' sweep results are displayed for information only. The 25 pairs
+are ER {0.25, 0.30, 0.35, 0.40, 0.45} × ATR percentile {60, 65, 70, 75, 80}.
 
-A REFUTED verdict might mean "the textbook is wrong" **or** "our definition of
-expansion is wrong"; the sweep separates those two interpretations.
+Verdict cells use only the efficiency axis: EFFICIENT / CHOPPY. The volatility
+cutoff acts only through the abstain band and the 3-bar confirmation/hysteresis;
+it is not a separate verdict-state axis.
 
 ---
 
@@ -350,22 +354,20 @@ table enables nothing and `routeSignals` keeps **0/288** probe signals.
 Priority order and table hash are deterministic. REFUTED/INCONCLUSIVE never
 enable. A missing cost/routing cell is a hard error, never a cheap fallback.
 
-### 6.1 Claim cards — DRAFT, needs your review
+### 6.1 Claim cards — FROZEN by owner approval (G0 Amendment 8)
 
-`scripts/map-compass/claim-cards.draft.mjs` holds **24 known strategies in 8
+`scripts/map-compass/claim-cards.draft.mjs` holds **22 known strategies in 8
 families**, each with a literature-derived strength and weakness, a rationale,
-a source, and a frozen numeric priority (1–24). These are claims to be
+a source, and a frozen numeric priority (1–22). These are claims to be
 falsified, written **before looking at any result on our data**.
 
-`verify-claims.mjs` **refuses to run real verification** while status is DRAFT.
-Decision #13 requires a human review → set `status=FROZEN`, `approvedBy`,
-`approvedAt`. Until then only `--dry-run` (synthetic calibration) is permitted.
+`FREEZE` records `status=FROZEN`, `approvedBy=Darrel`, and `approvedAt=2026-11-05`. All 22 cards were approved without edits before any result. Stage 2 implementation and Stage 3 synthetic rehearsal are required before the one-time Stage 4 DEV run; see §7.13.
 
-Review checklist and the full 24-card table: `docs/CLAIM-CARDS-REVIEW.md`.
+The full 22-card table is `docs/CLAIM-CARDS-FULL-TEXT.md`; earlier review materials are preserved as history.
 
 ---
 
-## 7. Stage 3 — Claim verification (M5 harness BUILT; M6 strategies pending)
+## 7. Stage 3 — Claim verification (M5 harness BUILT; A8 M6 pipeline preregistered, implementation pending Stage 2)
 
 ### 7.1 Standardised exit harness
 
@@ -1930,7 +1932,7 @@ those three tests. The separate pre-existing synth test mismatch remains.
 
 | Document                                      | Role                                                   |
 | --------------------------------------------- | ------------------------------------------------------ |
-| **`BLUEPRINT.md`** (this file, v1.7)          | Canonical pre-registration — wins on conflict          |
+| **`BLUEPRINT.md`** (this file, v1.8)          | Canonical pre-registration — wins on conflict          |
 | `docs/BLUEPRINT-v1.0.md`                      | Immutable v1.0 snapshot (reconstructed)                |
 | `docs/BLUEPRINT-v1.1.md`                      | Immutable v1.1 snapshot, SHA-256 `72c078f3…`           |
 | `docs/BLUEPRINT-v1.2.md`                      | Immutable v1.2 snapshot                                  |
@@ -1938,13 +1940,14 @@ those three tests. The separate pre-existing synth test mismatch remains.
 | `docs/BLUEPRINT-v1.4.md`                      | Immutable v1.4 snapshot (superseded)                     |
 | `docs/BLUEPRINT-v1.5.md`                      | Immutable v1.5 snapshot (superseded)                     |
 | `docs/BLUEPRINT-v1.6.md`                      | Immutable v1.6 snapshot (preserved)                      |
-| `docs/BLUEPRINT-v1.7.md`                      | Immutable v1.7 snapshot (this version)                   |
+| `docs/BLUEPRINT-v1.7.md`                      | Immutable v1.7 snapshot (preserved)
+| `docs/BLUEPRINT-v1.8.md`                      | Immutable v1.8 snapshot (this version)                   |
 | `docs/EMPIRICAL-EVIDENCE.md`                  | Eight opened studies + eight VERIFIED criticisms        |
 | `scripts/map-compass/signal-params.mjs`       | The 22 exact signal parameters (card source of truth)  |
 | `scripts/map-compass/lib/signals.mjs`         | The 22 pure causal entry-signal functions               |
-| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.7) |
-| `docs/CLAIM-CARDS-FULL-TEXT.md`               | Current 22 cards in full text, in TEST_ORDER (DRAFT)  |
-| `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`          | Current 22 exact DRAFT parameters and pseudo-code      |
+| `docs/BLUEPRINT-AMENDMENTS.md`                | Dated log of every amendment since v1.0 (through v1.8) |
+| `docs/CLAIM-CARDS-FULL-TEXT.md`               | Current 22 frozen cards in full text, in TEST_ORDER  |
+| `docs/CLAIM-SIGNAL-SPECIFICATIONS.md`          | Current 22 exact frozen parameters and pseudo-code      |
 | `docs/G0-AMENDMENT-5-REPORT.md`                 | Historical v1.5 slot, power, overlap, source report    |
 | `docs/G0-AMENDMENT-6-REPORT.md`                 | Historical A6 overlap, slots, daily frequencies, power |
 | `docs/G0-AMENDMENT-7-REPORT.md`                 | Current A7 signal-year, source, baseline, and capacity report |
@@ -1953,3 +1956,56 @@ those three tests. The separate pre-existing synth test mismatch remains.
 | `docs/CLAIM-CARDS-REVIEW.md`                  | The 24 draft cards + review checklist + power decision |
 | `scripts/map-compass/frozen.mjs`              | Machine-readable frozen constants                      |
 | `FORWARD-VALIDATION.md`, `PROJECT-CHARTER.md` | Old-project protocols reused for ledger/parity         |
+
+
+### 7.13 G0 Amendment 8 (2026-11-05) — frozen execution methods
+
+**Approval and scope.** Before any strategy result existed, Darrel approved all
+22 cards unchanged: `status=FROZEN`, `approvedBy=Darrel`,
+`approvedAt=2026-11-05`. No card is removed; no claim text, verdict state,
+parameter, priority, or order is altered. Map rules, costs, exits, thresholds,
+and the CONFIRMED rule remain unchanged. Earlier versions and report-only
+artifacts remain preserved history.
+
+**Method 1 — strict DEV-only segments.** A non-DEV gap is a hard segment
+boundary. The four inclusive DEV year spans are 2004–2007, 2009–2011,
+2013–2015, and 2017–2018. For each segment, recompute Map features/states from
+that segment's bars only; generate signals with warm-up from that segment only.
+No signal warm-up, Map feature, random baseline entry, or trade outcome may read
+a bar across a segment boundary. Candidate claim and random-baseline entries
+are allowed only at local segment index ≥1,000 and with at least 96 bars
+remaining after the entry within that segment. Discard entries outside these
+limits. Trade year is the entry year. Each card gets one independent
+unconditional slot: every eligible signal may enter irrespective of state,
+subject only to that card's slot being unoccupied; outcome diagnostics are
+binned by verdict state at entry. Rebuild the matched random-entry control with
+the same segment boundaries, entry eligibility, frozen costs, and frozen exit
+harness. Prior random-baseline, power, and signal-count artifacts remain
+unchanged as historical pre-A8 outputs and are marked superseded for the A8
+verification.
+
+**Method 2 — matched 5×5 sensitivity sweep.** The exact grid is ER cutoff
+{0.25, 0.30, 0.35, 0.40, 0.45} × ATR percentile cutoff {60, 65, 70, 75, 80}.
+For each pair, re-bin the same card trades and common random-entry candidates
+(using deterministic seeds) under that pair and apply the exact unchanged
+CONFIRMED rule with the corresponding matched baseline. A missing baseline in
+any cell means not CONFIRMED; it never falls back to zero. The authoritative
+verdict is the frozen center (0.35, 70). For claims CONFIRMED at that center,
+sensitivity grade is the share of all 25 cells that are CONFIRMED: ROBUST ≥80%,
+FRAGILE ≥50%, otherwise DEFINITION_SENSITIVE. Other claims' grid outcomes are
+reported for information only. The grade does not alter the center verdict.
+The claim-verdict cells use only the efficiency axis (EFFICIENT / CHOPPY); the
+volatility cutoff affects classification only through the abstain band and
+three-bar confirmation/hysteresis, not as a separate verdict axis.
+
+**Gates.** Stage 2 implementation requires unit tests for segment equivalence
+after warm-up on gap-free synthetic data; a sentinel in a non-DEV hole never
+read; hand-computed long/short, stop/target, time-exit, gap-through, and slot
+blocking trades; and causality. Stage 3 runs the pre-registered 60-world
+synthetic dress rehearsal; any failed criterion blocks Stage 4. Stage 4 is a
+one-time DEV-only run, after a passing rehearsal; no VAL, HOLDOUT, or STRESS
+outcomes are read. No rerun or post-result change to cards, rules, states, or
+thresholds is permitted.
+
+**Threshold changed?** No. **Card text/state/parameter changed?** No. **Any
+strategy result existed at freeze?** No.
