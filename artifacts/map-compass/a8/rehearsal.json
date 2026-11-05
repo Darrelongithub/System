@@ -1,0 +1,1109 @@
+{
+  "generatedAt": "2026-11-05T14:23:41.456Z",
+  "stage": "STAGE 3 DRESS REHEARSAL",
+  "strategyResults": "NONE — synthetic worlds only; no real bar was read",
+  "criteria": {
+    "worldsPerCondition": 10,
+    "barsPerWorld": 60000,
+    "A": {
+      "meanConfirmedCardsMax": 0.5,
+      "anyWorldMax": 2
+    },
+    "B": {
+      "meanConfirmedCardsMax": 0.5,
+      "anyWorldMax": 2
+    },
+    "C": {
+      "targetCard": "donchian-20",
+      "confirmedWorldShareMin": 0.8,
+      "measuredGrossToleranceR": 0.05,
+      "otherCardsMeanMax": 0.5
+    },
+    "frozenAt": "2026-11-05, G0 Amendment 8, before any rehearsal world was run"
+  },
+  "config": {
+    "worldsPerCondition": 10,
+    "barsPerWorld": 60000,
+    "barsPerSegment": 20000,
+    "baseSeed": 20261105,
+    "baselineConfig": {
+      "entriesPerCellPerSide": 4000,
+      "seed": 20261026,
+      "maxHoldBars": 96,
+      "matchOn": [
+        "state",
+        "side",
+        "session",
+        "volRegime"
+      ],
+      "reportLongAndShortSeparately": true,
+      "note": "Identical exit harness (1.5xATR stop, 2R target) and identical cost model. Only entry timing/side is random."
+    },
+    "claimCriteria": {
+      "minTradesPerCell": 100,
+      "practicalFloorR": 0.1,
+      "tStatMin": 2,
+      "excessFloorR": 0,
+      "concentrationMax": 0.5,
+      "loyoPositiveMin": 0.75,
+      "requireMatchedBaseline": true,
+      "baselineMinCellN": 200,
+      "note": "CONJUNCTION: net mean > +0.10R with clustered t > 2 AND excess > 0 with clustered t > 2, plus n/concentration/year/NO_BASELINE vetoes. Year-bucketing is a veto, not 24 independent significance tests. See BLUEPRINT.md §7.2.1.",
+      "amendedAt": "G0 Amendment 3, 2026-10-27, before any claim result"
+    },
+    "mapNote": "The synthetic worlds use the project's frozen MAP (ER 0.35 / ATR pctile 70). Because the generator's volatility is stationary, most bars land in one ATR regime; the rehearsal therefore tests the machinery, not the regime mix."
+  },
+  "planted": {
+    "B": {
+      "intendedNetR": 0.15,
+      "driftPerBarR": 0.025440110564172048,
+      "calibrationTrace": [
+        {
+          "drift": 0.002801770833333333,
+          "measured": -0.13103268458333253
+        },
+        {
+          "drift": 0.010646729166666665,
+          "measured": -0.08900130999999648
+        },
+        {
+          "drift": 0.040457570833333324,
+          "measured": 0.3193337029166687
+        },
+        {
+          "drift": 0.025440110564172048,
+          "measured": 0.13336333166666997
+        }
+      ],
+      "measuredRandomLongNetR": 0.13336333166666997,
+      "note": "Condition B: constant per-bar drift, calibrated on pilot seeds so a random long nets about +0.15R."
+    },
+    "C": {
+      "intendedNetR": 0.3,
+      "driftPerBarR": 0.02801241689144737,
+      "calibrationTrace": [
+        {
+          "drift": 0.004364270833333334,
+          "measured": 0.02297454208754209
+        },
+        {
+          "drift": 0.025749197916666668,
+          "measured": 0.2665330661322645
+        },
+        {
+          "drift": 0.02801241689144737,
+          "measured": 0.2862862862862863
+        }
+      ],
+      "measuredPilotDonchianGrossR": 0.2862862862862863,
+      "intended": {
+        "grossR": 2,
+        "netR": 1.88103,
+        "driftPerBarR": 0.02801241689144737,
+        "cappedAtTarget": true
+      },
+      "note": "Condition C: that drift, in the signal direction, for up to 96 bars after each donchian-20 signal bar. Target size is stated as GROSS R (what the verifier measures); net after frozen cost is shown too."
+    }
+  },
+  "results": {
+    "A": {
+      "condition": "A",
+      "worlds": 10,
+      "meanConfirmedCards": 0.2,
+      "maxConfirmedCards": 1,
+      "cellsTotal": 440,
+      "cellsNetFloorPass": 117,
+      "cellsNetFloorPassExcessFail": 112,
+      "netFloorOnlyShare": 0.2545,
+      "donchianConfirmedWorlds": 0,
+      "donchianConfirmedShare": 0,
+      "donchianMeasuredGrossMeanR": -0.0693,
+      "otherCardsMeanConfirmed": 0.2,
+      "otherCardsMaxConfirmed": 1
+    },
+    "B": {
+      "condition": "B",
+      "worlds": 10,
+      "meanConfirmedCards": 0.3,
+      "maxConfirmedCards": 2,
+      "cellsTotal": 440,
+      "cellsNetFloorPass": 114,
+      "cellsNetFloorPassExcessFail": 110,
+      "netFloorOnlyShare": 0.25,
+      "donchianConfirmedWorlds": 1,
+      "donchianConfirmedShare": 0.1,
+      "donchianMeasuredGrossMeanR": 0.153,
+      "otherCardsMeanConfirmed": 0.2,
+      "otherCardsMaxConfirmed": 1
+    },
+    "C": {
+      "condition": "C",
+      "worlds": 10,
+      "meanConfirmedCards": 7.8,
+      "maxConfirmedCards": 11,
+      "cellsTotal": 440,
+      "cellsNetFloorPass": 104,
+      "cellsNetFloorPassExcessFail": 13,
+      "netFloorOnlyShare": 0.0295,
+      "donchianConfirmedWorlds": 6,
+      "donchianConfirmedShare": 0.6,
+      "donchianMeasuredGrossMeanR": 0.2707,
+      "otherCardsMeanConfirmed": 7.2,
+      "otherCardsMaxConfirmed": 10
+    }
+  },
+  "checks": [
+    {
+      "id": "A.mean<=0.5",
+      "value": 0.2,
+      "required": "<= 0.5",
+      "pass": true
+    },
+    {
+      "id": "A.max<=2",
+      "value": 1,
+      "required": "<= 2",
+      "pass": true
+    },
+    {
+      "id": "B.mean<=0.5",
+      "value": 0.3,
+      "required": "<= 0.5",
+      "pass": true
+    },
+    {
+      "id": "B.max<=2",
+      "value": 2,
+      "required": "<= 2",
+      "pass": true
+    },
+    {
+      "id": "C.donchian>=80%",
+      "value": 0.6,
+      "required": ">= 0.8",
+      "pass": false
+    },
+    {
+      "id": "C.grossWithin0.05R",
+      "value": 0.2707,
+      "required": "planted 0.2863 +/- 0.05",
+      "pass": true
+    },
+    {
+      "id": "C.otherCards<=0.5",
+      "value": 7.2,
+      "required": "<= 0.5",
+      "pass": false
+    }
+  ],
+  "verdict": "FAIL",
+  "worldRecords": [
+    {
+      "condition": "A",
+      "seed": 20326105,
+      "confirmedCards": 1,
+      "confirmedCardIds": [
+        "pdh-pdl-break"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 10,
+      "netFloorOnlyShare": 0.2273,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.088,
+        -0.029953
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 375,
+        "meanNetR": -0.200404,
+        "excessVsRandomR": -0.059983,
+        "t": -0.9092,
+        "tNet": -3.0355,
+        "grossMeanR": -0.088
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326106,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 10,
+      "netFloorOnlyShare": 0.2273,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.049738,
+        0.0372
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 382,
+        "meanNetR": -0.16901,
+        "excessVsRandomR": -0.034819,
+        "t": -0.4717,
+        "tNet": -2.2892,
+        "grossMeanR": -0.049738
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326107,
+      "confirmedCards": 1,
+      "confirmedCardIds": [
+        "london-orb-30"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.167855,
+        -0.024427
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 365,
+        "meanNetR": -0.28706,
+        "excessVsRandomR": -0.135654,
+        "t": -2.019,
+        "tNet": -4.2676,
+        "grossMeanR": -0.167855
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326108,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 12,
+      "netFloorOnlyShare": 0.2727,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.036939,
+        0.019816
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 379,
+        "meanNetR": -0.080898,
+        "excessVsRandomR": 0.071053,
+        "t": 0.9909,
+        "tNet": -1.1267,
+        "grossMeanR": 0.036939
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326109,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 6,
+      "netFloorOnlyShare": 0.1364,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        -0.080648,
+        0.073699
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 388,
+        "meanNetR": -0.195814,
+        "excessVsRandomR": -0.053345,
+        "t": -0.7771,
+        "tNet": -2.8605,
+        "grossMeanR": -0.080648
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326110,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 12,
+      "netFloorOnlyShare": 0.2727,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.056657,
+        -0.060296
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 353,
+        "meanNetR": -0.181071,
+        "excessVsRandomR": -0.032644,
+        "t": -0.4193,
+        "tNet": -2.3394,
+        "grossMeanR": -0.056657
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326111,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 12,
+      "netFloorOnlyShare": 0.2727,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.027732,
+        -0.017369
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 374,
+        "meanNetR": -0.154402,
+        "excessVsRandomR": 0.001037,
+        "t": 0.0142,
+        "tNet": -2.0993,
+        "grossMeanR": -0.027732
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326112,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 14,
+      "netFloorOnlyShare": 0.3182,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.111519,
+        -0.021767
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 343,
+        "meanNetR": -0.230811,
+        "excessVsRandomR": -0.07521,
+        "t": -1.0505,
+        "tNet": -3.1898,
+        "grossMeanR": -0.111519
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326113,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 14,
+      "netFloorOnlyShare": 0.3182,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:REFUTED",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        -0.190652,
+        -0.000583
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "REFUTED",
+        "n": 388,
+        "meanNetR": -0.30658,
+        "excessVsRandomR": -0.14916,
+        "t": -2.3128,
+        "tNet": -4.7893,
+        "grossMeanR": -0.190652
+      }
+    },
+    {
+      "condition": "A",
+      "seed": 20326114,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.043024,
+        -0.029412
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 402,
+        "meanNetR": -0.072516,
+        "excessVsRandomR": 0.053299,
+        "t": 0.7368,
+        "tNet": -1.0046,
+        "grossMeanR": 0.043024
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327105,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.133333,
+        0.07369
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 405,
+        "meanNetR": -0.016789,
+        "excessVsRandomR": -0.023967,
+        "t": -0.3401,
+        "tNet": -0.2345,
+        "grossMeanR": 0.133333
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327106,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 10,
+      "netFloorOnlyShare": 0.2273,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.193258,
+        -0.000291
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 445,
+        "meanNetR": 0.044326,
+        "excessVsRandomR": 0.044262,
+        "t": 0.6467,
+        "tNet": 0.6361,
+        "grossMeanR": 0.193258
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327107,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.051044,
+        0.078805
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 431,
+        "meanNetR": -0.097866,
+        "excessVsRandomR": -0.058835,
+        "t": -0.864,
+        "tNet": -1.403,
+        "grossMeanR": 0.051044
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327108,
+      "confirmedCards": 1,
+      "confirmedCardIds": [
+        "engulfing"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.230415,
+        0.079932
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 434,
+        "meanNetR": 0.078629,
+        "excessVsRandomR": 0.044243,
+        "t": 0.6328,
+        "tNet": 1.0927,
+        "grossMeanR": 0.230415
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327109,
+      "confirmedCards": 2,
+      "confirmedCardIds": [
+        "donchian-20",
+        "asian-range-break"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 14,
+      "netFloorOnlyShare": 0.3182,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:CONFIRMED"
+      ],
+      "donchianGrossR": [
+        0.234867,
+        -0.049676
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 413,
+        "meanNetR": 0.082317,
+        "excessVsRandomR": 0.0644,
+        "t": 0.9057,
+        "tNet": 1.1333,
+        "grossMeanR": 0.234867
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327110,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 12,
+      "netFloorOnlyShare": 0.2727,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.079229,
+        0.030424
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 467,
+        "meanNetR": -0.073507,
+        "excessVsRandomR": -0.062847,
+        "t": -0.9913,
+        "tNet": -1.1103,
+        "grossMeanR": 0.079229
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327111,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 6,
+      "netFloorOnlyShare": 0.1364,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.145695,
+        0.06355
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 453,
+        "meanNetR": -0.005832,
+        "excessVsRandomR": 0.024717,
+        "t": 0.3768,
+        "tNet": -0.0876,
+        "grossMeanR": 0.145695
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327112,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 11,
+      "netFloorOnlyShare": 0.25,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.098795,
+        0.084112
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 415,
+        "meanNetR": -0.051667,
+        "excessVsRandomR": -0.035562,
+        "t": -0.5129,
+        "tNet": -0.7268,
+        "grossMeanR": 0.098795
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327113,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 14,
+      "netFloorOnlyShare": 0.3182,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.213636,
+        0.038141
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 440,
+        "meanNetR": 0.064099,
+        "excessVsRandomR": 0.083516,
+        "t": 1.2096,
+        "tNet": 0.9001,
+        "grossMeanR": 0.213636
+      }
+    },
+    {
+      "condition": "B",
+      "seed": 20327114,
+      "confirmedCards": 0,
+      "confirmedCardIds": [],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 10,
+      "netFloorOnlyShare": 0.2273,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:INCONCLUSIVE"
+      ],
+      "donchianGrossR": [
+        0.149938,
+        0.05431
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 432,
+        "meanNetR": 0.00328,
+        "excessVsRandomR": 0.066517,
+        "t": 0.9269,
+        "tNet": 0.045,
+        "grossMeanR": 0.149938
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328105,
+      "confirmedCards": 8,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "williams-r-fade",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 2,
+      "netFloorOnlyShare": 0.0455,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.296512,
+        0.221667
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 516,
+        "meanNetR": 0.181038,
+        "excessVsRandomR": 0.257594,
+        "t": 4.1125,
+        "tNet": 2.9012,
+        "grossMeanR": 0.296512
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328106,
+      "confirmedCards": 10,
+      "confirmedCardIds": [
+        "donchian-55",
+        "sma-20-50",
+        "pdh-pdl-break",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "williams-r-fade",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade",
+        "three-soldiers-crows"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 2,
+      "netFloorOnlyShare": 0.0455,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.246403,
+        0.318375
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 556,
+        "meanNetR": 0.125619,
+        "excessVsRandomR": 0.222053,
+        "t": 3.4836,
+        "tNet": 1.9704,
+        "grossMeanR": 0.246403
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328107,
+      "confirmedCards": 5,
+      "confirmedCardIds": [
+        "classic-pivot",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 2,
+      "netFloorOnlyShare": 0.0455,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.169937,
+        0.246562
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 519,
+        "meanNetR": 0.048339,
+        "excessVsRandomR": 0.183818,
+        "t": 3.0055,
+        "tNet": 0.7879,
+        "grossMeanR": 0.169937
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328108,
+      "confirmedCards": 6,
+      "confirmedCardIds": [
+        "sma-20-50",
+        "pdh-pdl-break",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 1,
+      "netFloorOnlyShare": 0.0227,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.252485,
+        0.235427
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 503,
+        "meanNetR": 0.130294,
+        "excessVsRandomR": 0.202853,
+        "t": 3.0425,
+        "tNet": 1.9597,
+        "grossMeanR": 0.252485
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328109,
+      "confirmedCards": 8,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "pdh-pdl-break",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "three-soldiers-crows"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 2,
+      "netFloorOnlyShare": 0.0455,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.365914,
+        0.283582
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 573,
+        "meanNetR": 0.248949,
+        "excessVsRandomR": 0.321485,
+        "t": 5.199,
+        "tNet": 4.0294,
+        "grossMeanR": 0.365914
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328110,
+      "confirmedCards": 8,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade",
+        "three-soldiers-crows"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 1,
+      "netFloorOnlyShare": 0.0227,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.257194,
+        0.273931
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 556,
+        "meanNetR": 0.13929,
+        "excessVsRandomR": 0.2233,
+        "t": 3.6248,
+        "tNet": 2.2565,
+        "grossMeanR": 0.257194
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328111,
+      "confirmedCards": 8,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "pdh-pdl-break",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "williams-r-fade",
+        "bollinger-20-2",
+        "keltner-20-atr"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 1,
+      "netFloorOnlyShare": 0.0227,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.268293,
+        0.2951
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 492,
+        "meanNetR": 0.154359,
+        "excessVsRandomR": 0.235569,
+        "t": 3.7377,
+        "tNet": 2.4345,
+        "grossMeanR": 0.268293
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328112,
+      "confirmedCards": 6,
+      "confirmedCardIds": [
+        "donchian-55",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 1,
+      "netFloorOnlyShare": 0.0227,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:INCONCLUSIVE",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.278142,
+        0.257968
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "INCONCLUSIVE",
+        "n": 520,
+        "meanNetR": 0.145819,
+        "excessVsRandomR": 0.218964,
+        "t": 3.3065,
+        "tNet": 2.1915,
+        "grossMeanR": 0.278142
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328113,
+      "confirmedCards": 8,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "asian-range-break",
+        "pdh-pdl-break",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "bollinger-20-2",
+        "keltner-20-atr"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 0,
+      "netFloorOnlyShare": 0,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.321755,
+        0.323537
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 547,
+        "meanNetR": 0.20084,
+        "excessVsRandomR": 0.267181,
+        "t": 4.1726,
+        "tNet": 3.1275,
+        "grossMeanR": 0.321755
+      }
+    },
+    {
+      "condition": "C",
+      "seed": 20328114,
+      "confirmedCards": 11,
+      "confirmedCardIds": [
+        "donchian-20",
+        "donchian-55",
+        "asian-range-break",
+        "pdh-pdl-break",
+        "classic-pivot",
+        "rsi-14-30-70",
+        "williams-r-fade",
+        "bollinger-20-2",
+        "keltner-20-atr",
+        "bb-squeeze-fade",
+        "morning-evening-star"
+      ],
+      "cellsTotal": 44,
+      "cellsNetFloorPassExcessFail": 1,
+      "netFloorOnlyShare": 0.0227,
+      "donchianVerdicts": [
+        "strength@EFFICIENT:CONFIRMED",
+        "weakness@CHOPPY:REFUTED"
+      ],
+      "donchianGrossR": [
+        0.250252,
+        0.306525
+      ],
+      "donchianDetail": {
+        "verdictState": "EFFICIENT",
+        "verdict": "CONFIRMED",
+        "n": 551,
+        "meanNetR": 0.132933,
+        "excessVsRandomR": 0.21119,
+        "t": 3.2246,
+        "tNet": 2.0177,
+        "grossMeanR": 0.250252
+      }
+    }
+  ]
+}

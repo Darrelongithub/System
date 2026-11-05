@@ -19,12 +19,29 @@
 | G0 Amendment 8 (freeze + preregister) | **DONE** — commit `9aae04e` |
 | Stage 1-REPAIR (report, constants, markers, STATUS, guards, docs) | **DONE** — see commit recorded below |
 | Stage 2 (build segments + sweep, unit tests) | **DONE** — 22 A8 tests, 418 passed / 1 known failure |
-| Stage 3 (dress rehearsal, synthetic) | NOT STARTED |
+| Stage 3 (dress rehearsal, synthetic) | **DONE — VERDICT FAIL** (2 of 7 pre-registered checks). See `docs/STAGE-3-REHEARSAL-REPORT.md` |
 | Stage 4 (real DEV run, once) | NOT STARTED — blocked until Stage 3 passes |
 | Compass / VAL / HOLDOUT / STRESS / robustness | OUT OF SCOPE |
 
-**Next action:** Stage 3 — dress rehearsal on synthetic bars (conditions A/B/C,
-10 worlds each) with the pre-registered pass criteria, before any real run.
+**Next action:** **HARD STOP — owner decision required before Stage 4.**
+Stage 3 failed two pre-registered checks (C: donchian-20 CONFIRMED 6/10 vs >=8/10;
+C: other cards 7.2 vs <=0.5 CONFIRMED per world). Conditions A and B passed. The
+planted gross R was recovered within 0.016R and the excess gate fired in every C
+world, so the verifier is sound; the failure is a criterion-design issue (the
+planted drift blankets the whole series because the cards overlap on 50-92% of
+signal bars) plus a power issue at a 0.30R edge. Criteria were NOT edited. No
+fix-and-rerun cycle was spent because no bug in the new code was found in C.
+Stage 4 is blocked. Options are in the hard-stop notice.
+
+### Stage 3 headline numbers
+
+| Condition | Mean CONFIRMED cards/world | Max | donchian-20 CONFIRMED | donchian gross R | Planted |
+| --- | --- | --- | --- | --- | --- |
+| A (no edge) | 0.2 (<=0.5 PASS) | 1 (<=2 PASS) | 0/10 | -0.0693 | none |
+| B (drift +0.15R) | 0.3 (<=0.5 PASS) | 2 (<=2 PASS) | 1/10 | +0.1530 | +0.133R net |
+| C (planted +0.30R) | 7.8 | 11 | 6/10 (FAIL) | +0.2707 (+/-0.05 PASS) | +0.2863R gross |
+
+Other-cards mean in C: 7.2 vs <= 0.5 required (FAIL).
 
 ### Stage 2 built (no strategy result existed when it was built)
 
