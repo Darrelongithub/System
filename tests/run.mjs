@@ -63,6 +63,7 @@ await import("./map-compass/amendment4.test.mjs");
 await import("./map-compass/amendment5.test.mjs");
 await import("./map-compass/amendment6.test.mjs");
 await import("./map-compass/amendment7.test.mjs");
+await import("./map-compass/segments-a8.test.mjs");
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

@@ -1,0 +1,795 @@
+{
+  "generatedAt": "2026-11-05T14:11:15.156Z",
+  "stage": "STAGE 2 BUILD (A8/A9 segmentation)",
+  "strategyResults": "NONE — this report contains no trade outcome or verdict",
+  "constants": {
+    "MAP": {
+      "erCutoff": 0.35,
+      "erLookback": 20,
+      "atrPeriod": 14,
+      "atrPctileCutoff": 70,
+      "atrPctileLookback": 500,
+      "rangeLookback": 50,
+      "warmupBars": 1000,
+      "hysteresisBars": 3,
+      "abstainBandPct": 10
+    },
+    "DEV_SEGMENTS": [
+      {
+        "id": "S1",
+        "years": [
+          2004,
+          2005,
+          2006,
+          2007
+        ],
+        "label": "2004-2007"
+      },
+      {
+        "id": "S2",
+        "years": [
+          2009,
+          2010,
+          2011
+        ],
+        "label": "2009-2011"
+      },
+      {
+        "id": "S3",
+        "years": [
+          2013,
+          2014,
+          2015
+        ],
+        "label": "2013-2015"
+      },
+      {
+        "id": "S4",
+        "years": [
+          2017,
+          2018
+        ],
+        "label": "2017-2018"
+      }
+    ],
+    "SEGMENT_WARMUP_BARS": 1000,
+    "SEGMENT_TAIL_BARS": 96,
+    "SWEEP_GRID": {
+      "erCutoffs": [
+        0.25,
+        0.3,
+        0.35,
+        0.4,
+        0.45
+      ],
+      "atrPctileCutoffs": [
+        60,
+        65,
+        70,
+        75,
+        80
+      ],
+      "center": {
+        "erCutoff": 0.35,
+        "atrPctileCutoff": 70
+      },
+      "cellCount": 25,
+      "gradeOfConfirmedPct": "share of all 25 cells CONFIRMED, graded by SENSITIVITY_RULE",
+      "missingBaselineMeans": "not CONFIRMED in that cell",
+      "authoritativeVerdict": "frozen center only",
+      "note": "The verdict cells use only the efficiency axis (EFFICIENT/CHOPPY); the volatility cutoff acts only through the abstain band and 3-bar confirmation.",
+      "decidedAt": "G0 Amendment 8, 2026-11-05, before any strategy result"
+    },
+    "roleYears": {
+      "DEV": [
+        2004,
+        2005,
+        2006,
+        2007,
+        2009,
+        2010,
+        2011,
+        2013,
+        2014,
+        2015,
+        2017,
+        2018
+      ],
+      "HOLDOUT": [
+        2008,
+        2012,
+        2016,
+        2019
+      ],
+      "VAL": [
+        2020,
+        2021,
+        2022,
+        2023,
+        2024
+      ],
+      "STRESS": [
+        2025,
+        2026
+      ]
+    }
+  },
+  "invariants": {
+    "warmupEqualsMapWarmup": true,
+    "tailEqualsMaxHold": true,
+    "segmentsCoverDevExactly": true,
+    "noSealedYearInAnySegment": true,
+    "gridCellsMatchDeclaration": true,
+    "centerIsInGrid": true
+  },
+  "totals": {
+    "barsInFile": 248912,
+    "readableDevBars": 131922,
+    "droppedNonDevBars": 116990,
+    "sealedBarsDropped": 46513,
+    "holes": [
+      {
+        "year": 2008,
+        "role": "HOLDOUT_SEALED",
+        "firstGlobalIndex": 39448,
+        "firstDatetime": "2008-01-02 12:00:00"
+      },
+      {
+        "year": 2012,
+        "role": "HOLDOUT_SEALED",
+        "firstGlobalIndex": 84916,
+        "firstDatetime": "2012-01-03 02:00:00"
+      },
+      {
+        "year": 2016,
+        "role": "HOLDOUT_SEALED",
+        "firstGlobalIndex": 131460,
+        "firstDatetime": "2016-01-04 02:00:00"
+      },
+      {
+        "year": 2019,
+        "role": "HOLDOUT_SEALED",
+        "firstGlobalIndex": 166696,
+        "firstDatetime": "2019-01-02 07:00:00"
+      },
+      {
+        "year": 2020,
+        "role": "VAL",
+        "firstGlobalIndex": 178435,
+        "firstDatetime": "2020-01-02 07:00:00"
+      },
+      {
+        "year": 2021,
+        "role": "VAL",
+        "firstGlobalIndex": 190243,
+        "firstDatetime": "2021-01-04 02:00:00"
+      },
+      {
+        "year": 2022,
+        "role": "VAL",
+        "firstGlobalIndex": 202038,
+        "firstDatetime": "2022-01-03 02:00:00"
+      },
+      {
+        "year": 2023,
+        "role": "VAL",
+        "firstGlobalIndex": 213865,
+        "firstDatetime": "2023-01-03 02:00:00"
+      },
+      {
+        "year": 2024,
+        "role": "VAL",
+        "firstGlobalIndex": 225646,
+        "firstDatetime": "2024-01-02 02:00:00"
+      },
+      {
+        "year": 2025,
+        "role": "STRESS",
+        "firstGlobalIndex": 237515,
+        "firstDatetime": "2025-01-01 00:00:00"
+      },
+      {
+        "year": 2026,
+        "role": "STRESS",
+        "firstGlobalIndex": 248274,
+        "firstDatetime": "2026-01-01 00:00:00"
+      }
+    ]
+  },
+  "segmentTable": [
+    {
+      "id": "S1",
+      "years": "2004, 2005, 2006, 2007",
+      "bars": 39448,
+      "firstDatetime": "2004-06-11 08:00:00",
+      "lastDatetime": "2007-12-31 19:30:00",
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "eligibleBars": 38352
+    },
+    {
+      "id": "S2",
+      "years": "2009, 2010, 2011",
+      "bars": 33862,
+      "firstDatetime": "2009-01-02 12:00:00",
+      "lastDatetime": "2011-12-31 00:30:00",
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "eligibleBars": 32766
+    },
+    {
+      "id": "S3",
+      "years": "2013, 2014, 2015",
+      "bars": 35147,
+      "firstDatetime": "2013-01-02 02:00:00",
+      "lastDatetime": "2015-12-31 19:30:00",
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "eligibleBars": 34051
+    },
+    {
+      "id": "S4",
+      "years": "2017, 2018",
+      "bars": 23465,
+      "firstDatetime": "2017-01-03 02:00:00",
+      "lastDatetime": "2018-12-31 21:30:00",
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "eligibleBars": 22369
+    }
+  ],
+  "yearTable": [
+    {
+      "year": 2004,
+      "role": "DEV",
+      "segment": "S1",
+      "barsInFile": 5966,
+      "barsReadable": 5966,
+      "barsDropped": 0
+    },
+    {
+      "year": 2005,
+      "role": "DEV",
+      "segment": "S1",
+      "barsInFile": 10946,
+      "barsReadable": 10946,
+      "barsDropped": 0
+    },
+    {
+      "year": 2006,
+      "role": "DEV",
+      "segment": "S1",
+      "barsInFile": 10982,
+      "barsReadable": 10982,
+      "barsDropped": 0
+    },
+    {
+      "year": 2007,
+      "role": "DEV",
+      "segment": "S1",
+      "barsInFile": 11554,
+      "barsReadable": 11554,
+      "barsDropped": 0
+    },
+    {
+      "year": 2008,
+      "role": "HOLDOUT_SEALED",
+      "segment": null,
+      "barsInFile": 11606,
+      "barsReadable": 0,
+      "barsDropped": 11606
+    },
+    {
+      "year": 2009,
+      "role": "DEV",
+      "segment": "S2",
+      "barsInFile": 11622,
+      "barsReadable": 11622,
+      "barsDropped": 0
+    },
+    {
+      "year": 2010,
+      "role": "DEV",
+      "segment": "S2",
+      "barsInFile": 11015,
+      "barsReadable": 11015,
+      "barsDropped": 0
+    },
+    {
+      "year": 2011,
+      "role": "DEV",
+      "segment": "S2",
+      "barsInFile": 11225,
+      "barsReadable": 11225,
+      "barsDropped": 0
+    },
+    {
+      "year": 2012,
+      "role": "HOLDOUT_SEALED",
+      "segment": null,
+      "barsInFile": 11397,
+      "barsReadable": 0,
+      "barsDropped": 11397
+    },
+    {
+      "year": 2013,
+      "role": "DEV",
+      "segment": "S3",
+      "barsInFile": 11727,
+      "barsReadable": 11727,
+      "barsDropped": 0
+    },
+    {
+      "year": 2014,
+      "role": "DEV",
+      "segment": "S3",
+      "barsInFile": 11735,
+      "barsReadable": 11735,
+      "barsDropped": 0
+    },
+    {
+      "year": 2015,
+      "role": "DEV",
+      "segment": "S3",
+      "barsInFile": 11685,
+      "barsReadable": 11685,
+      "barsDropped": 0
+    },
+    {
+      "year": 2016,
+      "role": "HOLDOUT_SEALED",
+      "segment": null,
+      "barsInFile": 11771,
+      "barsReadable": 0,
+      "barsDropped": 11771
+    },
+    {
+      "year": 2017,
+      "role": "DEV",
+      "segment": "S4",
+      "barsInFile": 11721,
+      "barsReadable": 11721,
+      "barsDropped": 0
+    },
+    {
+      "year": 2018,
+      "role": "DEV",
+      "segment": "S4",
+      "barsInFile": 11744,
+      "barsReadable": 11744,
+      "barsDropped": 0
+    },
+    {
+      "year": 2019,
+      "role": "HOLDOUT_SEALED",
+      "segment": null,
+      "barsInFile": 11739,
+      "barsReadable": 0,
+      "barsDropped": 11739
+    },
+    {
+      "year": 2020,
+      "role": "VAL",
+      "segment": null,
+      "barsInFile": 11808,
+      "barsReadable": 0,
+      "barsDropped": 11808
+    },
+    {
+      "year": 2021,
+      "role": "VAL",
+      "segment": null,
+      "barsInFile": 11795,
+      "barsReadable": 0,
+      "barsDropped": 11795
+    },
+    {
+      "year": 2022,
+      "role": "VAL",
+      "segment": null,
+      "barsInFile": 11827,
+      "barsReadable": 0,
+      "barsDropped": 11827
+    },
+    {
+      "year": 2023,
+      "role": "VAL",
+      "segment": null,
+      "barsInFile": 11781,
+      "barsReadable": 0,
+      "barsDropped": 11781
+    },
+    {
+      "year": 2024,
+      "role": "VAL",
+      "segment": null,
+      "barsInFile": 11869,
+      "barsReadable": 0,
+      "barsDropped": 11869
+    },
+    {
+      "year": 2025,
+      "role": "STRESS",
+      "segment": null,
+      "barsInFile": 10759,
+      "barsReadable": 0,
+      "barsDropped": 10759
+    },
+    {
+      "year": 2026,
+      "role": "STRESS",
+      "segment": null,
+      "barsInFile": 638,
+      "barsReadable": 0,
+      "barsDropped": 638
+    }
+  ],
+  "losses": [
+    {
+      "segmentId": "S1",
+      "bars": 39448,
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "ineligible": 1096,
+      "eligible": 38352,
+      "eligiblePct": 97.22
+    },
+    {
+      "segmentId": "S2",
+      "bars": 33862,
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "ineligible": 1096,
+      "eligible": 32766,
+      "eligiblePct": 96.76
+    },
+    {
+      "segmentId": "S3",
+      "bars": 35147,
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "ineligible": 1096,
+      "eligible": 34051,
+      "eligiblePct": 96.88
+    },
+    {
+      "segmentId": "S4",
+      "bars": 23465,
+      "warmupLost": 1000,
+      "tailLost": 96,
+      "ineligible": 1096,
+      "eligible": 22369,
+      "eligiblePct": 95.33
+    }
+  ],
+  "mapAgreement": {
+    "comparedBars": 127922,
+    "agreeBars": 127914,
+    "agreePct": 99.99,
+    "crossTab": {
+      "UNKNOWN -> UNKNOWN": 29068,
+      "QUIET -> QUIET": 61518,
+      "WHIPSAW -> WHIPSAW": 18483,
+      "GRIND -> GRIND": 11081,
+      "EXPANSION -> EXPANSION": 7764,
+      "QUIET -> UNKNOWN": 2,
+      "EXPANSION -> UNKNOWN": 4,
+      "WHIPSAW -> UNKNOWN": 2
+    },
+    "note": "REPORT ONLY. The segmented Map recomputes features inside each segment, so it loses up to 1,000 warm-up bars per segment and cannot match the continuous Map before that point. Disagreement after warm-up is expected at segment starts (different trailing windows) and is not used by any verdict."
+  },
+  "sweepGridCells": [
+    {
+      "erCutoff": 0.25,
+      "atrPctileCutoff": 60,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.25,
+      "atrPctileCutoff": 65,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.25,
+      "atrPctileCutoff": 70,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.25,
+      "atrPctileCutoff": 75,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.25,
+      "atrPctileCutoff": 80,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.3,
+      "atrPctileCutoff": 60,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.3,
+      "atrPctileCutoff": 65,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.3,
+      "atrPctileCutoff": 70,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.3,
+      "atrPctileCutoff": 75,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.3,
+      "atrPctileCutoff": 80,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.35,
+      "atrPctileCutoff": 60,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.35,
+      "atrPctileCutoff": 65,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.35,
+      "atrPctileCutoff": 70,
+      "isCenter": true
+    },
+    {
+      "erCutoff": 0.35,
+      "atrPctileCutoff": 75,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.35,
+      "atrPctileCutoff": 80,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.4,
+      "atrPctileCutoff": 60,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.4,
+      "atrPctileCutoff": 65,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.4,
+      "atrPctileCutoff": 70,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.4,
+      "atrPctileCutoff": 75,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.4,
+      "atrPctileCutoff": 80,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.45,
+      "atrPctileCutoff": 60,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.45,
+      "atrPctileCutoff": 65,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.45,
+      "atrPctileCutoff": 70,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.45,
+      "atrPctileCutoff": 75,
+      "isCenter": false
+    },
+    {
+      "erCutoff": 0.45,
+      "atrPctileCutoff": 80,
+      "isCenter": false
+    }
+  ],
+  "spreadMonths": {
+    "total": 44,
+    "source": "Dukascopy M1 bid+ask via kevingtlin/Market-Data-Lab (pinned git blob oids)",
+    "months": [
+      {
+        "month": "2010-01",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-02",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-03",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-04",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-05",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-06",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-07",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-08",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-09",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-10",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-11",
+        "role": "DEV"
+      },
+      {
+        "month": "2010-12",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-01",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-02",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-03",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-04",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-05",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-06",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-07",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-08",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-09",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-10",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-11",
+        "role": "DEV"
+      },
+      {
+        "month": "2011-12",
+        "role": "DEV"
+      },
+      {
+        "month": "2012-01",
+        "role": "HOLDOUT_SEALED"
+      },
+      {
+        "month": "2012-06",
+        "role": "HOLDOUT_SEALED"
+      },
+      {
+        "month": "2012-12",
+        "role": "HOLDOUT_SEALED"
+      },
+      {
+        "month": "2013-01",
+        "role": "DEV"
+      },
+      {
+        "month": "2013-04",
+        "role": "DEV"
+      },
+      {
+        "month": "2013-12",
+        "role": "DEV"
+      },
+      {
+        "month": "2014-01",
+        "role": "DEV"
+      },
+      {
+        "month": "2014-06",
+        "role": "DEV"
+      },
+      {
+        "month": "2014-12",
+        "role": "DEV"
+      },
+      {
+        "month": "2015-01",
+        "role": "DEV"
+      },
+      {
+        "month": "2015-06",
+        "role": "DEV"
+      },
+      {
+        "month": "2015-12",
+        "role": "DEV"
+      },
+      {
+        "month": "2018-08",
+        "role": "DEV"
+      },
+      {
+        "month": "2020-03",
+        "role": "VAL"
+      },
+      {
+        "month": "2021-06",
+        "role": "VAL"
+      },
+      {
+        "month": "2022-09",
+        "role": "VAL"
+      },
+      {
+        "month": "2023-10",
+        "role": "VAL"
+      },
+      {
+        "month": "2024-04",
+        "role": "VAL"
+      },
+      {
+        "month": "2025-04",
+        "role": "STRESS"
+      },
+      {
+        "month": "2026-01",
+        "role": "STRESS"
+      }
+    ],
+    "inSealedYears": [
+      "2012-01",
+      "2012-06",
+      "2012-12"
+    ]
+  }
+}

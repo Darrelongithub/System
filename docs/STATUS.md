@@ -18,14 +18,30 @@
 | --- | --- |
 | G0 Amendment 8 (freeze + preregister) | **DONE** — commit `9aae04e` |
 | Stage 1-REPAIR (report, constants, markers, STATUS, guards, docs) | **DONE** — see commit recorded below |
-| Stage 2 (build segments + sweep, unit tests) | NOT STARTED |
+| Stage 2 (build segments + sweep, unit tests) | **DONE** — 22 A8 tests, 418 passed / 1 known failure |
 | Stage 3 (dress rehearsal, synthetic) | NOT STARTED |
 | Stage 4 (real DEV run, once) | NOT STARTED — blocked until Stage 3 passes |
 | Compass / VAL / HOLDOUT / STRESS / robustness | OUT OF SCOPE |
 
-**Next action:** Stage 2 — segment Map wrapper, segment-aware signals, one-slot
-trade producer, matched random control, sweep re-binning, wiring into
-`verifyClaim`, plus unit tests (a)–(d) from the brief.
+**Next action:** Stage 3 — dress rehearsal on synthetic bars (conditions A/B/C,
+10 worlds each) with the pre-registered pass criteria, before any real run.
+
+### Stage 2 built (no strategy result existed when it was built)
+
+| File | Purpose |
+| --- | --- |
+| `scripts/map-compass/lib/segments.mjs` | DEV-only segmentation, eligibility window, per-segment Map, canonical 25-cell list, load-time invariants |
+| `scripts/map-compass/lib/segmented.mjs` | one-slot trade producer, matched random control, A4 top-up, per-verdict-state sweep, grade, `verifyCardA8` |
+| `scripts/map-compass/a8-segments-report.mjs` | Stage 2 structural report → `artifacts/map-compass/a8/segments.json` |
+| `tests/map-compass/segments-a8.test.mjs` | 22 tests: (a) segment == continuous Map after warm-up, (b) sentinel never read, (c) hand-computed long/short/stop/target/time-exit/gap-through/slot, (d) causality, plus binning/top-up/grade |
+
+Stage 2 structural numbers (from `a8/segments.json`): 248,912 bars in file;
+131,922 readable DEV bars (identical to the historical count); 116,990 non-DEV
+bars dropped including 46,513 sealed; segments S1 39,448 / S2 33,862 / S3 35,147
+/ S4 23,465 bars; 1,000 warm-up + 96 tail lost per segment (95.3–97.2% of each
+segment remains eligible); segmented Map agrees with the old continuous Map on
+99.99% of post-warm-up DEV bars (report only). 3 of the 44 sampled spread months
+are in sealed years (2012-01, 2012-06, 2012-12) — cost data only.
 
 ## Hashes
 
