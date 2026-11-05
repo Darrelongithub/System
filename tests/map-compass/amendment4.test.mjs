@@ -6,6 +6,7 @@ import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { test, assert, assertEqual } from "../tiny.mjs";
+import { assertA8OutputState } from "./a8-helpers.mjs";
 import { dataLines, num } from "../../scripts/map-compass/lib/csv.mjs";
 import {
   CLAIM_CARDS,
@@ -84,7 +85,9 @@ test("A4 1: the signal library has the retained 22 evaluators with exact card pa
   assertEqual(CLAIM_CARDS.length, 22);
   assertEqual(TEST_ORDER.length, 22);
   assertEqual(JSON.stringify(TEST_ORDER.map((t) => t.id)), JSON.stringify(FROZEN_TEST_SEQUENCE));
-  assertEqual(FREEZE.status, "DRAFT");
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assertEqual(FREEZE.approvedAt, "2026-11-05");
 });
 
 test("A4 1: signals emit ONLY entry bars and sides — no stops, targets, trades or R", () => {
@@ -440,11 +443,13 @@ test("A4 7: every family has a criticism whose URL was opened this run (VERIFIED
 // ---------------------------------------------------------------------------
 // Guards
 // ---------------------------------------------------------------------------
-test("A4: verify-claims stays BLOCKED and the cards stay DRAFT", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  assertEqual(FREEZE.approvedBy, null);
-  assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
-  assert(!existsSync(join(ART, "claimed-trades.jsonl")), "no trade stream may exist");
+test("A4 historical guard remains documented; real verification now requires the A8 DEV runner", () => {
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assertEqual(FREEZE.approvedAt, "2026-11-05");
+  
+  assertA8OutputState(ART);
+  
   assertEqual(read("routing-table.json").enabledCount, 0);
   assertEqual(read("power-projection.json").verdict, "UNDERPOWERED");
 });

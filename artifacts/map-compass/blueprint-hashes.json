@@ -36,7 +36,9 @@
     "sha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
     "full": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
     "matchesV18": true,
-    "matchesV17": false
+    "matchesV17": false,
+    "matchesV16": false,
+    "matchesV15": false
   },
   "v14": {
     "file": "docs/BLUEPRINT-v1.4.md",

@@ -129,9 +129,22 @@ export function matchedBaseline(trade, baseline) {
  * `baseline`: random-baseline.json. If null, an UNCONTROLLED dry run is
  *             flagged; if supplied, any missing cell is a NO_BASELINE veto.
  */
+export function applySensitivityGrade(stats, sensitivityAgreementPct) {
+  stats.sensitivityAgreementPct = Number.isFinite(sensitivityAgreementPct) ? sensitivityAgreementPct : null;
+  stats.stability = !Number.isFinite(sensitivityAgreementPct)
+    ? "NOT_RUN"
+    : sensitivityAgreementPct >= SENSITIVITY_RULE.robustMinPct
+      ? "ROBUST"
+      : sensitivityAgreementPct >= SENSITIVITY_RULE.fragileMinPct
+        ? "FRAGILE"
+        : "DEFINITION_SENSITIVE";
+  stats.conditional = stats.stability === "DEFINITION_SENSITIVE";
+  return stats;
+}
+
 export function verifyClaim(
   trades,
-  { direction = +1, sensitivityAgreementPct = 100, baseline = null } = {},
+  { direction = +1, sensitivityAgreementPct = null, baseline = null } = {},
 ) {
   const cfg = CLAIM_CRITERIA;
   // SEAL: discard holdout/VAL/STRESS trades BEFORE any aggregate statistic.
@@ -274,6 +287,8 @@ export function verifyClaim(
     bySide: {},
     byFourState: {}, // four Map states as DIAGNOSTICS (they never decide verdicts)
     years: {},
+    byYearNet: {},
+    leaveOneYearOut: {},
     concentration: null,
     loyoPositivePct: null,
     stability: null,
@@ -346,6 +361,46 @@ export function verifyClaim(
       totalExcessR: +v.reduce((a, b) => a + b, 0).toFixed(4),
     };
   }
+  const allByYear = new Map();
+  for (let i = 0; i < devTrades.length; i++) {
+    const year = devTrades[i].year;
+    if (!allByYear.has(year)) allByYear.set(year, []);
+    allByYear.get(year).push(i);
+  }
+  for (const [year, idx] of [...allByYear.entries()].sort((a,b)=>a[0]-b[0])) {
+    const net = idx.map((i) => signed[i]);
+    const netSe = clusterSe(net, idx.map((i) => dayKeys[i])).se;
+    const matched = idx.filter((i) => excesses[i] !== null);
+    const ex = matched.map((i) => excesses[i]);
+    const exSe = clusterSe(ex, matched.map((i) => dayKeys[i])).se;
+    out.byYearNet[year] = {
+      n: net.length,
+      meanNetR: +mean(net).toFixed(6),
+      tNet: netSe > 0 ? +(mean(net) / netSe).toFixed(4) : 0,
+      matchedN: ex.length,
+      meanExcessR: ex.length ? +mean(ex).toFixed(6) : null,
+      tExcess: ex.length && exSe > 0 ? +(mean(ex) / exSe).toFixed(4) : ex.length ? 0 : null,
+      diagnosticOnly: true,
+    };
+  }
+  for (const excludedYear of [...allByYear.keys()].sort((a,b)=>a-b)) {
+    const kept = devTrades.map((_, i) => i).filter((i) => devTrades[i].year !== excludedYear);
+    const net = kept.map((i) => signed[i]);
+    const netSe = clusterSe(net, kept.map((i) => dayKeys[i])).se;
+    const matched = kept.filter((i) => excesses[i] !== null);
+    const ex = matched.map((i) => excesses[i]);
+    const exSe = clusterSe(ex, matched.map((i) => dayKeys[i])).se;
+    out.leaveOneYearOut[excludedYear] = {
+      excludedYear,
+      n: net.length,
+      meanNetR: net.length ? +mean(net).toFixed(6) : null,
+      tNet: net.length && netSe > 0 ? +(mean(net) / netSe).toFixed(4) : net.length ? 0 : null,
+      matchedN: ex.length,
+      meanExcessR: ex.length ? +mean(ex).toFixed(6) : null,
+      tExcess: ex.length && exSe > 0 ? +(mean(ex) / exSe).toFixed(4) : ex.length ? 0 : null,
+      diagnosticOnly: true,
+    };
+  }
 
   // With NO controlled trades there is nothing to judge year-consistency on;
   // record nulls rather than manufacturing a TOO_FEW_YEARS veto on top.
@@ -368,13 +423,7 @@ export function verifyClaim(
   }
 
   // Definition-sensitivity: GRADE, not veto (SENSITIVITY_RULE, decided at G0).
-  out.stability =
-    sensitivityAgreementPct >= SENSITIVITY_RULE.robustMinPct
-      ? "ROBUST"
-      : sensitivityAgreementPct >= SENSITIVITY_RULE.fragileMinPct
-        ? "FRAGILE"
-        : "DEFINITION_SENSITIVE";
-  if (out.stability === "DEFINITION_SENSITIVE") out.conditional = true;
+  applySensitivityGrade(out, sensitivityAgreementPct);
 
   // G0 AMENDMENT 3 TASK 2b — FAIL CLOSED. A supplied baseline with a missing
   // fine AND coarse cell for ANY trade => INCONCLUSIVE (NO_BASELINE). The

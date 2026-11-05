@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { test, assert, assertEqual } from "../tiny.mjs";
+import { assertA8OutputState } from "./a8-helpers.mjs";
 import {
   ROLES,
   STATES,
@@ -472,10 +473,12 @@ test("A3 6: v1.0, v1.1, v1.2, v1.3 snapshots are preserved with full SHA-256", (
 // ---------------------------------------------------------------------------
 // Guards
 // ---------------------------------------------------------------------------
-test("A3: cards are STILL DRAFT and no real verification was run", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  assertEqual(FREEZE.approvedBy, null);
-  assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
+test("A3 historical DRAFT state remains documented; current A8 approval and outputs are valid", () => {
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assertEqual(FREEZE.approvedAt, "2026-11-05");
+  
+  assertA8OutputState(ART);
   const routing = read("routing-table.json");
   assertEqual(routing.enabledCount, 0);
   assertEqual(routing.conditionalPolicy.compassCanEnableConditional, false);

@@ -46,17 +46,11 @@ test("22 current claim cards across 8 families, structurally valid", () => {
   for (const f of FAMILIES) assert([2,3].includes(CLAIM_CARDS.filter((c) => c.family === f).length));
 });
 
-test("claim cards are DRAFT — real verification must be BLOCKED", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  let threw = false;
-  try {
-    assertCardsFrozen(FREEZE);
-  } catch {
-    threw = true;
-  }
-  assert(threw, "DRAFT cards must not authorize testing");
-  const approved = { status: "FROZEN", approvedBy: "human", approvedAt: "2026-10-26" };
-  assertCardsFrozen(approved); // no throw
+test("G0 Amendment 8: cards are frozen under the recorded owner approval", () => {
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assertEqual(FREEZE.approvedAt, "2026-11-05");
+  assertCardsFrozen(FREEZE); // no throw
 });
 
 test("every card has a frozen numeric priority, all distinct 1..22", () => {

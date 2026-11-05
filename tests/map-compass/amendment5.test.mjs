@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { test, assert, assertEqual } from "../tiny.mjs";
+import { assertA8OutputState } from "./a8-helpers.mjs";
 import { CLAIM_CARDS, FREEZE, TEST_ORDER } from "../../scripts/map-compass/claim-cards.draft.mjs";
 import { CLAIM_CRITERIA } from "../../scripts/map-compass/frozen.mjs";
 const ROOT=fileURLToPath(new URL("../..",import.meta.url)), ART=join(ROOT,"artifacts/map-compass");
@@ -47,8 +48,8 @@ test("A5: calendar-cluster baseline uses canonical dates; real verification rema
   for(const vs of ["EFFICIENT","CHOPPY"]){const days=Object.keys(daily.byVerdictState[vs]);assert(days.every(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)),`${vs} baseline clusters must use real ISO calendar days`);assertEqual(days.length,b.dailySe[vs].dayClusters);}
   assert(b.dailySe.EFFICIENT.dayClusters>1000 && b.dailySe.EFFICIENT.dayClusters<3000);
   assert(b.dailySe.CHOPPY.dayClusters>1000 && b.dailySe.CHOPPY.dayClusters<4000);
-  assertEqual(FREEZE.status,"DRAFT");assertEqual(FREEZE.approvedBy,null);assertEqual(FREEZE.approvedAt,null);
-  assert(!existsSync(join(ART,"claim-verification.json")));assert(!existsSync(join(ART,"claimed-trades.jsonl")));
+  assertEqual(FREEZE.status,"FROZEN");assertEqual(FREEZE.approvedBy,"Darrel");assertEqual(FREEZE.approvedAt,"2026-11-05");
+  assertA8OutputState(ART);
   assert(s.realHarnessAudit.requiredBeforeRealVerification.includes("per-card slot-constrained"));
 });
 

@@ -92,14 +92,19 @@ const minuteOfDay = (text) => {
  * needs, and several cards need the same ATR(14) series — caching keeps the
  * whole 22-card run linear instead of quadratic.
  */
-const SERIES_CACHE = new Map();
-function cached(key, fn) {
-  if (!SERIES_CACHE.has(key)) SERIES_CACHE.set(key, fn());
-  return SERIES_CACHE.get(key);
+const SERIES_CACHE = new WeakMap();
+function cached(bars, key, fn) {
+  let byKey = SERIES_CACHE.get(bars);
+  if (!byKey) {
+    byKey = new Map();
+    SERIES_CACHE.set(bars, byKey);
+  }
+  if (!byKey.has(key)) byKey.set(key, fn());
+  return byKey.get(key);
 }
-/** Causal ATR(p) with caching (p is MAP.atrPeriod = 14 for the signals). */
+/** Causal ATR(p) cache is scoped to the actual immutable bar-array identity. */
 function atrOf(bars, p) {
-  return cached(`atr|${p}|${bars.length}`, () => atrSeries(bars, p));
+  return cached(bars, `atr|${p}`, () => atrSeries(bars, p));
 }
 
 /** Rolling maximum / minimum of an array over `lb` bars ending at i. */

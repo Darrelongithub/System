@@ -15,7 +15,7 @@
  * Output: how many fake "CONFIRMED" claims the battery produces by chance.
  * That number is the false-discovery floor a real result must clear.
  */
-import { ROLES } from "../frozen.mjs";
+import { ROLES, VERDICT_STATE_OF } from "../frozen.mjs";
 
 /** Deterministic PRNG so placebo runs are reproducible. */
 export function mulberry32(seed) {
@@ -48,7 +48,9 @@ export function blockCircularShift(trades, rng) {
     offsets.set(year, shift);
     const states = idx.map((i) => trades[i].state);
     for (let k = 0; k < idx.length; k++) {
-      out[idx[k]].state = states[(k + shift) % idx.length];
+      const state = states[(k + shift) % idx.length];
+      out[idx[k]].state = state;
+      out[idx[k]].verdictState = VERDICT_STATE_OF[state] ?? null;
     }
   }
   return { shifted: out, offsets: Object.fromEntries(offsets) };

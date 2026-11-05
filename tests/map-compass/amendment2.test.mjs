@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { test, assert, assertEqual } from "../tiny.mjs";
+import { assertA8OutputState } from "./a8-helpers.mjs";
 import {
   EXIT_HARNESS,
   CLAIM_CRITERIA,
@@ -265,18 +266,21 @@ test("Amendment 2: version snapshots, amendment log, and full-text card dump exi
   );
   const full = readFileSync(cards, "utf8");
   for (const o of TEST_ORDER) assert(full.includes(`## ${o.testOrder}. \`${o.id}\``), `missing card ${o.id}`);
-  assert(full.includes("DRAFT"));
+  assert(full.includes("FROZEN"));
+  assert(full.includes("approvedAt: 2026-11-05"));
   const amendments = readFileSync(log, "utf8");
   for (const d of ["2026-10-26", "2026-10-27"]) assert(amendments.includes(d));
   assert(amendments.toLowerCase().includes("conditional"));
   assert(amendments.includes("1.24375"));
 });
 
-test("Amendment 2: claim cards are STILL DRAFT and no real verification was run", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  assertEqual(FREEZE.approvedBy, null);
+test("Amendment 2 history is preserved; current A8 card approval and output state are valid", () => {
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assertEqual(FREEZE.approvedAt, "2026-11-05");
+  
   assertEqual(CLAIM_CARDS.length, 22);
-  assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
+  assertA8OutputState(ART);
   const routing = read("routing-table.json");
   assertEqual(routing.enabledCount, 0);
   assertEqual(routing.conditionalPolicy.compassCanEnableConditional, false);

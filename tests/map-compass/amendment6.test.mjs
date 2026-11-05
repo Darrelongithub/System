@@ -4,6 +4,7 @@ import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { test, assert, assertEqual } from "../tiny.mjs";
+import { assertA8OutputState } from "./a8-helpers.mjs";
 import { CLAIM_CARDS, FREEZE, TEST_ORDER, FROZEN_TEST_SEQUENCE, FAMILIES } from "../../scripts/map-compass/claim-cards.draft.mjs";
 import { SIGNAL_PARAMS, paramsToString } from "../../scripts/map-compass/signal-params.mjs";
 import { CLAIM_CRITERIA } from "../../scripts/map-compass/frozen.mjs";
@@ -20,7 +21,7 @@ test("A6: exactly two owner-approved deletions, deletion-only priorities and rel
   const priorities=CLAIM_CARDS.map(c=>c.priority).sort((a,b)=>a-b);assertEqual(JSON.stringify(priorities),JSON.stringify(Array.from({length:22},(_,i)=>i+1)));
   const oldSpec=readFileSync(join(ROOT,"docs/CLAIM-SIGNAL-SPECIFICATIONS-v1.5.md"),"utf8");
   for(const c of CLAIM_CARDS){const old=oldPriority[c.id],expected=old-(old>15?2:old>3?1:0);assertEqual(c.priority,expected,`${c.id} priority is deletion-only`);assertEqual(c.parameters,SIGNAL_PARAMS[c.id]);const row=oldSpec.split("\n").find(line=>line.startsWith("| ")&&line.includes(`| ${c.id} |`));assert(row,`${c.id} exists in v1.5`);const fields=row.split("|").map(x=>x.trim());assertEqual(fields[5],`${c.strength.state} / ${c.weakness.state}`,`${c.id} states unchanged`);if(!["asian-range-break","london-orb-30"].includes(c.id))assertEqual(fields[7],paramsToString(c.id),`${c.id} parameters unchanged outside the explicit A7 clock-window corrections`);}
-  assertEqual(FREEZE.status,"DRAFT");assertEqual(FREEZE.approvedBy,null);assertEqual(FREEZE.approvedAt,null);
+  assertEqual(FREEZE.status,"FROZEN");assertEqual(FREEZE.approvedBy,"Darrel");assertEqual(FREEZE.approvedAt,"2026-11-05");
 });
 
 test("A6: slot counts are one per card and one total book slot; opposite sides cannot coexist",()=>{
@@ -57,14 +58,16 @@ test("A6: family × verdict power has six monotone edges, Kish/day dependence an
   assertEqual(CLAIM_CRITERIA.practicalFloorR,.1);assertEqual(CLAIM_CRITERIA.tStatMin,2);
 });
 
-test("A6: full report and unchanged v1.5 history are pinned; verification remains absent",()=>{
+test("A6: full historical report is pinned and the A8 output state remains DEV-only",()=>{
   const report=readFileSync(join(ROOT,"docs/G0-AMENDMENT-6-REPORT.md"),"utf8"),spec=readFileSync(join(ROOT,"docs/CLAIM-SIGNAL-SPECIFICATIONS.md"),"utf8");
   assert(report.includes("74,886"));assert(report.includes("123,541"));assert(report.includes("THIN-POWER"));assert(report.includes("neither rail is measured from that day's open"));
   for(const c of CLAIM_CARDS)assert(spec.includes(`| ${c.id} |`),`${c.id} needs an exact pseudo-code row`);
-  assertEqual(FAMILIES.length,8);assertEqual(existsSync(join(ART,"claim-verification.json")),false);assertEqual(existsSync(join(ART,"claimed-trades.jsonl")),false);
+  assertEqual(FAMILIES.length,8);assertA8OutputState(ART);
   const h=json("blueprint-hashes.json"),v15=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.5.md"));assertEqual(createHash("sha256").update(v15).digest("hex"),h.v15.sha256);
   const v16=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.6.md")),current=readFileSync(join(ROOT,"BLUEPRINT.md"));
   assertEqual(createHash("sha256").update(v16).digest("hex"),h.v16.sha256);
-  assertEqual(createHash("sha256").update(current).digest("hex"),h.v17.sha256);
-  assertEqual(h.current.matchesV17,true);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
+  const v17=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.7.md"));
+  assertEqual(createHash("sha256").update(v17).digest("hex"),h.v17.sha256);
+  assertEqual(createHash("sha256").update(current).digest("hex"),h.v18.sha256);
+  assertEqual(h.current.matchesV18,true);assertEqual(h.current.matchesV17,false);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
 });

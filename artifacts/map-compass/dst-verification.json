@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-02T12:35:57.021Z",
+  "generatedAt": "2026-11-05T07:53:54.777Z",
   "shippedRule": "two epochs: A UTC+1/+2 (pre 2011-05-09), B UTC+2/+3; both EU DST; target fixed EAT",
   "independentSource": "Dukascopy M1 BID via kevingtlin/Market-Data-Lab (UTC, pinned git blob oids)",
   "coverage": {

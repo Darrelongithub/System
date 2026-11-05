@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * G0 Amendments 2–6 — print all current 22 claim cards in full text, in the
- * A6 deletion-only TEST_ORDER. READ-ONLY dump; it does NOT freeze, edit,
- * reorder or evaluate any card. `FREEZE.status` stays DRAFT.
+ * G0 Amendment 8 — print all current 22 claim cards in full text, in the
+ * frozen TEST_ORDER. READ-ONLY dump; it does NOT edit cards or evaluate them.
+ * The owner-approved freeze metadata is printed from claim-cards.draft.mjs.
  */
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -45,7 +45,7 @@ const lines = [];
 lines.push("# Claim cards — FULL TEXT (all 22, in TEST_ORDER)");
 lines.push("");
 lines.push(`**Generated:** ${new Date().toISOString()}`);
-lines.push(`**Card status:** \`${FREEZE.status}\` — NOT FROZEN. NOT TESTED.`);
+lines.push(`**Card status:** \`${FREEZE.status}\` — approvedBy: ${FREEZE.approvedBy}; approvedAt: ${FREEZE.approvedAt}. NOT STRATEGY-TESTED.`);
 lines.push(
   `**Cards:** ${CLAIM_CARDS.length} | **Families:** ${FAMILIES.length} | **Prior false fraction:** ${EVIDENCE.priorFalseFraction}`,
 );
@@ -55,9 +55,9 @@ lines.push(
 );
 lines.push("");
 lines.push("> Generated mechanically from `scripts/map-compass/claim-cards.draft.mjs`");
-lines.push("> by `print-claim-cards.mjs`. **No card is frozen here.** Verdicts are decided on the");
-lines.push("> TWO verdict states; the four Map states are DIAGNOSTICS only. Editing a card after");
-lines.push("> results would be the laundering this project forbids — change it NOW, during review.");
+lines.push("> by `print-claim-cards.mjs`. All cards were approved unchanged before any result.");
+lines.push("> Verdicts are decided on the TWO verdict states; four Map states are DIAGNOSTICS.");
+lines.push("> No card text, state, parameter, priority or order was changed at the freeze.");
 lines.push("");
 
 lines.push("## Empirical-study registry (tiers REPLACED at G0 Amendment 3)");
@@ -190,20 +190,19 @@ for (const o of TEST_ORDER) {
   lines.push("");
   for (const s of c.sources ?? []) lines.push(`- ${s}`);
   lines.push("");
-  lines.push("**Review fields (leave blank until the human freeze)**");
+  lines.push("**Freeze approval (G0 Amendment 8)**");
   lines.push("");
-  lines.push("- Reviewer decision: _keep / edit / remove — `_");
-  lines.push("- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_");
+  lines.push("- Reviewer decision: _KEEP unchanged_");
+  lines.push(`- Approval: ${FREEZE.approvedBy}, ${FREEZE.approvedAt}; card text, states, parameters, priorities and order unchanged.`);
   lines.push("");
   lines.push("---");
   lines.push("");
 }
 
-lines.push("## Freeze gate (decision #13) — NOT DONE");
+lines.push("## Freeze gate (decision #13) — COMPLETE (G0 Amendment 8)");
 lines.push("");
-lines.push("Real verification stays BLOCKED until a reviewer sets `FREEZE.status = \"FROZEN\"`");
-lines.push("with `approvedBy` and `approvedAt` in `claim-cards.draft.mjs`. **Amendment 3 did");
-lines.push("not freeze anything.** See `docs/CLAIM-CARDS-REVIEW.md` for the review checklist.");
+lines.push(`\`FREEZE.status = \"FROZEN\"\`, approvedBy = \"${FREEZE.approvedBy}\", approvedAt = \"${FREEZE.approvedAt}\".`);
+lines.push("This approval alone does not authorize the real run: Stage 2 tests and the Stage 3 synthetic rehearsal must pass first.");
 lines.push("");
 
 const text = lines.join("\n").trimEnd() + "\n";

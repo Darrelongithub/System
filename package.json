@@ -34,7 +34,8 @@
     "mc:slots": "node scripts/map-compass/slot-model.mjs",
     "mc:powercurve": "node scripts/map-compass/power-curve.mjs",
     "mc:amend6-report": "node scripts/map-compass/print-amendment6-report.mjs",
-    "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs"
+    "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs",
+    "mc:a8-audit": "node scripts/map-compass/a8-segment-audit.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

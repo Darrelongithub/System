@@ -1,15 +1,15 @@
 # Claim cards — FULL TEXT (all 22, in TEST_ORDER)
 
-**Generated:** 2026-11-02T12:40:29.591Z
-**Card status:** `FROZEN` — approvedBy: Darrel; approvedAt: 2026-11-05. Not strategy-tested.
+**Generated:** 2026-11-05T07:54:29.240Z
+**Card status:** `FROZEN` — approvedBy: Darrel; approvedAt: 2026-11-05. NOT STRATEGY-TESTED.
 **Cards:** 22 | **Families:** 8 | **Prior false fraction:** 0.8
 **Order:** EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.
 **Verdict states:** EFFICIENT / CHOPPY — EFFICIENT = EXPANSION+GRIND (ER >= 0.35), CHOPPY = WHIPSAW+QUIET.
 
 > Generated mechanically from `scripts/map-compass/claim-cards.draft.mjs`
-> by `print-claim-cards.mjs`. All 22 cards were approved unchanged by Darrel on
-> 2026-11-05 before any strategy result. Verdicts are decided on the TWO verdict
-> states; the four Map states are DIAGNOSTICS only. No card text was edited at freeze.
+> by `print-claim-cards.mjs`. All cards were approved unchanged before any result.
+> Verdicts are decided on the TWO verdict states; four Map states are DIAGNOSTICS.
+> No card text, state, parameter, priority or order was changed at the freeze.
 
 ## Empirical-study registry (tiers REPLACED at G0 Amendment 3)
 
@@ -1363,6 +1363,5 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 
 ## Freeze gate (decision #13) — COMPLETE (G0 Amendment 8)
 
-`FREEZE.status = "FROZEN"`, `approvedBy = "Darrel"`, and `approvedAt = "2026-11-05"`.
-This approval authorizes no result by itself: Stage 2 tests and the Stage 3
-synthetic rehearsal must pass before the one-time DEV-only verification.
+`FREEZE.status = "FROZEN"`, approvedBy = "Darrel", approvedAt = "2026-11-05".
+This approval alone does not authorize the real run: Stage 2 tests and the Stage 3 synthetic rehearsal must pass first.

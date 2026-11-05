@@ -52,6 +52,12 @@ test("verifyClaim CONFIRMS a real, consistent edge", () => {
   assert(r.meanNetR > CLAIM_CRITERIA.practicalFloorR);
   assert(r.t > CLAIM_CRITERIA.tStatMin);
   assertEqual(r.vetoes.length, 0);
+  assertEqual(Object.keys(r.byYearNet).length, new Set(trades.map((t) => t.year)).size);
+  assertEqual(Object.keys(r.leaveOneYearOut).length, new Set(trades.map((t) => t.year)).size);
+  for (const x of Object.values(r.leaveOneYearOut)) {
+    assert(x.n > 0 && Number.isFinite(x.meanNetR));
+    assert(x.diagnosticOnly, "leave-one-year-out is report-only");
+  }
 });
 
 test("verifyClaim REFUTES a claim whose edge points the other way", () => {
@@ -101,9 +107,15 @@ test("LOYO veto kills an edge present in too few years", () => {
   assert(r.verdict !== "CONFIRMED", "a vetoed claim must never be CONFIRMED");
 });
 
-test("G0 RULE: definition-sensitivity GRADES but does NOT nullify the verdict", () => {
-  // Decided before results: frozen cutoffs are authoritative. Letting the
-  // sweep nullify them would hand threshold selection to the sweep.
+test("G0 RULE: absent sweep input is NOT_RUN; measured sensitivity grades but does NOT nullify the center verdict", () => {
+  // A real result must not inherit the old 100% default. Only the measured A8
+  // 25-cell sweep can set a stability grade; cutoffs remain authoritative.
+  const unmeasured = verifyClaim(normal(0.25, 1.43, 1200), { direction: +1 });
+  assertEqual(unmeasured.verdict, "CONFIRMED");
+  assertEqual(unmeasured.stability, "NOT_RUN");
+  assertEqual(unmeasured.sensitivityAgreementPct, null);
+  assertEqual(unmeasured.conditional, false);
+
   const robust = verifyClaim(normal(0.25, 1.43, 1200), {
     direction: +1,
     sensitivityAgreementPct: 100,

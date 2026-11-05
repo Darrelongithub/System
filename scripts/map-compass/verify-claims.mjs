@@ -27,7 +27,7 @@ import {
   powerAt,
 } from "./lib/verification.mjs";
 import { placeboDistribution, mulberry32 } from "./lib/placebo.mjs";
-import { ROLES, CLAIM_CRITERIA, STATES, SENSITIVITY_RULE, EVIDENCE } from "./frozen.mjs";
+import { ROLES, CLAIM_CRITERIA, STATES, SENSITIVITY_RULE, EVIDENCE, EXIT_HARNESS } from "./frozen.mjs";
 import { TEST_ORDER } from "./claim-cards.draft.mjs";
 
 /** True only when executed as a script, not when imported by tests. */
@@ -49,7 +49,7 @@ const familyOf = new Map(CLAIM_CARDS.map((c) => [c.id, c.family]));
  */
 export function runBattery(
   trades,
-  { windowKind = "DEV", baseline = null, sensitivityAgreementPct = 100 } = {},
+  { windowKind = "DEV", baseline = null, sensitivityAgreementPct = null, sensitivityByClaim = null } = {},
 ) {
   const familyCells = groupByFamilyVerdictState(trades, familyOf);
   const strategyCells = groupByStrategyVerdictState(trades);
@@ -62,16 +62,17 @@ export function runBattery(
       const key = `${c.family}|${half.state}`;
       const pooled = familyCells.get(key) ?? [];
       const own = strategyCells.get(`${c.id}|${half.state}`) ?? [];
+      const sensitivityPct = sensitivityByClaim?.[`${c.id}|${kind}`] ?? sensitivityAgreementPct;
       // Pooled (family | verdict state) is the verdict; strategy-level is
-      // diagnostic only.
+      // diagnostic only. A stability grade is NOT_RUN unless measured.
       const stats = verifyClaim(pooled, {
         direction: half.direction,
-        sensitivityAgreementPct,
+        sensitivityAgreementPct: sensitivityPct,
         baseline,
       });
       const diagnostic = verifyClaim(own, {
         direction: half.direction,
-        sensitivityAgreementPct,
+        sensitivityAgreementPct: sensitivityPct,
         baseline,
       });
       rows.push({
@@ -86,9 +87,8 @@ export function runBattery(
         stats,
         fourStateDiagnostics: stats.byFourState, // reported, never decisive
         strategyLevel: {
-          n: diagnostic.n,
-          meanNetR: diagnostic.meanNetR,
-          t: diagnostic.t,
+          ...diagnostic,
+          diagnosticOnly: true,
           verdict: diagnostic.verdict,
         },
         priority: c.priority,
@@ -294,24 +294,24 @@ export function calibrate() {
 }
 
 /** Real verification. Requires frozen cards AND a trades JSONL AND a baseline. */
-export function verifyReal(tradesPath) {
+export function verifyReal(tradesPath, { baseline, sensitivityByClaim, precomputedRows = null, a8DevOnly = false } = {}) {
   assertCardsFrozen(FREEZE); // hard gate — decision #13
-  // AMENDMENT 3 TASK 2b: real verification MUST have the matched random-entry
-  // control. An UNCONTROLLED dry run may never produce a real verdict.
-  const baseline = loadBaseline();
-  if (!baseline) {
-    throw new Error(
-      "NO_BASELINE: random-baseline.json is missing. Run mc:baseline first. Real verification may not use a zero null or an uncontrolled dry run.",
-    );
-  }
+  if (!a8DevOnly) throw new Error("A8 gate: real verification must be launched by the one-time DEV-segment runner after the synthetic rehearsal passes.");
+  if (!baseline?.a8Segmented) throw new Error("NO_BASELINE: a DEV-segmented A8 matched random baseline is required.");
+  if (!sensitivityByClaim || typeof sensitivityByClaim !== "object") throw new Error("SWEEP_NOT_RUN: measured center-confirmed claim sensitivity is required.");
   if (!existsSync(tradesPath)) {
-    throw new Error(`no trades file at ${tradesPath}. M6 strategy library must produce it.`);
+    throw new Error(`no trades file at ${tradesPath}. A8 segment producer must create it.`);
   }
   const trades = readFileSync(tradesPath, "utf8")
     .split("\n")
     .filter(Boolean)
     .map((l) => JSON.parse(l));
-  const rows = runBattery(trades, { baseline });
+  const nonDev = trades.filter((t) => !ROLES.DEV.includes(t.year));
+  if (nonDev.length) throw new Error(`DEV_ONLY_VIOLATION: ${nonDev.length} trade records have non-DEV entry years.`);
+  const badBoundary = trades.filter((t) => !t.segmentId || !Number.isInteger(t.localIndex) || !Number.isInteger(t.exitIndex) || !Number.isInteger(t.segmentLength) || t.localIndex + EXIT_HARNESS.maxHoldBars >= t.segmentLength || t.exitIndex >= t.segmentLength || t.exitIndex > t.localIndex + EXIT_HARNESS.maxHoldBars);
+  if (badBoundary.length) throw new Error(`SEGMENT_BOUNDARY_VIOLATION: ${badBoundary.length} trade records lack segment-local indices or a 96-bar same-segment horizon.`);
+  const rows = precomputedRows ?? runBattery(trades, { baseline, sensitivityByClaim });
+  if (rows.length !== CLAIM_CARDS.length * 2) throw new Error(`A8 rows must contain exactly 44 card/claim cells; got ${rows.length}.`);
   const ledger = ledgerPath(ROOT);
   for (const r of rows) {
     appendVerdict(ledger, {
