@@ -33,10 +33,19 @@
   },
   "current": {
     "file": "BLUEPRINT.md",
-    "sha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
-    "full": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
-    "matchesV18": true,
-    "matchesV17": false
+    "sha256": "dafdecb90883e88655684996c43266d54cbb547ed6b776667c77a4e28f1027b4",
+    "full": "dafdecb90883e88655684996c43266d54cbb547ed6b776667c77a4e28f1027b4",
+    "matchesV18": false,
+    "matchesV17": false,
+    "matchesV16": false,
+    "matchesV15": false,
+    "note": "Flags answer 'is BLUEPRINT.md byte-identical to this snapshot?'. Each historical flag is asserted FALSE and the current one TRUE, so any silent edit to BLUEPRINT.md breaks a pinned test.",
+    "matchesV19": true,
+    "matchesV10": false,
+    "matchesV11": false,
+    "matchesV12": false,
+    "matchesV13": false,
+    "matchesV14": false
   },
   "v14": {
     "file": "docs/BLUEPRINT-v1.4.md",
@@ -72,5 +81,24 @@
     "lines": 2011,
     "sha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
     "full": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4"
+  },
+  "frozenMjsFullHash": {
+    "file": "scripts/map-compass/frozen.mjs",
+    "purpose": "64-character SHA-256 anchor for the frozen constants file. Owner instruction (2026-11-05): record it before and after every stage; only the A8 allowed additions may change it.",
+    "beforeStage1Repair": "41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389",
+    "afterStage1Repair": "1641999f8b978c23686e58d05ed22badefd3ff6ac17da2ffd5bea96ac2c8bc56",
+    "allowedChange": "G0 Amendment 8 permitted additions ONLY: DEV_SEGMENTS, SEGMENT_WARMUP_BARS, SEGMENT_TAIL_BARS, SWEEP_GRID. No existing value edited."
+  },
+  "v19": {
+    "file": "docs/BLUEPRINT-v1.9.md",
+    "bytes": 133820,
+    "lines": 2055,
+    "sha256": "dafdecb90883e88655684996c43266d54cbb547ed6b776667c77a4e28f1027b4",
+    "full": "dafdecb90883e88655684996c43266d54cbb547ed6b776667c77a4e28f1027b4"
+  },
+  "claimCardsFullText": {
+    "file": "docs/CLAIM-CARDS-FULL-TEXT.md",
+    "sha256": "032021d167c4457fcb987872ac0af65f18fa37e4a9459ee813da83b8d6a07022",
+    "note": "Regenerated from the FROZEN cards at A9; the A2-era DRAFT dump was history and is preserved by git."
   }
 }

@@ -6,7 +6,7 @@
   "criteriaChanged": false,
   "thresholdChanged": false,
   "verdictChanged": false,
-  "unit": "family × verdict state (one decision cell per family's strength/weakness half)",
+  "unit": "family \u00d7 verdict state (one decision cell per family's strength/weakness half)",
   "edgesR": [
     0,
     0.05,
@@ -19,13 +19,13 @@
   "definition": {
     "confirmed": "Unchanged frozen conjunction: meanNetR > +0.10R AND day-clustered tNet > 2 AND excessVsRandomR > 0 AND day-clustered t > 2 AND n >= 100 AND concentration <= 0.50 AND LOYO >= 0.75 AND NO_BASELINE clear.",
     "eligibleSameBarCandidates": "74,886 means eligible EFFICIENT/CHOPPY signal instances across the 24-card pre-deletion A5 library, reduced to unique bar indices after lowest-priority same-bar resolution, before the one-slot book dropped occupied-period candidates. This historical denominator is not recomputed as if the deleted cards had never existed.",
-    "thinPower": "THIN-POWER is a diagnostic label only: family × verdict power at true net +0.20R below 0.50. It does not change any criterion or threshold."
+    "thinPower": "THIN-POWER is a diagnostic label only: family \u00d7 verdict power at true net +0.20R below 0.50. It does not change any criterion or threshold."
   },
   "method": {
-    "counts": "A6 per-family × verdict n is the sum of surviving card-specific one-slot records. Kish nEffective is recomputed over duplicate kept entry bars within each family/state; same-bar duplicates are not falsely counted as independent information.",
-    "dayClustering": "Use measured random-entry-baseline CR1/plain-SE inflation per verdict state, clustered by canonical EAT calendar date: 1.3222 EFFICIENT and 1.1202 CHOPPY. Family-cell SE = matching-session-weighted random-baseline SD × measured verdict-state CR1 inflation / sqrt(Kish nEffective). Actual family cell date/year counts are preserved in slot-model.json.",
-    "baselines": "Random-baseline means/SDs are weighted by that family/state's measured session mix using existing state × session matched-control fine cells.",
-    "simulation": "10,000 parametric runs per family × verdict × edge, common net/excess noise, and measured per-year survivor counts for concentration/LOYO simulations; NO strategy returns, exits or claim results are used.",
+    "counts": "A6 per-family \u00d7 verdict n is the sum of surviving card-specific one-slot records. Kish nEffective is recomputed over duplicate kept entry bars within each family/state; same-bar duplicates are not falsely counted as independent information.",
+    "dayClustering": "Use measured random-entry-baseline CR1/plain-SE inflation per verdict state, clustered by canonical EAT calendar date: 1.3222 EFFICIENT and 1.1202 CHOPPY. Family-cell SE = matching-session-weighted random-baseline SD \u00d7 measured verdict-state CR1 inflation / sqrt(Kish nEffective). Actual family cell date/year counts are preserved in slot-model.json.",
+    "baselines": "Random-baseline means/SDs are weighted by that family/state's measured session mix using existing state \u00d7 session matched-control fine cells.",
+    "simulation": "10,000 parametric runs per family \u00d7 verdict \u00d7 edge, common net/excess noise, and measured per-year survivor counts for concentration/LOYO simulations; NO strategy returns, exits or claim results are used.",
     "analyticCrossCheck": "Net-gate P(meanNet > .10 AND tNet > 2) = Phi((edge - max(.10, 2*SE))/SE). Monte Carlo estimates of the same net gate are recorded alongside the analytic value."
   },
   "dependence": {
@@ -33,7 +33,7 @@
       "EFFICIENT": 1.3222,
       "CHOPPY": 1.1202
     },
-    "unitSpecificKish": "familyPowerStructure contains n, nEffective, design effect, per-day counts, per-year counts, and session composition for every family × verdict state."
+    "unitSpecificKish": "familyPowerStructure contains n, nEffective, design effect, per-day counts, per-year counts, and session composition for every family \u00d7 verdict state."
   },
   "cells": [
     {
@@ -3811,7 +3811,7 @@
           },
           "analyticNetGateProbability": 0.01174,
           "mcNetGateProbability": 0.0118,
-          "analyticNetGateCrossCheckDifference": 0.00006
+          "analyticNetGateCrossCheckDifference": 6e-05
         },
         "0.1": {
           "runs": 10000,
@@ -5037,7 +5037,7 @@
           },
           "analyticNetGateProbability": 0.99977,
           "mcNetGateProbability": 0.9998,
-          "analyticNetGateCrossCheckDifference": 0.00003
+          "analyticNetGateCrossCheckDifference": 3e-05
         }
       }
     },
@@ -9088,7 +9088,7 @@
           },
           "analyticNetGateProbability": 0.99999,
           "mcNetGateProbability": 0.9999,
-          "analyticNetGateCrossCheckDifference": -0.00009
+          "analyticNetGateCrossCheckDifference": -9e-05
         }
       }
     },
@@ -14311,7 +14311,7 @@
           },
           "analyticNetGateProbability": 0.99931,
           "mcNetGateProbability": 0.9993,
-          "analyticNetGateCrossCheckDifference": -0.00001
+          "analyticNetGateCrossCheckDifference": -1e-05
         },
         "0.3": {
           "runs": 10000,
@@ -18297,9 +18297,9 @@
           "exclusiveFailureShare": {
             "netFloor": 1
           },
-          "analyticNetGateProbability": 0.00002,
+          "analyticNetGateProbability": 2e-05,
           "mcNetGateProbability": 0,
-          "analyticNetGateCrossCheckDifference": -0.00002
+          "analyticNetGateCrossCheckDifference": -2e-05
         },
         "0.05": {
           "runs": 10000,
@@ -18386,7 +18386,7 @@
           },
           "analyticNetGateProbability": 0.99998,
           "mcNetGateProbability": 1,
-          "analyticNetGateCrossCheckDifference": 0.00002
+          "analyticNetGateCrossCheckDifference": 2e-05
         },
         "0.3": {
           "runs": 10000,
@@ -21987,9 +21987,9 @@
           "exclusiveFailureShare": {
             "netFloor": 1
           },
-          "analyticNetGateProbability": 0.00003,
+          "analyticNetGateProbability": 3e-05,
           "mcNetGateProbability": 0,
-          "analyticNetGateCrossCheckDifference": -0.00003
+          "analyticNetGateCrossCheckDifference": -3e-05
         },
         "0.05": {
           "runs": 10000,
@@ -22077,7 +22077,7 @@
           },
           "analyticNetGateProbability": 0.99997,
           "mcNetGateProbability": 0.9999,
-          "analyticNetGateCrossCheckDifference": -0.00007
+          "analyticNetGateCrossCheckDifference": -7e-05
         },
         "0.3": {
           "runs": 10000,
@@ -30504,9 +30504,9 @@
           "family": "osc-fade",
           "verdictState": "CHOPPY",
           "probability": 0,
-          "analyticNetGateProbability": 0.00002,
+          "analyticNetGateProbability": 2e-05,
           "mcNetGateProbability": 0,
-          "analyticNetGateCrossCheckDifference": -0.00002
+          "analyticNetGateCrossCheckDifference": -2e-05
         },
         {
           "family": "band-reversion",
@@ -30520,9 +30520,9 @@
           "family": "band-reversion",
           "verdictState": "CHOPPY",
           "probability": 0,
-          "analyticNetGateProbability": 0.00003,
+          "analyticNetGateProbability": 3e-05,
           "mcNetGateProbability": 0,
-          "analyticNetGateCrossCheckDifference": -0.00003
+          "analyticNetGateCrossCheckDifference": -3e-05
         },
         {
           "family": "candlestick-reversal",
@@ -30575,7 +30575,7 @@
           "probability": 0.0118,
           "analyticNetGateProbability": 0.01174,
           "mcNetGateProbability": 0.0118,
-          "analyticNetGateCrossCheckDifference": 0.00006
+          "analyticNetGateCrossCheckDifference": 6e-05
         },
         {
           "family": "ma-cross",
@@ -31022,7 +31022,7 @@
           "probability": 0.9993,
           "analyticNetGateProbability": 0.99931,
           "mcNetGateProbability": 0.9993,
-          "analyticNetGateCrossCheckDifference": -0.00001
+          "analyticNetGateCrossCheckDifference": -1e-05
         },
         {
           "family": "osc-fade",
@@ -31038,7 +31038,7 @@
           "probability": 1,
           "analyticNetGateProbability": 0.99998,
           "mcNetGateProbability": 1,
-          "analyticNetGateCrossCheckDifference": 0.00002
+          "analyticNetGateCrossCheckDifference": 2e-05
         },
         {
           "family": "band-reversion",
@@ -31054,7 +31054,7 @@
           "probability": 0.9999,
           "analyticNetGateProbability": 0.99997,
           "mcNetGateProbability": 0.9999,
-          "analyticNetGateCrossCheckDifference": -0.00007
+          "analyticNetGateCrossCheckDifference": -7e-05
         },
         {
           "family": "candlestick-reversal",
@@ -31115,7 +31115,7 @@
           "probability": 0.9998,
           "analyticNetGateProbability": 0.99977,
           "mcNetGateProbability": 0.9998,
-          "analyticNetGateCrossCheckDifference": 0.00003
+          "analyticNetGateCrossCheckDifference": 3e-05
         },
         {
           "family": "ma-cross",
@@ -31131,7 +31131,7 @@
           "probability": 0.9999,
           "analyticNetGateProbability": 0.99999,
           "mcNetGateProbability": 0.9999,
-          "analyticNetGateCrossCheckDifference": -0.00009
+          "analyticNetGateCrossCheckDifference": -9e-05
         },
         {
           "family": "opening-range",
@@ -31225,5 +31225,13 @@
     }
   ],
   "requestedPooledConstraintCorrection": "Pooled power below a component cell's power is expected at true edges below +0.10R due to the frozen absolute-mean floor. The 'never below' relation applies only at edges at or above +0.10R; no rule or threshold was changed.",
-  "note": "Report-only capacity/power model; not strategy verification. Cards remain DRAFT. No Map, state, parameter, priority, cost, exit or CONFIRMED criterion changed."
+  "note": "Report-only capacity/power model; not strategy verification. Cards remain DRAFT. No Map, state, parameter, priority, cost, exit or CONFIRMED criterion changed.",
+  "supersededByA8": {
+    "superseded": true,
+    "supersededAt": "2026-11-05 (G0 Amendment 8)",
+    "supersedes": "G0 Amendment 8 Method 1 \u2014 DEV-only segments",
+    "what": "power curves computed on the pre-A8 continuous sample",
+    "why": "G0 Amendment 8 replaced the continuous DEV sample with four DEV-only segments (split at every non-DEV gap). These counts were computed across segment boundaries, so they are NOT valid for the A8 verification.",
+    "status": "RETAINED AS HISTORY; not an input to any A8 verdict"
+  }
 }

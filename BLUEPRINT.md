@@ -1,13 +1,14 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.8 — 2026-11-05; G0 AMENDMENT 8 applied before any strategy result**
+**Version 1.9 — 2026-11-05; G0 AMENDMENT 9 applied before any strategy result**
 **Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. No strategy result exists.**
 **Branch:** `arena/072665f9-system`
 
 > **Version history is immutable.** Eight byte-preserving snapshots exist:
 > `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
 > `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md`, `docs/BLUEPRINT-v1.4.md`,
-> `docs/BLUEPRINT-v1.5.md`, `docs/BLUEPRINT-v1.6.md`, and `docs/BLUEPRINT-v1.7.md`; the v1.8 snapshot is listed in the version register. The full 64-character
+> `docs/BLUEPRINT-v1.5.md`, `docs/BLUEPRINT-v1.6.md`, `docs/BLUEPRINT-v1.7.md`,
+> and `docs/BLUEPRINT-v1.8.md`; the v1.9 snapshot is listed in the version register. The full 64-character
 > SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
@@ -48,11 +49,14 @@
 >   edges ≥ +0.10R. Cards remain DRAFT; verification remains blocked.
 > - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards were DRAFT at this historical version.
 > - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No strategy result exists.
+> - **v1.9 / G0 Amendment 9 (2026-11-05)** — REPAIR of the Amendment 8 record, before any strategy result. Writes the missing A8 report; adds the permitted constants to `scripts/map-compass/frozen.mjs` (`DEV_SEGMENTS`, `SEGMENT_WARMUP_BARS`, `SEGMENT_TAIL_BARS`, `SWEEP_GRID`) with no existing value edited; marks the five pre-A8 artifacts superseded in their own metadata; restores the `matchesV15`/`matchesV16` flags lost from the hash register; records `frozen.mjs` hashes; creates `docs/STATUS.md`; and brings ten stale "cards are DRAFT" assertions up to the frozen state while keeping every "no result artifact" guard. **No threshold, card, Map rule, cost, exit or CONFIRMED-rule change.** No strategy result exists.
 >
 > **Every amendment was applied before any real strategy result exists.** At
 > v1.7 the cards were DRAFT and verification was blocked; G0 Amendment 8 now
 > records their unchanged owner-approved freeze and the staged pre-result
-> pipeline. **No MAP, cost, exit, stop, target, floor or t numeric threshold
+> pipeline. G0 Amendment 9 repairs that record (report, permitted constants,
+> superseded markers, hash flags, STATUS.md, stale guards) without changing any
+> value. **No MAP, cost, exit, stop, target, floor or t numeric threshold
 > changed at any version.** Amendment 3 explicitly rewrote the verification
 > RULE, but every numeric constant inside it remains an original frozen value.
 
@@ -2009,3 +2013,43 @@ thresholds is permitted.
 
 **Threshold changed?** No. **Card text/state/parameter changed?** No. **Any
 strategy result existed at freeze?** No.
+
+
+### 7.14 G0 Amendment 9 (2026-11-05) — repair of the Amendment 8 record
+
+**Why this version exists.** v1.8 recorded the freeze and both methods in prose,
+but the record was incomplete: no `docs/G0-AMENDMENT-8-REPORT.md`, the two
+permitted constant sets were never added to `frozen.mjs`, the pre-A8 artifacts
+carried no superseded marker, `docs/STATUS.md` did not exist, and ten older
+tests still asserted that the cards were `DRAFT`. Amendment 9 fixes the record
+only. It is applied **before any strategy result exists**.
+
+**What changed, exhaustively.**
+
+1. `docs/G0-AMENDMENT-8-REPORT.md` now exists and describes what commit
+   `9aae04e` froze and pre-registered.
+2. `scripts/map-compass/frozen.mjs` gained the two permitted additions and
+   nothing else: `DEV_SEGMENTS` (four inclusive DEV spans), with
+   `SEGMENT_WARMUP_BARS = 1000` and `SEGMENT_TAIL_BARS = 96` (each asserted at
+   load to equal `MAP.warmupBars` and `EXIT_HARNESS.maxHoldBars`), and
+   `SWEEP_GRID` (ER `{0.25,0.30,0.35,0.40,0.45}` x ATR percentile
+   `{60,65,70,75,80}` = 25 cells, center `0.35/70`). Its SHA-256 moved from
+   `41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389` to
+   `1641999f8b978c23686e58d05ed22badefd3ff6ac17da2ffd5bea96ac2c8bc56`.
+   **No existing value was edited**; the diff is 52 added lines, 0 removed.
+3. `random-baseline.json`, `power-curve.json`, `signal-counts.json`,
+   `baseline-coverage.json` and `slot-model.json` each carry a
+   `supersededByA8` block and say plainly that they are history, not inputs to
+   an A8 verdict. The files themselves are retained.
+4. `artifacts/map-compass/blueprint-hashes.json` regained the `matchesV15` and
+   `matchesV16` flags that had been dropped when v1.8 was recorded (their
+   absence, not the freeze, was what broke two pinned tests) and gained
+   `frozenMjsFullHash` with before/after digests.
+5. `docs/STATUS.md` was created as the one-page live record.
+6. Ten assertions in `tests/map-compass/{compass,amendment2,amendment3,amendment4,amendment5,amendment6}.test.mjs`
+   that pinned `status === "DRAFT"` / `approvedBy === null` now pin the frozen
+   state, and the card-dump assertion follows the generated dump. Every
+   "no claim-verification artifact may exist" guard is retained unchanged.
+
+**Threshold changed?** No. **Card text/state/parameter changed?** No. **Map,
+cost, exit or CONFIRMED rule changed?** No. **Any strategy result existed?** No.

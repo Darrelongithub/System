@@ -84,7 +84,7 @@ test("A4 1: the signal library has the retained 22 evaluators with exact card pa
   assertEqual(CLAIM_CARDS.length, 22);
   assertEqual(TEST_ORDER.length, 22);
   assertEqual(JSON.stringify(TEST_ORDER.map((t) => t.id)), JSON.stringify(FROZEN_TEST_SEQUENCE));
-  assertEqual(FREEZE.status, "DRAFT");
+  assertEqual(FREEZE.status, "FROZEN"); // A4-era assertion was "DRAFT"; A8 froze the cards
 });
 
 test("A4 1: signals emit ONLY entry bars and sides — no stops, targets, trades or R", () => {
@@ -440,9 +440,9 @@ test("A4 7: every family has a criticism whose URL was opened this run (VERIFIED
 // ---------------------------------------------------------------------------
 // Guards
 // ---------------------------------------------------------------------------
-test("A4: verify-claims stays BLOCKED and the cards stay DRAFT", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  assertEqual(FREEZE.approvedBy, null);
+test("A4: cards are FROZEN by A8 and no real verification result exists yet", () => {
+  assertEqual(FREEZE.status, "FROZEN"); // A4-era assertion was "DRAFT"
+  assertEqual(FREEZE.approvedBy, "Darrel");
   assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
   assert(!existsSync(join(ART, "claimed-trades.jsonl")), "no trade stream may exist");
   assertEqual(read("routing-table.json").enabledCount, 0);

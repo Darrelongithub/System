@@ -47,7 +47,7 @@ test("A5: calendar-cluster baseline uses canonical dates; real verification rema
   for(const vs of ["EFFICIENT","CHOPPY"]){const days=Object.keys(daily.byVerdictState[vs]);assert(days.every(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)),`${vs} baseline clusters must use real ISO calendar days`);assertEqual(days.length,b.dailySe[vs].dayClusters);}
   assert(b.dailySe.EFFICIENT.dayClusters>1000 && b.dailySe.EFFICIENT.dayClusters<3000);
   assert(b.dailySe.CHOPPY.dayClusters>1000 && b.dailySe.CHOPPY.dayClusters<4000);
-  assertEqual(FREEZE.status,"DRAFT");assertEqual(FREEZE.approvedBy,null);assertEqual(FREEZE.approvedAt,null);
+  assertEqual(FREEZE.status,"FROZEN");assertEqual(FREEZE.approvedBy,"Darrel");assert(FREEZE.approvedAt,"A8 freeze carries an approval date"); // A5-era assertion was DRAFT/null/null
   assert(!existsSync(join(ART,"claim-verification.json")));assert(!existsSync(join(ART,"claimed-trades.jsonl")));
   assert(s.realHarnessAudit.requiredBeforeRealVerification.includes("per-card slot-constrained"));
 });
@@ -57,6 +57,7 @@ test("A5: v1.5 snapshot hash is pinned and prior snapshots remain unchanged",()=
   const digest=b=>createHash("sha256").update(b).digest("hex");
   assertEqual(digest(snapshot),hashes.v15.sha256);
   assertEqual(hashes.current.matchesV15,false);
+  for(const k of ["v10","v11","v12","v13","v14"])assertEqual(hashes.current["matches"+k.toUpperCase()],false,`${k} must not be flagged current`);
   for(const key of ["v10","v11","v12","v13","v14"]){const f=readFileSync(join(ROOT,hashes[key].file));assertEqual(digest(f),hashes[key].sha256,`${key} snapshot stays byte-preserved`);}
 });
 

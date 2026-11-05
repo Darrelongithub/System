@@ -1,15 +1,15 @@
 # Claim cards — FULL TEXT (all 22, in TEST_ORDER)
 
-**Generated:** 2026-11-02T12:40:29.591Z
-**Card status:** `FROZEN` — approvedBy: Darrel; approvedAt: 2026-11-05. Not strategy-tested.
+**Generated:** 2026-11-05T14:08:29.411Z
+**Card status:** `FROZEN` — NOT FROZEN. NOT TESTED.
 **Cards:** 22 | **Families:** 8 | **Prior false fraction:** 0.8
 **Order:** EXPLICIT FROZEN SEQUENCE (v1.3, byte-identical to v1.2). evidenceTier is a diagnostic rank, NOT an ordering key and NOT an evidence claim.
 **Verdict states:** EFFICIENT / CHOPPY — EFFICIENT = EXPANSION+GRIND (ER >= 0.35), CHOPPY = WHIPSAW+QUIET.
 
 > Generated mechanically from `scripts/map-compass/claim-cards.draft.mjs`
-> by `print-claim-cards.mjs`. All 22 cards were approved unchanged by Darrel on
-> 2026-11-05 before any strategy result. Verdicts are decided on the TWO verdict
-> states; the four Map states are DIAGNOSTICS only. No card text was edited at freeze.
+> by `print-claim-cards.mjs`. **No card is frozen here.** Verdicts are decided on the
+> TWO verdict states; the four Map states are DIAGNOSTICS only. Editing a card after
+> results would be the laundering this project forbids — change it NOW, during review.
 
 ## Empirical-study registry (tiers REPLACED at G0 Amendment 3)
 
@@ -178,10 +178,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764.
 - http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -234,10 +234,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Brock, W., Lakonishok, J. & LeBaron, B. (1992). Simple Technical Trading Rules and the Stochastic Properties of Stock Returns. Journal of Finance 47(5), 1731-1764.
 - http://technicalanalysis.org.uk/support-and-resistance/BrockLakonishokLeBaron1992.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -290,10 +290,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Chong, T.T.-L. & Ng, W.-K. (2008). Technical analysis and the London stock exchange: testing the MACD and RSI rules using the FT30. Applied Economics Letters 15(14), 1111-1114. DOI 10.1080/13504850600993598.
 - https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -346,10 +346,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Chong, T.T.-L. & Ng, W.-K. (2008). Technical analysis and the London stock exchange: testing the MACD and RSI rules using the FT30. Applied Economics Letters 15(14), 1111-1114. DOI 10.1080/13504850600993598.
 - https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -402,10 +402,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Chong, T.T.-L. & Ng, W.-K. (2008). Technical analysis and the London stock exchange: testing the MACD and RSI rules using the FT30. Applied Economics Letters 15(14), 1111-1114. DOI 10.1080/13504850600993598.
 - https://ideas.repec.org/a/taf/apeclt/v15y2008i14p1111-1114.html
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -458,10 +458,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Crabel, T. (1990). Day Trading with Short Term Price Patterns & Opening Range Breakout (Traders Press) — practitioner book, not a peer-reviewed test.
 - https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -514,10 +514,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Crabel, T. (1990). Day Trading with Short Term Price Patterns & Opening Range Breakout (Traders Press) — practitioner book, not a peer-reviewed test.
 - https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -570,10 +570,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Crabel, T. (1990). Day Trading with Short Term Price Patterns & Opening Range Breakout (Traders Press) — practitioner book, not a peer-reviewed test.
 - https://chartschool.stockcharts.com/table-of-contents/trading-strategies-and-models/trading-strategies/narrow-range-day-nr7
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -626,10 +626,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Holmberg, U., Lönnbark, C. & Lundström, C. (2013). Assessing the profitability of intraday opening range breakout strategies. Finance Research Letters 10(1), 47-53. DOI 10.1016/j.frl.2012.09.001.
 - http://www.econ.umu.se/ueslpnr/ues845.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -682,10 +682,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Holmberg, U., Lönnbark, C. & Lundström, C. (2013). Assessing the profitability of intraday opening range breakout strategies. Finance Research Letters 10(1), 47-53. DOI 10.1016/j.frl.2012.09.001.
 - http://www.econ.umu.se/ueslpnr/ues845.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -738,10 +738,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Holmberg, U., Lönnbark, C. & Lundström, C. (2013). Assessing the profitability of intraday opening range breakout strategies. Finance Research Letters 10(1), 47-53. DOI 10.1016/j.frl.2012.09.001.
 - http://www.econ.umu.se/ueslpnr/ues845.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -794,10 +794,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Lento, C., Gradojevic, N. & Wright, C. S. (2007). Investment information content in Bollinger Bands? Applied Financial Economics Letters 3(4), 263-267. DOI 10.1080/17446540701206576.
 - https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -850,10 +850,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Lento, C., Gradojevic, N. & Wright, C. S. (2007). Investment information content in Bollinger Bands? Applied Financial Economics Letters 3(4), 263-267. DOI 10.1080/17446540701206576.
 - https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -906,10 +906,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Lento, C., Gradojevic, N. & Wright, C. S. (2007). Investment information content in Bollinger Bands? Applied Financial Economics Letters 3(4), 263-267. DOI 10.1080/17446540701206576.
 - https://www.researchgate.net/publication/46527151_Investment_information_content_in_Bollinger_Bands
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -962,10 +962,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Osler, C. L. (2000). Support for Resistance: Technical Analysis and Intraday Exchange Rates. FRBNY Economic Policy Review 6(2), 53-68.
 - https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1018,10 +1018,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Osler, C. L. (2000). Support for Resistance: Technical Analysis and Intraday Exchange Rates. FRBNY Economic Policy Review 6(2), 53-68.
 - https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1074,10 +1074,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Osler, C. L. (2000). Support for Resistance: Technical Analysis and Intraday Exchange Rates. FRBNY Economic Policy Review 6(2), 53-68.
 - https://www.newyorkfed.org/medialibrary/media/research/epr/00v06n2/0007osle.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1130,10 +1130,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149.
 - https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1186,10 +1186,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Chong, T.T.-L., Ng, W.-K. & Liew, V.K.-S. (2014). Revisiting the Performance of MACD and RSI Oscillators. Journal of Risk and Financial Management 7(1), 1-12 / MPRA Paper 54149.
 - https://mpra.ub.uni-muenchen.de/54149/1/MPRA_paper_54149.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1242,10 +1242,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Marshall, B. R., Young, M. R. & Rose, L. C. (2006). Candlestick technical trading strategies: Can they create value for investors? Journal of Banking & Finance 30(8), 2303-2323. DOI 10.1016/j.jbankfin.2005.08.001.
 - https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1298,10 +1298,10 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Marshall, B. R., Young, M. R. & Rose, L. C. (2006). Candlestick technical trading strategies: Can they create value for investors? Journal of Banking & Finance 30(8), 2303-2323. DOI 10.1016/j.jbankfin.2005.08.001.
 - https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
@@ -1354,15 +1354,15 @@ Cross-family mirror images (diagnostic only; pooling is per family):
 - Marshall, B. R., Young, M. R. & Rose, L. C. (2006). Candlestick technical trading strategies: Can they create value for investors? Journal of Banking & Finance 30(8), 2303-2323. DOI 10.1016/j.jbankfin.2005.08.001.
 - https://scispace.com/pdf/candlestick-technical-trading-strategies-can-they-create-2whgphf6vm.pdf
 
-**Freeze approval (G0 Amendment 8)**
+**Review fields (leave blank until the human freeze)**
 
-- Reviewer decision: _KEEP unchanged_
-- Approval: Darrel, 2026-11-05; card text, states, parameters, priorities and order unchanged.
+- Reviewer decision: _keep / edit / remove — `_
+- If edited, new strength/weakness verdict state + rationale (pre-results only): _`______`_
 
 ---
 
-## Freeze gate (decision #13) — COMPLETE (G0 Amendment 8)
+## Freeze gate (decision #13) — NOT DONE
 
-`FREEZE.status = "FROZEN"`, `approvedBy = "Darrel"`, and `approvedAt = "2026-11-05"`.
-This approval authorizes no result by itself: Stage 2 tests and the Stage 3
-synthetic rehearsal must pass before the one-time DEV-only verification.
+Real verification stays BLOCKED until a reviewer sets `FREEZE.status = "FROZEN"`
+with `approvedBy` and `approvedAt` in `claim-cards.draft.mjs`. **Amendment 3 did
+not freeze anything.** See `docs/CLAIM-CARDS-REVIEW.md` for the review checklist.

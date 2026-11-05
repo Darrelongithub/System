@@ -1688,5 +1688,13 @@
     "sharePct": 1.22319,
     "note": "Trades neither stopped nor targeted by bar 96 are closed at market as TIME_EXIT. Same cap applies to real claim evaluation."
   },
-  "verdict": "LONG_SHORT_ASYMMETRY_PRESENT — testing claims against zero would be invalid"
+  "verdict": "LONG_SHORT_ASYMMETRY_PRESENT \u2014 testing claims against zero would be invalid",
+  "supersededByA8": {
+    "superseded": true,
+    "supersededAt": "2026-11-05 (G0 Amendment 8)",
+    "supersedes": "G0 Amendment 8 Method 1 \u2014 DEV-only segments",
+    "what": "random-entry control (per-cell means) rebuilt under A8 segments",
+    "why": "G0 Amendment 8 replaced the continuous DEV sample with four DEV-only segments (split at every non-DEV gap). These counts were computed across segment boundaries, so they are NOT valid for the A8 verification.",
+    "status": "RETAINED AS HISTORY; not an input to any A8 verdict"
+  }
 }

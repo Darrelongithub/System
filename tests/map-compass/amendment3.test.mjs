@@ -472,9 +472,9 @@ test("A3 6: v1.0, v1.1, v1.2, v1.3 snapshots are preserved with full SHA-256", (
 // ---------------------------------------------------------------------------
 // Guards
 // ---------------------------------------------------------------------------
-test("A3: cards are STILL DRAFT and no real verification was run", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  assertEqual(FREEZE.approvedBy, null);
+test("A3: cards are FROZEN by A8 (was DRAFT at A3) and no real verification was run", () => {
+  assertEqual(FREEZE.status, "FROZEN"); // A3-era assertion was "DRAFT"
+  assertEqual(FREEZE.approvedBy, "Darrel");
   assert(!existsSync(join(ART, "claim-verification.json")), "no real strategy result may exist");
   const routing = read("routing-table.json");
   assertEqual(routing.enabledCount, 0);

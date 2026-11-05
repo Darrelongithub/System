@@ -1695,7 +1695,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "rsi-14-30-70 strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "rsi-14-30-70 strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1709,7 +1709,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "rsi-14-30-70 weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "rsi-14-30-70 weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1723,7 +1723,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "williams-r-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "williams-r-fade strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1737,7 +1737,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "williams-r-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "williams-r-fade weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1751,7 +1751,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "bollinger-20-2 strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bollinger-20-2 strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1765,7 +1765,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "bollinger-20-2 weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bollinger-20-2 weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1779,7 +1779,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "keltner-20-atr strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "keltner-20-atr strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1793,7 +1793,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "keltner-20-atr weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "keltner-20-atr weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1807,7 +1807,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "bb-squeeze-fade strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bb-squeeze-fade strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1821,7 +1821,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "bb-squeeze-fade weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "bb-squeeze-fade weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1835,7 +1835,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "engulfing strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "engulfing strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1849,7 +1849,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "engulfing weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "engulfing weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1863,7 +1863,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "morning-evening-star strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "morning-evening-star strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1877,7 +1877,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "morning-evening-star weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "morning-evening-star weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1891,7 +1891,7 @@
         "QUIET"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "three-soldiers-crows strength in CHOPPY — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "three-soldiers-crows strength in CHOPPY \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1905,7 +1905,7 @@
         "GRIND"
       ],
       "exitCaveat": "under the standard exit (1.5 ATR stop, 2R target) only",
-      "verdictLabel": "three-soldiers-crows weakness in EFFICIENT — under the standard exit (1.5 ATR stop, 2R target) only",
+      "verdictLabel": "three-soldiers-crows weakness in EFFICIENT \u2014 under the standard exit (1.5 ATR stop, 2R target) only",
       "reversionFamily": true,
       "verdictExists": false
     },
@@ -1999,5 +1999,13 @@
     "labelledReversionSlots": 16,
     "label": "under the standard exit (1.5 ATR stop, 2R target) only",
     "note": "Cards are DRAFT, so no verdict has been produced. These are the pre-registered labels; every future verdict for a reversion-family slot MUST be printed with this suffix. No new exit in this cycle."
+  },
+  "supersededByA8": {
+    "superseded": true,
+    "supersededAt": "2026-11-05 (G0 Amendment 8)",
+    "supersedes": "G0 Amendment 8 Method 1 \u2014 DEV-only segments",
+    "what": "baseline cell coverage computed on the pre-A8 continuous sample",
+    "why": "G0 Amendment 8 replaced the continuous DEV sample with four DEV-only segments (split at every non-DEV gap). These counts were computed across segment boundaries, so they are NOT valid for the A8 verification.",
+    "status": "RETAINED AS HISTORY; not an input to any A8 verdict"
   }
 }

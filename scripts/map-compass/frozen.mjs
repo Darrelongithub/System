@@ -450,3 +450,55 @@ export const EVIDENCE = Object.freeze({
   note: "Each family has one opened empirical study or is marked PRACTITIONER_ONLY. Full URLs above. No outcomes from our own data were used.",
   criticisms: "See CRITICISMS: the strongest published criticism or failed replication per family, every URL opened 2026-10-27.",
 });
+
+/**
+ * G0 AMENDMENT 8 (2026-11-05, before any strategy result) — ALLOWED ADDITION.
+ *
+ * DEV-only segment definitions (Method 1). The owner's amendment permits
+ * EXACTLY TWO additions to this file: these segment definitions and the sweep
+ * grid below. NO EXISTING VALUE WAS CHANGED.
+ *
+ * A non-DEV gap is a HARD segment boundary. The sealed HOLDOUT years
+ * (2008/2012/2016/2019) sit INSIDE the DEV date span and are themselves the
+ * gaps, so any component that reads across a boundary reads sealed bars.
+ *
+ * Entries are eligible only at local segment index >= warmupBars (1,000) AND
+ * with >= tailBars (96 = EXIT_HARNESS.maxHoldBars) bars left in the segment,
+ * so neither warm-up nor the forward scan can cross a boundary. A trade's year
+ * is its ENTRY year.
+ */
+export const DEV_SEGMENTS = Object.freeze(
+  Object.freeze([
+    Object.freeze({ id: "S1", years: Object.freeze([2004, 2005, 2006, 2007]), label: "2004-2007" }),
+    Object.freeze({ id: "S2", years: Object.freeze([2009, 2010, 2011]), label: "2009-2011" }),
+    Object.freeze({ id: "S3", years: Object.freeze([2013, 2014, 2015]), label: "2013-2015" }),
+    Object.freeze({ id: "S4", years: Object.freeze([2017, 2018]), label: "2017-2018" }),
+  ]),
+);
+
+/** Warm-up exclusion, measured in LOCAL segment bars. Equals MAP.warmupBars. */
+export const SEGMENT_WARMUP_BARS = 1000; // MUST equal MAP.warmupBars
+
+/** Tail exclusion, measured in LOCAL segment bars. Equals EXIT_HARNESS.maxHoldBars. */
+export const SEGMENT_TAIL_BARS = 96; // MUST equal EXIT_HARNESS.maxHoldBars
+
+/**
+ * G0 AMENDMENT 8 (2026-11-05) — ALLOWED ADDITION. Method 2 sweep grid.
+ *
+ * The frozen center (ER 0.35 x ATR percentile 70) remains the SOLE
+ * authoritative test. This grid produces a stability GRADE for claims already
+ * CONFIRMED at the center and never nullifies, rescues or selects a threshold.
+ * A missing baseline in a cell means "not CONFIRMED" in that cell (never a
+ * zero fallback). Grade thresholds live in SENSITIVITY_RULE and are unchanged.
+ */
+export const SWEEP_GRID = Object.freeze({
+  erCutoffs: Object.freeze([0.25, 0.3, 0.35, 0.4, 0.45]),
+  atrPctileCutoffs: Object.freeze([60, 65, 70, 75, 80]),
+  center: Object.freeze({ erCutoff: 0.35, atrPctileCutoff: 70 }),
+  cellCount: 25,
+  gradeOfConfirmedPct: "share of all 25 cells CONFIRMED, graded by SENSITIVITY_RULE",
+  missingBaselineMeans: "not CONFIRMED in that cell",
+  authoritativeVerdict: "frozen center only",
+  note: "The verdict cells use only the efficiency axis (EFFICIENT/CHOPPY); the volatility cutoff acts only through the abstain band and 3-bar confirmation.",
+  decidedAt: "G0 Amendment 8, 2026-11-05, before any strategy result",
+});

@@ -46,17 +46,26 @@ test("22 current claim cards across 8 families, structurally valid", () => {
   for (const f of FAMILIES) assert([2,3].includes(CLAIM_CARDS.filter((c) => c.family === f).length));
 });
 
-test("claim cards are DRAFT — real verification must be BLOCKED", () => {
-  assertEqual(FREEZE.status, "DRAFT");
-  let threw = false;
-  try {
-    assertCardsFrozen(FREEZE);
-  } catch {
-    threw = true;
+test("claim cards are FROZEN under G0 Amendment 8 — and a DRAFT card set is still BLOCKED", () => {
+  // G0 Amendment 8 (2026-11-05): the owner froze all 22 cards unchanged before
+  // any strategy result. The guard is still tested in BOTH directions.
+  assertEqual(FREEZE.status, "FROZEN");
+  assertEqual(FREEZE.approvedBy, "Darrel");
+  assert(FREEZE.approvedAt, "freeze must carry an approval date");
+  assertCardsFrozen(FREEZE); // frozen cards authorize the gated pipeline
+  for (const bad of [
+    { status: "DRAFT", approvedBy: null, approvedAt: null },
+    { status: "FROZEN", approvedBy: null, approvedAt: "2026-11-05" },
+    { status: "FROZEN", approvedBy: "Darrel", approvedAt: null },
+  ]) {
+    let threw = false;
+    try {
+      assertCardsFrozen(bad);
+    } catch {
+      threw = true;
+    }
+    assert(threw, `incomplete freeze ${JSON.stringify(bad)} must not authorize testing`);
   }
-  assert(threw, "DRAFT cards must not authorize testing");
-  const approved = { status: "FROZEN", approvedBy: "human", approvedAt: "2026-10-26" };
-  assertCardsFrozen(approved); // no throw
 });
 
 test("every card has a frozen numeric priority, all distinct 1..22", () => {

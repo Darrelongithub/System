@@ -45224,5 +45224,13 @@
     "requiredBeforeRealVerification": "M6 must produce per-card slot-constrained DEV trades for claim-level validation, and a separate priority-resolved single-book stream for Compass; reject a batch lacking that distinction."
   },
   "minTradesPerCell": 100,
-  "note": "Counts are signal-survival model counts only; baseline-sampled duration is an assumption. No P&L, verdict, threshold, Map, exit, cost or criterion is changed."
+  "note": "Counts are signal-survival model counts only; baseline-sampled duration is an assumption. No P&L, verdict, threshold, Map, exit, cost or criterion is changed.",
+  "supersededByA8": {
+    "superseded": true,
+    "supersededAt": "2026-11-05 (G0 Amendment 8)",
+    "supersedes": "G0 Amendment 8 Method 1 \u2014 DEV-only segments",
+    "what": "one-slot occupancy model computed on the pre-A8 continuous sample",
+    "why": "G0 Amendment 8 replaced the continuous DEV sample with four DEV-only segments (split at every non-DEV gap). These counts were computed across segment boundaries, so they are NOT valid for the A8 verification.",
+    "status": "RETAINED AS HISTORY; not an input to any A8 verdict"
+  }
 }

@@ -26,7 +26,8 @@ synthetic dress rehearsal remain prerequisites to the one-time DEV run.
 | **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | superseded by v1.6; **preserved** |
 | **v1.6** | 2026-11-02 | `docs/BLUEPRINT-v1.6.md` | `4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d` | superseded by v1.7; **preserved** |
 | **v1.7** | 2026-11-02 | `docs/BLUEPRINT-v1.7.md` | `045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281` | superseded by v1.8; **preserved** |
-| **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | current; `BLUEPRINT.md` byte-identical |
+| **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | superseded by v1.9; **preserved** |
+| **v1.9** | 2026-11-05 | `docs/BLUEPRINT-v1.9.md` | `dafdecb90883e88655684996c43266d54cbb547ed6b776667c77a4e28f1027b4` | current; `BLUEPRINT.md` byte-identical; A9 record repair |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -502,3 +503,27 @@ thresholds.
 
 **Threshold changed?** No. **Map/cost/exit changed?** No. **Any result existed?**
 No.
+
+
+## I — G0 Amendment 9 (2026-11-05, before any strategy result)
+
+**Purpose.** Repair the Amendment 8 record. No value, threshold, card, Map rule,
+cost, exit or CONFIRMED-rule change. Applied before any strategy result exists.
+
+| # | Item | What was done |
+| --- | --- | --- |
+| A9.1 | A8 report | Created `docs/G0-AMENDMENT-8-REPORT.md` describing what commit `9aae04e` froze and pre-registered. |
+| A9.2 | Permitted constants | `scripts/map-compass/frozen.mjs` gained ONLY `DEV_SEGMENTS`, `SEGMENT_WARMUP_BARS` (1000), `SEGMENT_TAIL_BARS` (96) and `SWEEP_GRID` (5x5, center 0.35/70). Diff = 52 added lines, 0 removed. Load-time assertions tie the warm-up/tail constants to `MAP.warmupBars` and `EXIT_HARNESS.maxHoldBars`. |
+| A9.3 | `frozen.mjs` hashes | before `41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389`; after `1641999f8b978c23686e58d05ed22badefd3ff6ac17da2ffd5bea96ac2c8bc56`. Recorded in `blueprint-hashes.json` (`frozenMjsFullHash`) and in this log. |
+| A9.4 | Superseded markers | `random-baseline.json`, `power-curve.json`, `signal-counts.json`, `baseline-coverage.json`, `slot-model.json` each carry `supersededByA8` and are retained as history, not inputs. |
+| A9.5 | Hash-register flags | `matchesV15`/`matchesV16` restored (their absence, not the freeze, broke two pinned tests); `matchesV18` corrected to `false`; `matchesV19` added; `matchesV10`–`matchesV14` made explicit. |
+| A9.6 | STATUS.md | Created `docs/STATUS.md` as the one-page live record (stage, commit, hashes, next action, known failures). |
+| A9.7 | Stale guards | Ten assertions across `compass`, `amendment2`, `amendment3`, `amendment4`, `amendment5`, `amendment6` that pinned `DRAFT`/`null` now pin the frozen state; the two "current snapshot" pins became version-agnostic (they now assert BLUEPRINT.md equals whichever snapshot the register flags current, and that every other flag is false). All "no claim-verification artifact" guards retained. |
+
+**Test result after A9.** 399 passed, 1 failed — the known untouched `synth UI`
+string mismatch. **Thresholds changed?** No. **Cards changed?** No. **Result
+existed?** No.
+
+**Scope note (declared, not hidden).** The owner's session is pinned to branch
+`arena/2350ac34-system`; this record was committed there, not on
+`arena/072665f9-system`. See `docs/STATUS.md`.

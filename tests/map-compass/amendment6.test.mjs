@@ -20,7 +20,7 @@ test("A6: exactly two owner-approved deletions, deletion-only priorities and rel
   const priorities=CLAIM_CARDS.map(c=>c.priority).sort((a,b)=>a-b);assertEqual(JSON.stringify(priorities),JSON.stringify(Array.from({length:22},(_,i)=>i+1)));
   const oldSpec=readFileSync(join(ROOT,"docs/CLAIM-SIGNAL-SPECIFICATIONS-v1.5.md"),"utf8");
   for(const c of CLAIM_CARDS){const old=oldPriority[c.id],expected=old-(old>15?2:old>3?1:0);assertEqual(c.priority,expected,`${c.id} priority is deletion-only`);assertEqual(c.parameters,SIGNAL_PARAMS[c.id]);const row=oldSpec.split("\n").find(line=>line.startsWith("| ")&&line.includes(`| ${c.id} |`));assert(row,`${c.id} exists in v1.5`);const fields=row.split("|").map(x=>x.trim());assertEqual(fields[5],`${c.strength.state} / ${c.weakness.state}`,`${c.id} states unchanged`);if(!["asian-range-break","london-orb-30"].includes(c.id))assertEqual(fields[7],paramsToString(c.id),`${c.id} parameters unchanged outside the explicit A7 clock-window corrections`);}
-  assertEqual(FREEZE.status,"DRAFT");assertEqual(FREEZE.approvedBy,null);assertEqual(FREEZE.approvedAt,null);
+  assertEqual(FREEZE.status,"FROZEN");assertEqual(FREEZE.approvedBy,"Darrel");assert(FREEZE.approvedAt,"A8 freeze carries an approval date"); // A6-era assertion was DRAFT/null/null
 });
 
 test("A6: slot counts are one per card and one total book slot; opposite sides cannot coexist",()=>{
@@ -65,6 +65,14 @@ test("A6: full report and unchanged v1.5 history are pinned; verification remain
   const h=json("blueprint-hashes.json"),v15=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.5.md"));assertEqual(createHash("sha256").update(v15).digest("hex"),h.v15.sha256);
   const v16=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.6.md")),current=readFileSync(join(ROOT,"BLUEPRINT.md"));
   assertEqual(createHash("sha256").update(v16).digest("hex"),h.v16.sha256);
-  assertEqual(createHash("sha256").update(current).digest("hex"),h.v17.sha256);
-  assertEqual(h.current.matchesV17,true);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
+  const v17=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.7.md"));
+  assertEqual(createHash("sha256").update(v17).digest("hex"),h.v17.sha256); // v1.7 snapshot stays byte-preserved
+  const v18=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.8.md"));
+  assertEqual(createHash("sha256").update(v18).digest("hex"),h.v18.sha256);
+  // BLUEPRINT.md must be byte-identical to whichever snapshot the register flags current.
+  const currentKey=Object.keys(h).find((k)=>/^v\d+$/.test(k)&&h.current["matches"+k.toUpperCase()]===true);
+  assert(currentKey,"the register must flag exactly one snapshot as current");
+  assertEqual(createHash("sha256").update(current).digest("hex"),h[currentKey].sha256);
+  assertEqual(createHash("sha256").update(readFileSync(join(ROOT,h[currentKey].file))).digest("hex"),h[currentKey].sha256);
+  for(const k of Object.keys(h).filter((x)=>/^v\d+$/.test(x)&&x!==currentKey))assertEqual(h.current["matches"+k.toUpperCase()],false,`${k} must not be flagged current`);
 });
