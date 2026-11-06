@@ -3,7 +3,7 @@
 **As of:** 2026-11-06 (Africa/Nairobi)  
 **Branch:** `arena/072665f9-system`  
 **Verified starting tip:** `5cdf4749d3543c00f3298d59a4ef2536803dc9a4` (matched `git ls-remote`).  
-**Current task stage:** Part 0 and Part 1 are committed/pushed; Part 1 used report-only diagnostics, with no production-code changes. Classification: (ii), B synthetic drift-calibration mismatch.
+**Current task stage:** Part 0 and Part 1 are committed/pushed; Part 1 used report-only diagnostics, with no production-code changes. Classification: (ii), B synthetic drift-calibration mismatch. Part 2 is blocked at preflight and has not started.
 **Real DEV results:** none. Stage 4 has not been started.
 
 ## Existing pushed commits
@@ -40,4 +40,4 @@ The deterministic A/B replay reproduced the saved confirmed-card lists. Across t
 
 ## Next action
 
-Part 1 report and replay diagnostics are committed and remote-verified at `9dd84e32f234781f804746963f70711d7af6bc36`. Begin Part 2: apply the single B drift-calibration correction without altering A/B criteria; compute signal-only/co-fire and UNKNOWN-entry tables on synthetic and DEV data only; preregister the C planted card, calibration, seeds, and run outputs before any scored Stage 3 results. Commit and push Part 2 before the single Part 4 run. Stop after Part 4; do not run Stage 4.
+Part 1 report and replay diagnostics are committed and remote-verified at `9dd84e32f234781f804746963f70711d7af6bc36`; status bookkeeping is pushed at `46d510f6e154bd953e335aa4cfe0b05a51b2db2d`. Part 2 was not started: raw and normalized DEV inputs are absent, and the only pinned XAU source is a single 2004–2024 archive that must be fully extracted/normalized by the existing recovery path, which would read sealed-year bars. Stop here under the DEV-only rule. Resume only when the owner supplies hash-identified DEV-only M30/M15 inputs (or authorizes a genuinely date-bounded source that does not deliver sealed bars). After that prerequisite, complete Parts 2–4 in order and stop after Part 4; never run Stage 4.
