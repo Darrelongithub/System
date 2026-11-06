@@ -1,8 +1,8 @@
 {
   "generatedAt": "2026-11-06",
-  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot through G0 Amendment 8B (v1.9).",
+  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot through G0 Amendment 8C (v1.10).",
   "algorithm": "SHA-256 over the raw file bytes (sha256sum equivalent)",
-  "note": "Earlier versions v1.0-v1.8 are preserved byte-for-byte. BLUEPRINT.md is byte-identical to docs/BLUEPRINT-v1.9.md.",
+  "note": "Earlier versions v1.0-v1.9 are preserved byte-for-byte. BLUEPRINT.md is byte-identical to docs/BLUEPRINT-v1.10.md.",
   "v10": {
     "file": "docs/BLUEPRINT-v1.0.md",
     "bytes": 28232,
@@ -33,9 +33,10 @@
   },
   "current": {
     "file": "BLUEPRINT.md",
-    "sha256": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a",
-    "full": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a",
-    "matchesV19": true,
+    "sha256": "3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2",
+    "full": "3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2",
+    "matchesV110": true,
+    "matchesV19": false,
     "matchesV18": false,
     "matchesV17": false,
     "matchesV16": false,
@@ -99,5 +100,12 @@
       "removedLines": 0,
       "behaviorChange": false
     }
+  },
+  "v110": {
+    "file": "docs/BLUEPRINT-v1.10.md",
+    "bytes": 139330,
+    "lines": 2088,
+    "sha256": "3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2",
+    "full": "3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2"
   }
 }

@@ -1,11 +1,11 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.9 — 2026-11-06; G0 Amendment 8B (Stage 3b correction) pre-registered before any real DEV result**
-**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. Synthetic-only Stage 3a failed; no real DEV result exists.**
+**Version 1.10 — 2026-11-06; G0 Amendment 8C (Part 1b no-edge diagnosis and criterion proposal; owner approval pending)**
+**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. Synthetic-only Stage 3a failed; Part 1b classifies the A no-edge anomaly as a multiple-cell false-confirmation tail. The proposed follow-up criterion is pending owner approval and is not effective. No real DEV result exists.**
 **Branch:** `arena/072665f9-system`
 
-> **Version history is immutable.** Nine prior snapshots exist:
-> `docs/BLUEPRINT-v1.0.md` through `docs/BLUEPRINT-v1.8.md`; this v1.9 snapshot
+> **Version history is immutable.** Ten prior snapshots exist:
+> `docs/BLUEPRINT-v1.0.md` through `docs/BLUEPRINT-v1.9.md`; this v1.10 snapshot
 > is the new current version. The full 64-character SHA-256 of each is in
 > `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
@@ -48,6 +48,7 @@
 > - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards were DRAFT at this historical version.
 > - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No real strategy result existed at the freeze.
 > - **v1.9 / G0 Amendment 8B (2026-11-06)** — pre-result Stage 3b correction after the synthetic-only Stage 3a false-confirm criteria failed. Changes only the pre-authorized no-edge rehearsal criterion and redesigns the planted-edge rehearsal around a signal-exclusive card, with contamination handling and a report-only original Donchian-20 condition. Map rules, costs, exits, frozen thresholds, 22 cards, signal definitions and the CONFIRMED rule remain unchanged. No real DEV result exists.
+> - **v1.10 / G0 Amendment 8C (2026-11-06)** — report-only Part 1b reanalysis identifies the A no-edge outcome as a direction-aware multiple-cell false-confirmation tail; withdraws the prior causal attribution to B calibration. Records an exact no-edge criterion proposal for owner approval only. No current threshold is replaced; no bar, generator, verifier, or code is changed. No real DEV result exists.
 >
 > **Every amendment was applied before any real strategy result exists.** At
 > v1.7 the cards were DRAFT and verification was blocked; G0 Amendment 8 now
@@ -2025,3 +2026,63 @@ strategy result existed at freeze?** No.
 For condition C, the existing substance of the criteria is unchanged: planted card CONFIRMED in ≥8/10 worlds, measured gross within ±0.05R of planted gross, and ≤0.5 other-card confirmations/world on average. Before the run, list as CONTAMINATION-EXPECTED and exclude from that “other cards” count any card whose same-bar/same-side co-fire share exceeds 25% of the planted card's signal bars. The frozen list is derived from signals only and cannot be edited after outcomes. Original Donchian-20 planting becomes condition C-D, report-only, with confirmed card count and identities printed; it has no pass criterion.
 
 **Run and stop rule.** Part 4 runs A, B, redesigned C, and C-D once each: 10 worlds/condition and 60,000 bars/world. Print the full criteria table, per-world confirmed lists, planting diagnostics and unknown-entry coverage. Save and commit all outputs. Any criterion failure is a hard stop; do not start Stage 4. Stage 4 remains separately unauthorized and one-time.
+
+
+## G0 Amendment 8C — Part 1b no-edge diagnosis and proposal (2026-11-06)
+
+**Status: report-only and proposal-only; owner approval is pending. No acceptance
+criterion is changed or applied by this amendment.** This dated addendum
+supersedes only the v1.9 statement that the cause of the synthetic no-edge
+false confirmations was unknown and the provisional Part 1 classification
+(ii) as a causal explanation. It does not erase that historical record.
+
+**Anomaly and counted object.** The saved Stage 3a diagnostic count is unique
+card IDs with at least one strategy-level diagnostic half `CONFIRMED`: 22 cards
+× 2 halves = 44 strategy-level claim cells per world. The authoritative center
+verdict grid is 8 families × 2 verdict states/halves = 16 family rows per world.
+The A condition had mean 0.700 confirmed cards/world and maximum 4; its seven
+confirmed cells were all weakness halves. Across A and B the 14 observed
+strategy-level confirmations were all weakness halves.
+
+**Diagnosis.** Under the A zero-gross-edge null, raw net mean is minus cost.
+The frozen verifier direction makes the weakness-half signed null `+cost`,
+while strength is `−cost`. Across 220 A weakness cell-worlds, every mean cost
+(0.119951R–0.194167R) exceeds the +0.10R net floor; the mean probability of
+passing the net gate is 0.578189 for weakness and 0.001129 for strength. Each
+cell must still pass the matched-control excess gate, whose one-sided null
+probability at `t>2` is 0.0227501. Calendar-day CR1/plain SE inflation averages
+1.001752 pooled (438 finite ratios; range 0.8989–1.0662), and no warm-up
+crossing, wrong entry-state label, wrong weakness sign, or mis-specified
+matched-control key was found. The A-only Poisson approximation gives
+`λ=0.281701` unique confirmed cards/world, `P(total≥7 across ten)=0.025110`,
+`P(max≥4)=0.002095`, and `P(total≥7 and max≥4)=0.001004`. This is a rare
+multiple-cell tail, not an observed parameter outside the A null model. The
+prior B calibration observation cannot explain A, which has no drift parameter
+and produced 7 of the 14 confirmations; its causal use is withdrawn.
+
+**Selected conclusion: (i).** No bar, generator, threshold, or production code
+changes follow. The existing `mean≤0.5, max≤2` criterion was not calibrated to
+the 44 diagnostic cell tests; its approximate ten-world null false-fail
+probability under the measured `λ` is 0.067167. The model reference for the
+observed mean is `λ=0.281701` cards/world. Full cell-level probabilities,
+observed excess/SE table, counts, and preflight failure are in
+`docs/G0-AMENDMENT-8B-PART1B.md`.
+
+**Exact criterion proposed, pending owner approval (not effective):** on ten
+no-edge worlds, count unique strategy-level confirmed card IDs; require mean
+`≤ max(0.5, 1.5×λ)=0.500`, and maximum no greater than the smallest integer
+`k≥2` such that `P(Poisson(λ)>k)<0.001`. With `λ=0.2817011047`,
+`P(X>2)=0.003021` and `P(X>3)=0.000210`, hence proposed `k=3`. The current
+criterion remains unchanged unless and until the owner separately approves
+this proposal. No Stage 3 rerun, Part 4 run, or Stage 4 run is authorized here.
+
+**Data scope.** Part 1b used only the deterministic synthetic A/B diagnostics;
+no market bar, and in particular no HOLDOUT, VAL, or STRESS bar, entered this
+computation. The frozen DEV-year filter is
+`{2004,2005,2006,2007,2009,2010,2011,2013,2014,2015,2017,2018}`, split into
+2004–2007, 2009–2011, 2013–2015, and 2017–2018 before signal/trade
+computation. `npm run mc:a8-audit` was attempted as a non-reading preflight and
+failed before opening a bar because
+`artifacts/map-compass/normalized/xauusd-m30-eat.csv` is absent. Per this
+task’s instruction, `mc:m1` and `mc:map` were not run. The existing segment
+audit artifact is historical aggregate output, not a newly read input.

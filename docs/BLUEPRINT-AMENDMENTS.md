@@ -26,7 +26,9 @@ synthetic dress rehearsal remain prerequisites to the one-time DEV run.
 | **v1.5** | 2026-10-28 | `docs/BLUEPRINT-v1.5.md` | `f1d29351548bb0297cff4ee2fbe1df720f7070efa575e9524f8e68ebaf228fce` | superseded by v1.6; **preserved** |
 | **v1.6** | 2026-11-02 | `docs/BLUEPRINT-v1.6.md` | `4ba3e529dfc0a60c1881f9c9331790de9e3680dec0b8bbe69145b631d2b7b16d` | superseded by v1.7; **preserved** |
 | **v1.7** | 2026-11-02 | `docs/BLUEPRINT-v1.7.md` | `045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281` | superseded by v1.8; **preserved** |
-| **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | current; `BLUEPRINT.md` byte-identical |
+| **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | superseded by v1.9; **preserved** |
+| **v1.9** | 2026-11-06 | `docs/BLUEPRINT-v1.9.md` | `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a` | superseded by v1.10; **preserved** |
+| **v1.10** | 2026-11-06 | `docs/BLUEPRINT-v1.10.md` | `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2` | current; `BLUEPRINT.md` byte-identical |
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from
@@ -534,3 +536,44 @@ not below 2) and the signal-exclusive C design, with original Donchian-20
 retained as report-only C-D. All details and the requirement for Part 1
 calculation before Part 4 are in v1.9 and `docs/G0-AMENDMENT-8-REPORT.md`.
 No real DEV result exists; Stage 4 remains separately unauthorized.
+
+
+---
+
+## J — G0 Amendment 8C (2026-11-06) · Part 1b no-edge diagnosis; proposal pending owner approval
+
+**What:** a report-only reanalysis of the synthetic no-edge anomaly. It finds
+that the weakness half’s null signed net is `+cost`, which exceeds the +0.10R
+net floor in all 220 A weakness cell-world observations (cost range
+0.119951R–0.194167R), while strength null signed net is `−cost`. Mean net-gate
+probabilities are 0.578189 for weakness and 0.001129 for strength; the
+one-sided excess-gate probability is 0.0227501. Pooled CR1/plain SE inflation
+is 1.001752, with no evidence of material clustering understatement. The A
+condition has 44 strategy-level card-half tests/world (22×2), distinct from
+the 16 official family×verdict-state rows/world. Its mean 0.700 and max 4 are
+a rare Poisson multiple-cell tail under `λ=0.281701` (P(total≥7)=0.025110;
+P(max≥4)=0.002095; joint tail≈0.001004), not an identified generator or
+verifier defect. The previous causal classification (ii) is withdrawn: the B
+calibration observation cannot explain the seven A confirmations because A has
+no drift parameter. Full tables and the explicit candidate-set, warm-up,
+state-label, sign, and CR1 checks are in
+`docs/G0-AMENDMENT-8B-PART1B.md`.
+
+**Exact criterion proposed (not effective):** on ten no-edge worlds, count
+unique strategy-level confirmed card IDs. Compare mean with
+`max(0.5,1.5×λ)=0.500`; cap maximum at the smallest `k≥2` for which
+`P(Poisson(λ)>k)<0.001`. At `λ=0.2817011047`, `P(X>2)=0.003021` and
+`P(X>3)=0.000210`, so proposed `k=3`. This proposal is **pending owner
+approval**; the existing `mean≤0.5, max≤2` criterion is unchanged and has not
+been replaced or applied. No bar, generator, threshold, or production code was
+changed. No Stage 3 rerun, Part 4, or Stage 4 is authorized by this entry.
+
+**Data scope:** this Part 1b used only synthetic A/B diagnostics; no market bar
+or sealed-year outcome entered the computation. The frozen DEV-year inclusion
+filter is the exact twelve years in `ROLES.DEV`: 2004–2007, 2009–2011,
+2013–2015, 2017–2018, with four separate segments and no cross-gap state or
+trade computation. The non-reading preflight `npm run mc:a8-audit` failed
+exactly because `artifacts/map-compass/normalized/xauusd-m30-eat.csv` is absent.
+Per the task-specific instruction, `mc:m1` and `mc:map` were not run.
+**Threshold changed?** No; proposal only. **Map/cost/exit changed?** No.
+**Owner approved?** Pending.

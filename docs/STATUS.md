@@ -2,9 +2,9 @@
 
 **As of:** 2026-11-06 (Africa/Nairobi)  
 **Branch:** `arena/072665f9-system`  
-**Verified starting tip:** `5cdf4749d3543c00f3298d59a4ef2536803dc9a4` (matched `git ls-remote`).  
-**Current task stage:** Part 0 and Part 1 are committed/pushed; Part 1 used report-only diagnostics, with no production-code changes. Classification: (ii), B synthetic drift-calibration mismatch. Part 2 is blocked at preflight and has not started.
-**Real DEV results:** none. Stage 4 has not been started.
+**Verified starting tip for Part 1b:** `12c3a8d932ddf84675181033072e69ee7e21bb98` (matched `git ls-remote` before work; branch fetched/reset to this tip).
+**Current task stage:** Part 0 and Part 1 are committed/pushed. Part 1b report and dated v1.10 proposal are prepared; no production code, generator, bar, cost, or threshold changed. Part 1b conclusion: (i); earlier causal classification (ii) is withdrawn. The proposed criterion is pending owner approval and is not effective.
+**Real DEV results:** none. No Stage 3 rerun, Part 4, or Stage 4 was started.
 
 ## Existing pushed commits
 
@@ -13,6 +13,8 @@
 - Stage 3a synthetic rehearsal report: `5cdf4749d3543c00f3298d59a4ef2536803dc9a4`.
 - Part 0 / v1.9 Stage 3b pre-registration: `dc9ec21429db671c49143abd11e76f2fbe280608` (pushed and remote-verified).
 - Part 1 synthetic diagnosis: `9dd84e32f234781f804746963f70711d7af6bc36` (pushed and remote-verified).
+- Part 1 completion bookkeeping: `46d510f6e154bd953e335aa4cfe0b05a51b2db2d`.
+- Part 1b starting tip: `12c3a8d932ddf84675181033072e69ee7e21bb98` (remote-verified).
 
 ## Part 0 completed
 
@@ -25,19 +27,24 @@
 ## Hashes
 
 - Before Part 0: `frozen.mjs` SHA-256 `41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389`; `BLUEPRINT.md` SHA-256 `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4`.
-- After current Part 0 edits: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; `BLUEPRINT.md` / `docs/BLUEPRINT-v1.9.md` SHA-256 `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a`.
+- After Part 0: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; v1.9 `BLUEPRINT.md` / `docs/BLUEPRINT-v1.9.md` SHA-256 `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a`.
+- Part 1b current blueprint v1.10 (`BLUEPRINT.md` byte-identical to `docs/BLUEPRINT-v1.10.md`) SHA-256 `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`; frozen code unchanged.
 - Frozen-file diff: 38 additions, 0 removals.
 
-## Part 1 diagnosis (synthetic only)
+## Part 1 / Part 1b diagnosis (synthetic only)
 
-The deterministic A/B replay reproduced the saved confirmed-card lists. Across the ten A worlds, strategy-level diagnostics showed mean 0.700 unique confirmed cards/world and max 4; official family-pooled A confirmations were zero. In B there were 11 repeated official card rows representing four unique family cells. All 14 strategy-level confirmation cells were weakness halves, passed numeric gates, and had no vetoes. CR1/day inflation averaged 1.0018. A bar-return purity metrics matched white-noise expectations.
+The deterministic A/B replay reproduced the saved confirmed-card lists. Across the ten A worlds, strategy-level diagnostics showed mean 0.700 unique confirmed cards/world and max 4; official family-pooled A confirmations were zero. In B there were 11 repeated official card rows representing four unique family cells. All 14 strategy-level confirmation cells were weakness halves, passed numeric gates, and had no vetoes. CR1/day inflation averaged 1.0018; A bar-return purity metrics matched white-noise expectations.
 
-**Classification (ii): generator/calibration defect.** B was calibrated to +0.1492R using a fixed M15 seed and all eligible bars, while scored B worlds used a world-specific M15 seed and excluded UNKNOWN-state random entries; scored random-long mean was +0.0990R. No verifier fix or threshold changes. Full Part 1 analysis, complete cell tables, and Poisson checks: `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md`; deterministic diagnostics: `artifacts/map-compass/a8-stage3b-part1-diagnostics.json`. The one required fix cycle is in Part 2. No real DEV bars/results were read. Stage 4 remains blocked.
+The initial Part 1 report provisionally classified (ii) based on a B pilot/scored calibration difference. **Part 1b supersedes that causal attribution and selects (i)** for the no-edge anomaly: direction-aware weakness net null is +cost (all A weakness cell costs exceed +0.10R), whereas strength null is −cost; per-cell net-gate probabilities are 0.578189 vs 0.001129, with the excess gate at 0.0227501. A-only λ=0.281701 confirmed cards/world; observed mean 0.700/max 4 is a rare multiple-cell Poisson tail (joint tail about 0.001004), not a demonstrated generator/verifier defect. No code, bar, generator, cost or threshold changed. Detailed 44-cell probability table and observed excess/SE table: `docs/G0-AMENDMENT-8B-PART1B.md`; earlier Part 1 record and replay diagnostics remain at `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md` and `artifacts/map-compass/a8-stage3b-part1-diagnostics.json`.
+
+Part 1b used only synthetic A/B diagnostics; no market bar, including no non-DEV bar, entered its computations. The DEV-year inclusion set remains `ROLES.DEV = {2004–2007, 2009–2011, 2013–2015, 2017–2018}`, handled as four independent segments. The non-reading preflight `npm run mc:a8-audit` failed before opening bars with `Error: missing /home/user/System/artifacts/map-compass/normalized/xauusd-m30-eat.csv; run the appropriate M1/Map inputs first`. Per task instruction, `mc:m1` and `mc:map` were not run. The committed `a8-segment-audit.json` remains historical aggregate output (131,922 bars; 127,538 eligible; 4,000 warm-up and 384 tail exclusions), not an input newly read for this report.
+
+**Proposed criterion only; owner approval pending.** See dated G0 Amendment 8C in `BLUEPRINT.md` / v1.10 and the amendment log. Current criterion is not replaced.
 
 ## Environment / known test status
 
-`npm install` completed. Current full-suite run: **408 passed, 4 failed**. One is the existing `tests/synth.test.mjs:694` D1 display assertion; three `data-contract.test.mjs` checks fail because the fresh checkout has no raw fetch manifest or normalized OHLC files. The recovery commands `mc:m1`/`mc:map` were not run because their current whole-dataset normalization/map paths read non-DEV prices, prohibited by the explicit sealed-data restriction. This conflict is logged in `QUESTIONS.md`; only DEV bars may be used if Part 2 requires real signal counts.
+`npm install` completed. The recorded full-suite run is **408 passed, 4 failed**: one existing `tests/synth.test.mjs:694` D1 display assertion and three `data-contract.test.mjs` failures due absent raw manifest/normalized OHLC files. On this Part 1b task, `mc:m1` and `mc:map` were explicitly not to be run. The safe preflight `npm run mc:a8-audit` failed before reading bars because the normalized M30 DEV input is absent; exact error is recorded in the Part 1b report. No real-bar computation was attempted.
 
 ## Next action
 
-Part 1 report and replay diagnostics are committed and remote-verified at `9dd84e32f234781f804746963f70711d7af6bc36`; status bookkeeping is pushed at `46d510f6e154bd953e335aa4cfe0b05a51b2db2d`. Part 2 was not started: raw and normalized DEV inputs are absent, and the only pinned XAU source is a single 2004–2024 archive that must be fully extracted/normalized by the existing recovery path, which would read sealed-year bars. Stop here under the DEV-only rule. Resume only when the owner supplies hash-identified DEV-only M30/M15 inputs (or authorizes a genuinely date-bounded source that does not deliver sealed bars). After that prerequisite, complete Parts 2–4 in order and stop after Part 4; never run Stage 4.
+Commit and push the Part 1b report, G0 Amendment 8C proposal, v1.10 blueprint/hash register and status/question updates; verify remote tip. Then **stop and await owner approval**. Do not rerun Stage 3, run Part 4, or start Stage 4.
