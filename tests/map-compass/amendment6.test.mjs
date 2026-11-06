@@ -68,6 +68,6 @@ test("A6: full historical report is pinned and the A8 output state remains DEV-o
   assertEqual(createHash("sha256").update(v16).digest("hex"),h.v16.sha256);
   const v17=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.7.md"));
   assertEqual(createHash("sha256").update(v17).digest("hex"),h.v17.sha256);
-  assertEqual(createHash("sha256").update(current).digest("hex"),h.v18.sha256);
-  assertEqual(h.current.matchesV18,true);assertEqual(h.current.matchesV17,false);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
+  assertEqual(createHash("sha256").update(current).digest("hex"),h.v19.sha256);
+  assertEqual(h.current.matchesV19,true);assertEqual(h.current.matchesV18,false);assertEqual(h.current.matchesV17,false);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
 });

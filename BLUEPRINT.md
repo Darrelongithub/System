@@ -1,14 +1,13 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.8 — 2026-11-05; G0 AMENDMENT 8 applied before any strategy result**
-**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. No strategy result exists.**
+**Version 1.9 — 2026-11-06; G0 Amendment 8B (Stage 3b correction) pre-registered before any real DEV result**
+**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. Synthetic-only Stage 3a failed; no real DEV result exists.**
 **Branch:** `arena/072665f9-system`
 
-> **Version history is immutable.** Eight byte-preserving snapshots exist:
-> `docs/BLUEPRINT-v1.0.md`, `docs/BLUEPRINT-v1.1.md`,
-> `docs/BLUEPRINT-v1.2.md`, `docs/BLUEPRINT-v1.3.md`, `docs/BLUEPRINT-v1.4.md`,
-> `docs/BLUEPRINT-v1.5.md`, `docs/BLUEPRINT-v1.6.md`, and `docs/BLUEPRINT-v1.7.md`; the v1.8 snapshot is listed in the version register. The full 64-character
-> SHA-256 of each is in `artifacts/map-compass/blueprint-hashes.json` and is
+> **Version history is immutable.** Nine prior snapshots exist:
+> `docs/BLUEPRINT-v1.0.md` through `docs/BLUEPRINT-v1.8.md`; this v1.9 snapshot
+> is the new current version. The full 64-character SHA-256 of each is in
+> `artifacts/map-compass/blueprint-hashes.json` and is
 > printed in `docs/BLUEPRINT-AMENDMENTS.md`. That same file is the dated log of
 > every amendment since v1.0. No earlier version may be edited; superseded
 > text is struck by a new dated amendment.
@@ -47,7 +46,8 @@
 >   calendar-day CR1. The pooled-power “never below” comparison is scoped to
 >   edges ≥ +0.10R. Cards remain DRAFT; verification remains blocked.
 > - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards were DRAFT at this historical version.
-> - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No strategy result exists.
+> - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No real strategy result existed at the freeze.
+> - **v1.9 / G0 Amendment 8B (2026-11-06)** — pre-result Stage 3b correction after the synthetic-only Stage 3a false-confirm criteria failed. Changes only the pre-authorized no-edge rehearsal criterion and redesigns the planted-edge rehearsal around a signal-exclusive card, with contamination handling and a report-only original Donchian-20 condition. Map rules, costs, exits, frozen thresholds, 22 cards, signal definitions and the CONFIRMED rule remain unchanged. No real DEV result exists.
 >
 > **Every amendment was applied before any real strategy result exists.** At
 > v1.7 the cards were DRAFT and verification was blocked; G0 Amendment 8 now
@@ -2009,3 +2009,19 @@ thresholds is permitted.
 
 **Threshold changed?** No. **Card text/state/parameter changed?** No. **Any
 strategy result existed at freeze?** No.
+
+## G0 Amendment 8B — Stage 3b rehearsal correction (2026-11-06)
+
+**Pre-registration status.** Written and committed before any real DEV result exists. The synthetic-only Stage 3a run (10 worlds each for A/B/C, 60,000 bars/world) failed its original no-edge thresholds: A and B each averaged 0.700 strategy-level confirmed cards/world and each had a maximum of 4; in planted condition C, Donchian-20 confirmed 10/10, but other cards averaged 10.4. The cause of the no-edge false confirmations is not yet known and must be diagnosed before a correction is implemented. No real result or VAL/HOLDOUT/STRESS price bar was used.
+
+**Reason for the correction.** Signal-only overlap review reports that only 7.9% of Donchian-20 signal bars are exclusive to that card; overlapping cards can inherit the planted directional drift. Therefore Donchian-20 is not a clean isolated planting choice. The A/B no-edge conditions also failed the original confirmation-count criteria with unknown cause. These facts require diagnosis; they do not authorize changing the verifier or any frozen strategy rule.
+
+**Unchanged strategy contract.** Map rules, thresholds, abstention/hysteresis, costs, exits, the 22 cards and their signal definitions/states/order, and the CONFIRMED rule are unchanged. The only permitted additions remain the DEV segments and 25-cell sweep. This amendment changes rehearsal criteria/design only and does not authorize Stage 4.
+
+**Pre-authorized no-edge criterion replacement.** After Part 1 computes λ from the verifier's own power model for the evaluated no-edge cells, the replacement condition is: mean CONFIRMED cells per world ≤ `max(0.5, 1.5 × λ)`; maximum CONFIRMED cells per world ≤ the smallest integer k for which `P(Poisson(λ) > k) < 0.001`, with k no lower than 2. Part 1 must show the inputs and derivation before the single Part 4 run. No other A/B criterion may change. If diagnosis finds a generator or verifier defect instead of criterion mis-scaling, preserve the existing criteria and make exactly one justified fix cycle.
+
+**Redesigned synthetic condition C.** Before any scored run, compute same-bar/same-side signal counts, exclusive share per card, and all pairwise co-fire shares using signals only, on both synthetic pilot worlds and real DEV bars. Choose the planted card as the highest-exclusive-share eligible card among those with at least 1,500 DEV signals and expected strength-state trade count ≥600 per 60,000-bar world; freeze that choice in the report before the run. Use three disjoint pilot seeds for bisection calibration. After an eligible signal, only when no planted window is active, apply directional drift for 24 bars; target measured NET about +0.30R and print the planted drift, gross target and measured cost. Report event count and window-bar share. If window share exceeds 40%, shorten it to 12 bars and record that decision before scoring. Do not enlarge the edge if the planted card fails to confirm in 8/10 worlds; record that as a power fact.
+
+For condition C, the existing substance of the criteria is unchanged: planted card CONFIRMED in ≥8/10 worlds, measured gross within ±0.05R of planted gross, and ≤0.5 other-card confirmations/world on average. Before the run, list as CONTAMINATION-EXPECTED and exclude from that “other cards” count any card whose same-bar/same-side co-fire share exceeds 25% of the planted card's signal bars. The frozen list is derived from signals only and cannot be edited after outcomes. Original Donchian-20 planting becomes condition C-D, report-only, with confirmed card count and identities printed; it has no pass criterion.
+
+**Run and stop rule.** Part 4 runs A, B, redesigned C, and C-D once each: 10 worlds/condition and 60,000 bars/world. Print the full criteria table, per-world confirmed lists, planting diagnostics and unknown-entry coverage. Save and commit all outputs. Any criterion failure is a hard stop; do not start Stage 4. Stage 4 remains separately unauthorized and one-time.

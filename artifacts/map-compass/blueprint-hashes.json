@@ -1,8 +1,8 @@
 {
-  "generatedAt": "2026-11-05",
-  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot through G0 Amendment 8.",
+  "generatedAt": "2026-11-06",
+  "purpose": "Full 64-character SHA-256 of every immutable blueprint snapshot through G0 Amendment 8B (v1.9).",
   "algorithm": "SHA-256 over the raw file bytes (sha256sum equivalent)",
-  "note": "Earlier versions are preserved byte-for-byte. BLUEPRINT.md is byte-identical to docs/BLUEPRINT-v1.8.md.",
+  "note": "Earlier versions v1.0-v1.8 are preserved byte-for-byte. BLUEPRINT.md is byte-identical to docs/BLUEPRINT-v1.9.md.",
   "v10": {
     "file": "docs/BLUEPRINT-v1.0.md",
     "bytes": 28232,
@@ -33,9 +33,10 @@
   },
   "current": {
     "file": "BLUEPRINT.md",
-    "sha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
-    "full": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
-    "matchesV18": true,
+    "sha256": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a",
+    "full": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a",
+    "matchesV19": true,
+    "matchesV18": false,
     "matchesV17": false,
     "matchesV16": false,
     "matchesV15": false
@@ -74,5 +75,29 @@
     "lines": 2011,
     "sha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4",
     "full": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4"
+  },
+  "v19": {
+    "file": "docs/BLUEPRINT-v1.9.md",
+    "bytes": 134909,
+    "lines": 2027,
+    "sha256": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a",
+    "full": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a"
+  },
+  "stage3bPaperwork": {
+    "recordedAt": "2026-11-06",
+    "baselineCommit": "5cdf4749d3543c00f3298d59a4ef2536803dc9a4",
+    "before": {
+      "frozenSha256": "41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389",
+      "blueprintSha256": "b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4"
+    },
+    "after": {
+      "frozenSha256": "67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22",
+      "blueprintSha256": "c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a"
+    },
+    "frozenDiff": {
+      "addedLines": 38,
+      "removedLines": 0,
+      "behaviorChange": false
+    }
   }
 }

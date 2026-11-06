@@ -1999,5 +1999,14 @@
     "labelledReversionSlots": 16,
     "label": "under the standard exit (1.5 ATR stop, 2R target) only",
     "note": "Cards are DRAFT, so no verdict has been produced. These are the pre-registered labels; every future verdict for a reversion-family slot MUST be printed with this suffix. No new exit in this cycle."
+  },
+  "supersession": {
+    "status": "SUPERSEDED_FOR_A8_A9",
+    "recordedAt": "2026-11-06",
+    "replacement": "G0 Amendment 8 strict DEV-segment artifacts",
+    "historyOnly": true,
+    "computedAcrossDevSegmentBoundaries": true,
+    "usedAsInputToAnyA8A9Verdict": false,
+    "note": "Historical output computed across segment boundaries. Preserve as history; NOT an input to any A8 or A9 verdict."
   }
 }

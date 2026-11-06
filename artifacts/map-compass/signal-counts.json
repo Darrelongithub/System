@@ -3054,5 +3054,14 @@
     "familiesWithoutAnyTestableCell": [],
     "familiesWithoutAnyTestableCellCount": 0
   },
-  "note": "STRUCTURALLY THIN means the measured DEV signal count for that claim cell is below the frozen n >= 100 gate. It says NOTHING about whether the strategy works — only that the cell cannot be tested with the current DEV window. It does NOT authorise changing any card, state, Map threshold or criterion."
+  "note": "STRUCTURALLY THIN means the measured DEV signal count for that claim cell is below the frozen n >= 100 gate. It says NOTHING about whether the strategy works — only that the cell cannot be tested with the current DEV window. It does NOT authorise changing any card, state, Map threshold or criterion.",
+  "supersession": {
+    "status": "SUPERSEDED_FOR_A8_A9",
+    "recordedAt": "2026-11-06",
+    "replacement": "G0 Amendment 8 strict DEV-segment artifacts",
+    "historyOnly": true,
+    "computedAcrossDevSegmentBoundaries": true,
+    "usedAsInputToAnyA8A9Verdict": false,
+    "note": "Historical output computed across segment boundaries. Preserve as history; NOT an input to any A8 or A9 verdict."
+  }
 }

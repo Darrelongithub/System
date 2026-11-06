@@ -450,3 +450,41 @@ export const EVIDENCE = Object.freeze({
   note: "Each family has one opened empirical study or is marked PRACTITIONER_ONLY. Full URLs above. No outcomes from our own data were used.",
   criticisms: "See CRITICISMS: the strongest published criticism or failed replication per family, every URL opened 2026-10-27.",
 });
+
+/**
+ * G0 Amendment 8 / Stage 3b: additive, behavior-preserving DEV segmentation and
+ * sensitivity-grid definitions. These do not change any existing threshold,
+ * card, signal, cost, exit, state, or verdict value.
+ */
+export const A8_DEV_SEGMENTS = Object.freeze([
+  Object.freeze({ id: "2004-2007", firstYear: 2004, lastYear: 2007 }),
+  Object.freeze({ id: "2009-2011", firstYear: 2009, lastYear: 2011 }),
+  Object.freeze({ id: "2013-2015", firstYear: 2013, lastYear: 2015 }),
+  Object.freeze({ id: "2017-2018", firstYear: 2017, lastYear: 2018 }),
+]);
+export const A8_SEGMENT_WARMUP_BARS = 1000;
+export const A8_SEGMENT_TAIL_BARS = 96;
+export const A8_SWEEP_ER = Object.freeze([0.25, 0.3, 0.35, 0.4, 0.45]);
+export const A8_SWEEP_ATR_PERCENTILE = Object.freeze([60, 65, 70, 75, 80]);
+export const A8_SWEEP_GRID = Object.freeze(A8_SWEEP_ER.flatMap((erCutoff) =>
+  A8_SWEEP_ATR_PERCENTILE.map((atrPercentile) => Object.freeze({ erCutoff, atrPercentile })),
+));
+
+/** Fail immediately if the additive A8 constants drift from frozen inputs. */
+export const A8_CONSTANTS_ASSERTED = (() => {
+  const yearsFromSegments = A8_DEV_SEGMENTS.flatMap(({ firstYear, lastYear }) =>
+    Array.from({ length: lastYear - firstYear + 1 }, (_, i) => firstYear + i),
+  );
+  if (A8_SEGMENT_WARMUP_BARS !== MAP.warmupBars)
+    throw new Error("A8 segment warm-up must equal frozen MAP.warmupBars");
+  if (A8_SEGMENT_TAIL_BARS !== EXIT_HARNESS.maxHoldBars)
+    throw new Error("A8 segment tail must equal frozen EXIT_HARNESS.maxHoldBars");
+  if (JSON.stringify(yearsFromSegments) !== JSON.stringify(ROLES.DEV))
+    throw new Error("A8 segment spans must exactly cover frozen ROLES.DEV years in order");
+  if (A8_SWEEP_GRID.length !== 25)
+    throw new Error("A8 sweep grid must contain exactly 25 cells");
+  if (!A8_SWEEP_GRID.some(({ erCutoff, atrPercentile }) =>
+    erCutoff === MAP.erCutoff && atrPercentile === MAP.atrPctileCutoff))
+    throw new Error("A8 sweep grid must include frozen center ER/ATR cutoffs");
+  return true;
+})();

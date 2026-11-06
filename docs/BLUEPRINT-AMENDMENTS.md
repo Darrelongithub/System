@@ -502,3 +502,35 @@ thresholds.
 
 **Threshold changed?** No. **Map/cost/exit changed?** No. **Any result existed?**
 No.
+
+---
+
+## I — G0 Amendment 8B (2026-11-06, before any real DEV result)
+
+A new v1.9 snapshot, `docs/BLUEPRINT-v1.9.md`, preserves all v1.0–v1.8
+versions. Its full SHA-256 is
+`c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a`.
+Before this stage, `BLUEPRINT.md` was SHA-256
+`b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4`; it is
+now byte-identical to v1.9. `scripts/map-compass/frozen.mjs` was
+`41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389` before
+the additive segment/grid definitions and is now
+`67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`.
+The frozen-file diff has 38 added lines and zero removed lines; its only new
+values are the four DEV spans, 1,000-bar segment warm-up, 96-bar tail, and the
+25-cell sweep grid. A module-load assertion checks equality with existing
+MAP/exit/DEV-role values and presence of the frozen center.
+
+The Stage 3a synthetic-only rehearsal failed the original no-edge criteria
+(mean strategy-level confirmed cards/world 0.700 in A and B, maximum 4) and
+showed that Donchian-20 was not an isolated planting choice: signal-only review
+reports 7.9% exclusive signals and overlapping cards can inherit a planted
+edge. The cause of the no-edge failures remains unknown pending diagnosis.
+This correction does not alter Map rules, costs, exits, frozen thresholds, the
+22 cards/signals/states/order, or the CONFIRMED rule. It pre-registers the
+owner-authorized replacement criterion only for A/B (mean ≤
+`max(0.5,1.5×λ)`; maximum bounded by the Poisson(λ) upper-tail <0.001 integer,
+not below 2) and the signal-exclusive C design, with original Donchian-20
+retained as report-only C-D. All details and the requirement for Part 1
+calculation before Part 4 are in v1.9 and `docs/G0-AMENDMENT-8-REPORT.md`.
+No real DEV result exists; Stage 4 remains separately unauthorized.
