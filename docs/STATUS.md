@@ -3,7 +3,7 @@
 **As of:** 2026-11-06 (Africa/Nairobi)  
 **Branch:** `arena/072665f9-system`  
 **Verified starting tip:** `5cdf4749d3543c00f3298d59a4ef2536803dc9a4` (matched `git ls-remote`).  
-**Current task stage:** Part 0 paperwork completed and validated; ready for its standalone commit. No Part 1 diagnosis has started.  
+**Current task stage:** Part 0 committed/pushed. Part 1 report is complete and ready for independent commit before Part 2; no production code changes were made for Part 1. Classification: (ii), B synthetic drift-calibration mismatch.
 **Real DEV results:** none. Stage 4 has not been started.
 
 ## Existing pushed commits
@@ -11,8 +11,9 @@
 - Stage 1 freeze: `9aae04e67b1102d1802c4dd0b92f47af19d81fe6`.
 - Stage 2 segmented pipeline/audit: `c7879aef39fce647e4dccfa34cf691e3f466ddb8`.
 - Stage 3a synthetic rehearsal report: `5cdf4749d3543c00f3298d59a4ef2536803dc9a4`.
+- Part 0 / v1.9 Stage 3b pre-registration: `dc9ec21429db671c49143abd11e76f2fbe280608` (pushed and remote-verified).
 
-## Part 0 changes in progress
+## Part 0 completed
 
 - Additive frozen definitions only: four DEV spans, 1,000-bar warm-up, 96-bar tail and 25 sweep cells. Load-time assertions ensure equality with existing `ROLES.DEV`, `MAP`, `EXIT_HARNESS`, and frozen center values.
 - Baseline/power/signal-count/coverage/slot artifacts carry explicit superseded-history metadata.
@@ -26,9 +27,11 @@
 - After current Part 0 edits: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; `BLUEPRINT.md` / `docs/BLUEPRINT-v1.9.md` SHA-256 `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a`.
 - Frozen-file diff: 38 additions, 0 removals.
 
-## Known synthetic Stage 3a failure
+## Part 1 diagnosis (synthetic only)
 
-The saved 30-world rehearsal failed: A and B each averaged 0.700 strategy-level confirmed cards/world, with maximum 4; C Donchian-20 confirmed 10/10 and gross averaged 0.4595R against 0.45R planted, but other cards averaged 10.4 confirmations/world. Full output: `artifacts/map-compass/a8-dress-rehearsal.json` and `docs/G0-AMENDMENT-8-DRESS-REHEARSAL.md`. The cause of A/B confirmations is not yet known. Per the manager instruction, Stage 4 remains blocked.
+The deterministic A/B replay reproduced the saved confirmed-card lists. Across the ten A worlds, strategy-level diagnostics showed mean 0.700 unique confirmed cards/world and max 4; official family-pooled A confirmations were zero. In B there were 11 repeated official card rows representing four unique family cells. All 14 strategy-level confirmation cells were weakness halves, passed numeric gates, and had no vetoes. CR1/day inflation averaged 1.0018. A bar-return purity metrics matched white-noise expectations.
+
+**Classification (ii): generator/calibration defect.** B was calibrated to +0.1492R using a fixed M15 seed and all eligible bars, while scored B worlds used a world-specific M15 seed and excluded UNKNOWN-state random entries; scored random-long mean was +0.0990R. No verifier fix or threshold changes. Full Part 1 analysis, complete cell tables, and Poisson checks: `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md`; deterministic diagnostics: `artifacts/map-compass/a8-stage3b-part1-diagnostics.json`. The one required fix cycle is in Part 2. No real DEV bars/results were read. Stage 4 remains blocked.
 
 ## Environment / known test status
 
@@ -36,4 +39,4 @@ The saved 30-world rehearsal failed: A and B each averaged 0.700 strategy-level 
 
 ## Next action
 
-Commit and push Part 0 independently, verify the remote tip, and record that hash here. Then perform Part 1 diagnosis only, print and commit its report before Part 2. Do not run Stage 4.
+Commit and push the Part 1 report and its report-only replay diagnostics, verify the remote tip, then begin Part 2. During Part 2, apply the single B drift-calibration correction without altering A/B criteria; compute signal-only/co-fire and UNKNOWN-entry tables on synthetic and DEV data only; preregister the C planted card, calibration, seeds, and run outputs before any scored Stage 3 results. Commit and push Part 2 before the single Part 4 run. Stop after Part 4; do not run Stage 4.
