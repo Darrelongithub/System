@@ -3,7 +3,7 @@
 **As of:** 2026-11-06 (Africa/Nairobi)  
 **Branch:** `arena/072665f9-system`  
 **Verified starting tip for Part 1b:** `12c3a8d932ddf84675181033072e69ee7e21bb98` (matched `git ls-remote` before work; branch fetched/reset to this tip).
-**Current task stage:** Part 0 and Part 1 are committed/pushed. Part 1b report and dated v1.10 proposal are prepared; no production code, generator, bar, cost, or threshold changed. Part 1b conclusion: (i); earlier causal classification (ii) is withdrawn. The proposed criterion is pending owner approval and is not effective.
+**Current task stage:** Parts 0, 1 and 1b are committed/pushed. Part 1b is report-only; no production code, generator, bar, cost, or current threshold changed. Conclusion: (i); earlier causal classification (ii) is withdrawn. The v1.10 criterion proposal is pending owner approval and is not effective.
 **Real DEV results:** none. No Stage 3 rerun, Part 4, or Stage 4 was started.
 
 ## Existing pushed commits
@@ -15,6 +15,7 @@
 - Part 1 synthetic diagnosis: `9dd84e32f234781f804746963f70711d7af6bc36` (pushed and remote-verified).
 - Part 1 completion bookkeeping: `46d510f6e154bd953e335aa4cfe0b05a51b2db2d`.
 - Part 1b starting tip: `12c3a8d932ddf84675181033072e69ee7e21bb98` (remote-verified).
+- Part 1b diagnosis/proposal: `921387db3d74ab8e54f559fb40b5e571ca30b6ef` (pushed; remote-verified).
 
 ## Part 0 completed
 
@@ -47,4 +48,4 @@ Part 1b used only synthetic A/B diagnostics; no market bar, including no non-DEV
 
 ## Next action
 
-Commit and push the Part 1b report, G0 Amendment 8C proposal, v1.10 blueprint/hash register and status/question updates; verify remote tip. Then **stop and await owner approval**. Do not rerun Stage 3, run Part 4, or start Stage 4.
+Part 1b report and G0 Amendment 8C proposal are committed and pushed at `921387db3d74ab8e54f559fb40b5e571ca30b6ef`. **Stop and await owner approval** of the proposed criterion. Do not rerun Stage 3, run Part 4, or start Stage 4.
