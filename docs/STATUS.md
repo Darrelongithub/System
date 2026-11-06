@@ -3,7 +3,7 @@
 **As of:** 2026-11-06 (Africa/Nairobi)  
 **Branch:** `arena/072665f9-system`  
 **Verified starting tip:** `5cdf4749d3543c00f3298d59a4ef2536803dc9a4` (matched `git ls-remote`).  
-**Current task stage:** Part 0 committed/pushed. Part 1 report is complete and ready for independent commit before Part 2; no production code changes were made for Part 1. Classification: (ii), B synthetic drift-calibration mismatch.
+**Current task stage:** Part 0 and Part 1 are committed/pushed; Part 1 used report-only diagnostics, with no production-code changes. Classification: (ii), B synthetic drift-calibration mismatch.
 **Real DEV results:** none. Stage 4 has not been started.
 
 ## Existing pushed commits
@@ -12,6 +12,7 @@
 - Stage 2 segmented pipeline/audit: `c7879aef39fce647e4dccfa34cf691e3f466ddb8`.
 - Stage 3a synthetic rehearsal report: `5cdf4749d3543c00f3298d59a4ef2536803dc9a4`.
 - Part 0 / v1.9 Stage 3b pre-registration: `dc9ec21429db671c49143abd11e76f2fbe280608` (pushed and remote-verified).
+- Part 1 synthetic diagnosis: `9dd84e32f234781f804746963f70711d7af6bc36` (pushed and remote-verified).
 
 ## Part 0 completed
 
@@ -39,4 +40,4 @@ The deterministic A/B replay reproduced the saved confirmed-card lists. Across t
 
 ## Next action
 
-Commit and push the Part 1 report and its report-only replay diagnostics, verify the remote tip, then begin Part 2. During Part 2, apply the single B drift-calibration correction without altering A/B criteria; compute signal-only/co-fire and UNKNOWN-entry tables on synthetic and DEV data only; preregister the C planted card, calibration, seeds, and run outputs before any scored Stage 3 results. Commit and push Part 2 before the single Part 4 run. Stop after Part 4; do not run Stage 4.
+Part 1 report and replay diagnostics are committed and remote-verified at `9dd84e32f234781f804746963f70711d7af6bc36`. Begin Part 2: apply the single B drift-calibration correction without altering A/B criteria; compute signal-only/co-fire and UNKNOWN-entry tables on synthetic and DEV data only; preregister the C planted card, calibration, seeds, and run outputs before any scored Stage 3 results. Commit and push Part 2 before the single Part 4 run. Stop after Part 4; do not run Stage 4.
