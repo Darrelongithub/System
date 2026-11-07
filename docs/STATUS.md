@@ -3,7 +3,8 @@
 **As of:** 2026-11-07 (Africa/Nairobi)
 **Branch:** `arena/072665f9-system`
 **Current status:** The one-time Stage 3b run remains a hard-stop failure and was not rerun. Stage 4 has not been run and remains unauthorized. The A-only diagnostics above remain measurement-only. The pre-Stage-4 conditional-routing correction and regression tests are complete; `npm ci` succeeded and the full suite ran once (416 passed, 5 expected failures; see below). No verification criterion, threshold, card, cost, exit, or Stage 3 result changed.
-**Starting tip for this routing fix:** `1ba0e367a80e701358c0f336a6e8841149ebf319`. This status and the focused fix ship together; the resulting commit and remote tip are printed in the publication handoff.
+**Starting tip for this routing fix:** `1ba0e367a80e701358c0f336a6e8841149ebf319`.
+**Routing-fix implementation commit:** `9b6983f97bc99e5e759b80f92f2661eb6b2fca92` (the status sync below is a separate documentation-only commit). The final branch tip and remote verification are printed in the publication handoff.
 
 ## Dated decisions and preserved constraints
 
