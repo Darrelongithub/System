@@ -107,3 +107,7 @@ All five routing regression tests passed, including the direct 22-card complemen
 - Integrity guards remain unchanged: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; `criteriaHash` `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`.
 
 **Stage:** provenance/versioning repair before Stage 4. No Stage 3 rerun, Stage 4, rehearsal, or criteria change. The v1.10 pin remains immutable; v1.11 is current. Versioning commit `c3d853b7ff6f05c330d39793f469d208a0c4c49b` has been pushed to the authorized branch. The final remote tip is quoted in the handoff. **Next action:** await the separate follow-up; keep Stage 4 unauthorized.
+
+## Stage 4 orchestrator authorization — 2026-11-08, before code
+
+**Owner authorization (2026-11-08; recorded before any orchestrator code exists):** The Stage 4 orchestrator is authorized as a deliberate pre-registered component and is the **only new machinery permitted**. It consists of exactly one new driver script plus its tests. The driver may only wire the existing DEV segment builder, card signals, one-slot trade producer with the frozen exit harness, segmented random control, 25-cell sweep, `verifyReal` with `a8DevOnly=true`, and report generation. It must not change `scripts/map-compass/frozen.mjs`, `verifyReal`, `lib/verification.mjs`, `lib/signals.mjs`, `lib/compass.mjs`, or any threshold, card, cost, or exit rule. This is Step 1 documentation authorization only; no orchestrator code or tests exist yet, and it does not authorize a Stage 4 execution.
