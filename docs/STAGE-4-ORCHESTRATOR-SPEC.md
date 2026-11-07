@@ -1,9 +1,9 @@
 # Stage 4 Orchestrator Specification — Step 1 of 3
 
-**Status:** Document-only specification and pre-code owner authorization, dated 2026-11-08. No Stage 4 run is authorized by this specification. The driver and its tests are future Step 2 work only after this specification is reviewed.
+**Status:** Document-only specification, verifier-reviewed and **SIGNED as the Step 2 build contract** on 2026-11-08. No Stage 4 run is authorized by this specification. The driver and its tests are future Step 2 work under this contract.
 
 **Branch of record:** `arena/072665f9-system`
-**Baseline tip:** `5a70fbf478c0e4cd9b423073fa379dffae87652f`
+**Revision base tip:** `cdb9a6fba7533954344ad5ff74d5f2858c981c33`
 **Frozen SHA-256:** `scripts/map-compass/frozen.mjs` = `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`
 **Required historical criteriaHash:** `power-projection.json.reportOnly.criteriaHash` = `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`
 
@@ -24,22 +24,23 @@ It MUST NOT change `scripts/map-compass/frozen.mjs`, `verifyReal`, `lib/verifica
 
 ### 1.2 M15 sub-bars
 
-If M15 bars are available, read them from `artifacts/map-compass/normalized/xauusd-m15-eat.csv`, produced by normalization alongside the M30 feed (`scripts/map-compass/normalize.mjs:119-123`). Parse timestamps to establish year/order, but parse high/low only for M15 records whose timestamps fall in a DEV segment and whose own year is in `ROLES.DEV`; do not pass sealed-year OHLC to the mapper. The resolver's intrabar ordering reads M15 high/low values only when both sub-bars exist (`scripts/map-compass/lib/trade.mjs:71-90,155-165`). M15 records are associated with their M30 segment by `m15MapForSegment(segment.bars, m15Bars)`; that helper filters by segment start through `addMinutes(segmentEnd, 15)` and pairs bars at the M30 timestamp and timestamp + 15 minutes (`scripts/map-compass/lib/dev-segments.mjs:132-154`). Missing either M15 sub-bar retains the existing conservative M30 stop-first fallback; the driver must not invent or interpolate sub-bars (`scripts/map-compass/lib/trade.mjs:74-90`). The M15 feed must be ordered and unique by timestamp and must not be stitched across segments.
+Read M15 bars, when available, from `artifacts/map-compass/normalized/xauusd-m15-eat.csv` (`scripts/map-compass/normalize.mjs:119-123`). For each segment, the driver's selected M15 input is bounded exactly to `[segmentStart, segmentEnd]`, inclusive; never select `segmentEnd + 15 minutes`. Every M15 bar actually used in an intrabar decision must satisfy both `yearOf(bar) in ROLES.DEV` and `segmentStart <= bar.datetime <= segmentEnd`; the `M15_SEALED_READ` assertion in §8 enforces this. The existing `m15MapForSegment` helper selects through `addMinutes(segmentEnd, 15)` and is therefore broader than this driver contract (`scripts/map-compass/lib/dev-segments.mjs:139-154`). The driver leaves that helper untouched and supplies only the union of per-segment, bounded M15 slices; before passing that union, it must exclude any timestamp that would be selected by the helper for a different segment. No out-of-segment sub-bar is handed to it or used by it. The helper can still pair the last M30 bar with its first M15 sub-bar, but the second sub-bar is intentionally unavailable under the bounded input. If the second sub-bar is unavailable, the existing conservative M30 stop-first fallback applies unchanged (`scripts/map-compass/lib/trade.mjs:74-90`). Do not interpolate, extend the map, or invent sub-bars. This is stricter input selection than the helper's default window, not a change to frozen behavior: the helper and resolver are unchanged; the driver simply withholds out-of-segment bars. The M15 feed must be ordered and unique by timestamp and must not be stitched across segments.
 
 ### 1.3 Segment definitions and input refusals
 
 - Read, do not restate, `DEV_SEGMENT_RULE` (`scripts/map-compass/lib/dev-segments.mjs:5-14`): the four inclusive DEV year spans, warm-up, and tail are sourced from that constant and the frozen imports.
 - Call `splitDevSegments(bars, ROLES.DEV)` (`scripts/map-compass/lib/dev-segments.mjs:22-45`). Splitting inspects only timestamps/year labels of non-DEV rows; their OHLCV is never parsed into feature input or passed to Map, signals, trades, random controls, aggregates, or verdicts. Assert that returned segment spans agree with `DEV_SEGMENT_RULE` and that all trade/input bars passed onward belong to `ROLES.DEV`.
-- Refuse duplicate timestamps, descending/out-of-order or non-contiguous input under the approved source-calendar rule, malformed or unmatched M30/Map timestamps, unexpected segment spans, non-DEV rows in any pipeline segment or emitted trade, an exit or signal window that crosses a segment boundary, and an M15 mapping that crosses a segment boundary.
-- The precise source-calendar definition of “non-contiguous” must be resolved before Step 2. The repository documents ordinary market/holiday gaps as well as material holes (`docs/MAP-COMPASS-DATA-CONTRACT.md:158-173`), but does not define one universal acceptable-gap threshold for this Stage 4 input. The ambiguity is listed in §10; no gap tolerance is invented here.
+- Structural timestamp refusal only: timestamps must be strictly increasing, with no duplicates and no out-of-order rows. No maximum-gap tolerance is introduced. Documented holiday gaps, including the 2005-11-23 and 2006-11-22 gaps in `docs/MAP-COMPASS-DATA-CONTRACT.md` §5 (`:158-173`), must not be rejected solely for their duration.
+- Assert the already-verified DEV M30 counts by segment: `2004-2007` = 38,352; `2009-2011` = 32,766; `2013-2015` = 34,051; `2017-2018` = 22,369; and total = 131,922. Each per-segment count and the overall total is an independent guard. The supplied counts do not arithmetically agree; §10 records the exact discrepancy. Do not alter any count to make the assertions pass.
+- Also refuse malformed or unmatched M30/Map timestamps, unexpected segment spans, non-DEV rows in any pipeline segment or emitted trade, an exit or signal window that crosses a segment boundary, and an M15 mapping that crosses a segment boundary.
 
 ## 2. Call sequence and point of no return
 
-The sole real-run invocation must be a single-use driver. It imports the frozen 22-card registry `CLAIM_CARDS` (`scripts/map-compass/claim-cards.draft.mjs:124-345`; registry cardinality guard at `:469`) and explicitly imports the functions/constants below; it does not invoke the `verify-claims.mjs` CLI, whose main path does not supply the A8 options required by `verifyReal` (`scripts/map-compass/verify-claims.mjs:361-366`).
+The sole real-run invocation must be a single-use driver. Its mandatory committed outputs are `artifacts/map-compass/claimed-trades.jsonl`, `artifacts/map-compass/claim-verification.json`, `artifacts/map-compass/claim-ledger.jsonl`, and `docs/G0-STAGE4-REPORT.md`. The ledger is not gitignored, not currently tracked, and does not exist; it is created by `verifyReal` and must be committed with the other outputs. The driver imports the frozen 22-card registry `CLAIM_CARDS` (`scripts/map-compass/claim-cards.draft.mjs:124-345`; registry cardinality guard at `:469`) and explicitly imports the functions/constants below; it does not invoke the `verify-claims.mjs` CLI, whose main path does not supply the A8 options required by `verifyReal` (`scripts/map-compass/verify-claims.mjs:361-366`).
 
 ### 2.1 Ordered calls
 
-1. **Preflight:** before computation, assert the two permanent output paths do not exist; validate input paths/schema availability, frozen-file hash, the required `reportOnly.criteriaHash`, card registry size, and placebo artifact availability. Read the placebo value from the existing calibration artifact as specified in §6; never regenerate it in Stage 4. Timestamp, segment, boundary, baseline, sweep, and row-equality assertions are evaluated as soon as their in-memory inputs exist and all must pass before the first permanent write.
+1. **Preflight:** before computation, assert the production single-use outputs `claim-verification.json`, `claimed-trades.jsonl`, and `docs/G0-STAGE4-REPORT.md` do not exist; validate input paths/schema availability, frozen-file hash, the required `reportOnly.criteriaHash`, card registry size, and placebo artifact availability. The ledger path is append-only: never truncate/delete/rewrite/regenerate it; preserve any existing bytes and append only through `appendVerdict`. Read the placebo value from the existing calibration artifact as specified in §6; never regenerate it in Stage 4. Timestamp, segment, boundary, baseline, sweep, and row-equality assertions are evaluated as soon as their in-memory inputs exist and all must pass before the first ledger append.
 2. Load the M30 timestamps and DEV OHLCV; preserve non-DEV rows as timestamp-only separators. Load the aligned Map `datetime,state` fields for comparison only. Load/segment eligible M15 sub-bars as in §1.2.
 3. Call `splitDevSegments(bars, ROLES.DEV)` and assert the segment list and each segment's entry range.
 4. Call **exactly**:
@@ -58,7 +59,7 @@ The sole real-run invocation must be a single-use driver. It imports the frozen 
 5. Serialize `centerTrades` in memory to the exact one-record-per-line JSONL bytes. Parse those bytes in memory and run the integrity checks, including baseline coverage, expected rows, and row determinism. Use `pipeline.gridInputs`/`pipeline.baseline` as the source of controls; do not load the legacy `random-baseline.json` as the A8 baseline.
 6. Call **exactly** `sweepBattery(pipeline, runBattery)`, where `runBattery` is the named export from `scripts/map-compass/verify-claims.mjs:50` (`sweepBattery` source: `scripts/map-compass/lib/dev-pipeline.mjs:323-347`). This invokes the same battery on each `pipeline.gridInputs` entry and returns `results`, `sensitivityByClaim`, and `informationalPctByClaim`.
 7. Produce the center `precomputedRows` from the exact call `runBattery(tradesFromJsonl, { windowKind: "DEV", baseline: pipeline.baseline, sensitivityByClaim: sweep.sensitivityByClaim })`. The sweep's annotated center rows also carry `sweepConfirmedCells`, `sweepCells`, and `sweepConfirmedPct`; these are report annotations, not `runBattery` output fields. Before verification, deep-compare the unannotated center rows with `precomputedRows`, after removing only those three sweep-annotation fields from each sweep row. Also independently call `runBattery` again with the same arguments and assert deep equality with `precomputedRows`. Any mismatch aborts; it is not acceptable to assume the sweep rows are verifier-identical. Compute the complete report payload in memory from these rows, sweep results, center trades, pipeline metadata, placebo input, and signal-only overlap before any permanent write.
-8. After every pre-write assertion passes, write the production `artifacts/map-compass/claimed-trades.jsonl` with exclusive-create semantics; never overwrite. Then call `verifyReal` exactly as follows:
+8. After every pre-append assertion passes, write the production `artifacts/map-compass/claimed-trades.jsonl` with exclusive-create semantics; never overwrite. Then call `verifyReal` exactly as follows:
 
    ```text
    verifyReal(tradesPath, {
@@ -69,12 +70,12 @@ The sole real-run invocation must be a single-use driver. It imports the frozen 
    })
    ```
 
-   Signature and gates: `scripts/map-compass/verify-claims.mjs:297-314`. `precomputedRows` are the deterministic `runBattery` rows just specified. `verifyReal` itself appends ledger records (`:315-327`) and returns `rows,summary` (`:328-338`). Do not call it more than once. Assert its returned rows equal the prevalidated `precomputedRows` before publication.
-9. Atomically publish `artifacts/map-compass/claim-verification.json` and the already-computed human-readable report `docs/G0-STAGE4-REPORT.md` as the final result publication. No threshold or result is recomputed after publication.
+   Signature and gates: `scripts/map-compass/verify-claims.mjs:297-314`. `precomputedRows` are the deterministic `runBattery` rows just specified. `verifyReal` calls `appendVerdict` once per row (`:315-327`) and returns `rows,summary` (`:328-338`). Its ledger path is `artifacts/map-compass/claim-ledger.jsonl` (`scripts/map-compass/lib/claim-ledger.mjs:12-14`). The ledger is a mandatory committed Stage 4 output beside the trade and verification files. It is append-only and must never be truncated, deleted, rewritten, or regenerated. `appendVerdict` records `rerun` and monotonically increasing `seq` for repeated claim/kind/window keys (`lib/claim-ledger.mjs:32-48`); that visible trail is tamper evidence and must be preserved. Do not call `verifyReal` more than once. Assert its returned rows equal the prevalidated `precomputedRows` before final publication.
+9. Publish `artifacts/map-compass/claim-verification.json` and the already-computed human-readable report `docs/G0-STAGE4-REPORT.md` only after `verifyReal` has appended all ledger rows and returned successfully. These, `claimed-trades.jsonl`, and the appended `claim-ledger.jsonl` are all mandatory committed outputs. No threshold or result is recomputed after the first append.
 
 ### 2.2 Point of no return
 
-For the public result artifacts, the point of no return is the atomic publication of `claim-verification.json` (the report is published as part of that same final publication step). The permanent `claimed-trades.jsonl` is also single-use and is never overwritten, deleted, regenerated, or used for a second run. Important: existing `verifyReal` appends the ledger before it returns, while `claim-verification.json` is written by its caller afterward (`verify-claims.mjs:315-327,341-373`). Therefore the ledger is an earlier irreversible side effect, not literally after the report PNR. The required failure/atomicity policy for an I/O or ledger failure in that interval is unresolved; see §10. All mathematical and scope assertions must pass before the first permanent write.
+The logical **POINT OF NO RETURN is the first append to `artifacts/map-compass/claim-ledger.jsonl`**, which occurs inside `verifyReal` before `claim-verification.json` is written (`verify-claims.mjs:315-327,341-373`). From that first append onward, every ledger byte is permanent tamper evidence. If any failure occurs after the first ledger append and before final publication, report the failure, publish nothing further, do not retry, do not delete or rewrite anything, and mark the run **FAILED** in `docs/STATUS.md`. Never truncate, delete, rewrite, regenerate, or roll back the ledger. All mathematical and scope assertions must pass before the first append.
 
 ## 3. Frozen constants: read, never redeclare
 
@@ -138,7 +139,7 @@ The production `claimed-trades.jsonl` contains one record per `pipeline.centerTr
 - The only real-run baseline is `pipeline.baseline`, built by `baselineForGrid` for the center grid (`scripts/map-compass/lib/dev-pipeline.mjs:172-209,276-305`). It carries `a8Segmented: true`; it is assembled from the segmented pipeline's deterministic random entries. The old `artifacts/map-compass/random-baseline.json` cannot satisfy the gate because it is not the A8 segmented object; `verifyReal` checks `baseline?.a8Segmented` and throws `NO_BASELINE` otherwise (`scripts/map-compass/verify-claims.mjs:299-301`).
 - `sweepBattery` returns `sensitivityByClaim` (`scripts/map-compass/lib/dev-pipeline.mjs:323-347`). Only center-grid CONFIRMED claim/kind rows receive a sensitivity grade and enter that object (`:332-345`). This non-null measured object is what satisfies `verifyReal`'s `SWEEP_NOT_RUN` gate (`scripts/map-compass/verify-claims.mjs:301`).
 - The sweep grade is a **GRADE ONLY**. The frozen center `CENTER_GRID_ID` is authoritative; other cells cannot nullify or rescue its verdict (`scripts/map-compass/frozen.mjs:211-234,236-250`; `scripts/map-compass/lib/dev-pipeline.mjs:329-345`).
-- Every one of the 44 card/kind rows is retained. If an eligible verdict-cell trade has no matched baseline, report the exact missing count and match levels from `row.stats.baseline` and `row.stats.vetoes`; never substitute zero (`scripts/map-compass/lib/verification.mjs:103-120,275-283,428-445`). Whether this condition must abort the entire run, rather than be reported as the frozen `NO_BASELINE` / `INCONCLUSIVE` outcome, is an open issue in §10 because §8's requested abort wording conflicts with the existing fail-closed verifier behavior.
+- Every one of the 44 card/kind rows is retained. The `NO_BASELINE` abort applies only to trades with `verdictState` equal to imported `VERDICT_STATES` (`EFFICIENT` or `CHOPPY`): if such a trade has no fine or sufficient coarse baseline cell, abort before `verifyReal`. Do not change or override the verifier's own fail-closed `NO_BASELINE` → `INCONCLUSIVE` semantics (`scripts/map-compass/lib/verification.mjs:103-120,275-283,428-445`). An UNKNOWN trade with no baseline cell is not an abort: report `NOT_APPLICABLE` with the explicit UNKNOWN trade count only; never substitute zero or fabricate a cell.
 
 ## 6. Final report layout — exact section order
 
@@ -156,7 +157,7 @@ Following reading 2(a), count **families with at least one CONFIRMED STRENGTH cl
 
 ### (iii) Strength count beside placebo p95
 
-Print `CONFIRMED STRENGTH claims: N` directly beside `placebo p95: P`. Read `P` exactly from `artifacts/map-compass/harness-calibration.json` at `placebo.p95FakeConfirms`; the property is produced by the synthetic `verify-claims.mjs --dry-run` calibration (`scripts/map-compass/verify-claims.mjs:271-289,348-358`; `scripts/map-compass/lib/placebo.mjs:64-81`). Label it **synthetic-calibration figure — not a DEV result**. Stage 4 must not regenerate or recompute this figure.
+Print `CONFIRMED STRENGTH claims: N` directly beside `placebo p95: 0`. Read the committed value from `artifacts/map-compass/harness-calibration.json` at `placebo.p95FakeConfirms`; it is **0**. This is a synthetic-calibration quantity and must not be compared with a DEV CONFIRMED count. Keep the label **synthetic-calibration figure — not a DEV result**. The property is produced by the synthetic `verify-claims.mjs --dry-run` calibration (`scripts/map-compass/verify-claims.mjs:271-289,348-358`; `scripts/map-compass/lib/placebo.mjs:64-81`). Stage 4 must not regenerate or recompute this figure.
 
 ### (iv) Per-family signal overlap — reading 2(b)
 
@@ -164,11 +165,11 @@ Compute on **all bars within the DEV segments** only, before trade outcomes, by 
 
 ### (v) Per-year and leave-one-year-out detail per cell
 
-For each of the 44 card/kind cells, print the returned `stats.years`, `stats.byYearNet`, `stats.leaveOneYearOut`, `stats.concentration`, and `stats.loyoPositivePct`. Preserve nulls and missing years as null/absent; do not manufacture zero estimates. These are returned by `verifyClaim` (`scripts/map-compass/lib/verification.mjs:346-403`). Include a distinct NO_BASELINE detail for each cell: `stats.baseline.missing`, `missingFraction`, `matchLevels`, and the exact related vetoes; never conceal or relabel a missing match. The provenance header also prints the DEV-only input row counts and zero-sealed-outcome assertion.
+For each of the 44 card/kind cells, print the returned `stats.years`, `stats.byYearNet`, `stats.leaveOneYearOut`, `stats.concentration`, and `stats.loyoPositivePct`. Preserve nulls and missing years as null/absent; do not manufacture zero estimates. These are returned by `verifyClaim` (`scripts/map-compass/lib/verification.mjs:346-403`). On a successful run, report the eligible-cell NO_BASELINE count and match levels from `stats.baseline.missing`, `missingFraction`, `matchLevels`, and related vetoes (the required preflight abort means such missing eligible trades must be zero on a published result). Report UNKNOWN baseline status as **NOT_APPLICABLE**, with counts only; never create a zero baseline or fabricated cell. The provenance header also prints the DEV-only input row counts and zero-sealed-outcome assertion.
 
 ### (vi) UNKNOWN entries and per-card book identities
 
-For each card, count accepted center-book trades by `verdictState` as EFFICIENT, CHOPPY, or UNKNOWN (where `verdictState === null`); report count and UNKNOWN share. Show the identity **EFFICIENT + CHOPPY + UNKNOWN = total book** on every card row. Total is the accepted one-slot card book (`pipeline.centerTrades`/`cardTradeSummary`), not raw signal emissions or slot-rejected candidates (`scripts/map-compass/lib/dev-pipeline.mjs:66-99,298-320`).
+For each card, count accepted center-book trades by `verdictState` as EFFICIENT, CHOPPY, or UNKNOWN (where `verdictState === null`); report count and UNKNOWN share. For UNKNOWN trades lacking a baseline, report **NOT_APPLICABLE** and the count only; do not report a zero baseline or fabricate a baseline cell. Show the identity **EFFICIENT + CHOPPY + UNKNOWN = total book** on every card row. Total is the accepted one-slot card book (`pipeline.centerTrades`/`cardTradeSummary`), not raw signal emissions or slot-rejected candidates (`scripts/map-compass/lib/dev-pipeline.mjs:66-99,298-320`).
 
 ### (vii) 25-cell sweep table per card per kind, and grade
 
@@ -184,21 +185,22 @@ State the distinct confirmed-strength-family count, compare it with the preregis
 
 ## 7. Dry-inspection checklist — Step 3 mode
 
-A future `--dry-run` mode must not call `verifyReal`, `appendVerdict`, or any ledger writer; must not write `claim-verification.json`; and must not write verdicts. It may write **only** a dry-run trade JSONL and its inspection report. The inspection must be checkable from those files alone and contain:
+A future `--dry-run` mode must not call `verifyReal`, `appendVerdict`, or any ledger writer; must not write `claim-verification.json`; and must not write verdicts. It may write **only** `artifacts/map-compass/stage4-dry/claimed-trades.dry.jsonl` and `artifacts/map-compass/stage4-dry/inspection.json`. These paths are separate from all production single-use paths, are retained and committed as Step 3 evidence, and neither satisfy nor trip the production single-use guard. A dry-run test must assert that `artifacts/map-compass/claim-ledger.jsonl` is not created. The inspection must be checkable from those files alone and contain:
 
 1. year → trade-count table, with total row equal to the JSONL record count;
 2. count of entries in sealed/HOLDOUT/VAL/STRESS years — exactly zero;
 3. per-segment eligible entry range and count of trades outside it — exactly zero;
 4. minimum and maximum of `localIndex - eligibleStart` and `segmentLength - exitIndex`;
-5. `barsHeld` distribution and maximum;
-6. per-card trade count;
-7. per-card long, short, and total counts, with long + short = total;
-8. per-card UNKNOWN count and share;
-9. per-card per-verdict-state trade count and mean net R, including UNKNOWN;
-10. `sum(year-row counts) === trade record count` and per-card state identity `EFFICIENT + CHOPPY + UNKNOWN = total book`;
-11. SHA-256 of the exact trade JSONL bytes.
+5. count and share of M30 bars lacking a second M15 sub-bar under the bounded `[segmentStart, segmentEnd]` rule, per segment and total; report the share as missing-second-sub-bar M30 bars divided by all M30 bars in that segment, so fallback availability is visible;
+6. `barsHeld` distribution and maximum;
+7. per-card trade count;
+8. per-card long, short, and total counts, with long + short = total;
+9. per-card UNKNOWN count and share; UNKNOWN baseline status is `NOT_APPLICABLE`, counts only;
+10. per-card per-verdict-state trade count and mean net R, including UNKNOWN;
+11. `sum(year-row counts) === trade record count` and per-card state identity `EFFICIENT + CHOPPY + UNKNOWN = total book`;
+12. SHA-256 of the exact trade JSONL bytes.
 
-The dry-run path must be separate from the permanent `artifacts/map-compass/claimed-trades.jsonl` path so inspection cannot consume the single-use production guard. The exact dry-run filenames/location and cleanup/retention policy require owner confirmation before Step 2; see §10. Dry inspection is not a rehearsal of verdicts and may not write a baseline verdict, sweep verdict, report verdict, claim ledger row, or claim-verification artifact.
+Dry inspection is not a rehearsal of verdicts and may not write a baseline verdict, sweep verdict, report verdict, claim ledger row, ledger file, or claim-verification artifact.
 
 ## 8. Abort assertions and exact errors
 
@@ -210,6 +212,9 @@ Every listed assertion is a pre-write gate. Before the first permanent output wr
 | Any entry has `localIndex < MAP.warmupBars` in its segment | `STAGE4_ABORT[ENTRY_BEFORE_WARMUP]: segment={segmentId} localIndex={localIndex} warmupBars={MAP.warmupBars}` |
 | Any entry has fewer than `EXIT_HARNESS.maxHoldBars` bars remaining (equivalently `localIndex + maxHoldBars >= segmentLength`) | `STAGE4_ABORT[INSUFFICIENT_SEGMENT_TAIL]: segment={segmentId} localIndex={localIndex} segmentLength={segmentLength} maxHoldBars={EXIT_HARNESS.maxHoldBars}` |
 | Any signal, feature, trade, M15 pair, or exit reads across a segment boundary; or any returned trade violates its segment-local boundary | `STAGE4_ABORT[SEGMENT_CROSSING]: segment={segmentId} localIndex={localIndex} exitIndex={exitIndex}` |
+| Any M15 bar actually used has a year outside `ROLES.DEV` or a datetime outside the segment in which it is used | `STAGE4_ABORT[M15_SEALED_READ]: segment={segmentId} datetime={datetime} year={year}` |
+| A segment's DEV bar count differs from its prescribed count | `STAGE4_ABORT[SEGMENT_BAR_COUNT]: segment={segmentId} expected={expectedCount} actual={actualCount}` |
+| Total DEV M30 row count differs from the prescribed total | `STAGE4_ABORT[DEV_TOTAL_BAR_COUNT]: expected=131922 actual={actualCount}` |
 | Any verdict-eligible trade has no fine or sufficient coarse baseline cell (`matchedBaseline(...).missing`) | `STAGE4_ABORT[NO_BASELINE]: strategyId={strategyId} state={state} side={side} session={session} vol={vol} year={year}` |
 | `CLAIM_CARDS.length !== 22` | `STAGE4_ABORT[CARD_COUNT]: expected 22 cards, got {actual}` |
 | Center `runBattery` does not produce exactly `CLAIM_CARDS.length * 2` rows (44 when card count is valid) | `STAGE4_ABORT[ROW_COUNT]: expected {expected} center rows, got {actual}` |
@@ -217,23 +222,25 @@ Every listed assertion is a pre-write gate. Before the first permanent output wr
 | SHA-256 of raw `scripts/map-compass/frozen.mjs` differs from the required exact hash | `STAGE4_ABORT[FROZEN_HASH]: expected 67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22, got {actual}` |
 | `artifacts/map-compass/claim-verification.json` already exists | `STAGE4_ABORT[OUTPUT_EXISTS]: artifacts/map-compass/claim-verification.json already exists; Stage 4 is single-use` |
 | `artifacts/map-compass/claimed-trades.jsonl` already exists | `STAGE4_ABORT[OUTPUT_EXISTS]: artifacts/map-compass/claimed-trades.jsonl already exists; Stage 4 is single-use` |
+| `docs/G0-STAGE4-REPORT.md` already exists | `STAGE4_ABORT[OUTPUT_EXISTS]: docs/G0-STAGE4-REPORT.md already exists; Stage 4 is single-use` |
 | Precomputed center rows differ from the exact `runBattery` output as specified in §2.1 | `STAGE4_ABORT[PRECOMPUTED_ROWS_MISMATCH]: precomputed rows differ from runBattery output` |
 
 The driver must additionally refuse missing inputs, malformed CSV/JSON, timestamp misalignment, duplicate/out-of-order timestamps, unexpected segments, missing placebo calibration, missing `.reportOnly.criteriaHash`, and an invalid DEV-only assertion before any permanent write. Stable error strings for these input failures must be fixed in Step 2 tests before the one-time run. `verifyReal` also retains its own guards and exact existing errors (`scripts/map-compass/verify-claims.mjs:297-314`); those checks are not bypassed.
 
-**Pre-write guarantee:** all Stage 4-specific assertions above must be performed against in-memory objects/serialized bytes before creating the permanent trade file. The two permanent result paths use exclusive create/atomic publication and are never overwritten. There is a known technical limit: `verifyReal` reads the production trade path and appends ledger rows internally, so an unexpected verifier or filesystem failure after trade-file creation cannot be guaranteed to leave every file untouched without a staging/transaction design. Do not silently invent rollback behavior; resolve §10 before Step 2.
+**Pre-append guarantee:** all Stage 4-specific assertions above must be performed against in-memory objects/serialized bytes before creating the production trade file and before invoking `verifyReal`. The production trade file is exclusive-create and never overwritten. `verifyReal` appends to the ledger internally; its first append is the PNR. If any failure occurs after that append and before final publication, follow §2.2 exactly: report failure, publish nothing further, do not retry, do not delete or rewrite anything, preserve and commit the ledger trail, and mark the run FAILED in `docs/STATUS.md`.
 
 ## 9. What must not change
 
 The sole new machinery is one driver script and its tests. It may only wire the existing DEV segment builder, card signals, one-slot trade producer with frozen exit harness, segmented random control, 25-cell sweep, `verifyReal(..., {a8DevOnly: true})`, and report. It must not alter or copy the logic of `scripts/map-compass/frozen.mjs`, `verifyReal`, `scripts/map-compass/lib/verification.mjs`, `scripts/map-compass/lib/signals.mjs`, `scripts/map-compass/lib/compass.mjs`, or any threshold, card, cost, exit, criterion, routing path, or prior artifact. Imports and direct calls only; no parallel implementation of Map, signal, trade, baseline, sweep, or verdict behavior.
 
-No `npm` script, test, or implementation file is authorized by this Step 1 document-only task. Do not run Stage 4 in Step 1.
+This Step 1 revision writes no `npm` script, test, or implementation file. The signed contract scopes the future Step 2 driver and tests; it does not authorize a Stage 4 execution.
 
 ## 10. Open questions for resolution before Step 2
 
-1. **Continuity rule:** what exact timestamp-gap test distinguishes a malformed/missing M30 trading bar from documented weekend/holiday closures and known data holes? The normalized feed is not uniformly 30-minute continuous, and the data contract identifies multi-hour market gaps. The frozen pipeline does not export a universal “acceptable gap” policy. No threshold is guessed here.
-2. **Sealed M15 edge:** `m15MapForSegment` includes the timestamp at `segmentEnd + 15 minutes` (`lib/dev-segments.mjs:139-154`). Confirm the rule for a second M15 sub-bar whose timestamp falls into a sealed calendar year or across an excluded gap. It must not expose sealed OHLC to an outcome, and the existing conservative fallback must remain unchanged.
-3. **NO_BASELINE abort scope:** §8 says abort for any trade without a baseline cell, while the report must account for UNKNOWN entries and the frozen verifier deliberately records missing matches as `NO_BASELINE`/`INCONCLUSIVE`. Should the abort apply only to EFFICIENT/CHOPPY verdict-eligible trades (UNKNOWN trades are outside verdict cells), or literally to all accepted card trades? The frozen code cannot resolve this policy conflict.
-4. **Dry-run paths/retention:** confirm the dry-run-only trade and inspection filenames and whether those files are retained. They must not be the permanent single-use output paths or block a later authorized real run.
-5. **Failure atomicity/ledger:** `verifyReal` appends ledger rows before the caller writes `claim-verification.json` (`verify-claims.mjs:315-373`). Confirm whether the specified report publication is the logical PNR despite this earlier ledger side effect, and how to handle an I/O failure between ledger append and final artifact publication without changing `verifyReal` or deleting outputs.
-6. **UNKNOWN baseline diagnostic:** if question 3 excludes UNKNOWN entries from the NO_BASELINE abort, confirm that their baseline status is reported as not applicable rather than fabricated or treated as a zero baseline.
+The six prior questions are closed by verifier review and the rulings now applied in §§1.3, 1.2, 5, 7, and 8: structural timestamps only with no maximum-gap tolerance; bounded M15 selection plus `M15_SEALED_READ`; NO_BASELINE scope limited to EFFICIENT/CHOPPY verdict-eligible trades while UNKNOWN is NOT_APPLICABLE; the exact retained dry-run paths; first ledger append as PNR with the specified FAILED/no-retry/no-delete response; and UNKNOWN baseline counts only. In particular, §10 Q2 is **CLOSED**: M15 selection is inclusive `[segmentStart, segmentEnd]`, never `segmentEnd + 15`, the helper remains unchanged, the conservative fallback remains unchanged, and the inspection reports missing second-sub-bar counts.
+
+**One genuine unresolved inconsistency in the supplied count ruling:** the four required segment counts sum to 127,538:
+
+`38,352 + 32,766 + 34,051 + 22,369 = 127,538`
+
+but the same ruling requires a total of 131,922, a difference of 4,384. The spec requires independent checks against all four segment counts and the stated total, with the exact mismatch errors in §8; all five assertions cannot pass simultaneously as written. No segment count or total has been altered or guessed. The verifier/owner must correct the inconsistent count before a successful Step 2 preflight or Stage 4 execution is possible.
