@@ -12,4 +12,4 @@
 
 ## Open questions
 
-None blocking the authorized work. The remaining action is procedural: commit/push the completed Part 2 package, verify the remote tip, then perform the one Stage 3 run. Stage 4 requires separate authorization and must not be started here.
+None blocking the authorized work. Part 2 was committed/pushed as `14120e306815ba9456f2550c696621d290cb350f`, and the remote tip was verified to match. The sole Stage 3 run is the next authorized action. Stage 4 requires separate authorization and must not be started here.

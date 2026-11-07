@@ -2,7 +2,7 @@
 
 **As of:** 2026-11-07 (Africa/Nairobi)
 **Branch:** `arena/072665f9-system`
-**Current task stage:** Part 2 is implemented and calibrated; Part 2 commit/push is the next gate. The owner approved Amendment 8C’s A/B no-edge criterion and authorized Parts 2–4, including exactly one Stage 3 run. **Do not run Stage 4 or rerun Stage 3 after results exist.**
+**Current task stage:** Part 2 is implemented, calibrated, committed and remote-verified; the sole Stage 3 run is now authorized by the recorded approval. The owner approved Amendment 8C’s A/B no-edge criterion and authorized Parts 2–4, including exactly one Stage 3 run. **Do not run Stage 4 or rerun Stage 3 after results exist.**
 **Verified starting remote tip:** `ad1f9433ba3cdf8be20393ebe8e34b6c11ba031a`.
 **Stage 3b scored worlds:** none yet. **Stage 4:** not run; `claim-verification.json` and `claimed-trades.jsonl` remain guarded/absent.
 
@@ -30,7 +30,7 @@
 - Frozen contamination exclusion: **`pdh-pdl-break`**; 6,038 same-bar/same-side co-fires, 34.32% of planted-card DEV signal bars (>25%). The full signal-only pairwise table and all real/synthetic pilot card tables are in `artifacts/map-compass/a8-part2-prep.json` and `docs/G0-AMENDMENT-8-PART2.md`.
 - Three disjoint pilot seeds: 20261110, 20261111, 20261112. Condition B retained its constant additive drift generator, but recalibrated only the drift scalar against the production matched-control pipeline (world-specific M15 `seed+71`, UNKNOWN-state random entries dropped): 0.03143677 → **0.03542774**; mean pilot random-long net +0.1677R (target +0.15R), gross +0.3264R, cost 0.1587R.
 - For C, the 24-bar pilot window share exceeded 40%, so the preregistered 12-bar contingency was applied before scoring. Final drift is **0.23780454 price units/bar**; across three pilots, measured gross +0.4964R, net +0.3466R (target about +0.30R), and cost +0.1497R. The 12-bar window share remains 68.81%; this is explicitly reported and no further shortening is authorized by the pre-registration.
-- Part 2 freeze SHA-256: `e594639f33c065beb7e8389b62a3768d2d3c1aaa478e94c6f670d9d522853a16`. Part 2 code/report and the safe map-role correction must be committed and pushed before Stage 3.
+- Part 2 freeze SHA-256: `e594639f33c065beb7e8389b62a3768d2d3c1aaa478e94c6f670d9d522853a16`. Part 2 code/report and the safe map-role correction were committed at `14120e306815ba9456f2550c696621d290cb350f`, pushed to `arena/072665f9-system`, and remote-verified (`git ls-remote` matched `14120e306815ba9456f2550c696621d290cb350f`).
 
 ## Existing freeze assertions and Stage 4 guard
 
@@ -44,9 +44,8 @@ The last full `npm test` run, before the stale historical-hash assertion was upd
 
 ## Next actions — strictly ordered
 
-1. Final static review, inspect Stage 4 output absence, run tests/role checks as needed.
-2. Commit and push Part 2 to `arena/072665f9-system`; verify the remote tip equals the pushed commit.
-3. Only after remote verification, run `npm run mc:a8-stage3b` exactly once. It refuses an existing output and refuses Stage 4 output files.
+1. Part 2 commit/push/remote verification completed at `14120e306815ba9456f2550c696621d290cb350f`; final static/role and output-absence checks passed.
+2. Run `npm run mc:a8-stage3b` exactly once. It refuses an existing output and refuses Stage 4 output files.
 4. Report all four-condition tables, λ recomputation, old/new bounds beside A/B observations, confirmation lists, C planting/exclusions and coverage identities, and the final full test result.
 5. If every criterion passes, commit/push results, verify the remote tip, then stop. If any criterion fails, hard stop without rerun. Never run Stage 4.
 
