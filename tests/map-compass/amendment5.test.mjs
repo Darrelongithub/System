@@ -54,11 +54,11 @@ test("A5: calendar-cluster baseline uses canonical dates; real verification rema
 });
 
 test("A5: v1.5 snapshot hash is pinned and prior snapshots remain unchanged",()=>{
-  const hashes=json("blueprint-hashes.json"),snapshot=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.5.md"));
-  const digest=b=>createHash("sha256").update(b).digest("hex");
-  assertEqual(digest(snapshot),hashes.v15.sha256);
+  const hashes=json("blueprint-hashes.json"),digest=b=>createHash("sha256").update(b).digest("hex");
+  const snapshotPin=hashes.v15,snapshot=readFileSync(join(ROOT,snapshotPin.file));
+  assertEqual(digest(snapshot),snapshotPin.sha256,`${snapshotPin.file} matches its v15 historical pin`);
   assertEqual(hashes.current.matchesV15,false);
-  for(const key of ["v10","v11","v12","v13","v14"]){const f=readFileSync(join(ROOT,hashes[key].file));assertEqual(digest(f),hashes[key].sha256,`${key} snapshot stays byte-preserved`);}
+  for(const key of ["v10","v11","v12","v13","v14"]){const pin=hashes[key],f=readFileSync(join(ROOT,pin.file));assertEqual(digest(f),pin.sha256,`${pin.file} matches its ${key} historical pin`);}
 });
 
 test("A5: v1.5 signal-spec dump is preserved as a historical artifact",()=>{

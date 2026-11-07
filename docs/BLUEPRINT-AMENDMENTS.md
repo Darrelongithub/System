@@ -28,7 +28,10 @@ synthetic dress rehearsal remain prerequisites to the one-time DEV run.
 | **v1.7** | 2026-11-02 | `docs/BLUEPRINT-v1.7.md` | `045b345320fc0a691e9af1cea8fcc0fd140bb7c04204647172f8ac5b0df13281` | superseded by v1.8; **preserved** |
 | **v1.8** | 2026-11-05 | `docs/BLUEPRINT-v1.8.md` | `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4` | superseded by v1.9; **preserved** |
 | **v1.9** | 2026-11-06 | `docs/BLUEPRINT-v1.9.md` | `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a` | superseded by v1.10; **preserved** |
-| **v1.10** | 2026-11-06 | `docs/BLUEPRINT-v1.10.md` | `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2` | current; `BLUEPRINT.md` byte-identical |
+| **v1.10** | 2026-11-06 | `docs/BLUEPRINT-v1.10.md` | `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2` | superseded by v1.11; preserved |
+| **v1.11** | 2026-11-07 | `docs/BLUEPRINT-v1.11.md` | `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c` | current; `BLUEPRINT.md` byte-identical; 141,013 bytes; 2,097 lines; v1.10 pin preserved |
+
+**v1.11 provenance (2026-11-07):** The Stage 3b status text was edited after the v1.10 pin was recorded. The committed pre-edit `docs/BLUEPRINT-v1.10.md` was restored and remains pinned without changing its hash; the updated current `BLUEPRINT.md` is versioned as v1.11 instead of rewriting the v1.10 pin. `BLUEPRINT.md` content is unchanged by this commit.
 
 - v1.1's snapshot is the **original committed file** (hash verified by a test).
 - v1.0's original git blob was lost when the workspace was re-cloned from

@@ -250,20 +250,28 @@ test("Amendment 2: power report-only block exists and does not change criteria",
 });
 
 test("Amendment 2: version snapshots, amendment log, and full-text card dump exist", () => {
-  const v10 = join(DOCS, "BLUEPRINT-v1.0.md");
-  const v11 = join(DOCS, "BLUEPRINT-v1.1.md");
-  const v12 = join(DOCS, "BLUEPRINT-v1.2.md");
+  const hashes = read("blueprint-hashes.json");
+  for (const version of ["v10", "v11", "v12"]) {
+    const pin = hashes[version], snapshotPath = join(ROOT, pin.file);
+    assert(existsSync(snapshotPath), `${pin.file} must be preserved`);
+    assertEqual(
+      createHash("sha256").update(readFileSync(snapshotPath)).digest("hex"),
+      pin.sha256,
+      `${pin.file} matches ${version} pinned SHA-256`,
+    );
+  }
+  const currentPath = join(ROOT, hashes.current.file);
+  const currentHash = createHash("sha256").update(readFileSync(currentPath)).digest("hex");
+  const currentSnapshot = Object.entries(hashes).find(([version]) =>
+    /^v\d+$/.test(version) && hashes.current[`matches${version[0].toUpperCase()}${version.slice(1)}`] === true,
+  );
+  assert(currentSnapshot, "current must identify its pinned snapshot");
+  assertEqual(currentHash, hashes.current.sha256, `${hashes.current.file} matches current pin`);
+  assertEqual(currentHash, currentSnapshot[1].sha256, `${hashes.current.file} matches ${currentSnapshot[1].file}`);
   const log = join(DOCS, "BLUEPRINT-AMENDMENTS.md");
   const cards = join(DOCS, "CLAIM-CARDS-FULL-TEXT.md");
-  assert(existsSync(v10), "v1.0 must be preserved");
-  assert(existsSync(v11), "v1.1 must be preserved");
-  assert(existsSync(v12), "v1.2 must be preserved");
   assert(existsSync(log), "dated amendment log must exist");
   assert(existsSync(cards));
-  assertEqual(
-    createHash("sha256").update(readFileSync(v11)).digest("hex"),
-    "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480",
-  );
   const full = readFileSync(cards, "utf8");
   for (const o of TEST_ORDER) assert(full.includes(`## ${o.testOrder}. \`${o.id}\``), `missing card ${o.id}`);
   assert(full.includes("FROZEN"));

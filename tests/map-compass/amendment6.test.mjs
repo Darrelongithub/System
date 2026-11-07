@@ -58,16 +58,28 @@ test("A6: family × verdict power has six monotone edges, Kish/day dependence an
   assertEqual(CLAIM_CRITERIA.practicalFloorR,.1);assertEqual(CLAIM_CRITERIA.tStatMin,2);
 });
 
-test("A6: full historical report is pinned and the A8 output state remains DEV-only",()=>{
+test("A6: all historical blueprint snapshots match pins and BLUEPRINT.md matches the current snapshot",()=>{
   const report=readFileSync(join(ROOT,"docs/G0-AMENDMENT-6-REPORT.md"),"utf8"),spec=readFileSync(join(ROOT,"docs/CLAIM-SIGNAL-SPECIFICATIONS.md"),"utf8");
   assert(report.includes("74,886"));assert(report.includes("123,541"));assert(report.includes("THIN-POWER"));assert(report.includes("neither rail is measured from that day's open"));
   for(const c of CLAIM_CARDS)assert(spec.includes(`| ${c.id} |`),`${c.id} needs an exact pseudo-code row`);
   assertEqual(FAMILIES.length,8);assertA8OutputState(ART);
-  const h=json("blueprint-hashes.json"),v15=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.5.md"));assertEqual(createHash("sha256").update(v15).digest("hex"),h.v15.sha256);
-  const v16=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.6.md")),current=readFileSync(join(ROOT,"BLUEPRINT.md"));
-  assertEqual(createHash("sha256").update(v16).digest("hex"),h.v16.sha256);
-  const v17=readFileSync(join(ROOT,"docs/BLUEPRINT-v1.7.md"));
-  assertEqual(createHash("sha256").update(v17).digest("hex"),h.v17.sha256);
-  assertEqual(createHash("sha256").update(current).digest("hex"),h.v110.sha256);
-  assertEqual(h.current.matchesV110,true);assertEqual(h.current.matchesV19,false);assertEqual(h.current.matchesV18,false);assertEqual(h.current.matchesV17,false);assertEqual(h.current.matchesV16,false);assertEqual(h.current.matchesV15,false);
+  const hashes=json("blueprint-hashes.json");
+  const snapshots=Object.entries(hashes).filter(([key,value])=>/^v\d+$/.test(key)&&value?.file);
+  const digest=bytes=>createHash("sha256").update(bytes).digest("hex");
+  assert(snapshots.length>0,"blueprint-hashes.json must list historical snapshots");
+  for(const [version,pin] of snapshots){
+    const snapshotPath=join(ROOT,pin.file),actual=digest(readFileSync(snapshotPath));
+    assertEqual(actual,pin.sha256,`${pin.file} matches ${version} pinned SHA-256`);
+    assertEqual(pin.full,pin.sha256,`${pin.file} full and short-form pins agree`);
+  }
+  const matchingFlags=Object.entries(hashes.current).filter(([key])=>/^matchesV\d+$/.test(key));
+  const currentSnapshot=snapshots.find(([version])=>hashes.current[`matches${version[0].toUpperCase()}${version.slice(1)}`]===true);
+  assert(currentSnapshot,"current must identify exactly one pinned snapshot");
+  assertEqual(matchingFlags.filter(([,matches])=>matches===true).length,1,"exactly one matchesV* flag is true");
+  for(const [flag,matches] of matchingFlags)
+    assertEqual(matches,flag===`matches${currentSnapshot[0][0].toUpperCase()}${currentSnapshot[0].slice(1)}`,`current ${flag} flag is consistent`);
+  const currentPath=join(ROOT,hashes.current.file),currentHash=digest(readFileSync(currentPath));
+  assertEqual(currentHash,hashes.current.sha256,`${hashes.current.file} matches its current SHA-256`);
+  assertEqual(currentHash,currentSnapshot[1].sha256,`${hashes.current.file} matches ${currentSnapshot[1].file}`);
+  assertEqual(hashes.current.matchesV111,true,"BLUEPRINT.md is the v1.11 current snapshot");
 });

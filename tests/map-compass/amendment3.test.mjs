@@ -453,9 +453,9 @@ test("A3 6: v1.0, v1.1, v1.2, v1.3 snapshots are preserved with full SHA-256", (
   assertEqual(v11.length, 64);
   assertEqual(v12.length, 64);
   assertEqual(v13.length, 64);
-  assertEqual(v11, "72c078f335fb77b1a1260a49e39cbc856afda6ce9ac5635fd5ad345dcb7dd480");
-  assertEqual(v12, "cf3c94b1f505dc31828ce740dceb0e7989a606f62cf28c8d48cf91713917d543");
   const hashes = read("blueprint-hashes.json");
+  assertEqual(v11, hashes.v11.sha256, "docs/BLUEPRINT-v1.1.md matches its historical pin");
+  assertEqual(v12, hashes.v12.sha256, "docs/BLUEPRINT-v1.2.md matches its historical pin");
   assertEqual(hashes.v10.full, v10);
   assertEqual(hashes.v11.full, v11);
   assertEqual(hashes.v12.full, v12);

@@ -2,9 +2,8 @@
 
 **As of:** 2026-11-07 (Africa/Nairobi)
 **Branch:** `arena/072665f9-system`
-**Current status:** The one-time Stage 3b run remains a hard-stop failure and was not rerun. Stage 4 has not been run and remains unauthorized. The A-only diagnostics above remain measurement-only. The pre-Stage-4 conditional-routing correction and regression tests are complete; `npm ci` succeeded and the full suite ran once (416 passed, 5 expected failures; see below). No verification criterion, threshold, card, cost, exit, or Stage 3 result changed.
-**Starting tip for this routing fix:** `1ba0e367a80e701358c0f336a6e8841149ebf319`.
-**Routing-fix implementation commit:** `9b6983f97bc99e5e759b80f92f2661eb6b2fca92`. **Status sync commit:** `1ecc9e3063c3e2366b508135867dca415925319b`. The final branch tip and remote verification are printed in the publication handoff.
+**Current status:** The Stage 3b hard-stop result remains final and was not rerun; Stage 4 remains unauthorized. The routing correction is published. This provenance repair restores the pinned v1.10 snapshot and versions current `BLUEPRINT.md` as v1.11 without editing `BLUEPRINT.md`. `npm ci`, `npm run mc:m1`, and `npm run mc:map` succeeded; the latest full suite reports 420 passed and one known synth UI failure (87.5 seconds).
+**Base tip for this provenance fix:** `f28bddef5efc0df194f99928f6f03d2eca6d7b71`. Final commit and remote verification are reported in the handoff.
 
 ## Dated decisions and preserved constraints
 
@@ -54,9 +53,16 @@ No Stage 3 runner, battery sweep, `verifyClaim`, or verdict recomputation was ru
 - **Q3, counterfactual only:** re-applied chronological one-slot blocking within each segment to the same seed-generated, known-state random-control entries, independently per card slot; retained the existing ≥200 control-cell sufficiency/fallback rules. Equal-weight across 15 cells, the matched-control mean shifted from −0.039R before blocking to −0.181R after blocking; mean signed excess shifted from +0.227R to +0.104R. Trade-weighted control means were −0.056R before and −0.171R after; trade-weighted excesses were +0.199R and +0.099R. Only 2,868/5,637 confirmation trades (50.9%) retained an eligible matched control after blocking, leaving 14/15 cells partially unmatched. Twelve cells retained positive excess on their matched subset, five had subset excess t>2, and only one of those had complete matched coverage. This is a report-only counterfactual, not a changed test or verdict.
 - **Interpretation:** the ten-world counts descriptively support over-dispersion. The one-slot control comparison also signals excess-gate sensitivity/bias, but the counterfactual is incomplete and cannot establish a full-cell replacement verdict. Why the A confirmations cluster and why the unblocked matched-control means differ from the blocked samples remain unexplained. No recommendation is made.
 
-## Prior test result (previous publication; historical)
+## Corrected test report and provenance verification — 2026-11-07
 
-In the previous task, `npm test` stopped before the test harness loaded: 0 tests executed because `date-fns` was missing from `src/lib/ohlc-generator.ts`. The prior completed full run before that task was 415 passed, 1 failed in 84.1 seconds; its sole test failure was `tests/synth.test.mjs:694`, D1 UI assertion “UI shows the final recorded D1 count”. These are historical; the routing-fix test run is recorded below.
+The earlier reports of **“415 passed / 1 failed”** and **“0 tests executed”** were **WRONG as the required verification position**. They do not describe the completed sequence below. The intermediate 416-passed/5-failed result was also from before the required data retrieval and provenance repair; its three missing-data failures and A6 v1.10 pin failure are now resolved.
+
+- `npm ci`: succeeded; 360 packages installed (npm audit reported 19 existing dependency vulnerabilities: 7 moderate, 6 high, 6 critical; no audit fix was run).
+- `npm run mc:m1`: succeeded. Fetch: **76 files, 0 errors**. Normalized outputs: XAU M30 248,912 bars, XAU M15 494,235 bars, EURUSD M30 115,200 bars. DST verification: PASS across 44 months; spread table matched 1,318,470 M1 minutes; data audit reported `problems: none`.
+- `npm run mc:map`: succeeded; causality/truncation PASS, deterministic output, coverage problems 0, verdict PASS.
+- `npm test`: **420 passed, 1 failed** in 87.5 seconds (latest run). The only failing test is `synth UI: the map generator discloses the latest exhausted D1 result without claiming certification` at `tests/synth.test.mjs:694` (“UI shows the final recorded D1 count”). The A6 blueprint-hash test now passes; all three data-contract tests now pass with M1 artifacts present. No other failure occurred.
+
+The M1/map runs changed only `generatedAt` in tracked `artifacts/map-compass/data-manifest.json`, `dst-verification.json`, `map-validation.json`, and `spread-table.json`. Those timestamp-only changes were restored; they are not part of this patch. `BLUEPRINT.md` was not edited. The A6 failure is fixed by versioning: the v1.10 historical snapshot is restored to its pinned bytes and current content is recorded as v1.11.
 
 ## Freeze assertions and Stage 4 guard
 
@@ -66,7 +72,7 @@ The repository review recorded **seven actual current-card freeze test cases**, 
 
 Part 1/1b and freeze history remain in `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md`, `docs/BLUEPRINT-v1.10.md`, and `docs/G0-AMENDMENT-8-REPORT.md`. These are historical, not scored Stage 3b outputs.
 
-## Pre-Stage-4 Compass routing fix — 2026-11-07
+## Compass routing fix — historical record from preceding change (2026-11-07)
 
 **Risk-acceptance reason (a), corrected:** Weakness claims cannot ADD an enabled (card, state) pair. The single path by which a weakness confirmation could REMOVE one — unconditional promotion of any DEFINITION_SENSITIVE ledger record, including weakness and VAL-window records, into conditionalIds — was found by the verifier by code inspection and reproduction, and was fixed and regression-tested before any real result. Cause: build-compass.mjs built conditionalIds without a kind or window filter.
 
@@ -78,11 +84,11 @@ Other risk-acceptance reasons (b) through (e) are unchanged by this correction. 
 
 **Frozen hashes:** `scripts/map-compass/frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; frozen `criteriaHash` `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`. Neither is changed.
 
-**Stage:** pre-Stage-4 routing correction only; Stage 3 was not rerun, no rehearsal was performed, and Stage 4 remains unauthorized. The focused fix and test record are published. **Next action:** await the separate provenance/hash prompt; do not resume Stage 3 or start Stage 4. The dead-code weakness block remains a deferred routing-stage design question.
+**Historical stage note:** the conditional-routing correction was completed in the preceding change. Stage 3 was not rerun, no rehearsal was performed, and Stage 4 remained unauthorized. The dead-code weakness block remained a deferred routing-stage design question; this provenance task does not change it.
 
-## Routing-fix test run — 2026-11-07
+## Prior routing-fix test run (before data restoration/versioning; superseded)
 
-`npm ci` succeeded (360 packages installed). The one full `npm test` run completed in 94.9 seconds: **416 passed, 5 failed**. All five failures match the explicitly anticipated known failures; no additional failures occurred:
+`npm ci` succeeded (360 packages installed). The earlier full `npm test` run completed in 94.9 seconds: **416 passed, 5 failed**. This is a historical, data-incomplete run; the current verification position appears above after `mc:m1`, `mc:map`, and the versioning repair.
 
 1. `synth UI: the map generator discloses the latest exhausted D1 result without claiming certification` — `tests/synth.test.mjs:694`, assertion “UI shows the final recorded D1 count”.
 2. `every fetched blob still matches its pinned git oid` — missing `artifacts/map-compass/raw/fetch-manifest.json`.
@@ -90,4 +96,14 @@ Other risk-acceptance reasons (b) through (e) are unchanged by this correction. 
 4. `no hindsight/derived column ever enters the normalised schema` — same missing normalized CSV.
 5. `A6: full historical report is pinned and the A8 output state remains DEV-only` — pre-existing v1.10 hash mismatch: expected `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`, actual `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c`. Per scope, no hash/blueprint file was changed.
 
-All five new routing regression tests passed, including the direct 22-card complementarity/key uniqueness proof. The permitted routing fix, tests, and documentation were committed and pushed; the branch tip was verified against `git ls-remote`. Stage 3 and Stage 4 remain prohibited. **Next action:** await the separate provenance/hash prompt; do not edit the v1.10 blueprint or blueprint hash registry in this cycle.
+All five routing regression tests passed, including the direct 22-card complementarity/key uniqueness proof. This historical test run is superseded by the corrected current run above; the A6 pin and data-contract failures were fixed by versioning and successful data retrieval. Stage 3 and Stage 4 remain prohibited.
+
+## Blueprint provenance versioning — 2026-11-07, before Stage 4
+
+- The commit immediately before the BLUEPRINT status edit in `1ba0e367a80e701358c0f336a6e8841149ebf319` is `3e32c067c39e184a3c85737dfb737ea0bfddb694`. `docs/BLUEPRINT-v1.10.md` was restored from that committed content.
+- Restored v1.10 SHA-256: `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`; existing pinned v1.10 SHA-256: `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`. **They are equal.** The v1.10 pin entry was not changed.
+- `docs/BLUEPRINT-v1.11.md` is byte-identical to the current, unchanged `BLUEPRINT.md`: 141,013 bytes, 2,097 lines, SHA-256 `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c`. The registry adds `v111`; `current.matchesV111` is true and all other existing `matchesV*` flags are false.
+- The amendment log now marks v1.10 “superseded by v1.11; preserved,” records the v1.11 metadata and reason, and explicitly states that `BLUEPRINT.md` content is unchanged by this commit. Snapshot tests now verify every versioned snapshot against its registry pin and separately verify `BLUEPRINT.md` against the single current snapshot.
+- Integrity guards remain unchanged: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; `criteriaHash` `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`.
+
+**Stage:** provenance/versioning repair before Stage 4. No Stage 3 rerun, Stage 4, rehearsal, or criteria change. The v1.10 pin remains immutable; v1.11 is current. Next: commit/push only the authorized provenance, test, log, and status files; verify the branch tip; then await the separate follow-up. Keep Stage 4 unauthorized.
