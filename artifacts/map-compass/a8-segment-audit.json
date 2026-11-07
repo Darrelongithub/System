@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T07:55:35.241Z",
+  "generatedAt": "2026-11-07T10:35:20.538Z",
   "stage": "A8_STAGE_2_SEGMENT_AUDIT",
   "strategyOutcomesRun": false,
   "roles": {
@@ -229,14 +229,9 @@
       "entryEligibleLastLocalIndex": 23368
     }
   ],
-  "oldContinuousAgreement": {
-    "comparedBars": 127538,
-    "agreeingBars": 127530,
-    "agreementPct": 99.9937,
-    "reportOnly": true
-  },
-  "oldContinuousAgreementReportOnly": true,
-  "oldContinuousInputHash": null,
+  "oldContinuousAgreement": null,
+  "oldContinuousAgreementOmitted": "A full-feed comparison would compute features on non-DEV rows; it is prohibited and was not run.",
+  "devOnlyMapStatesSha256": "3c5834134adfb94be48fc566f3e1265f32aad3e54bdc341d6e8c467d0fc32f60",
   "spreadMonths": {
     "total": 44,
     "pairedObservedCount": 30,

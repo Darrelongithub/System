@@ -272,12 +272,17 @@ export function buildDevPipeline({ bars, m15Bars = [], segments = null, randomSe
   const random = randomCandidateRecords(devSegments, segmentFeatures, segmentM15, { seed: randomSeed, entriesPerGroup: entriesPerRandomGroup });
   const gridInputs = new Map();
   let centerRandomTrades = [];
+  let centerRandomUnknownStateDropped = 0;
   for (const grid of SWEEP_GRID) {
     const states = stateByGrid.get(grid.id);
     const trades = rebinStrategyTrades(centerTrades, states);
-    const randomTrades = remapRecords(random.records, states).filter((t) => t.state !== "UNKNOWN");
+    const remappedRandom = remapRecords(random.records, states);
+    const randomTrades = remappedRandom.filter((t) => t.state !== "UNKNOWN");
     const baseline = baselineForGrid(randomTrades);
-    if (grid.id === CENTER_GRID_ID) centerRandomTrades = randomTrades;
+    if (grid.id === CENTER_GRID_ID) {
+      centerRandomTrades = randomTrades;
+      centerRandomUnknownStateDropped = remappedRandom.length - randomTrades.length;
+    }
     gridInputs.set(grid.id, { trades, baseline });
   }
   const center = gridInputs.get(CENTER_GRID_ID);
@@ -305,6 +310,8 @@ export function buildDevPipeline({ bars, m15Bars = [], segments = null, randomSe
       randomSeed,
       entriesPerRandomGroup,
       randomCandidatesGenerated: random.records.length,
+      randomUnknownStateDropped: centerRandomUnknownStateDropped,
+      randomKnownStateKept: centerRandomTrades.length,
       gridCells: SWEEP_GRID.length,
       centerGrid: CENTER_GRID_ID,
       noNonDevYearEntries: [...center.trades, ...centerRandomTrades].every((t) => ROLES.DEV.includes(t.year)),

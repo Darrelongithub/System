@@ -1,6 +1,6 @@
 # G0 Amendment 8 — DEV segment audit (Stage 2)
 
-Generated 2026-11-05T07:55:35.241Z. **No strategy signals, trades, or outcomes were generated.**
+Generated 2026-11-07T10:35:20.538Z. **No strategy signals, trades, or outcomes were generated.**
 
 ## Frozen segment rule
 
@@ -15,9 +15,9 @@ Split at every non-DEV gap; recompute Map independently per contiguous DEV segme
 
 **Totals:** 131922 DEV bars; 4000 lost to segment warm-up; 384 lost to segment tails; 127538 eligible entry bars.
 
-## Historical continuous-Map comparison (report-only)
+## Full-feed Map comparator
 
-After each segment's 1,000-bar warm-up and 96-bar tail, 127530/127538 bars agree (99.9937%). This diagnostic does not feed the A8 Map, signals, trades, baselines, or verdicts.
+Omitted. Computing a continuous Map over the full feed would derive features from non-DEV rows, which is prohibited. No continuous comparator was run; the DEV-only state hash is recorded in the JSON artifact.
 
 ## Spread-sample months in sealed years (cost data only)
 

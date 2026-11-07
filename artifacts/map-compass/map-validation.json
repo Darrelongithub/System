@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-05T07:54:29.064Z",
+  "generatedAt": "2026-11-07T10:35:16.182Z",
   "mapVersion": "M2-v0 (hand-defined 2x2 + abstain + hysteresis)",
   "thresholds": {
     "erCutoff": 0.35,
@@ -13,6 +13,32 @@
     "abstainBandPct": 10
   },
   "bars": 248912,
+  "computedDevBars": 131922,
+  "excludedNonDevRows": 116990,
+  "devOnlyFeatureComputation": true,
+  "devSegmentBoundaries": [
+    {
+      "id": "2004-2007",
+      "globalStart": 0,
+      "globalEndExclusive": 39448
+    },
+    {
+      "id": "2009-2011",
+      "globalStart": 51054,
+      "globalEndExclusive": 84916
+    },
+    {
+      "id": "2013-2015",
+      "globalStart": 96313,
+      "globalEndExclusive": 131460
+    },
+    {
+      "id": "2017-2018",
+      "globalStart": 143231,
+      "globalEndExclusive": 166696
+    }
+  ],
+  "statesSha256": "3c5834134adfb94be48fc566f3e1265f32aad3e54bdc341d6e8c467d0fc32f60",
   "devYearsOnly": true,
   "sealedYears": [
     2008,
@@ -67,14 +93,14 @@
     },
     "2009": {
       "bars": 11622,
-      "warmup": 0,
-      "EXPANSION": 589,
-      "GRIND": 957,
-      "WHIPSAW": 1732,
-      "QUIET": 5718,
-      "UNKNOWN": 2626,
-      "abstain": 2626,
-      "pending": 1757
+      "warmup": 1000,
+      "EXPANSION": 504,
+      "GRIND": 895,
+      "WHIPSAW": 1572,
+      "QUIET": 5239,
+      "UNKNOWN": 3412,
+      "abstain": 3410,
+      "pending": 1606
     },
     "2010": {
       "bars": 11015,
@@ -100,14 +126,14 @@
     },
     "2013": {
       "bars": 11727,
-      "warmup": 0,
-      "EXPANSION": 921,
-      "GRIND": 927,
-      "WHIPSAW": 1484,
-      "QUIET": 5815,
-      "UNKNOWN": 2580,
-      "abstain": 2580,
-      "pending": 1645
+      "warmup": 1000,
+      "EXPANSION": 828,
+      "GRIND": 853,
+      "WHIPSAW": 1396,
+      "QUIET": 5289,
+      "UNKNOWN": 3361,
+      "abstain": 3357,
+      "pending": 1507
     },
     "2014": {
       "bars": 11735,
@@ -133,14 +159,14 @@
     },
     "2017": {
       "bars": 11721,
-      "warmup": 0,
-      "EXPANSION": 655,
-      "GRIND": 1224,
-      "WHIPSAW": 1653,
-      "QUIET": 5497,
-      "UNKNOWN": 2692,
-      "abstain": 2692,
-      "pending": 1797
+      "warmup": 1000,
+      "EXPANSION": 609,
+      "GRIND": 1131,
+      "WHIPSAW": 1423,
+      "QUIET": 5059,
+      "UNKNOWN": 3499,
+      "abstain": 3497,
+      "pending": 1631
     },
     "2018": {
       "bars": 11744,
@@ -157,66 +183,66 @@
   "coverageProblems": [],
   "dwell": {
     "EXPANSION": {
-      "runs": 3765,
-      "meanBars": 3.99,
+      "runs": 1961,
+      "meanBars": 3.96,
       "medianBars": 2,
       "maxBars": 33
     },
     "GRIND": {
-      "runs": 6324,
-      "meanBars": 3.47,
+      "runs": 3264,
+      "meanBars": 3.39,
       "medianBars": 2,
       "maxBars": 35
     },
     "WHIPSAW": {
-      "runs": 7944,
-      "meanBars": 4.55,
+      "runs": 4121,
+      "meanBars": 4.49,
       "medianBars": 2,
       "maxBars": 61
     },
     "QUIET": {
-      "runs": 17161,
-      "meanBars": 6.91,
+      "runs": 8966,
+      "meanBars": 6.86,
       "medianBars": 3,
-      "maxBars": 92
+      "maxBars": 76
     },
     "UNKNOWN": {
-      "runs": 22912,
-      "meanBars": 2.5,
+      "runs": 11885,
+      "meanBars": 2.78,
       "medianBars": 2,
-      "maxBars": 1002
+      "maxBars": 1010
     }
   },
   "episodeDwell": {
     "EXPANSION": {
-      "episodes": 1480,
-      "meanBars": 10.16,
+      "episodes": 763,
+      "meanBars": 10.18,
       "medianBars": 9,
       "maxBars": 47
     },
     "GRIND": {
-      "episodes": 2767,
-      "meanBars": 7.94,
+      "episodes": 1440,
+      "meanBars": 7.7,
       "medianBars": 6,
-      "maxBars": 49
+      "maxBars": 42
     },
     "WHIPSAW": {
-      "episodes": 3072,
-      "meanBars": 11.77,
+      "episodes": 1601,
+      "meanBars": 11.54,
       "medianBars": 11,
-      "maxBars": 110
+      "maxBars": 72
     },
     "QUIET": {
-      "episodes": 4964,
-      "meanBars": 23.88,
+      "episodes": 2629,
+      "meanBars": 23.4,
       "medianBars": 20,
-      "maxBars": 146
+      "maxBars": 143
     }
   },
-  "flatBarPct": 23.27,
-  "pendingTransitionPct": 14.97,
+  "flatBarPct": 25.07,
+  "pendingTransitionPct": 14.63,
   "warnings": [
-    "UNKNOWN/flat bars are 23.27% of DEV (abstain band + pending transitions). This is conservative by design but reduces effective sample size — the power calculation must use post-flat counts.",
+    "UNKNOWN/flat bars are 25.07% of DEV (abstain band + pending transitions). This is conservative by design but reduces effective sample size — the power calculation must use post-flat counts.",
     "Routing dwell (UNKNOWN counts as a break) has median 2-3 bars; regime-episode dwell ignoring UNKNOWN is 6-20 bars. Both are reported; do not quote one as the other.",
     "HIGH definition-sensitivity: expect many INCONCLUSIVE claims at M6. Thresholds stay frozen."
   ],
@@ -246,70 +272,70 @@
     },
     "cells": 25,
     "stableCellsOver80pct": 5,
-    "minAgreementPct": 53.92,
-    "medianAgreementPct": 71.38,
+    "minAgreementPct": 54.93,
+    "medianAgreementPct": 72.01,
     "vetoAtM2": false,
     "note": "DIAGNOSTIC at M2. The blueprint's veto applies to claim VERDICTS at M6: a claim whose verdict is not identical across >=80% of this grid is INCONCLUSIVE (definition-sensitive). State labels moving with cutoffs is expected, not a Map failure. Thresholds stay frozen at G0; the sweep never selects a threshold.",
     "results": [
       {
         "erCutoff": 0.25,
         "atrPctileCutoff": 60,
-        "agreementPct": 53.92
+        "agreementPct": 54.93
       },
       {
         "erCutoff": 0.25,
         "atrPctileCutoff": 65,
-        "agreementPct": 62.71
+        "agreementPct": 63.57
       },
       {
         "erCutoff": 0.25,
         "atrPctileCutoff": 70,
-        "agreementPct": 72
+        "agreementPct": 72.65
       },
       {
         "erCutoff": 0.25,
         "atrPctileCutoff": 75,
-        "agreementPct": 63.14
+        "agreementPct": 63.98
       },
       {
         "erCutoff": 0.25,
         "atrPctileCutoff": 80,
-        "agreementPct": 55.46
+        "agreementPct": 56.46
       },
       {
         "erCutoff": 0.3,
         "atrPctileCutoff": 60,
-        "agreementPct": 61.81
+        "agreementPct": 62.63
       },
       {
         "erCutoff": 0.3,
         "atrPctileCutoff": 65,
-        "agreementPct": 71.38
+        "agreementPct": 72.01
       },
       {
         "erCutoff": 0.3,
         "atrPctileCutoff": 70,
-        "agreementPct": 81.73
+        "agreementPct": 82.14
       },
       {
         "erCutoff": 0.3,
         "atrPctileCutoff": 75,
-        "agreementPct": 71.71
+        "agreementPct": 72.35
       },
       {
         "erCutoff": 0.3,
         "atrPctileCutoff": 80,
-        "agreementPct": 63.11
+        "agreementPct": 63.93
       },
       {
         "erCutoff": 0.35,
         "atrPctileCutoff": 60,
-        "agreementPct": 76.63
+        "agreementPct": 77.12
       },
       {
         "erCutoff": 0.35,
         "atrPctileCutoff": 65,
-        "agreementPct": 87.71
+        "agreementPct": 87.98
       },
       {
         "erCutoff": 0.35,
@@ -319,71 +345,71 @@
       {
         "erCutoff": 0.35,
         "atrPctileCutoff": 75,
-        "agreementPct": 87.82
+        "agreementPct": 88.09
       },
       {
         "erCutoff": 0.35,
         "atrPctileCutoff": 80,
-        "agreementPct": 77.51
+        "agreementPct": 78.03
       },
       {
         "erCutoff": 0.4,
         "atrPctileCutoff": 60,
-        "agreementPct": 65.12
+        "agreementPct": 65.87
       },
       {
         "erCutoff": 0.4,
         "atrPctileCutoff": 65,
-        "agreementPct": 74.78
+        "agreementPct": 75.35
       },
       {
         "erCutoff": 0.4,
         "atrPctileCutoff": 70,
-        "agreementPct": 85.3
+        "agreementPct": 85.64
       },
       {
         "erCutoff": 0.4,
         "atrPctileCutoff": 75,
-        "agreementPct": 75.08
+        "agreementPct": 75.65
       },
       {
         "erCutoff": 0.4,
         "atrPctileCutoff": 80,
-        "agreementPct": 66.24
+        "agreementPct": 67.01
       },
       {
         "erCutoff": 0.45,
         "atrPctileCutoff": 60,
-        "agreementPct": 59.33
+        "agreementPct": 60.24
       },
       {
         "erCutoff": 0.45,
         "atrPctileCutoff": 65,
-        "agreementPct": 68.49
+        "agreementPct": 69.23
       },
       {
         "erCutoff": 0.45,
         "atrPctileCutoff": 70,
-        "agreementPct": 78.3
+        "agreementPct": 78.84
       },
       {
         "erCutoff": 0.45,
         "atrPctileCutoff": 75,
-        "agreementPct": 68.96
+        "agreementPct": 69.69
       },
       {
         "erCutoff": 0.45,
         "atrPctileCutoff": 80,
-        "agreementPct": 60.79
+        "agreementPct": 61.68
       }
     ]
   },
   "lag": {
     "buckets": {
-      "0-1": 12476,
-      "2-3": 10951,
-      "4-6": 14320,
-      "7+": 63473
+      "0-1": 12165,
+      "2-3": 10673,
+      "4-6": 13956,
+      "7+": 62052
     },
     "medianByState": {
       "EXPANSION": 6,

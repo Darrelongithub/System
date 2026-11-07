@@ -9,8 +9,7 @@ import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import { dataLines, num } from "./lib/csv.mjs";
 import { MAP, ROLES, EXIT_HARNESS } from "./frozen.mjs";
-import { buildMap } from "./lib/map.mjs";
-import { splitDevSegments, mapDevSegments, summarizeSegments, continuousAgreement } from "./lib/dev-segments.mjs";
+import { splitDevSegments, mapDevSegments, summarizeSegments } from "./lib/dev-segments.mjs";
 import { countSealedSpreadMonths } from "./lib/dev-pipeline.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
@@ -36,9 +35,8 @@ const segments = splitDevSegments(bars);
 if (segments.length !== 4) throw new Error(`expected four contiguous DEV segments, found ${segments.length}: ${segments.map((x) => x.id).join(", ")}`);
 const segmentMaps = mapDevSegments(segments, MAP);
 const summary = summarizeSegments(segments, segmentMaps);
-// Historical comparator: compute continuous map only for this report-only delta.
-const oldContinuous = buildMap(bars, MAP).states;
-const agreement = continuousAgreement(segments, segmentMaps, oldContinuous);
+// A full-feed continuous-map comparator would compute features on sealed rows;
+// it is deliberately omitted under the strict role boundary.
 const pins = JSON.parse(readFileSync(new URL("./pins.json", import.meta.url), "utf8"));
 const pinnedMonths = Object.keys(pins).filter((key) => /^bid_\d{4}_\d{2}$/.test(key)).map((key) => key.slice(4)).sort();
 const spreadMonths = countSealedSpreadMonths(JSON.parse(readFileSync(spreadPath, "utf8")), ROLES.DEV, pinnedMonths);
@@ -52,9 +50,9 @@ const report = {
   boundaries: segments.map((s) => ({ id: s.id, firstDatetime: s.bars[0].datetime, lastDatetime: s.bars.at(-1).datetime, globalStart: s.globalStart, globalEndExclusive: s.globalEnd })),
   eligibility: { warmupBars: MAP.warmupBars, tailBars: EXIT_HARNESS.maxHoldBars, rule: "local index >= 1,000 and localIndex + 96 < segment length" },
   ...summary,
-  oldContinuousAgreement: agreement,
-  oldContinuousAgreementReportOnly: true,
-  oldContinuousInputHash: oldMapValidation.sha256 ?? oldMapValidation.statesSha256 ?? null,
+  oldContinuousAgreement: null,
+  oldContinuousAgreementOmitted: "A full-feed comparison would compute features on non-DEV rows; it is prohibited and was not run.",
+  devOnlyMapStatesSha256: oldMapValidation.statesSha256 ?? null,
   spreadMonths,
   supersededForA8Verification: [
     "artifacts/map-compass/random-baseline.json",
@@ -85,9 +83,9 @@ const md = [
   "",
   `**Totals:** ${summary.totalBars} DEV bars; ${summary.warmupLost} lost to segment warm-up; ${summary.tailLost} lost to segment tails; ${summary.eligibleBars} eligible entry bars.`,
   "",
-  "## Historical continuous-Map comparison (report-only)",
+  "## Full-feed Map comparator",
   "",
-  `After each segment's 1,000-bar warm-up and 96-bar tail, ${agreement.agreeingBars}/${agreement.comparedBars} bars agree (${agreement.agreementPct}%). This diagnostic does not feed the A8 Map, signals, trades, baselines, or verdicts.`,
+  "Omitted. Computing a continuous Map over the full feed would derive features from non-DEV rows, which is prohibited. No continuous comparator was run; the DEV-only state hash is recorded in the JSON artifact.",
   "",
   "## Spread-sample months in sealed years (cost data only)",
   "",

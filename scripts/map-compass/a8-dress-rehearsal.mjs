@@ -42,7 +42,7 @@ function nextTradingBarTime(ms) {
   return day;
 }
 
-function makeNoiseSegments({ seed, barsPerSegment = BARS_PER_SEGMENT, sigma = SIGMA }) {
+export function makeNoiseSegments({ seed, barsPerSegment = BARS_PER_SEGMENT, sigma = SIGMA }) {
   const rng = mulberry32(seed);
   return starts.map((start, si) => {
     let t = parseNaive(start);
@@ -60,7 +60,7 @@ function makeNoiseSegments({ seed, barsPerSegment = BARS_PER_SEGMENT, sigma = SI
   });
 }
 
-function barsFromNoise(noiseSegments, { driftPerBar = 0, edgeBySegment = new Map() } = {}) {
+export function barsFromNoise(noiseSegments, { driftPerBar = 0, edgeBySegment = new Map() } = {}) {
   return noiseSegments.map((segment) => {
     const bars = [];
     let close = 2200;
@@ -152,7 +152,7 @@ function calibrateUpDrift(seed) {
   return { driftPerBar, expectedNetR: estimateLongControlNet(noise, driftPerBar), bracketed: true, calibrationBarsPerSegment };
 }
 
-function plantDonchianEdge(noiseSegments, seed) {
+export function plantDonchianEdge(noiseSegments, seed) {
   const base = barsFromNoise(noiseSegments);
   const edgeBySegment = new Map();
   let signalCount = 0;
@@ -194,7 +194,7 @@ function plantDonchianEdge(noiseSegments, seed) {
   };
 }
 
-function makeSyntheticM15(segments, seed) {
+export function makeSyntheticM15(segments, seed) {
   const rng = mulberry32(seed);
   const out = [];
   for (const segment of segments) {

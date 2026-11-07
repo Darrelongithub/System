@@ -5,9 +5,8 @@
  *   artifacts/map-compass/map-validation.json   coverage/dwell/causality/sweep/lag
  *   artifacts/map-compass/normalized/xauusd-m30-map.csv   per-bar states (gitignored)
  *
- * HOLDOUT years are SEALED: they are excluded from every statistic here. Only
- * DEV years are used to characterise the instrument. VAL/STRESS/HOLDOUT rows
- * are still emitted into the CSV for later (M8/M10), but never inspected here.
+ * Only DEV segment OHLC enters Map/features or any statistic. VAL/STRESS/HOLDOUT
+ * timestamps are retained as EXCLUDED rows in the aligned CSV, with no features.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -15,7 +14,8 @@ import { join } from "node:path";
 import { createHash } from "node:crypto";
 import { dataLines, num, toCsv } from "./lib/csv.mjs";
 import { MAP, ROLES, STATES } from "./frozen.mjs";
-import { computeFeatures, classify, rawStateOf, buildMap } from "./lib/map.mjs";
+import { classify } from "./lib/map.mjs";
+import { splitDevSegments, mapDevSegments } from "./lib/dev-segments.mjs";
 
 const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const NORM = join(ROOT, "artifacts/map-compass/normalized");
@@ -44,10 +44,30 @@ const median = (a) => {
 };
 
 const bars = loadBars("xauusd-m30-eat.csv");
-const { features, states } = buildMap(bars, MAP);
+const devSet = new Set(ROLES.DEV);
+const segments = splitDevSegments(bars);
+const segmentMaps = mapDevSegments(segments, MAP);
+const features = Array(bars.length).fill(null);
+const states = Array(bars.length).fill(null);
+for (const mapped of segmentMaps) {
+  for (let local = 0; local < mapped.bars.length; local++) {
+    const global = mapped.globalStart + local;
+    features[global] = mapped.features[local];
+    states[global] = mapped.states[local];
+  }
+}
+const devBarCount = segmentMaps.reduce((n, segment) => n + segment.bars.length, 0);
+const mapDevOnly = (inputBars) => {
+  const out = Array(inputBars.length).fill(null);
+  for (const mapped of mapDevSegments(splitDevSegments(inputBars), MAP)) {
+    for (let local = 0; local < mapped.bars.length; local++) {
+      out[mapped.globalStart + local] = mapped.states[local];
+    }
+  }
+  return out;
+};
 
 /* ---------- 1. coverage per DEV year ---------- */
-const devSet = new Set(ROLES.DEV);
 const coverage = {};
 for (const y of [...ROLES.DEV].sort((a, b) => a - b)) {
   coverage[y] = {
@@ -80,17 +100,19 @@ for (const [y, c] of Object.entries(coverage)) {
 
 /* ---------- 2. dwell time (consecutive bars in the same confirmed state) ---------- */
 const runs = [];
-let runState = states[0].state,
-  runLen = 0;
-for (const s of states) {
-  if (s.state === runState) runLen++;
-  else {
-    runs.push({ state: runState, len: runLen });
-    runState = s.state;
-    runLen = 1;
+for (const mapped of segmentMaps) {
+  let runState = mapped.states[0]?.state;
+  let runLen = 0;
+  for (const state of mapped.states) {
+    if (state.state === runState) runLen++;
+    else {
+      runs.push({ state: runState, len: runLen });
+      runState = state.state;
+      runLen = 1;
+    }
   }
+  if (runLen) runs.push({ state: runState, len: runLen });
 }
-runs.push({ state: runState, len: runLen });
 const dwell = {};
 for (const s of [...STATES, "UNKNOWN"]) {
   const l = runs.filter((r) => r.state === s).map((r) => r.len);
@@ -108,18 +130,20 @@ for (const s of [...STATES, "UNKNOWN"]) {
 // Both are reported; conflating them would make a healthy instrument look
 // broken (or hide a flickering one).
 const episodeRuns = [];
-let epState = null,
-  epLen = 0;
-for (const s of states) {
-  if (s.state === "UNKNOWN") continue;
-  if (s.state === epState) epLen++;
-  else {
-    if (epState) episodeRuns.push({ state: epState, len: epLen });
-    epState = s.state;
-    epLen = 1;
+for (const mapped of segmentMaps) {
+  let epState = null;
+  let epLen = 0;
+  for (const state of mapped.states) {
+    if (state.state === "UNKNOWN") continue;
+    if (state.state === epState) epLen++;
+    else {
+      if (epState) episodeRuns.push({ state: epState, len: epLen });
+      epState = state.state;
+      epLen = 1;
+    }
   }
+  if (epState) episodeRuns.push({ state: epState, len: epLen });
 }
-if (epState) episodeRuns.push({ state: epState, len: epLen });
 const episodeDwell = {};
 for (const s of STATES) {
   const l = episodeRuns.filter((r) => r.state === s).map((r) => r.len);
@@ -130,7 +154,7 @@ for (const s of STATES) {
     maxBars: l.length ? Math.max(...l) : 0,
   };
 }
-const devRows = states.filter((_, i) => devSet.has(yearOf(bars[i].datetime)));
+const devRows = segmentMaps.flatMap((mapped) => mapped.states);
 const flatPct = +(
   (devRows.filter((s) => s.state === "UNKNOWN").length / devRows.length) *
   100
@@ -154,37 +178,38 @@ for (let i = CUT + 1; i < bars.length; i++) {
     v: 1,
   });
 }
-const mutatedFull = buildMap(mutated, MAP);
+const mutatedStates = mapDevOnly(mutated);
 let causalityMismatch = 0;
 for (let i = 0; i <= CUT; i++) {
-  if (mutatedFull.states[i].state !== states[i].state) causalityMismatch++;
+  if (states[i] && mutatedStates[i]?.state !== states[i].state) causalityMismatch++;
 }
 // Truncation test: features at bar t must not need bars after t.
-const truncated = buildMap(bars.slice(0, CUT + 1), MAP);
+const truncatedStates = mapDevOnly(bars.slice(0, CUT + 1));
 let truncationMismatch = 0;
 for (let i = 0; i <= CUT; i++) {
-  if (truncated.states[i].state !== states[i].state) truncationMismatch++;
+  if (states[i] && truncatedStates[i]?.state !== states[i].state) truncationMismatch++;
 }
 
 /* ---------- 4. determinism ---------- */
-const second = buildMap(bars, MAP);
-const determinism = sha(second.states.map((s) => s.state)) === sha(states.map((s) => s.state));
+const secondStates = mapDevOnly(bars);
+const devStateLabels = segmentMaps.flatMap((segment) => segment.states.map((s) => s.state));
+const determinism = sha(secondStates.filter(Boolean).map((s) => s.state)) === sha(devStateLabels);
 
 /* ---------- 5. threshold sensitivity sweep — VETO ONLY, never selects ---------- */
 const erGrid = [0.25, 0.3, 0.35, 0.4, 0.45];
 const pcGrid = [60, 65, 70, 75, 80];
 const sweep = [];
-const refStates = states.map((s) => s.state);
 for (const er of erGrid) {
   for (const pc of pcGrid) {
     const cfg = { ...MAP, erCutoff: er, atrPctileCutoff: pc };
-    const st = classify(features, cfg).map((s) => s.state);
-    let same = 0,
-      devBars = 0;
-    for (let i = 0; i < bars.length; i++) {
-      if (!devSet.has(yearOf(bars[i].datetime))) continue;
-      devBars++;
-      if (st[i] === refStates[i]) same++;
+    let same = 0;
+    let devBars = 0;
+    for (const mapped of segmentMaps) {
+      const swept = classify(mapped.features, cfg);
+      for (let i = 0; i < mapped.states.length; i++) {
+        devBars++;
+        if (swept[i].state === mapped.states[i].state) same++;
+      }
     }
     sweep.push({
       erCutoff: er,
@@ -240,12 +265,17 @@ const roleOfYear = (y) =>
     : ROLES.VAL.includes(y)
       ? "VAL"
       : ROLES.STRESS.includes(y)
-        ? "STRESS"
-        : "DEV";
+      ? "STRESS"
+      : ROLES.DEV.includes(y)
+        ? "DEV"
+        : "UNASSIGNED";
 const rows = bars.map((b, i) => {
-  const f = features[i],
-    s = states[i];
+  const f = features[i];
+  const s = states[i];
   const r = (v) => (Number.isFinite(v) ? v.toFixed(6) : "");
+  if (!devSet.has(yearOf(b.datetime))) {
+    return [b.datetime, "EXCLUDED", "", "non_dev_not_computed", "", "", "", "", "", "", "", "", roleOfYear(yearOf(b.datetime))];
+  }
   return [
     b.datetime,
     s.state,
@@ -269,6 +299,11 @@ const report = {
   mapVersion: "M2-v0 (hand-defined 2x2 + abstain + hysteresis)",
   thresholds: MAP,
   bars: bars.length,
+  computedDevBars: devBarCount,
+  excludedNonDevRows: bars.length - devBarCount,
+  devOnlyFeatureComputation: true,
+  devSegmentBoundaries: segments.map((segment) => ({ id: segment.id, globalStart: segment.globalStart, globalEndExclusive: segment.globalEnd })),
+  statesSha256: sha(devStateLabels),
   devYearsOnly: true,
   sealedYears: ROLES.HOLDOUT,
   coverage,

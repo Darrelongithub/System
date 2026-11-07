@@ -1,51 +1,55 @@
-# Work status — G0 Amendment 8 Stage 3b
+# Work status — G0 Amendment 8, authorized Parts 2–4
 
-**As of:** 2026-11-06 (Africa/Nairobi)  
-**Branch:** `arena/072665f9-system`  
-**Verified starting tip for Part 1b:** `12c3a8d932ddf84675181033072e69ee7e21bb98` (matched `git ls-remote` before work; branch fetched/reset to this tip).
-**Current task stage:** Parts 0, 1 and 1b are committed/pushed. Part 1b is report-only; no production code, generator, bar, cost, or current threshold changed. Conclusion: (i); earlier causal classification (ii) is withdrawn. The v1.10 criterion proposal is pending owner approval and is not effective.
-**Real DEV results:** none. No Stage 3 rerun, Part 4, or Stage 4 was started.
+**As of:** 2026-11-07 (Africa/Nairobi)
+**Branch:** `arena/072665f9-system`
+**Current task stage:** Part 2 is implemented and calibrated; Part 2 commit/push is the next gate. The owner approved Amendment 8C’s A/B no-edge criterion and authorized Parts 2–4, including exactly one Stage 3 run. **Do not run Stage 4 or rerun Stage 3 after results exist.**
+**Verified starting remote tip:** `ad1f9433ba3cdf8be20393ebe8e34b6c11ba031a`.
+**Stage 3b scored worlds:** none yet. **Stage 4:** not run; `claim-verification.json` and `claimed-trades.jsonl` remain guarded/absent.
 
-## Existing pushed commits
+## Dated decisions and acceptance criteria
 
-- Stage 1 freeze: `9aae04e67b1102d1802c4dd0b92f47af19d81fe6`.
-- Stage 2 segmented pipeline/audit: `c7879aef39fce647e4dccfa34cf691e3f466ddb8`.
-- Stage 3a synthetic rehearsal report: `5cdf4749d3543c00f3298d59a4ef2536803dc9a4`.
-- Part 0 / v1.9 Stage 3b pre-registration: `dc9ec21429db671c49143abd11e76f2fbe280608` (pushed and remote-verified).
-- Part 1 synthetic diagnosis: `9dd84e32f234781f804746963f70711d7af6bc36` (pushed and remote-verified).
-- Part 1 completion bookkeeping: `46d510f6e154bd953e335aa4cfe0b05a51b2db2d`.
-- Part 1b starting tip: `12c3a8d932ddf84675181033072e69ee7e21bb98` (remote-verified).
-- Part 1b diagnosis/proposal: `921387db3d74ab8e54f559fb40b5e571ca30b6ef` (pushed; remote-verified).
+- **2026-11-07 — Amendment 8C approved.** Use the A/B no-edge rule: mean unique strategy-level confirmed cards/world ≤ `max(0.5,1.5λ)`; maximum ≤ smallest `k≥2` with `P(Poisson(λ)>k)<0.001`. Recompute λ from the 44 card-half A model. At λ≈0.2817011047 this gives mean≤0.500 and max≤3. Always report the previous mean≤0.5/max≤2 bounds beside the new bounds and observed A/B values.
+- The owner accepted the caveat: the prior A result 0.700 mean / max 4 is inside the new bounds, so the approved rule will not flag a roughly 0.28-cards/world leaked-drift defect. The change is justified as calibration to 44-cell multiplicity, not as evidence the anomaly is benign.
+- Parts 2–4 are authorized. Stage 3 is one-time: A, B, C and C-D; 10 worlds/condition; 60,000 bars/world. Any criterion failure is a hard stop; no rerun and no Stage 4.
+- C-D preserves the original Donchian-20 planting as report-only and has no pass criterion. If C confirms in fewer than 8/10 worlds, report the power result; do not increase edge.
+- UNKNOWN is UNBINNED: execute trades in each card’s slot; count/share them in the book totals, but exclude them from both EFFICIENT and CHOPPY verdict cells.
 
-## Part 0 completed
+## Part 2 — completed, not yet committed
 
-- Additive frozen definitions only: four DEV spans, 1,000-bar warm-up, 96-bar tail and 25 sweep cells. Load-time assertions ensure equality with existing `ROLES.DEV`, `MAP`, `EXIT_HARNESS`, and frozen center values.
-- Baseline/power/signal-count/coverage/slot artifacts carry explicit superseded-history metadata.
-- v1.9 / G0 Amendment 8B is pre-registered for 2026-11-06, before any real result. It preserves v1.0–v1.8.
-- `docs/G0-AMENDMENT-8-REPORT.md`, this file, and `QUESTIONS.md` record scope, hashes, decisions and constraints.
-- Tests add frozen-constant/metadata checks and enforce absence of `claim-verification.json` and `claimed-trades.jsonl` before separate Stage 4 authorization.
+### Data and role boundary
 
-## Hashes
+- `npm install`, `npm run mc:m1`, and the safe `npm run mc:map` completed. M1 fetched 76 files with no errors; the normalized XAUUSD M30 feed has 248,912 rows. The three tracked metadata files changed only in `generatedAt`, so those timestamp-only edits were restored; frozen cost inputs were not altered.
+- The original map builder computed features on the full feed. It was made DEV-segment-only **before running** `mc:map`: Map/features/statistics now receive only the four frozen DEV segments (131,922 bars); 116,990 non-DEV rows are emitted as `EXCLUDED` with blank feature cells. Causality, truncation, determinism, sensitivity and coverage report PASS. No VAL/HOLDOUT/STRESS OHLC entered features or signals.
+- `npm run mc:a8-audit` now recomputes each DEV segment independently. Totals: 131,922 DEV bars; 4,000 warm-up and 384 tail exclusions; 127,538 eligible entry bars. The old full-feed continuous-Map comparator was omitted rather than computing features on sealed rows.
+- Real DEV input was used in Part 2 for **signal-only** tables. No real DEV trade/outcome was generated. Synthetic pilots alone were used for expected strength-state trade counts and calibration. The frozen cost file remains unchanged.
 
-- Before Part 0: `frozen.mjs` SHA-256 `41403386254a20d1261e5adc77fc674067a70823c642a06b373c9d95e7b67389`; `BLUEPRINT.md` SHA-256 `b878aa2747677a8e3324ba32ea74142edfbca86df892bad83dd3fec037292ff4`.
-- After Part 0: `frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; v1.9 `BLUEPRINT.md` / `docs/BLUEPRINT-v1.9.md` SHA-256 `c91ee38c6c56355360fe3def3723b6de81cf9675814c76be4176a2be9375f74a`.
-- Part 1b current blueprint v1.10 (`BLUEPRINT.md` byte-identical to `docs/BLUEPRINT-v1.10.md`) SHA-256 `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`; frozen code unchanged.
-- Frozen-file diff: 38 additions, 0 removals.
+### C card, exclusions and calibration — frozen before scored worlds
 
-## Part 1 / Part 1b diagnosis (synthetic only)
+- Selected card: **`williams-r-fade`**, strength state CHOPPY; 17,594 DEV signals; 6,900 exclusive (39.22%); expected strength-state trades 1,450.667 per 60,000-bar pilot world.
+- The next eligible exclusivity candidates were `bollinger-20-2` (38.77%), `morning-evening-star` (35.96%), `inside-bar-break` (34.48%) and `nr7-break` (23.78%). Higher-share cards did not meet the ≥600 expected strength-state trade requirement.
+- Frozen contamination exclusion: **`pdh-pdl-break`**; 6,038 same-bar/same-side co-fires, 34.32% of planted-card DEV signal bars (>25%). The full signal-only pairwise table and all real/synthetic pilot card tables are in `artifacts/map-compass/a8-part2-prep.json` and `docs/G0-AMENDMENT-8-PART2.md`.
+- Three disjoint pilot seeds: 20261110, 20261111, 20261112. Condition B retained its constant additive drift generator, but recalibrated only the drift scalar against the production matched-control pipeline (world-specific M15 `seed+71`, UNKNOWN-state random entries dropped): 0.03143677 → **0.03542774**; mean pilot random-long net +0.1677R (target +0.15R), gross +0.3264R, cost 0.1587R.
+- For C, the 24-bar pilot window share exceeded 40%, so the preregistered 12-bar contingency was applied before scoring. Final drift is **0.23780454 price units/bar**; across three pilots, measured gross +0.4964R, net +0.3466R (target about +0.30R), and cost +0.1497R. The 12-bar window share remains 68.81%; this is explicitly reported and no further shortening is authorized by the pre-registration.
+- Part 2 freeze SHA-256: `e594639f33c065beb7e8389b62a3768d2d3c1aaa478e94c6f670d9d522853a16`. Part 2 code/report and the safe map-role correction must be committed and pushed before Stage 3.
 
-The deterministic A/B replay reproduced the saved confirmed-card lists. Across the ten A worlds, strategy-level diagnostics showed mean 0.700 unique confirmed cards/world and max 4; official family-pooled A confirmations were zero. In B there were 11 repeated official card rows representing four unique family cells. All 14 strategy-level confirmation cells were weakness halves, passed numeric gates, and had no vetoes. CR1/day inflation averaged 1.0018; A bar-return purity metrics matched white-noise expectations.
+## Existing freeze assertions and Stage 4 guard
 
-The initial Part 1 report provisionally classified (ii) based on a B pilot/scored calibration difference. **Part 1b supersedes that causal attribution and selects (i)** for the no-edge anomaly: direction-aware weakness net null is +cost (all A weakness cell costs exceed +0.10R), whereas strength null is −cost; per-cell net-gate probabilities are 0.578189 vs 0.001129, with the excess gate at 0.0227501. A-only λ=0.281701 confirmed cards/world; observed mean 0.700/max 4 is a rare multiple-cell Poisson tail (joint tail about 0.001004), not a demonstrated generator/verifier defect. No code, bar, generator, cost or threshold changed. Detailed 44-cell probability table and observed excess/SE table: `docs/G0-AMENDMENT-8B-PART1B.md`; earlier Part 1 record and replay diagnostics remain at `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md` and `artifacts/map-compass/a8-stage3b-part1-diagnostics.json`.
+The repository review recorded **seven actual current-card freeze test cases**, not ten. Their old → current assertions are documented in `docs/G0-AMENDMENT-8-REPORT.md`: Amendment 2 full-text and freeze guard; A3 historical guard; A4 signal-library contract and verifier guard; A5 calendar-baseline guard; A6 sequence/history guard. A6’s separate historical output-absence assertion is retained. Historical v1.5 “24 DRAFT cards” prose remains historical. The Stage 4 guard still requires both `artifacts/map-compass/claim-verification.json` and `artifacts/map-compass/claimed-trades.jsonl` to be absent before separate Stage 4 authorization.
 
-Part 1b used only synthetic A/B diagnostics; no market bar, including no non-DEV bar, entered its computations. The DEV-year inclusion set remains `ROLES.DEV = {2004–2007, 2009–2011, 2013–2015, 2017–2018}`, handled as four independent segments. The non-reading preflight `npm run mc:a8-audit` failed before opening bars with `Error: missing /home/user/System/artifacts/map-compass/normalized/xauusd-m30-eat.csv; run the appropriate M1/Map inputs first`. Per task instruction, `mc:m1` and `mc:map` were not run. The committed `a8-segment-audit.json` remains historical aggregate output (131,922 bars; 127,538 eligible; 4,000 warm-up and 384 tail exclusions), not an input newly read for this report.
+New tests additionally pin DEV-only map computation, Part 2 freeze-hash integrity, UNKNOWN book totals, and UNKNOWN exclusion from both verdict cells.
 
-**Proposed criterion only; owner approval pending.** See dated G0 Amendment 8C in `BLUEPRINT.md` / v1.10 and the amendment log. Current criterion is not replaced.
+## Test status before Part 2 commit
 
-## Environment / known test status
+The last full `npm test` run, before the stale historical-hash assertion was updated, reported **414 passed, 2 failed** in 88.2 seconds. Failures: (1) existing unrelated `tests/synth.test.mjs:694` D1 display assertion (“UI shows the final recorded D1 count”); (2) `tests/map-compass/amendment6.test.mjs:71` expected current blueprint v1.9 SHA `c91ee38…` while `blueprint-hashes.json` and current `BLUEPRINT.md` correctly identify v1.10 SHA `3f1613e…`. The A6 test now checks the already-recorded v1.10 hash, and its focused test passes. The final full-suite result is still pending. All new A8 Part 2/map/UNKNOWN tests passed in the prior full run; do not represent the full suite as green.
 
-`npm install` completed. The recorded full-suite run is **408 passed, 4 failed**: one existing `tests/synth.test.mjs:694` D1 display assertion and three `data-contract.test.mjs` failures due absent raw manifest/normalized OHLC files. On this Part 1b task, `mc:m1` and `mc:map` were explicitly not to be run. The safe preflight `npm run mc:a8-audit` failed before reading bars because the normalized M30 DEV input is absent; exact error is recorded in the Part 1b report. No real-bar computation was attempted.
+## Next actions — strictly ordered
 
-## Next action
+1. Final static review, inspect Stage 4 output absence, run tests/role checks as needed.
+2. Commit and push Part 2 to `arena/072665f9-system`; verify the remote tip equals the pushed commit.
+3. Only after remote verification, run `npm run mc:a8-stage3b` exactly once. It refuses an existing output and refuses Stage 4 output files.
+4. Report all four-condition tables, λ recomputation, old/new bounds beside A/B observations, confirmation lists, C planting/exclusions and coverage identities, and the final full test result.
+5. If every criterion passes, commit/push results, verify the remote tip, then stop. If any criterion fails, hard stop without rerun. Never run Stage 4.
 
-Part 1b report and G0 Amendment 8C proposal are committed and pushed at `921387db3d74ab8e54f559fb40b5e571ca30b6ef`. **Stop and await owner approval** of the proposed criterion. Do not rerun Stage 3, run Part 4, or start Stage 4.
+## Prior records
+
+Part 1/1b and earlier freeze/pre-registration records remain in `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md`, `docs/G0-AMENDMENT-8B-PART1B.md`, `docs/BLUEPRINT-v1.10.md`, `docs/G0-AMENDMENT-8-REPORT.md`, and the existing `a8-stage3b-part1-diagnostics.json` artifact. These historical files are not scored Stage 3b output.
