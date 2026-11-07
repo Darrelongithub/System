@@ -4,7 +4,7 @@
 **Branch:** `arena/072665f9-system`
 **Current status:** The one-time Stage 3b run remains a hard-stop failure and was not rerun. Stage 4 has not been run and remains unauthorized. The A-only diagnostics above remain measurement-only. The pre-Stage-4 conditional-routing correction and regression tests are complete; `npm ci` succeeded and the full suite ran once (416 passed, 5 expected failures; see below). No verification criterion, threshold, card, cost, exit, or Stage 3 result changed.
 **Starting tip for this routing fix:** `1ba0e367a80e701358c0f336a6e8841149ebf319`.
-**Routing-fix implementation commit:** `9b6983f97bc99e5e759b80f92f2661eb6b2fca92` (the status sync below is a separate documentation-only commit). The final branch tip and remote verification are printed in the publication handoff.
+**Routing-fix implementation commit:** `9b6983f97bc99e5e759b80f92f2661eb6b2fca92`. **Status sync commit:** `1ecc9e3063c3e2366b508135867dca415925319b`. The final branch tip and remote verification are printed in the publication handoff.
 
 ## Dated decisions and preserved constraints
 
@@ -78,7 +78,7 @@ Other risk-acceptance reasons (b) through (e) are unchanged by this correction. 
 
 **Frozen hashes:** `scripts/map-compass/frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; frozen `criteriaHash` `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`. Neither is changed.
 
-**Stage:** pre-Stage-4 routing correction only; Stage 3 was not rerun, no rehearsal was performed, and Stage 4 remains unauthorized. The next authorized action is publication of this focused fix and test record; the dead-code weakness block remains a deferred routing-stage design question.
+**Stage:** pre-Stage-4 routing correction only; Stage 3 was not rerun, no rehearsal was performed, and Stage 4 remains unauthorized. The focused fix and test record are published. **Next action:** await the separate provenance/hash prompt; do not resume Stage 3 or start Stage 4. The dead-code weakness block remains a deferred routing-stage design question.
 
 ## Routing-fix test run — 2026-11-07
 
@@ -90,4 +90,4 @@ Other risk-acceptance reasons (b) through (e) are unchanged by this correction. 
 4. `no hindsight/derived column ever enters the normalised schema` — same missing normalized CSV.
 5. `A6: full historical report is pinned and the A8 output state remains DEV-only` — pre-existing v1.10 hash mismatch: expected `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`, actual `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c`. Per scope, no hash/blueprint file was changed.
 
-All five new routing regression tests passed, including the direct 22-card complementarity/key uniqueness proof. **Next action:** commit/push only the permitted routing fix, test, and documentation files, verify the remote tip, then stop. Stage 3 and Stage 4 remain prohibited.
+All five new routing regression tests passed, including the direct 22-card complementarity/key uniqueness proof. The permitted routing fix, tests, and documentation were committed and pushed; the branch tip was verified against `git ls-remote`. Stage 3 and Stage 4 remain prohibited. **Next action:** await the separate provenance/hash prompt; do not edit the v1.10 blueprint or blueprint hash registry in this cycle.
