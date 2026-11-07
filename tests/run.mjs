@@ -55,6 +55,7 @@ await import("./map-compass/data-contract.test.mjs");
 await import("./map-compass/map.test.mjs");
 await import("./map-compass/cost.test.mjs");
 await import("./map-compass/compass.test.mjs");
+await import("./map-compass/routing-conditional.test.mjs");
 await import("./map-compass/verification.test.mjs");
 await import("./map-compass/random-baseline.test.mjs");
 await import("./map-compass/amendment2.test.mjs");

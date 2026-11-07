@@ -9,7 +9,7 @@
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { createHash } from "node:crypto";
 import { STATES, VERDICT_STATES } from "./frozen.mjs";
 import { CLAIM_CARDS, FREEZE, validateClaimCards } from "./claim-cards.draft.mjs";
@@ -20,29 +20,43 @@ const ROOT = fileURLToPath(new URL("../..", import.meta.url));
 const OUT = join(ROOT, "artifacts/map-compass");
 const LEDGER = ledgerPath(ROOT);
 
-const errors = validateClaimCards();
-if (errors.length) {
-  console.error("claim card errors:", errors);
-  process.exit(1);
+/** Select the DEV verdict map and the claims whose own strength is conditional. */
+export function selectRoutingInputs(records) {
+  const verdicts = new Map();
+  const conditionalIds = new Set();
+  let ignored = 0;
+  for (const r of records) {
+    // Match the existing verdict loop: a missing/absent (or otherwise falsey)
+    // windowKind is treated as DEV; only a truthy non-DEV kind is ignored.
+    const isDevWindow = !(r.windowKind && r.windowKind !== "DEV");
+    if (!isDevWindow) {
+      ignored++;
+    } else if (r.verdict) {
+      verdicts.set(`${r.claimId}|${r.state}`, r.verdict);
+    }
+    // Only a conditional DEV strength affects the card-level Compass gate.
+    // Weakness and non-DEV records cannot suppress a confirmed strength.
+    if (isDevWindow && r.kind === "strength" &&
+        (r.conditional === true || r.stability === "DEFINITION_SENSITIVE")) {
+      conditionalIds.add(r.claimId);
+    }
+  }
+  return { verdicts, conditionalIds, ignored };
 }
 
-// Only CONFIRMED verdicts from a DISCOVERY/DEV window may enable a strategy.
-// A holdout/VAL record can never promote (FORWARD-VALIDATION.md §1).
-const records = existsSync(LEDGER) ? readLedger(LEDGER) : [];
-const verdicts = new Map();
-const conditionalIds = new Set();
-let ignored = 0;
-for (const r of records) {
-  if (r.windowKind && r.windowKind !== "DEV") {
-    ignored++;
-  } else {
-    if (r.verdict) verdicts.set(`${r.claimId}|${r.state}`, r.verdict);
+// Keep direct CLI execution unchanged while making the pure ledger-selection
+// helper importable by regression tests without writing the routing artifact.
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  const errors = validateClaimCards();
+  if (errors.length) {
+    console.error("claim card errors:", errors);
+    process.exit(1);
   }
-  // CONDITIONAL status is a property of the claim on the DEV sweep; it is
-  // reported at M9/M10 and can only be lifted by VAL support.
-  if (r.conditional === true || r.stability === "DEFINITION_SENSITIVE")
-    conditionalIds.add(r.claimId);
-}
+
+  // Only CONFIRMED verdicts from a DISCOVERY/DEV window may enable a strategy.
+  // A holdout/VAL record can never promote (FORWARD-VALIDATION.md §1).
+  const records = existsSync(LEDGER) ? readLedger(LEDGER) : [];
+  const { verdicts, conditionalIds, ignored } = selectRoutingInputs(records);
 
 // G0 Amendment 2 (user default "no"): CONDITIONAL claims do not enable Compass.
 const routing = buildRoutingTable(verdicts, CLAIM_CARDS, { conditionalIds, records });
@@ -103,3 +117,4 @@ console.log(
 );
 console.log(`plumbing: ${routed.kept.length}/${probe.length} kept, exact=${report.plumbing.exact}`);
 if (!report.plumbing.exact) process.exit(1);
+}

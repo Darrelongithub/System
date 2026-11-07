@@ -1,9 +1,9 @@
-# Work status — G0 Amendment 8 Parts 2–4
+# Work status — G0 Amendment 8 and Compass routing
 
 **As of:** 2026-11-07 (Africa/Nairobi)
 **Branch:** `arena/072665f9-system`
-**Current status:** Amendment 8C was approved and exercised in the single authorized Stage 3b run. Stage 3b **failed hard-stop criteria**; it was not rerun. Stage 4 was not run and remains unauthorized. The requested A-only diagnostics are measurement-only and use the ten existing A seeds. No criterion, threshold, card, cost, exit, generator, or code was changed.
-**Last verified remote tip before this publication:** `3e32c067c39e184a3c85737dfb737ea0bfddb694`. The publication commit and final pushed tip are reported in the delivery summary.
+**Current status:** The one-time Stage 3b run remains a hard-stop failure and was not rerun. Stage 4 has not been run and remains unauthorized. The A-only diagnostics above remain measurement-only. The pre-Stage-4 conditional-routing correction and regression tests are complete; `npm ci` succeeded and the full suite ran once (416 passed, 5 expected failures; see below). No verification criterion, threshold, card, cost, exit, or Stage 3 result changed.
+**Starting tip for this routing fix:** `1ba0e367a80e701358c0f336a6e8841149ebf319`. This status and the focused fix ship together; the resulting commit and remote tip are printed in the publication handoff.
 
 ## Dated decisions and preserved constraints
 
@@ -53,9 +53,9 @@ No Stage 3 runner, battery sweep, `verifyClaim`, or verdict recomputation was ru
 - **Q3, counterfactual only:** re-applied chronological one-slot blocking within each segment to the same seed-generated, known-state random-control entries, independently per card slot; retained the existing ≥200 control-cell sufficiency/fallback rules. Equal-weight across 15 cells, the matched-control mean shifted from −0.039R before blocking to −0.181R after blocking; mean signed excess shifted from +0.227R to +0.104R. Trade-weighted control means were −0.056R before and −0.171R after; trade-weighted excesses were +0.199R and +0.099R. Only 2,868/5,637 confirmation trades (50.9%) retained an eligible matched control after blocking, leaving 14/15 cells partially unmatched. Twelve cells retained positive excess on their matched subset, five had subset excess t>2, and only one of those had complete matched coverage. This is a report-only counterfactual, not a changed test or verdict.
 - **Interpretation:** the ten-world counts descriptively support over-dispersion. The one-slot control comparison also signals excess-gate sensitivity/bias, but the counterfactual is incomplete and cannot establish a full-cell replacement verdict. Why the A confirmations cluster and why the unblocked matched-control means differ from the blocked samples remain unexplained. No recommendation is made.
 
-## Full test result for this publication
+## Prior test result (previous publication; historical)
 
-`npm test` was run once after the documentation updates and stopped before the test harness loaded: **0 tests executed**. Runtime failure: `ERR_MODULE_NOT_FOUND: Cannot find package 'date-fns' imported from src/lib/ohlc-generator.ts`. No test-case names were emitted because collection did not start; the named runtime failure is the missing `date-fns` package. Do not rerun `npm test` under this task. The prior full run (before this publication) was **415 passed, 1 failed** in 84.1 seconds; its sole test failure was `tests/synth.test.mjs:694`, D1 UI assertion “UI shows the final recorded D1 count”. Neither result is a green suite.
+In the previous task, `npm test` stopped before the test harness loaded: 0 tests executed because `date-fns` was missing from `src/lib/ohlc-generator.ts`. The prior completed full run before that task was 415 passed, 1 failed in 84.1 seconds; its sole test failure was `tests/synth.test.mjs:694`, D1 UI assertion “UI shows the final recorded D1 count”. These are historical; the routing-fix test run is recorded below.
 
 ## Freeze assertions and Stage 4 guard
 
@@ -64,3 +64,29 @@ The repository review recorded **seven actual current-card freeze test cases**, 
 ## Prior records
 
 Part 1/1b and freeze history remain in `docs/G0-AMENDMENT-8B-PART1-DIAGNOSIS.md`, `docs/BLUEPRINT-v1.10.md`, and `docs/G0-AMENDMENT-8-REPORT.md`. These are historical, not scored Stage 3b outputs.
+
+## Pre-Stage-4 Compass routing fix — 2026-11-07
+
+**Risk-acceptance reason (a), corrected:** Weakness claims cannot ADD an enabled (card, state) pair. The single path by which a weakness confirmation could REMOVE one — unconditional promotion of any DEFINITION_SENSITIVE ledger record, including weakness and VAL-window records, into conditionalIds — was found by the verifier by code inspection and reproduction, and was fixed and regression-tested before any real result. Cause: build-compass.mjs built conditionalIds without a kind or window filter.
+
+Other risk-acceptance reasons (b) through (e) are unchanged by this correction. The bug fix is restricted to selection of conditionalIds from strength records in the evaluated DEV window; verdict-map selection remains as before. Missing/falsey `windowKind` continues to be treated as DEV, matching the existing verdict loop. The exported selector is pure; direct CLI invocation is guarded so importing it for tests does not run the CLI or write `routing-table.json`.
+
+**Complementarity finding — proved.** A direct test over all 22 `CLAIM_CARDS` confirms `weakness.state === otherVerdictState(strength.state)` and that all 44 `${claimId}|${state}` keys are unique. `validateClaimCards()` at `claim-cards.draft.mjs:446-451` already checks the complementary-state invariant; it is called by `compass.test.mjs:43`, `amendment3.test.mjs:288`, and `amendment4.test.mjs:70`. Those validator checks are logically sufficient to reject a non-complementary pair when run, but a direct CLAIM_CARDS test is still needed to explicitly pin the verdict-map key-collision invariant. The result is stated in the regression test name.
+
+**Known open — not fixed in this cycle:** the weakness hard-block branch in `lib/compass.mjs:169-171` is dead code. Only a CONFIRMED strength reaches that branch; routing only adds the card to `table[c.strength.state]`, while weakness and strength states are complementary. Thus `table[c.weakness.state]` cannot contain that card at the check. A CONFIRMED strength plus CONFIRMED weakness currently enables the strength state with decision `ENABLED`; the blueprint statement that CONFIRMED weakness blocks the other state is not implemented. Deferred as a design question to the routing stage. The branch and its comment were left untouched.
+
+**Frozen hashes:** `scripts/map-compass/frozen.mjs` SHA-256 `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; frozen `criteriaHash` `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`. Neither is changed.
+
+**Stage:** pre-Stage-4 routing correction only; Stage 3 was not rerun, no rehearsal was performed, and Stage 4 remains unauthorized. The next authorized action is publication of this focused fix and test record; the dead-code weakness block remains a deferred routing-stage design question.
+
+## Routing-fix test run — 2026-11-07
+
+`npm ci` succeeded (360 packages installed). The one full `npm test` run completed in 94.9 seconds: **416 passed, 5 failed**. All five failures match the explicitly anticipated known failures; no additional failures occurred:
+
+1. `synth UI: the map generator discloses the latest exhausted D1 result without claiming certification` — `tests/synth.test.mjs:694`, assertion “UI shows the final recorded D1 count”.
+2. `every fetched blob still matches its pinned git oid` — missing `artifacts/map-compass/raw/fetch-manifest.json`.
+3. `normalised outputs are LF-only, monotonic, and OHLC-valid` — missing `artifacts/map-compass/normalized/xauusd-m30-eat.csv`.
+4. `no hindsight/derived column ever enters the normalised schema` — same missing normalized CSV.
+5. `A6: full historical report is pinned and the A8 output state remains DEV-only` — pre-existing v1.10 hash mismatch: expected `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`, actual `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c`. Per scope, no hash/blueprint file was changed.
+
+All five new routing regression tests passed, including the direct 22-card complementarity/key uniqueness proof. **Next action:** commit/push only the permitted routing fix, test, and documentation files, verify the remote tip, then stop. Stage 3 and Stage 4 remain prohibited.

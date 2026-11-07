@@ -577,3 +577,19 @@ exactly because `artifacts/map-compass/normalized/xauusd-m30-eat.csv` is absent.
 Per the task-specific instruction, `mc:m1` and `mc:map` were not run.
 **Threshold changed?** No; proposal only. **Map/cost/exit changed?** No.
 **Owner approved?** Pending.
+
+---
+
+## K — 2026-11-07 · Pre-Stage-4 conditional routing correction
+
+**Scope and reason (a), replacing the prior risk-acceptance wording:** Weakness claims cannot ADD an enabled (card, state) pair. The single path by which a weakness confirmation could REMOVE one — unconditional promotion of any DEFINITION_SENSITIVE ledger record, including weakness and VAL-window records, into conditionalIds — was found by the verifier by code inspection and reproduction, and was fixed and regression-tested before any real result. Cause: build-compass.mjs built conditionalIds without a kind or window filter.
+
+The builder now derives `conditionalIds` only from strength records in the same DEV-selection window as verdicts. A missing/absent `windowKind` follows the existing verdict loop's convention and is treated as DEV. The verdict map selection and ignored-record behavior are unchanged. The helper used by the tests is importable without running the builder CLI; direct script invocation remains guarded. No other routing logic, threshold, criterion, card, cost, or exit changed. Other risk-acceptance reasons (b)–(e) were not edited.
+
+**Regression evidence.** The new routing tests exercise the builder's real selector and routing table for: a DEFINITION_SENSITIVE weakness alongside a CONFIRMED strength; a VAL-window conditional record alongside a DEV strength; a strength's own DEFINITION_SENSITIVE grade and `conditional === true`; weakness-only confirmation; and the state/key invariant over all 22 cards. Result: all 22 cards have complementary states and the 44 `${claimId}|${state}` verdict keys are unique. `validateClaimCards()` already asserts complementarity and existing tests call it; the direct test is retained because it proves the map-key collision property explicitly.
+
+**Known open, intentionally deferred.** The weakness hard-block branch in `lib/compass.mjs` remains unchanged and is dead code under the current strength-only insertion path. A CONFIRMED strength plus CONFIRMED weakness enables the strength state with decision `ENABLED`; the blueprint claim that a CONFIRMED weakness blocks the card in the other state is not implemented. Record this as a design question for the routing stage. Do not remove or modify the branch in this cycle.
+
+**Integrity and limits.** `frozen.mjs` SHA-256 remains `67f1c1eda386769fc262853856156bfdd74b3f05f50700a9aedb148e33840a22`; `criteriaHash` remains `788e01dff4bba7455058fdcdf7fecb31dfb8f4c5215702a0e8bf50e0ef98b5e6`. The 8C Stage 3 failure remains final; there was no Stage 3 rerun, new rehearsal, retuning, or Stage 4 run. This correction is recorded before Stage 4 and does not authorize it.
+
+**Verification result (2026-11-07):** `npm ci` succeeded. The one full `npm test` run completed with **416 passed, 5 failed** (94.9 seconds). All five failures were anticipated: the synth D1 UI string assertion at `tests/synth.test.mjs:694`; three data-contract tests blocked by missing `artifacts/map-compass/raw/fetch-manifest.json` and `artifacts/map-compass/normalized/xauusd-m30-eat.csv`; and the pre-existing A6 v1.10 snapshot hash mismatch (expected `3f1613e12b2e53b69aa360c0cc81490b59a6c2dc59b21273bd4cba7f3e87c5e2`, actual `decd0ae949288750c78a7939c67fb8c61003bcde356d270d93a1a17cca59d63c`). The five new routing tests passed. None of the failures was changed in this cycle.
