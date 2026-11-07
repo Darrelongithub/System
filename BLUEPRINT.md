@@ -1,7 +1,7 @@
 # BLUEPRINT — Map / Compass / Strategy Verification
 
-**Version 1.10 — 2026-11-06; G0 Amendment 8C (Part 1b no-edge diagnosis and criterion proposal; owner approval pending)**
-**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. Synthetic-only Stage 3a failed; Part 1b classifies the A no-edge anomaly as a multiple-cell false-confirmation tail. The proposed follow-up criterion is pending owner approval and is not effective. No real DEV result exists.**
+**Version 1.10 — 2026-11-07 status update; G0 Amendment 8C approved and exercised in the one-time synthetic Stage 3b run**
+**Status: G0 FROZEN. All 22 claim cards approved unchanged by Darrel on 2026-11-05. Amendment 8C was subsequently approved and exercised as the A/B no-edge criterion in the single synthetic Stage 3b run. A failed (mean 1.500/max 7 against 0.500/3); no real DEV result exists, and Stage 4 remains unauthorized. The one-time result and measurement-only A diagnostics are recorded in `docs/G0-AMENDMENT-8-STAGE3B.md`, `docs/STATUS.md`, and `docs/QUESTIONS.md`.**
 **Branch:** `arena/072665f9-system`
 
 > **Version history is immutable.** Ten prior snapshots exist:
@@ -48,7 +48,7 @@
 > - **v1.7 / G0 Amendment 7 (2026-11-02)** — pre-outcome DRAFT corrections: Asian range uses the full EAT 01:00–10:59 clock window; London ORB uses [11:00,11:30); classic PP uses prior-day H/L/C; soldiers emit LONG and crows SHORT. Adds 22-card source-timeframe/status labels, per-year signal and valid-range diagnostics, year-matched report-only baseline with sampling error, and DRIFT_DEPENDENT routing guard. Reconciles the A4 hold prose/artifact mismatch; Map, costs, exits, thresholds, and CONFIRMED rule remain unchanged. Cards were DRAFT at this historical version.
 > - **v1.8 / G0 Amendment 8 (2026-11-05)** — Darrel approved all 22 existing cards unchanged. Preregisters DEV-segment-only Map, signals, trades and matched random control; exact segment warm-up/tail exclusions; per-card unconditional one-slot book; and the matched 25-cell claim-verdict sweep. Map rules, costs, exits, frozen thresholds, card content/states/order and CONFIRMED rule are unchanged. No real strategy result existed at the freeze.
 > - **v1.9 / G0 Amendment 8B (2026-11-06)** — pre-result Stage 3b correction after the synthetic-only Stage 3a false-confirm criteria failed. Changes only the pre-authorized no-edge rehearsal criterion and redesigns the planted-edge rehearsal around a signal-exclusive card, with contamination handling and a report-only original Donchian-20 condition. Map rules, costs, exits, frozen thresholds, 22 cards, signal definitions and the CONFIRMED rule remain unchanged. No real DEV result exists.
-> - **v1.10 / G0 Amendment 8C (2026-11-06)** — report-only Part 1b reanalysis identifies the A no-edge outcome as a direction-aware multiple-cell false-confirmation tail; withdraws the prior causal attribution to B calibration. Records an exact no-edge criterion proposal for owner approval only. No current threshold is replaced; no bar, generator, verifier, or code is changed. No real DEV result exists.
+> - **v1.10 / G0 Amendment 8C (2026-11-06; execution status updated 2026-11-07)** — report-only Part 1b reanalysis identified the A no-edge outcome as a direction-aware multiple-cell false-confirmation tail and withdrew the prior causal attribution to B calibration. The owner subsequently approved the exact A/B no-edge criterion and it was exercised once in synthetic Stage 3b. A failed the approved limits; no bar, production threshold, generator, verifier, or code was changed. No real DEV result exists.
 >
 > **Every amendment was applied before any real strategy result exists.** At
 > v1.7 the cards were DRAFT and verification was blocked; G0 Amendment 8 now
@@ -2086,3 +2086,12 @@ failed before opening a bar because
 `artifacts/map-compass/normalized/xauusd-m30-eat.csv` is absent. Per this
 task’s instruction, `mc:m1` and `mc:map` were not run. The existing segment
 audit artifact is historical aggregate output, not a newly read input.
+
+
+## G0 Amendment 8C — approval and one-time execution status (2026-11-07)
+
+**Approval and use.** The owner approved the previously recorded A/B no-edge criterion: mean unique strategy-level confirmed cards/world ≤ `max(0.5,1.5λ)` and maximum ≤ the smallest `k≥2` with `P(Poisson(λ)>k)<0.001`, with λ recomputed from the 44 card-half A model. It was applied unchanged in the single authorized Stage 3b run. This approval governs the synthetic rehearsal acceptance criterion only; it does not change the frozen Map, strategy-verification thresholds, cards, costs, exits, or `CONFIRMED` rule.
+
+**Execution result.** At λ=0.281701104658, the applied A limits were mean≤0.500/max≤3 (old limits≤0.500/≤2 also reported). A observed mean 1.500/max 7 and **failed** both old and approved new limits. B observed 0.300/max 1 and passed. The run's broader Stage 3b hard-stop criteria also failed on C's non-planted/non-excluded confirmations, so Stage 3 was not rerun and Stage 4 was not started. The machine-readable and run report remain `artifacts/map-compass/a8-stage3b-report.json` and `docs/G0-AMENDMENT-8-STAGE3B.md`; the A-only measurement diagnostic is documented in `docs/QUESTIONS.md`.
+
+The approval/execution update supersedes the earlier in-section “pending approval” status, which records the proposal's pre-approval state. It adds no criterion or machinery and is not a reason to resume the experiment.
