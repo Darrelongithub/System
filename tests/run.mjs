@@ -66,6 +66,7 @@ await import("./map-compass/amendment6.test.mjs");
 await import("./map-compass/amendment7.test.mjs");
 await import("./map-compass/amendment8b.test.mjs");
 await import("./map-compass/a8-stage3b.test.mjs");
+await import("./map-compass/a8-stage4-orchestrator.test.mjs");
 await import("./map-compass/dev-segments.test.mjs");
 await import("./map-compass/dev-trade.test.mjs");
 

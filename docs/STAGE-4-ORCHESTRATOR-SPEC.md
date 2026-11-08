@@ -1,6 +1,6 @@
 # Stage 4 Orchestrator Specification — Step 1 of 3
 
-**Status:** Document-only specification, verifier-reviewed and **SIGNED as the Step 2 build contract** on 2026-11-08. No Stage 4 run is authorized by this specification. The driver and its tests are future Step 2 work under this contract.
+**Status:** Verifier-reviewed and **SIGNED as the Step 2 build contract** on 2026-11-08; the approved driver and tests are implemented under this contract. No Stage 4 run is authorized by this specification.
 
 **Branch of record:** `arena/072665f9-system`
 **Revision base tip:** `cdb9a6fba7533954344ad5ff74d5f2858c981c33`
@@ -31,7 +31,7 @@ Read M15 bars, when available, from `artifacts/map-compass/normalized/xauusd-m15
 - Read, do not restate, `DEV_SEGMENT_RULE` (`scripts/map-compass/lib/dev-segments.mjs:5-14`): the four inclusive DEV year spans, warm-up, and tail are sourced from that constant and the frozen imports.
 - Call `splitDevSegments(bars, ROLES.DEV)` (`scripts/map-compass/lib/dev-segments.mjs:22-45`). Splitting inspects only timestamps/year labels of non-DEV rows; their OHLCV is never parsed into feature input or passed to Map, signals, trades, random controls, aggregates, or verdicts. Assert that returned segment spans agree with `DEV_SEGMENT_RULE` and that all trade/input bars passed onward belong to `ROLES.DEV`.
 - Structural timestamp refusal only: timestamps must be strictly increasing, with no duplicates and no out-of-order rows. No maximum-gap tolerance is introduced. Documented holiday gaps, including the 2005-11-23 and 2006-11-22 gaps in `docs/MAP-COMPASS-DATA-CONTRACT.md` §5 (`:158-173`), must not be rejected solely for their duration.
-- Assert the already-verified DEV M30 counts by segment: `2004-2007` = 38,352; `2009-2011` = 32,766; `2013-2015` = 34,051; `2017-2018` = 22,369; and total = 131,922. Each per-segment count and the overall total is an independent guard. The supplied counts do not arithmetically agree; §10 records the exact discrepancy. Do not alter any count to make the assertions pass.
+- Assert **both independent count families**, all with no tolerance: raw DEV M30 bars by segment `2004-2007` = 39,448; `2009-2011` = 33,862; `2013-2015` = 35,147; `2017-2018` = 23,465; total = 131,922. Separately assert eligible entry bars by segment `2004-2007` = 38,352; `2009-2011` = 32,766; `2013-2015` = 34,051; `2017-2018` = 22,369; total = 127,538. These figures are verified in `artifacts/map-compass/a8-segment-audit.json` under `bySegment[].bars`, `bySegment[].eligibleBars`, `bySegment[].byYear`, and top-level totals. Assert the arithmetic identity `totalRawBars - (MAP.warmupBars + EXIT_HARNESS.maxHoldBars) * DEV_SEGMENT_RULE.years.length === totalEligibleBars`. All four guard families—raw per-segment, raw total, eligible per-segment, eligible total—plus the identity must hold simultaneously with no tolerance.
 - Also refuse malformed or unmatched M30/Map timestamps, unexpected segment spans, non-DEV rows in any pipeline segment or emitted trade, an exit or signal window that crosses a segment boundary, and an M15 mapping that crosses a segment boundary.
 
 ## 2. Call sequence and point of no return
@@ -213,8 +213,11 @@ Every listed assertion is a pre-write gate. Before the first permanent output wr
 | Any entry has fewer than `EXIT_HARNESS.maxHoldBars` bars remaining (equivalently `localIndex + maxHoldBars >= segmentLength`) | `STAGE4_ABORT[INSUFFICIENT_SEGMENT_TAIL]: segment={segmentId} localIndex={localIndex} segmentLength={segmentLength} maxHoldBars={EXIT_HARNESS.maxHoldBars}` |
 | Any signal, feature, trade, M15 pair, or exit reads across a segment boundary; or any returned trade violates its segment-local boundary | `STAGE4_ABORT[SEGMENT_CROSSING]: segment={segmentId} localIndex={localIndex} exitIndex={exitIndex}` |
 | Any M15 bar actually used has a year outside `ROLES.DEV` or a datetime outside the segment in which it is used | `STAGE4_ABORT[M15_SEALED_READ]: segment={segmentId} datetime={datetime} year={year}` |
-| A segment's DEV bar count differs from its prescribed count | `STAGE4_ABORT[SEGMENT_BAR_COUNT]: segment={segmentId} expected={expectedCount} actual={actualCount}` |
-| Total DEV M30 row count differs from the prescribed total | `STAGE4_ABORT[DEV_TOTAL_BAR_COUNT]: expected=131922 actual={actualCount}` |
+| Raw DEV M30 bars in a segment differ from its expected count (`2004-2007`: 39448; `2009-2011`: 33862; `2013-2015`: 35147; `2017-2018`: 23465) | `STAGE4_ABORT[SEGMENT_BAR_COUNT]: segment={segmentId} expected={expectedCount} actual={n}` |
+| Total raw DEV M30 bars differ from 131922 | `STAGE4_ABORT[DEV_TOTAL_BAR_COUNT]: expected=131922 actual={n}` |
+| Eligible entry bars in a segment differ from its expected count (`2004-2007`: 38352; `2009-2011`: 32766; `2013-2015`: 34051; `2017-2018`: 22369) | `STAGE4_ABORT[SEGMENT_ELIGIBLE_COUNT]: segment={segmentId} expected={expectedEligible} actual={n}` |
+| Total eligible entry bars differ from 127538 | `STAGE4_ABORT[DEV_TOTAL_ELIGIBLE_COUNT]: expected=127538 actual={n}` |
+| Raw/eligible totals fail `rawTotal - (MAP.warmupBars + EXIT_HARNESS.maxHoldBars) * DEV_SEGMENT_RULE.years.length === eligibleTotal` | `STAGE4_ABORT[DEV_ELIGIBILITY_IDENTITY]: raw={rawTotal} excluded={excludedTotal} eligible={eligibleTotal}` |
 | Any verdict-eligible trade has no fine or sufficient coarse baseline cell (`matchedBaseline(...).missing`) | `STAGE4_ABORT[NO_BASELINE]: strategyId={strategyId} state={state} side={side} session={session} vol={vol} year={year}` |
 | `CLAIM_CARDS.length !== 22` | `STAGE4_ABORT[CARD_COUNT]: expected 22 cards, got {actual}` |
 | Center `runBattery` does not produce exactly `CLAIM_CARDS.length * 2` rows (44 when card count is valid) | `STAGE4_ABORT[ROW_COUNT]: expected {expected} center rows, got {actual}` |
@@ -233,14 +236,10 @@ The driver must additionally refuse missing inputs, malformed CSV/JSON, timestam
 
 The sole new machinery is one driver script and its tests. It may only wire the existing DEV segment builder, card signals, one-slot trade producer with frozen exit harness, segmented random control, 25-cell sweep, `verifyReal(..., {a8DevOnly: true})`, and report. It must not alter or copy the logic of `scripts/map-compass/frozen.mjs`, `verifyReal`, `scripts/map-compass/lib/verification.mjs`, `scripts/map-compass/lib/signals.mjs`, `scripts/map-compass/lib/compass.mjs`, or any threshold, card, cost, exit, criterion, routing path, or prior artifact. Imports and direct calls only; no parallel implementation of Map, signal, trade, baseline, sweep, or verdict behavior.
 
-This Step 1 revision writes no `npm` script, test, or implementation file. The signed contract scopes the future Step 2 driver and tests; it does not authorize a Stage 4 execution.
+No npm script is added. The signed contract scopes the driver and tests; it does not authorize a Stage 4 execution.
 
-## 10. Open questions for resolution before Step 2
+## 10. Closed questions and count-mapping resolution
 
-The six prior questions are closed by verifier review and the rulings now applied in §§1.3, 1.2, 5, 7, and 8: structural timestamps only with no maximum-gap tolerance; bounded M15 selection plus `M15_SEALED_READ`; NO_BASELINE scope limited to EFFICIENT/CHOPPY verdict-eligible trades while UNKNOWN is NOT_APPLICABLE; the exact retained dry-run paths; first ledger append as PNR with the specified FAILED/no-retry/no-delete response; and UNKNOWN baseline counts only. In particular, §10 Q2 is **CLOSED**: M15 selection is inclusive `[segmentStart, segmentEnd]`, never `segmentEnd + 15`, the helper remains unchanged, the conservative fallback remains unchanged, and the inspection reports missing second-sub-bar counts.
+The six prior questions are closed by verifier review and the rulings now applied in §§1.3, 1.2, 5, 7, and 8: structural timestamps only with no maximum-gap tolerance; bounded M15 selection plus `M15_SEALED_READ`; NO_BASELINE scope limited to EFFICIENT/CHOPPY verdict-eligible trades while UNKNOWN is NOT_APPLICABLE; the exact retained dry-run paths; first ledger append as PNR with the specified FAILED/no-retry/no-delete response; and UNKNOWN baseline counts only. In particular, the M15 ruling is **CLOSED**: selection is inclusive `[segmentStart, segmentEnd]`, never `segmentEnd + 15`, the helper remains unchanged, the conservative fallback remains unchanged, and the inspection reports missing second-sub-bar counts.
 
-**One genuine unresolved inconsistency in the supplied count ruling:** the four required segment counts sum to 127,538:
-
-`38,352 + 32,766 + 34,051 + 22,369 = 127,538`
-
-but the same ruling requires a total of 131,922, a difference of 4,384. The spec requires independent checks against all four segment counts and the stated total, with the exact mismatch errors in §8; all five assertions cannot pass simultaneously as written. No segment count or total has been altered or guessed. The verifier/owner must correct the inconsistent count before a successful Step 2 preflight or Stage 4 execution is possible.
+**Count-mapping resolution:** the earlier mismatch was a verifier interpretation error: the lower figures are eligible entry bars, not total DEV bars. `artifacts/map-compass/a8-segment-audit.json` `bySegment` and `byYear` data agree with both count families. Raw DEV bars sum to 131,922; warm-up plus tail exclusions are `(MAP.warmupBars + EXIT_HARNESS.maxHoldBars) * DEV_SEGMENT_RULE.years.length` = 4,384; eligible entry bars sum to 127,538. The four guard families and the arithmetic identity are now separately specified in §§1.3 and 8 and must all hold simultaneously without tolerance.
