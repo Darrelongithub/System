@@ -1,5 +1,13 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, existsSync, readFileSync, rmSync, mkdirSync, writeFileSync } from "node:fs";
+import {
+  mkdtempSync,
+  existsSync,
+  readFileSync,
+  rmSync,
+  mkdirSync,
+  writeFileSync,
+  readdirSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "../tiny.mjs";
@@ -8,9 +16,11 @@ import { CLAIM_CARDS } from "../../scripts/map-compass/claim-cards.draft.mjs";
 import { resolveTrade } from "../../scripts/map-compass/lib/trade.mjs";
 import { costR } from "../../scripts/map-compass/lib/cost.mjs";
 import { runBattery } from "../../scripts/map-compass/verify-claims.mjs";
+import { m15MapForSegment, yearOf } from "../../scripts/map-compass/lib/dev-segments.mjs";
 import {
   assertBaselineCoverage,
   assertCardCount,
+  callVerifyReal,
   assertCountFamilies,
   assertCriteriaHash,
   assertFrozenHash,
@@ -23,7 +33,7 @@ import {
   assertTradeBoundaries,
   boundedM15ForSegments,
   inspectTrades,
-  publishDryInspection,
+  runDryInspection,
 } from "../../scripts/map-compass/a8-stage4-orchestrator.mjs";
 
 const equal = (actual, expected, label) => assert.equal(actual, expected, label);
@@ -86,6 +96,7 @@ function expectedCountFixture() {
 }
 
 function edgeTrades() {
+  // Planted net edge is +0.300R with deterministic noise bounded to ±0.010R.
   const session = "london";
   const vol = "mid";
   const cost = costR({ session, vol, variant: "baseline" });
@@ -146,6 +157,9 @@ test("Stage 4 accounting: hand-calculated stop, spread, and one-round-trip net R
     { datetime: "2004-01-01 00:00:00", o: 100, h: 100, l: 100, c: 100, v: 1 },
     { datetime: "2004-01-01 00:30:00", o: 100, h: 100.2, l: 98, c: 99, v: 1 },
   ];
+  // Hand calculation: risk = 1.5 * ATR = 1.5, so stop = 100 - 1.5 = 98.5.
+  // The fill loses exactly 1R. Round-trip cost = (0.18212 spread ATR + 0.04
+  // slippage ATR) / 1.5 = 0.14808R; net = -1 - 0.14808 = -1.14808R.
   const result = resolveTrade(bars, 0, "long", 1, {
     session: "london",
     vol: "mid",
@@ -157,6 +171,7 @@ test("Stage 4 accounting: hand-calculated stop, spread, and one-round-trip net R
   equal(result.grossR, -1, "gross loss is exactly one R");
   equal(result.costR, 0.14808, "round-trip spread + slippage cost");
   equal(result.netR, -1.14808, "net = -1R - 0.14808R cost");
+  equal(result.barsHeld, 1, "one M30 bar elapsed before the stop exit");
 });
 
 test("Stage 4 planted edge: one synthetic card recovers a noisy +0.30R edge and leaves an unplanted claim unconfirmed", () => {
@@ -178,7 +193,7 @@ test("Stage 4 planted edge: one synthetic card recovers a noisy +0.30R edge and 
     "independent runBattery outputs are exactly equal",
   );
   const perturbedRows = structuredClone(repeatedRows);
-  perturbedRows[0].stats.meanNetR += 1e-9;
+  perturbedRows[0].stats.meanNetR += 1;
   throwsPrefix(
     () => assertPrecomputedRowsEqual(perturbedRows, rows),
     "STAGE4_ABORT[PRECOMPUTED_ROWS_MISMATCH]: precomputed rows differ from runBattery output",
@@ -195,7 +210,39 @@ test("Stage 4 planted edge: one synthetic card recovers a noisy +0.30R edge and 
     `mean should recover ~+0.30R, got ${planted.stats.meanNetR}`,
   );
   assert.notEqual(unplanted.verdict, "CONFIRMED", "unplanted weakness is not confirmed");
+  console.log(
+    `[Stage 4 planted-edge recovered] card=donchian-20 verdictState=${planted.state} kind=${planted.kind} verdict=${planted.verdict} n=${planted.stats.n} meanNetR=${planted.stats.meanNetR.toFixed(6)}R noiseBound=±0.010R; unplanted ${unplanted.state}/${unplanted.kind}=${unplanted.verdict}`,
+  );
   assert.equal(rows.length, CLAIM_CARDS.length * 2);
+});
+
+test("Stage 4 passes all 44 precomputed rows to verifyReal exactly as a fresh runBattery call", () => {
+  const trades = edgeTrades();
+  const baseline = {
+    a8Segmented: true,
+    fineCellsVerdictState: {
+      "EFFICIENT|long|london|mid": { n: 200, meanNetR: 0, sufficient: true },
+    },
+  };
+  const sensitivityByClaim = {};
+  const precomputedRows = runBattery(trades, { windowKind: "DEV", baseline, sensitivityByClaim });
+  const freshRows = runBattery(trades, { windowKind: "DEV", baseline, sensitivityByClaim });
+  assert.equal(precomputedRows.length, 44);
+  assert.equal(assertPrecomputedRowsEqual(precomputedRows, freshRows), true);
+  let passedToVerifier;
+  const fakeVerifyReal = (tradePath, options) => {
+    passedToVerifier = { tradePath, options };
+    return { rows: options.precomputedRows };
+  };
+  const result = callVerifyReal(fakeVerifyReal, "in-memory-trades.jsonl", {
+    baseline,
+    sensitivityByClaim,
+    precomputedRows,
+  });
+  assert.equal(passedToVerifier.tradePath, "in-memory-trades.jsonl");
+  assert.deepEqual(passedToVerifier.options.precomputedRows, freshRows);
+  assert.equal(passedToVerifier.options.a8DevOnly, true);
+  assert.deepEqual(result.rows, precomputedRows);
 });
 
 test("Stage 4 abort guards: all exact preflight guards fail closed with their specified templates", () => {
@@ -338,16 +385,27 @@ test("Stage 4 M15 sealed-read proof: bounded selection excludes segmentEnd + 15 
       { datetime: "2007-12-31 23:45:00", o: 1, h: 1, l: 1, c: 1, v: 0 },
     ],
   };
-  const inRange = { datetime: "2007-12-31 23:45:00", o: 1, h: 1, l: 1, c: 1, v: 0 };
+  const first = { datetime: "2007-12-31 23:15:00", o: 1, h: 1, l: 1, c: 1, v: 0 };
+  const middle = { datetime: "2007-12-31 23:30:00", o: 1, h: 1, l: 1, c: 1, v: 0 };
+  const last = { datetime: "2007-12-31 23:45:00", o: 1, h: 1, l: 1, c: 1, v: 0 };
   const sealed = { datetime: "2008-01-01 00:00:00", o: 1, h: 1, l: 1, c: 1, v: 0 };
-  const bounded = boundedM15ForSegments([segment], [inRange, sealed]);
+  const bounded = boundedM15ForSegments([segment], [first, middle, last, sealed]);
   assert.deepEqual(
     bounded.map((bar) => bar.datetime),
-    [inRange.datetime],
+    [first.datetime, middle.datetime, last.datetime],
   );
-  const safeMap = new Map([[segment.id, new Map()]]);
-  assert.equal(assertM15Usage([segment], safeMap), true);
-  const injected = new Map([[segment.id, new Map([[1, [inRange, sealed]]])]]);
+  const safeMap = m15MapForSegment(segment.bars, bounded);
+  assert.equal(assertM15Usage([segment], new Map([[segment.id, safeMap]])), true);
+  assert.deepEqual(
+    [...safeMap.values()].flat().map((bar) => bar.datetime),
+    [first.datetime, middle.datetime],
+  );
+  assert.equal(
+    [...safeMap.values()].flat().some((bar) => yearOf(bar) === 2008),
+    false,
+  );
+  const injectedMap = m15MapForSegment(segment.bars, [...bounded, sealed]);
+  const injected = new Map([[segment.id, injectedMap]]);
   throwsPrefix(
     () => assertM15Usage([segment], injected),
     "STAGE4_ABORT[M15_SEALED_READ]: segment=2004-2007 datetime=2008-01-01 00:00:00 year=2008",
@@ -372,7 +430,7 @@ test("Stage 4 map alignment and segment-span guards reject timestamp drift and u
   throwsPrefix(() => assertSegmentSpans([]), "STAGE4_ABORT[UNEXPECTED_SEGMENTS]:");
 });
 
-test("Stage 4 dry inspection writes only isolated dry files and never creates production outputs or ledger", () => {
+test("Stage 4 --dry-run writes only the two dry files and creates no production output or ledger", async () => {
   const root = mkdtempSync(join(tmpdir(), "a8-stage4-dry-"));
   try {
     const length = MAP.warmupBars + EXIT_HARNESS.maxHoldBars + 10;
@@ -391,14 +449,20 @@ test("Stage 4 dry inspection writes only isolated dry files and never creates pr
       entryDatetime: segment.bars[MAP.warmupBars].datetime,
       barsHeld: 1,
     };
-    const result = publishDryInspection({
+    const result = await runDryInspection({
       root,
-      trades: [trade],
-      segments: [segment],
-      m15MissingSecondBySegment: { "2004-2007": 0 },
+      buildInputs: () => ({
+        pipeline: { centerTrades: [trade] },
+        segments: [segment],
+        m15MissingSecondBySegment: { "2004-2007": 0 },
+      }),
     });
     assert.equal(existsSync(result.tradePath), true);
     assert.equal(existsSync(result.inspectionPath), true);
+    assert.deepEqual(readdirSync(join(root, "artifacts/map-compass/stage4-dry")).sort(), [
+      "claimed-trades.dry.jsonl",
+      "inspection.json",
+    ]);
     const dryBytes = readFileSync(result.tradePath, "utf8");
     assert.equal(JSON.parse(dryBytes.trim()).strategyId, "donchian-20");
     const inspection = JSON.parse(readFileSync(result.inspectionPath, "utf8"));

@@ -857,9 +857,12 @@ function buildStage4Inputs({ checkProductionOutputs = true } = {}) {
   return { ...loaded, pipeline, provenance, m15MissingSecondBySegment };
 }
 
-export async function runDryInspection({ root = ROOT } = {}) {
+export async function runDryInspection({
+  root = ROOT,
+  buildInputs = () => buildStage4Inputs({ checkProductionOutputs: false }),
+} = {}) {
   assertCardCount();
-  const input = buildStage4Inputs({ checkProductionOutputs: false });
+  const input = await buildInputs();
   const trades = input.pipeline.centerTrades;
   assertTradeBoundaries(trades, input.segments);
   const report = publishDryInspection({
@@ -869,6 +872,19 @@ export async function runDryInspection({ root = ROOT } = {}) {
     m15MissingSecondBySegment: input.m15MissingSecondBySegment,
   });
   return { ...report, trades: trades.length };
+}
+
+export function callVerifyReal(
+  verifyFn,
+  tradePath,
+  { baseline, sensitivityByClaim, precomputedRows },
+) {
+  return verifyFn(tradePath, {
+    baseline,
+    sensitivityByClaim,
+    precomputedRows,
+    a8DevOnly: true,
+  });
 }
 
 export async function runRealStage4() {
@@ -941,11 +957,10 @@ export async function runRealStage4() {
   const ledgerBytesBefore = existsSync(ledgerPath) ? readFileSync(ledgerPath).length : 0;
   let verified;
   try {
-    verified = verifyReal(tradePath, {
+    verified = callVerifyReal(verifyReal, tradePath, {
       baseline: pipeline.baseline,
       sensitivityByClaim: sweep.sensitivityByClaim,
       precomputedRows,
-      a8DevOnly: true,
     });
     assertPrecomputedRowsEqual(verified.rows, precomputedRows);
   } catch (error) {
