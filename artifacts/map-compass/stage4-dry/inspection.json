@@ -1,0 +1,739 @@
+{
+  "trades": 78373,
+  "years": {
+    "2004": 2890,
+    "2005": 6780,
+    "2006": 7317,
+    "2007": 7111,
+    "2009": 6451,
+    "2010": 6846,
+    "2011": 6964,
+    "2013": 6368,
+    "2014": 6938,
+    "2015": 6927,
+    "2017": 6547,
+    "2018": 7234,
+    "TOTAL": 78373
+  },
+  "sealedYearEntries": 0,
+  "eligibleEntryOffset": {
+    "min": 0,
+    "max": 38351
+  },
+  "tailSlack": {
+    "min": 53,
+    "max": 38447
+  },
+  "eligibleRangesBySegment": {
+    "2004-2007": {
+      "start": 1000,
+      "endExclusive": 39352,
+      "count": 38352
+    },
+    "2009-2011": {
+      "start": 1000,
+      "endExclusive": 33766,
+      "count": 32766
+    },
+    "2013-2015": {
+      "start": 1000,
+      "endExclusive": 35051,
+      "count": 34051
+    },
+    "2017-2018": {
+      "start": 1000,
+      "endExclusive": 23369,
+      "count": 22369
+    }
+  },
+  "outsideEligibleBySegment": {
+    "2004-2007": 0,
+    "2009-2011": 0,
+    "2013-2015": 0,
+    "2017-2018": 0
+  },
+  "barsHeld": {
+    "distribution": {
+      "1": 7272,
+      "2": 8634,
+      "3": 7277,
+      "4": 6060,
+      "5": 4910,
+      "6": 4152,
+      "7": 3593,
+      "8": 3083,
+      "9": 2532,
+      "10": 2154,
+      "11": 1773,
+      "12": 1544,
+      "13": 1300,
+      "14": 1164,
+      "15": 1045,
+      "16": 955,
+      "17": 858,
+      "18": 737,
+      "19": 806,
+      "20": 720,
+      "21": 666,
+      "22": 662,
+      "23": 640,
+      "24": 614,
+      "25": 576,
+      "26": 606,
+      "27": 624,
+      "28": 605,
+      "29": 569,
+      "30": 651,
+      "31": 591,
+      "32": 576,
+      "33": 613,
+      "34": 592,
+      "35": 572,
+      "36": 582,
+      "37": 588,
+      "38": 530,
+      "39": 542,
+      "40": 539,
+      "41": 501,
+      "42": 482,
+      "43": 418,
+      "44": 366,
+      "45": 294,
+      "46": 211,
+      "47": 176,
+      "48": 173,
+      "49": 139,
+      "50": 119,
+      "51": 101,
+      "52": 80,
+      "53": 92,
+      "54": 65,
+      "55": 73,
+      "56": 36,
+      "57": 34,
+      "58": 52,
+      "59": 48,
+      "60": 36,
+      "61": 62,
+      "62": 40,
+      "63": 33,
+      "64": 71,
+      "65": 41,
+      "66": 49,
+      "67": 56,
+      "68": 44,
+      "69": 66,
+      "70": 62,
+      "71": 49,
+      "72": 62,
+      "73": 55,
+      "74": 52,
+      "75": 58,
+      "76": 60,
+      "77": 64,
+      "78": 71,
+      "79": 93,
+      "80": 95,
+      "81": 67,
+      "82": 68,
+      "83": 82,
+      "84": 59,
+      "85": 66,
+      "86": 48,
+      "87": 44,
+      "88": 40,
+      "89": 43,
+      "90": 32,
+      "91": 23,
+      "92": 27,
+      "93": 26,
+      "94": 25,
+      "95": 10,
+      "96": 527
+    },
+    "max": 96
+  },
+  "perCard": {
+    "donchian-20": {
+      "total": 6586,
+      "long": 3358,
+      "short": 3228,
+      "sideIdentity": true,
+      "unknown": 1690,
+      "unknownShare": 0.25660491952626785,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 909,
+          "meanNetR": -0.028833490649064614
+        },
+        "CHOPPY": {
+          "count": 3987,
+          "meanNetR": -0.055157492600950854
+        },
+        "UNKNOWN": {
+          "count": 1690,
+          "meanNetR": -0.11317317100591548
+        }
+      },
+      "stateIdentity": true
+    },
+    "donchian-55": {
+      "total": 4032,
+      "long": 2130,
+      "short": 1902,
+      "sideIdentity": true,
+      "unknown": 1233,
+      "unknownShare": 0.30580357142857145,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 765,
+          "meanNetR": -0.029317475816993184
+        },
+        "CHOPPY": {
+          "count": 2034,
+          "meanNetR": 0.01572231760078719
+        },
+        "UNKNOWN": {
+          "count": 1233,
+          "meanNetR": -0.12684204703974053
+        }
+      },
+      "stateIdentity": true
+    },
+    "sma-20-50": {
+      "total": 2363,
+      "long": 1177,
+      "short": 1186,
+      "sideIdentity": true,
+      "unknown": 621,
+      "unknownShare": 0.2628015234870927,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 271,
+          "meanNetR": 0.027817634686346956
+        },
+        "CHOPPY": {
+          "count": 1471,
+          "meanNetR": -0.0992686811692718
+        },
+        "UNKNOWN": {
+          "count": 621,
+          "meanNetR": -0.1385375008051523
+        }
+      },
+      "stateIdentity": true
+    },
+    "macd-cross": {
+      "total": 4656,
+      "long": 2422,
+      "short": 2234,
+      "sideIdentity": true,
+      "unknown": 1300,
+      "unknownShare": 0.27920962199312716,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 946,
+          "meanNetR": -0.24205797885834804
+        },
+        "CHOPPY": {
+          "count": 2410,
+          "meanNetR": -0.07397783485477089
+        },
+        "UNKNOWN": {
+          "count": 1300,
+          "meanNetR": -0.13791014461538215
+        }
+      },
+      "stateIdentity": true
+    },
+    "ichimoku-tk": {
+      "total": 3674,
+      "long": 1879,
+      "short": 1795,
+      "sideIdentity": true,
+      "unknown": 764,
+      "unknownShare": 0.20794774088187262,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 129,
+          "meanNetR": 0.0419506976744187
+        },
+        "CHOPPY": {
+          "count": 2781,
+          "meanNetR": -0.1365610298453807
+        },
+        "UNKNOWN": {
+          "count": 764,
+          "meanNetR": -0.14282386387434506
+        }
+      },
+      "stateIdentity": true
+    },
+    "asian-range-break": {
+      "total": 3566,
+      "long": 1759,
+      "short": 1807,
+      "sideIdentity": true,
+      "unknown": 793,
+      "unknownShare": 0.22237801458216488,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 485,
+          "meanNetR": -0.0664639278350515
+        },
+        "CHOPPY": {
+          "count": 2288,
+          "meanNetR": -0.051992321678320776
+        },
+        "UNKNOWN": {
+          "count": 793,
+          "meanNetR": -0.164078675914249
+        }
+      },
+      "stateIdentity": true
+    },
+    "london-orb-30": {
+      "total": 4949,
+      "long": 2501,
+      "short": 2448,
+      "sideIdentity": true,
+      "unknown": 957,
+      "unknownShare": 0.19337239846433624,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 710,
+          "meanNetR": -0.0135641929577465
+        },
+        "CHOPPY": {
+          "count": 3282,
+          "meanNetR": -0.0877629311395473
+        },
+        "UNKNOWN": {
+          "count": 957,
+          "meanNetR": -0.17600043782653998
+        }
+      },
+      "stateIdentity": true
+    },
+    "pdh-pdl-break": {
+      "total": 5570,
+      "long": 3037,
+      "short": 2533,
+      "sideIdentity": true,
+      "unknown": 1581,
+      "unknownShare": 0.28384201077199284,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 1171,
+          "meanNetR": -0.10025298206661089
+        },
+        "CHOPPY": {
+          "count": 2818,
+          "meanNetR": -0.06176216820440009
+        },
+        "UNKNOWN": {
+          "count": 1581,
+          "meanNetR": -0.09248657621758187
+        }
+      },
+      "stateIdentity": true
+    },
+    "pdh-retest": {
+      "total": 997,
+      "long": 997,
+      "short": 0,
+      "sideIdentity": true,
+      "unknown": 301,
+      "unknownShare": 0.30190571715145437,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 155,
+          "meanNetR": -0.2581585935483863
+        },
+        "CHOPPY": {
+          "count": 541,
+          "meanNetR": -0.13117074306839122
+        },
+        "UNKNOWN": {
+          "count": 301,
+          "meanNetR": -0.19612437541528183
+        }
+      },
+      "stateIdentity": true
+    },
+    "pdl-retest": {
+      "total": 826,
+      "long": 0,
+      "short": 826,
+      "sideIdentity": true,
+      "unknown": 246,
+      "unknownShare": 0.29782082324455206,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 114,
+          "meanNetR": -0.10797016666666663
+        },
+        "CHOPPY": {
+          "count": 466,
+          "meanNetR": -0.14100186051502103
+        },
+        "UNKNOWN": {
+          "count": 246,
+          "meanNetR": -0.14540910569105664
+        }
+      },
+      "stateIdentity": true
+    },
+    "classic-pivot": {
+      "total": 2325,
+      "long": 1146,
+      "short": 1179,
+      "sideIdentity": true,
+      "unknown": 675,
+      "unknownShare": 0.2903225806451613,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 307,
+          "meanNetR": -0.015738547231270324
+        },
+        "CHOPPY": {
+          "count": 1343,
+          "meanNetR": -0.02926026731198776
+        },
+        "UNKNOWN": {
+          "count": 675,
+          "meanNetR": -0.10280623407407377
+        }
+      },
+      "stateIdentity": true
+    },
+    "rsi-14-30-70": {
+      "total": 3130,
+      "long": 1454,
+      "short": 1676,
+      "sideIdentity": true,
+      "unknown": 1144,
+      "unknownShare": 0.36549520766773164,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 1160,
+          "meanNetR": -0.24263395775861918
+        },
+        "CHOPPY": {
+          "count": 826,
+          "meanNetR": -0.11471047336561721
+        },
+        "UNKNOWN": {
+          "count": 1144,
+          "meanNetR": -0.06941427272727313
+        }
+      },
+      "stateIdentity": true
+    },
+    "williams-r-fade": {
+      "total": 6299,
+      "long": 3211,
+      "short": 3088,
+      "sideIdentity": true,
+      "unknown": 1703,
+      "unknownShare": 0.27036037466264484,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 1219,
+          "meanNetR": 0.004203515996718982
+        },
+        "CHOPPY": {
+          "count": 3377,
+          "meanNetR": -0.07437838584542222
+        },
+        "UNKNOWN": {
+          "count": 1703,
+          "meanNetR": -0.12571779271873
+        }
+      },
+      "stateIdentity": true
+    },
+    "bollinger-20-2": {
+      "total": 4572,
+      "long": 2283,
+      "short": 2289,
+      "sideIdentity": true,
+      "unknown": 1112,
+      "unknownShare": 0.2432195975503062,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 564,
+          "meanNetR": -0.11118868439716291
+        },
+        "CHOPPY": {
+          "count": 2896,
+          "meanNetR": -0.12722300448895107
+        },
+        "UNKNOWN": {
+          "count": 1112,
+          "meanNetR": -0.012329010791366685
+        }
+      },
+      "stateIdentity": true
+    },
+    "keltner-20-atr": {
+      "total": 3815,
+      "long": 1849,
+      "short": 1966,
+      "sideIdentity": true,
+      "unknown": 1181,
+      "unknownShare": 0.30956749672346,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 645,
+          "meanNetR": -0.11537975658914705
+        },
+        "CHOPPY": {
+          "count": 1989,
+          "meanNetR": -0.09222057013574572
+        },
+        "UNKNOWN": {
+          "count": 1181,
+          "meanNetR": -0.10702256138865406
+        }
+      },
+      "stateIdentity": true
+    },
+    "bb-squeeze-fade": {
+      "total": 2046,
+      "long": 1032,
+      "short": 1014,
+      "sideIdentity": true,
+      "unknown": 662,
+      "unknownShare": 0.3235581622678397,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 367,
+          "meanNetR": -0.15541610081743845
+        },
+        "CHOPPY": {
+          "count": 1017,
+          "meanNetR": -0.14440940019665563
+        },
+        "UNKNOWN": {
+          "count": 662,
+          "meanNetR": -0.055041280966767005
+        }
+      },
+      "stateIdentity": true
+    },
+    "engulfing": {
+      "total": 1578,
+      "long": 815,
+      "short": 763,
+      "sideIdentity": true,
+      "unknown": 349,
+      "unknownShare": 0.2211660329531052,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 243,
+          "meanNetR": -0.15221173662551407
+        },
+        "CHOPPY": {
+          "count": 986,
+          "meanNetR": -0.12841139959431996
+        },
+        "UNKNOWN": {
+          "count": 349,
+          "meanNetR": -0.10937393123209153
+        }
+      },
+      "stateIdentity": true
+    },
+    "morning-evening-star": {
+      "total": 4930,
+      "long": 2571,
+      "short": 2359,
+      "sideIdentity": true,
+      "unknown": 1317,
+      "unknownShare": 0.26713995943204866,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 848,
+          "meanNetR": -0.09345183136792387
+        },
+        "CHOPPY": {
+          "count": 2765,
+          "meanNetR": -0.17262479566003716
+        },
+        "UNKNOWN": {
+          "count": 1317,
+          "meanNetR": -0.09721341002277967
+        }
+      },
+      "stateIdentity": true
+    },
+    "three-soldiers-crows": {
+      "total": 1532,
+      "long": 796,
+      "short": 736,
+      "sideIdentity": true,
+      "unknown": 304,
+      "unknownShare": 0.19843342036553524,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 223,
+          "meanNetR": -0.17183243497757827
+        },
+        "CHOPPY": {
+          "count": 1005,
+          "meanNetR": -0.16471175024875476
+        },
+        "UNKNOWN": {
+          "count": 304,
+          "meanNetR": -0.10767149013157847
+        }
+      },
+      "stateIdentity": true
+    },
+    "atr-squeeze-break": {
+      "total": 546,
+      "long": 348,
+      "short": 198,
+      "sideIdentity": true,
+      "unknown": 97,
+      "unknownShare": 0.17765567765567766,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 95,
+          "meanNetR": -0.02108498947368418
+        },
+        "CHOPPY": {
+          "count": 354,
+          "meanNetR": -0.16227080508474512
+        },
+        "UNKNOWN": {
+          "count": 97,
+          "meanNetR": -0.23151615463917535
+        }
+      },
+      "stateIdentity": true
+    },
+    "nr7-break": {
+      "total": 4619,
+      "long": 2409,
+      "short": 2210,
+      "sideIdentity": true,
+      "unknown": 1213,
+      "unknownShare": 0.2626109547521108,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 914,
+          "meanNetR": -0.1976166586433238
+        },
+        "CHOPPY": {
+          "count": 2492,
+          "meanNetR": -0.09560486556982184
+        },
+        "UNKNOWN": {
+          "count": 1213,
+          "meanNetR": -0.13774310882110422
+        }
+      },
+      "stateIdentity": true
+    },
+    "inside-bar-break": {
+      "total": 5762,
+      "long": 3303,
+      "short": 2459,
+      "sideIdentity": true,
+      "unknown": 1636,
+      "unknownShare": 0.2839291912530371,
+      "unknownBaseline": "NOT_APPLICABLE",
+      "byVerdictState": {
+        "EFFICIENT": {
+          "count": 1169,
+          "meanNetR": -0.16538989563729473
+        },
+        "CHOPPY": {
+          "count": 2957,
+          "meanNetR": -0.08797938687859042
+        },
+        "UNKNOWN": {
+          "count": 1636,
+          "meanNetR": -0.14580116870415502
+        }
+      },
+      "stateIdentity": true
+    }
+  },
+  "perSegmentMissingSecondM15": {
+    "2004-2007": {
+      "count": 1473,
+      "totalM30": 39448,
+      "share": 0.037340296085986616
+    },
+    "2009-2011": {
+      "count": 492,
+      "totalM30": 33862,
+      "share": 0.014529561160002362
+    },
+    "2013-2015": {
+      "count": 25,
+      "totalM30": 35147,
+      "share": 0.0007112982615870486
+    },
+    "2017-2018": {
+      "count": 5,
+      "totalM30": 23465,
+      "share": 0.00021308331557639036
+    }
+  },
+  "totalMissingSecondM15": {
+    "count": 1995,
+    "totalM30": 131922,
+    "share": 0.015122572429162687
+  },
+  "yearIdentity": true,
+  "cardStateIdentities": {
+    "donchian-20": true,
+    "donchian-55": true,
+    "sma-20-50": true,
+    "macd-cross": true,
+    "ichimoku-tk": true,
+    "asian-range-break": true,
+    "london-orb-30": true,
+    "pdh-pdl-break": true,
+    "pdh-retest": true,
+    "pdl-retest": true,
+    "classic-pivot": true,
+    "rsi-14-30-70": true,
+    "williams-r-fade": true,
+    "bollinger-20-2": true,
+    "keltner-20-atr": true,
+    "bb-squeeze-fade": true,
+    "engulfing": true,
+    "morning-evening-star": true,
+    "three-soldiers-crows": true,
+    "atr-squeeze-break": true,
+    "nr7-break": true,
+    "inside-bar-break": true
+  },
+  "tradeJsonlSha256": "6395905fda19489445086865bdafe7e7d9833446386c5d1ae250652073fb75e4"
+}

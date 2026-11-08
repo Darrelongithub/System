@@ -37,7 +37,8 @@
     "mc:amend2": "node scripts/map-compass/recompute-power-report.mjs",
     "mc:a8-audit": "node scripts/map-compass/a8-segment-audit.mjs",
     "mc:a8-part2": "node --expose-gc scripts/map-compass/a8-part2-prep.mjs",
-    "mc:a8-stage3b": "node --expose-gc scripts/map-compass/a8-stage3b-run.mjs"
+    "mc:a8-stage3b": "node --expose-gc scripts/map-compass/a8-stage3b-run.mjs",
+    "mc:a8-stage4-dry": "node scripts/map-compass/a8-stage4-orchestrator.mjs --dry-run"
   },
   "overrides": {
     "rolldown": "1.2.1"
