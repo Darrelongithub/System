@@ -113,3 +113,21 @@ All five routing regression tests passed, including the direct 22-card complemen
 **Owner authorization (2026-11-08; recorded before any orchestrator code exists):** The Stage 4 orchestrator is authorized as a deliberate pre-registered component and is the **only new machinery permitted**. It consists of exactly one new driver script plus its tests. The driver may only wire the existing DEV segment builder, card signals, one-slot trade producer with the frozen exit harness, segmented random control, 25-cell sweep, `verifyReal` with `a8DevOnly=true`, and report generation. It must not change `scripts/map-compass/frozen.mjs`, `verifyReal`, `lib/verification.mjs`, `lib/signals.mjs`, `lib/compass.mjs`, or any threshold, card, cost, or exit rule. This authorization is dated before the code exists.
 
 **Verifier review and signature (2026-11-08):** `docs/STAGE-4-ORCHESTRATOR-SPEC.md` was revised after line-by-line verifier review. The two requested corrections and four rulings were applied; it is now **SIGNED as the Step 2 build contract**. Section 10 records the one arithmetic inconsistency in the supplied DEV segment counts (sum 127,538 versus required total 131,922); do not guess or silently amend the counts. No orchestrator code or tests exist yet. This signature authorizes only Step 2 implementation within the recorded scope, not a Stage 4 run. If a real run fails after the first ledger append but before final publication, publish nothing further, do not retry or delete anything, and mark the run FAILED here.
+
+## Stage 4 dry-run verifier sign-off — 2026-10-25
+
+The verifier independently checked the committed `artifacts/map-compass/stage4-dry/claimed-trades.dry.jsonl` and `inspection.json`:
+
+- The JSONL contains **78,373 trades**; its recomputed SHA-256 is `6395905fda19489445086865bdafe7e7d9833446386c5d1ae250652073fb75e4`, matching the inspection. Exactly the 12 DEV years are present: 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2013, 2014, 2015, 2017, and 2018. Sealed-year entries: **0**.
+- Entry-boundary checks: **0** before warm-up; **0** lacking the 96-bar tail. Exit checks: **0** at or beyond segment end. For every trade, `barsHeld <= 96` and `barsHeld == exitIndex - localIndex`.
+- Segment lengths: `2004-2007` 39,448; `2009-2011` 33,862; `2013-2015` 35,147; `2017-2018` 23,465.
+- For all 22 cards, `long + short == total` and `EFFICIENT + CHOPPY + UNKNOWN == book`. Every card's dry trade count is no greater than its DEV signal count.
+- Bounded M15 fallback: 1,995 / 131,922 M30 bars = **1.5123%**.
+
+The independent duplicate cross-check, using a read-only worktree of `arena/2350ac34-system` at `b5df0ae`, its separate segmented engine, and the same real DEV feed, reproduced segment sizes 39,448 / 33,862 / 35,147 / 23,465 and **all 22 per-card trade counts exactly**: 0.000% difference, with 78,373 trades on each build. This is recorded as the independent verifier cross-check; that branch was not checked out or modified here.
+
+### Slot-model divergence — explained, not an orchestrator fault
+
+The real dry book has 78,373 trades versus 61,307 `kept` in `artifacts/map-compass/slot-model.json`, **27.8% above** the slot-model count. The model is an explicit pre-result **ASSUMPTION**: it samples hold duration from the random-entry baseline histogram, whose mean is 17.532 bars. The observed dry-run mean hold is 13.875 bars (0.791× that assumption). Shorter real holds free a card slot sooner and increase survival. The verifier's per-card comparison reports correlation **−0.636** between mean hold and `(real − model)` survival; the three shortest-hold cards are the outliers. The slot model is superseded by measured holds and survival; the orchestrator is not at fault.
+
+These are dry-inspection/accounting checks only: **no verdicts were produced**. This sign-off does not itself assert that the real Stage 4 invocation has run.
