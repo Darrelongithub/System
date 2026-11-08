@@ -1,0 +1,49 @@
+
+--- XAU-MOM-1H (Cost x1) ---
+Trades: 4768 | Win Rate: 25.15% | Avg Win: 2.87R | Avg Loss: -1.39R
+Net Mean: -0.3181R | Gross Mean: -0.1237R | Cost/Trade: 0.1945R
+Profit Factor: 0.69 | Max DD: 1527.06R
+Day-clustered t: -6.67 | 95% CI: (np.float64(-0.8177780985771077), np.float64(-0.4463262796923632))
+Random Control Mean: -0.3200R | Excess: -0.3121R (t=-2.46)
+Longs: 4768 | Shorts: 0
+Concentration (Max Yr Share): 0.0%
+Leave-One-Year-Out Positive: 0.0%
+Circular-shift Placebo Percentile: 79.7%
+STATUS: FAILS (EXPLORATORY)
+
+
+--- XAU-MOM-1H (Cost x2) ---
+Trades: 4551 | Win Rate: 21.45% | Avg Win: 2.88R | Avg Loss: -1.68R
+Net Mean: -0.7031R | Gross Mean: -0.3253R | Cost/Trade: 0.3778R
+Profit Factor: 0.47 | Max DD: 3199.95R
+Day-clustered t: -9.85 | 95% CI: (np.float64(-1.6243763863740008), np.float64(-1.0850253096445261))
+Random Control Mean: -0.7646R | Excess: -0.5901R (t=-3.06)
+Longs: 4551 | Shorts: 0
+Concentration (Max Yr Share): 0.0%
+Leave-One-Year-Out Positive: 0.0%
+Circular-shift Placebo Percentile: 71.0%
+
+
+--- XAU-SWEEP-ASIA (Cost x1) ---
+Trades: 301 | Win Rate: 25.58% | Avg Win: 2.05R | Avg Loss: -1.11R
+Net Mean: -0.3055R | Gross Mean: -0.2390R | Cost/Trade: 0.0665R
+Profit Factor: 0.63 | Max DD: 111.56R
+Day-clustered t: -3.37 | 95% CI: (np.float64(-0.48390472459268347), np.float64(-0.12710752696615263))
+Random Control Mean: 0.1913R | Excess: -0.4968R (t=-3.86)
+Longs: 126 | Shorts: 175
+Concentration (Max Yr Share): 0.0%
+Leave-One-Year-Out Positive: 0.0%
+Circular-shift Placebo Percentile: 94.3%
+STATUS: FAILS (EXPLORATORY)
+
+
+--- XAU-SWEEP-ASIA (Cost x2) ---
+Trades: 301 | Win Rate: 24.58% | Avg Win: 1.89R | Avg Loss: -1.19R
+Net Mean: -0.4306R | Gross Mean: -0.2977R | Cost/Trade: 0.1329R
+Profit Factor: 0.52 | Max DD: 145.10R
+Day-clustered t: -4.97 | 95% CI: (np.float64(-0.6009588041459225), np.float64(-0.26019320164932236))
+Random Control Mean: -0.1166R | Excess: -0.3140R (t=-2.54)
+Longs: 126 | Shorts: 175
+Concentration (Max Yr Share): 0.0%
+Leave-One-Year-Out Positive: 0.0%
+Circular-shift Placebo Percentile: 46.5%
