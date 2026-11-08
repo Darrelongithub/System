@@ -114,7 +114,7 @@ All five routing regression tests passed, including the direct 22-card complemen
 
 **Verifier review and signature (2026-11-08):** `docs/STAGE-4-ORCHESTRATOR-SPEC.md` was revised after line-by-line verifier review. The two requested corrections and four rulings were applied; it is now **SIGNED as the Step 2 build contract**. Section 10 records the one arithmetic inconsistency in the supplied DEV segment counts (sum 127,538 versus required total 131,922); do not guess or silently amend the counts. No orchestrator code or tests exist yet. This signature authorizes only Step 2 implementation within the recorded scope, not a Stage 4 run. If a real run fails after the first ledger append but before final publication, publish nothing further, do not retry or delete anything, and mark the run FAILED here.
 
-## Stage 4 dry-run verifier sign-off — 2026-10-25
+## Stage 4 dry-run verifier sign-off — 2026-11-08 (corrected; the earlier entry carried a stale date)
 
 The verifier independently checked the committed `artifacts/map-compass/stage4-dry/claimed-trades.dry.jsonl` and `inspection.json`:
 
@@ -128,6 +128,18 @@ The independent duplicate cross-check, using a read-only worktree of `arena/2350
 
 ### Slot-model divergence — explained, not an orchestrator fault
 
-The real dry book has 78,373 trades versus 61,307 `kept` in `artifacts/map-compass/slot-model.json`, **27.8% above** the slot-model count. The model is an explicit pre-result **ASSUMPTION**: it samples hold duration from the random-entry baseline histogram, whose mean is 17.532 bars. The observed dry-run mean hold is 13.875 bars (0.791× that assumption). Shorter real holds free a card slot sooner and increase survival. The verifier's per-card comparison reports correlation **−0.636** between mean hold and `(real − model)` survival; the three shortest-hold cards are the outliers. The slot model is superseded by measured holds and survival; the orchestrator is not at fault.
+The real dry book has 78,373 trades versus 61,307 `kept` in `artifacts/map-compass/slot-model.json`, **27.8% above** the slot-model count. The model is an explicit pre-result **ASSUMPTION**: it samples hold duration from the random-entry baseline histogram, whose mean is 17.532 bars. The observed dry-run mean hold is 13.875 bars (0.791× that assumption). Shorter real holds free a card slot sooner and increase survival. The random-entry baseline histogram mean is **17.532 bars**; this is distinct from the per-card mean sampled and weighted by `kept` (**17.59 bars**). The verifier reports **r = −0.6360** between per-card mean hold and `(real − model)` survival in percentage points, over 22 cards. This coefficient is **NOT robust**: excluding the three shortest-hold cards lowers it to **−0.3525**. The mechanism is directionally supported, but the correlation is fragile to three influential points; do not treat it as a strong statistic. The slot model is superseded by measured holds and survival; the orchestrator is not at fault.
 
 These are dry-inspection/accounting checks only: **no verdicts were produced**. This sign-off does not itself assert that the real Stage 4 invocation has run.
+
+## Stage 4 real-run abort — 2026-11-08; no result, re-attempt conditional
+
+The first `npm run mc:a8-stage4` attempt aborted during input loading with the exact message:
+
+`STAGE4_ABORT[INPUT_MISSING]: /home/user/System/artifacts/map-compass/normalized/xauusd-m30-eat.csv does not exist`
+
+The abort occurred in `parseCsvWithHeader` before the point of no return (PNR): no trade was produced, `verifyReal` was not called, no ledger row was appended, and no output was written. The Stage 4 orchestrator, `scripts/map-compass/frozen.mjs`, and `reportOnly.criteriaHash` are unchanged. This is a missing-input abort, not a produced Stage 4 result.
+
+A re-attempt is **CONTINGENT on owner authorization**. The Stage 4 single-use budget is treated as **UNSPENT** because this attempt produced no result, no output, and no ledger append. No re-attempt is authorized by this record.
+
+The annotated tag `stage4-real-run-dev` was created on `2dd752fd439c8c98fa1a774bb2b04c9ceead831f` because that was the current pre-run tip after the dry-run sign-off commit. The existing `stage4-pre-run-dev` was not reused: it peels to the older `5a70fbf478c0e4cd9b423073fa379dffae87652f`, not the current tip. The new tag message is `Stage 4 real DEV run pre-state: fa958179`.
