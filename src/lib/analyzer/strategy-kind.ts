@@ -4,22 +4,21 @@
  *
  * turtle and opening-range-breakout remain classified as "trade" so that
  * explicit research runs (strategyIds) still produce trade stats; they are
- * not part of the default production set (see FINAL_STRATEGY_IDS / STRATEGIES).
+ * not part of the default production set (see V2_STRATEGY_IDS / STRATEGIES).
  */
 export type StrategyKind = "trade" | "context";
 
 const STRATEGY_KIND: Record<string, StrategyKind> = {
   turtle: "trade",
   "opening-range-breakout": "trade",
-  "dual-thrust": "trade",
-  "macd-cross": "trade",
-  "pdh-retest": "trade",
-  "williams-r-fade": "trade",
-  "three-soldiers": "trade",
-  "morning-star": "trade",
-  "classic-pivot": "trade",
-  "ichimoku-tk": "trade",
-  "donchian-55": "trade",
+  "donchian-55-coiled": "trade",
+  "ny-pivot-s1r1-reject": "trade",
+  "killzone-orb-stretch": "trade",
+  "supertrend-ema-pullback": "trade",
+  "keltner-squeeze-release": "trade",
+  "asymmetric-vol-breakout": "trade",
+  "kijun-cloud-continuation": "trade",
+  "engulfing-zone-retest": "trade",
   "raschke-keltner": "context",
   "previous-day-high-low": "context",
   "bollinger-bands": "context",

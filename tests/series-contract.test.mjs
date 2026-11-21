@@ -6,7 +6,8 @@
  *   - too short a warm-up (the newest decision stops matching a full-history run);
  *   - swing references that do not resolve (trend silently degraded);
  *   - a collapsed trend distribution (every row "ranging" ⇒ no counter-trend
- *     decision can fire, so Filters C/F and the trend strategies go quiet).
+ *     decision can fire, so the trend-aware strategies go quiet and the regime
+ *     gate's G3/G4 routing goes dark).
  *
  * The locked baseline is the reference for healthy data, and it deliberately
  * carries a known 6.8 % of dangling refs (3,039 of 44,652 — refs into UTC weekend
@@ -128,10 +129,12 @@ test("contract: re-timestamped data (refs point at rows that are not there) coll
   );
   assertEqual(report.nonRangingShare, 0, "everything fell back to ranging");
 
-  // And the practical consequence the gate exists for: the counter-trend layer
-  // is dead, so the shipped filters reject nothing.
-  const fFails = analysis.results.filter((r) => r.reason?.startsWith("FILTER_F")).length;
-  assertEqual(fFails, 0, "Filter F cannot fire on a series with no trend");
+  // The contract is the gate: on a collapsed-trend series the engine still
+  // runs (the stratified gates do not consult the trend column — they read
+  // HTF structure, EMAs and volatility), but no row claims a resolved trend —
+  // the swing resolver cannot name one, so every row falls back to ranging.
+  const anyTrend = analysis.results.filter((r) => r.trend !== "ranging");
+  assertEqual(anyTrend.length, 0, "no row may carry a resolved trend");
 });
 
 test("contract: the report is computed from the engine's own resolver, not from a second opinion", () => {

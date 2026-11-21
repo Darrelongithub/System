@@ -1,12 +1,17 @@
 /**
  * G1 regression — Saturday session tails (Forex weeks close Saturday ~01:00
- * EAT) carry real candles and real trade triggers (39 across the locked
- * baseline). Pre-fix, the backtest day loop short-circuited on
- * `isWeekend(day) || (no data)`, so every Saturday emitted a SKIPPED report
- * and its triggers never entered the rolling strategy stats: the report
- * silently undercounted the engine's own continuous pass. These tests pin the
- * predicate and prove day-supplied accounting now equals the continuous
- * total over the full baseline series.
+ * EAT) carry real candles and real trade triggers. Pre-fix, the backtest day
+ * loop short-circuited on `isWeekend(day) || (no data)`, so every Saturday
+ * emitted a SKIPPED report and its triggers never entered the rolling
+ * strategy stats: the report silently undercounted the engine's own
+ * continuous pass. These tests pin the predicate and prove day-supplied
+ * accounting now equals the continuous total over the full baseline series.
+ *
+ * Re-based to the v2.0 ruleset (regime-routed bots): the locked baseline now
+ * contains 0 weekend trigger-bearing days — every trigger lands Monday,
+ * Tuesday, Wednesday, Thursday or Friday (M 47 / T 35 / W 42 / Th 31 / F 31)
+ * — so the old "37 Saturday-tail Saturdays" anchor is replaced by an explicit
+ * 0-trigger assertion over the same map.
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { dayReportSkipReason, isSunday, isWeekend, rangeDays } from "../src/lib/backtest/engine.ts";
@@ -73,12 +78,12 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
 
   let applied = 0;
   let skippedDays = 0;
-  let saturdayTriggerBearing = new Map(); // day -> trigger count (must all be processed)
+  let weekendTriggerBearing = new Map(); // day -> trigger count (must all be processed)
   for (const day of rangeDays(firstRow.datetime.slice(0, 10), lastRow.datetime.slice(0, 10))) {
     const triggers = continuous.tradesOnDay(day);
     const ctx = continuous.contextOnDay(day);
     if (isWeekend(day) && triggers.length > 0) {
-      saturdayTriggerBearing.set(day, triggers.length);
+      weekendTriggerBearing.set(day, triggers.length);
     }
     const reason = dayReportSkipReason(day, daysWithCandles.has(day), triggers.length, ctx.length);
     if (reason !== null) {
@@ -91,12 +96,13 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
 
   assertEqual(applied, continuous.tradeTriggers.length, "every engine trigger is applied");
   assert(skippedDays > 0, "true empty days are still skipped");
-  // The pre-fix deficit: 37 trigger-bearing Saturdays in the locked baseline
-  // (was 39 pre-Filter-C; Filter C removed 2 Saturday-tail trades in v1.3).
+  // v2.0 locked baseline: no trigger-bearing weekend days at all (the old
+  // v1.8 ruleset had 37 Saturday-tail triggers); the G1 fix keeps any
+  // future Saturday-tail triggers in the day loop rather than skipping them.
   assertEqual(
-    [...saturdayTriggerBearing.values()].reduce((a, b) => a + b, 0),
-    37,
-    "all 37 Saturday-tail triggers accounted",
+    [...weekendTriggerBearing.values()].reduce((a, b) => a + b, 0),
+    0,
+    "all 0 weekend-tail triggers accounted",
   );
-  assert(!saturdayTriggerBearing.has("9999-01-01"), "map is real");
+  assert(!weekendTriggerBearing.has("9999-01-01"), "map is real");
 });

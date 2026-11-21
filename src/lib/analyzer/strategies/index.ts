@@ -1,9 +1,9 @@
 import type { StrategyCheck } from "../types";
 import { ALL_STRATEGY_IMPLEMENTATIONS, SPEC_STRATEGIES } from "./spec-strategies";
-import { FINAL_STRATEGY_IDS, FINAL_TRADE_STRATEGIES } from "./final-survivors";
+import { V2_STRATEGY_IDS, V2_TRADE_STRATEGIES } from "./v2-regime-bots";
 
 /**
- * Default production strategy set (9 final trade strategies + context diagnostics).
+ * Default production strategy set (8 regime-routed trade bots + context diagnostics).
  * Turtle and Opening-Range-Breakout are not included here.
  */
 export const STRATEGIES: StrategyCheck[] = SPEC_STRATEGIES;
@@ -14,4 +14,4 @@ export const STRATEGIES: StrategyCheck[] = SPEC_STRATEGIES;
  */
 export const ALL_STRATEGIES: StrategyCheck[] = ALL_STRATEGY_IMPLEMENTATIONS;
 
-export { FINAL_STRATEGY_IDS, FINAL_TRADE_STRATEGIES };
+export { V2_STRATEGY_IDS, V2_TRADE_STRATEGIES };

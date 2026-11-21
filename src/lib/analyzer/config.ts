@@ -13,15 +13,11 @@
  *   ANALYZER_CERTIFIED_OPTIONS  backtest / golden: the series ends on a closed
  *                              bar, so every row is signal-eligible.
  *
- * NOT pinned here, on purpose: `enableFilterC` / `enableFilterF`. Which filters
- * ship is a *product decision* and it is defined in exactly one place — the
+ * NOT pinned here, on purpose: the v2.0 regime gates and portfolio gate. Which
+ * gates ship is a *product decision* and is defined in exactly one place — the
  * `runAnalysis` option defaults in `run.ts`. Keeping it out of this file means a
  * call site cannot quietly run a different rule set, and
  * `tests/analyzer-config-parity.test.mjs` fails if one ever tries to.
- *
- * `enableHtfDirectionFilter` is also inert for trade generation (see the
- * RunOptions doc); it is carried here only because the historical call sites
- * passed it, and `tests/analyzer-htf-inert.test.mjs` pins that.
  */
 import type { RunOptions } from "./run";
 
@@ -39,12 +35,10 @@ export const MIN_PRODUCTION_BARS = 1000;
 
 /** Live analysis: the final row is treated as possibly-in-progress. */
 export const ANALYZER_LIVE_OPTIONS: RunOptions = {
-  enableHtfDirectionFilter: true,
   seriesEndsComplete: false,
 };
 
 /** Certified backtest / golden: every row in the series is a closed candle. */
 export const ANALYZER_CERTIFIED_OPTIONS: RunOptions = {
-  enableHtfDirectionFilter: true,
   seriesEndsComplete: true,
 };

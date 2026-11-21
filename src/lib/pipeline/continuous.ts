@@ -1,7 +1,7 @@
 /**
  * Continuous portfolio analysis (default backtest mode).
  * One runAnalysis over the full series using the default production strategy set
- * (FINAL_STRATEGY_IDS + context). Legacy Turtle/ORB are not included unless the
+ * (V2_STRATEGY_IDS + context). Legacy Turtle/ORB are not included unless the
  * caller later requests them via explicit strategyIds on runAnalysis.
  */
 import { runAnalysis, type RunOutcome } from "@/lib/analyzer/run";

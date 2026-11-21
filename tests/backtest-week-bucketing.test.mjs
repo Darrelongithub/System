@@ -114,9 +114,18 @@ test("batchBacktestReports: per-strategy subtotals inside a package come from su
   const out = batchBacktestReports(
     [
       // `strategy` must be the registry NAME (not the id): the subtotal block is
-      // emitted per STRATEGIES[].name, so "dual-thrust" would score 0.
-      { day: "2026-03-02", content: "d1", triggers: [{ strategy: "Dual Thrust Breakout" }] },
-      { day: "2026-03-03", content: "d2", triggers: [{ strategy: "Dual Thrust Breakout" }] },
+      // emitted per STRATEGIES[].name, so using an id (not the name)
+      // would score 0.
+      {
+        day: "2026-03-02",
+        content: "d1",
+        triggers: [{ strategy: "55-Bar Coiled Channel Breakout" }],
+      },
+      {
+        day: "2026-03-03",
+        content: "d2",
+        triggers: [{ strategy: "55-Bar Coiled Channel Breakout" }],
+      },
     ],
     14,
   );
@@ -126,11 +135,11 @@ test("batchBacktestReports: per-strategy subtotals inside a package come from su
     "subtotal block is present",
   );
   assert(
-    out[0].content.includes("Dual Thrust Breakout | triggers in package: 2"),
+    out[0].content.includes("55-Bar Coiled Channel Breakout | triggers in package: 2"),
     "triggers from both days are summed for the strategy",
   );
   assert(
-    out[0].content.includes("MACD Signal Cross | triggers in package: 0"),
+    out[0].content.includes("SuperTrend + EMA20 Dynamic Pullback | triggers in package: 0"),
     "strategies with no triggers still report an explicit 0",
   );
 });

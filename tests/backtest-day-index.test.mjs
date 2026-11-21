@@ -96,29 +96,29 @@ test("day-index: buildStrategyBreakdown(rowsForDay) matches the naive scan and d
   // it would not match `datetime.startsWith(day)`.
   const synthetic = [
     {
-      strategyId: "macd-cross",
-      strategy: "MACD Cross",
+      strategyId: "donchian-55-coiled",
+      strategy: "55-Bar Coiled Channel Breakout",
       datetime: "2026-03-02 10:00:00",
       result: "PASS",
       reason: "breakout",
     },
     {
-      strategyId: "macd-cross",
-      strategy: "MACD Cross",
+      strategyId: "donchian-55-coiled",
+      strategy: "55-Bar Coiled Channel Breakout",
       datetime: "2026-03-02 10:30:00",
       result: "FAIL",
       reason: "no trend",
     },
     {
-      strategyId: "macd-cross",
-      strategy: "MACD Cross",
+      strategyId: "donchian-55-coiled",
+      strategy: "55-Bar Coiled Channel Breakout",
       datetime: "2026-03-02 11:00:00",
       result: "FAIL",
       reason: "no trend",
     },
     {
-      strategyId: "dual-thrust",
-      strategy: "Dual Thrust",
+      strategyId: "engulfing-zone-retest",
+      strategy: "Engulfing Supply/Demand Zone First-Retest",
       datetime: "2026-03-03 09:00:00",
       result: "FAIL",
       reason: "inside range",
@@ -132,12 +132,12 @@ test("day-index: buildStrategyBreakdown(rowsForDay) matches the naive scan and d
     synthetic.filter((row) => row.datetime.startsWith(day)),
   );
   assertDeepEqual(indexedSynthetic, naiveSynthetic, "pre-sliced rows match the full scan");
-  const macd = naiveSynthetic.find((entry) => entry.strategyId === "macd-cross");
-  assert(macd, "production set includes macd-cross");
-  assertEqual(macd.passCount, 1, "synthetic PASS counted");
-  assertEqual(macd.evaluatedBars, 3, "synthetic bars counted");
-  assertEqual(macd.topFailReasons[0].reason, "no trend", "top fail reason");
-  assertEqual(macd.topFailReasons[0].count, 2, "top fail count");
+  const donchian = naiveSynthetic.find((entry) => entry.strategyId === "donchian-55-coiled");
+  assert(donchian, "production set includes donchian-55-coiled");
+  assertEqual(donchian.passCount, 1, "synthetic PASS counted");
+  assertEqual(donchian.evaluatedBars, 3, "synthetic bars counted");
+  assertEqual(donchian.topFailReasons[0].reason, "no trend", "top fail reason");
+  assertEqual(donchian.topFailReasons[0].count, 2, "top fail count");
 
   const forcedEmpty = buildStrategyBreakdown(synthetic, day, []);
   assert(
@@ -146,12 +146,12 @@ test("day-index: buildStrategyBreakdown(rowsForDay) matches the naive scan and d
   );
   const forced = buildStrategyBreakdown(synthetic, day, [synthetic[3]]);
   assertEqual(
-    forced.find((entry) => entry.strategyId === "dual-thrust").evaluatedBars,
+    forced.find((entry) => entry.strategyId === "engulfing-zone-retest").evaluatedBars,
     1,
     "rowsForDay is consumed as-is",
   );
   assertEqual(
-    forced.find((entry) => entry.strategyId === "macd-cross").evaluatedBars,
+    forced.find((entry) => entry.strategyId === "donchian-55-coiled").evaluatedBars,
     0,
     "rows absent from rowsForDay are not pulled back out of results",
   );

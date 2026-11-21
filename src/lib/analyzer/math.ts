@@ -65,3 +65,30 @@ export function applySpreadAndRR(outcome: Outcome, spread: number): SpreadAdjust
   }
   return { entry, sl, tp, rr };
 }
+
+/**
+ * MIN STOP FLOOR gate — runs before consume().
+ *
+ * Reject any setup whose risk is smaller than max(9 × spread, 0.80 × ATR14).
+ * On XAUUSD (spread = $0.20) the spread term is $1.80; the function scales
+ * automatically to FX pip conventions because `spread` is the caller's
+ * post-spread convention unit. Returns the rejection reason, or null when the
+ * stop is clear.
+ */
+export function checkMinStopFloor(
+  entry: number | undefined,
+  sl: number | undefined,
+  atr14: number | undefined,
+  spread: number,
+): string | null {
+  if (entry === undefined || sl === undefined) return null;
+  const risk = Math.abs(entry - sl);
+  if (!Number.isFinite(risk) || risk <= 0) {
+    return "MIN_STOP_FLOOR: stop too tight relative to ATR/spread";
+  }
+  const minStop = Math.max(9 * spread, Number.isFinite(atr14) ? 0.8 * (atr14 as number) : 0);
+  if (!(risk >= minStop)) {
+    return "MIN_STOP_FLOOR: stop too tight relative to ATR/spread";
+  }
+  return null;
+}

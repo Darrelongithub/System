@@ -1,6 +1,6 @@
 import { dailyAggregates, openingRanges } from "./daily";
 import { ema } from "./indicators";
-import { applySpreadAndRR, RR_FAIL_REASON, RR_THRESHOLD } from "./math";
+import { applySpreadAndRR, checkMinStopFloor, RR_FAIL_REASON, RR_THRESHOLD } from "./math";
 import { parseCsv, parseSpread } from "./parse";
 import { atrSeries, findPivots } from "./pivots";
 import { evaluateSetupStatus, isLive } from "./status";
@@ -13,22 +13,10 @@ import {
   computeMarketStructure,
   htfAllowsDirection,
 } from "./structure";
-import {
-  rejectFilterC,
-  FILTER_C_REASON,
-  rejectFilterD,
-  FILTER_D_REASON,
-  rejectFilterDojiCompressed,
-  FILTER_DOJI_COMPRESSED_REASON,
-  rejectFilterDojiHighVol,
-  FILTER_DOJI_HIGHVOL_REASON,
-  rejectFilterF,
-  FILTER_F_REASON,
-  rejectFilterH1214,
-  FILTER_H1214_REASON,
-} from "./regime-filters";
 import { ANALYZER_LIVE_OPTIONS } from "./config";
 import { inspectSeriesContract } from "./series-contract";
+import { createPortfolioGate, type PortfolioGate } from "./portfolio-gate";
+import { checkRegimeGate } from "./regime-state";
 import {
   formatContextChannel,
   isContextStrategy,
@@ -51,18 +39,10 @@ export type RunOutcome = RunSuccess | RunFailure;
 
 export interface RunOptions {
   /**
-   * Accepted for call-site compatibility (UI, tests, golden generator).
-   * CURRENTLY INERT for trade generation: runAnalysis does not reject PASS rows
-   * via htfAllowsDirection and the flag is not stored on AnalysisContext.
-   * Activating it would change strategy definition (A1) and requires an
-   * explicit experiment + new golden — do not treat as live filter.
-   */
-  enableHtfDirectionFilter?: boolean;
-  /**
    * Restrict evaluation to this subset of strategy ids (e.g. ["turtle"] when
    * running Turtle on its own wider-lookback window). Resolved against the full
    * implementation registry (including legacy Turtle/ORB). When omitted, the
-   * default production set is used: the 9 FINAL_STRATEGY_IDS plus context tools —
+   * default production set is used: the 8 V2_STRATEGY_IDS plus context tools —
    * Turtle and Opening-Range-Breakout are not included.
    */
   strategyIds?: string[];
@@ -72,50 +52,17 @@ export interface RunOptions {
    */
   seriesEndsComplete?: boolean;
   /**
-   * Global Filter C: reject PASS candidates that are counter-trend under
-   * extreme ATR percentile (≥95%, full 50-bar prior window). Default true
-   * (v1.3 product decision). Pass enableFilterC: false to disable for experiments.
+   * v2.0 regime gate (Layer 2). Runs before consume() on every PASS candidate:
+   * G1 HTF alignment, G2 dead-tape lockout, G3 macro tide (EMA50/EMA200),
+   * G4 per-archetype volatility & trend routing. Default true.
    */
-  enableFilterC?: boolean;
+  enableRegimeGate?: boolean;
   /**
-   * Global Filter F: reject PASS candidates that fade the local structure on a
-   * strong momentum bar closing on its high (body ≥80% of range, upper wick
-   * ≤2%). Default true (v1.8 product decision). Pass enableFilterF: false to
-   * disable for experiments.
+   * v2.0 portfolio gate (Layer 4). Runs before consume() on every PASS candidate:
+   * per-bar dedupe, opposite-side anti-hedge, same-side stack cap, and the
+   * rolling-drawdown riskMultiplier. Default true.
    */
-  enableFilterF?: boolean;
-  /**
-   * RESEARCH / forward-validation candidate D (`D_conflict_nearPDL`): reject
-   * trend-aligned candidates whose EMA20/50/200 stack is conflicted and whose
-   * entry sits at pos ≤ 0.26 of the prior EAT day's range.
-   *
-   * Default false. Frozen from the discovery vocabulary; must be evaluated once
-   * on post-2026-08-20 data under the pre-registered criteria
-   * (FORWARD-VALIDATION.md) before any production decision. Rejected
-   * candidates do not consume the strategy's de-dupe slot.
-   */
-  enableFilterD?: boolean;
-  /**
-   * RESEARCH / forward-validation candidate H1214: reject candidates whose
-   * signal bar falls in hours 12–14 EAT (inclusive).
-   *
-   * Default false; same freeze and evaluation protocol as enableFilterD.
-   */
-  enableFilterH1214?: boolean;
-  /**
-   * RESEARCH / forward-validation candidate Doji+highVol: reject doji signal
-   * bars (body < 15% of range) with ATR percentile ≥ 0.80 (prior 50 bars).
-   *
-   * Default false; same freeze and evaluation protocol as enableFilterD.
-   */
-  enableFilterDojiHighVol?: boolean;
-  /**
-   * RESEARCH / forward-validation candidate doji+compressed: reject doji signal
-   * bars (body < 15% of range) with range/ATR ≤ 0.66.
-   *
-   * Default false; same freeze and evaluation protocol as enableFilterD.
-   */
-  enableFilterDojiCompressed?: boolean;
+  enablePortfolioGate?: boolean;
 }
 
 /** Steps 1-5: validation gate, structure, strategies, math, aggregation. */
@@ -218,6 +165,10 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   };
   const invalidRowList: { datetime: string; reason: string }[] = [];
 
+  const enableRegimeGate = options.enableRegimeGate ?? true;
+  const enablePortfolioGate = options.enablePortfolioGate ?? true;
+  const portfolioGate = createPortfolioGate();
+
   const seriesEndsComplete = options.seriesEndsComplete ?? false;
   const signalLimit = seriesEndsComplete ? candles.length : Math.max(0, candles.length - 1);
   // When the series end is flagged incomplete, the final bar is untrusted: it
@@ -285,61 +236,35 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
               if (math.rr <= RR_THRESHOLD) {
                 row.result = "FAIL";
                 row.reason = RR_FAIL_REASON;
-              } else if (
-                (options.enableFilterC ?? true) &&
-                outcome.side &&
-                rejectFilterC(ctx, candle.index, candle.trend, outcome.side)
-              ) {
-                // Global regime reject (Filter C). Do not consume — slot stays free.
-                row.result = "FAIL";
-                row.reason = FILTER_C_REASON;
-              } else if (
-                (options.enableFilterF ?? true) &&
-                outcome.side &&
-                rejectFilterF(ctx, candle.index, candle.trend, outcome.side)
-              ) {
-                // Global regime reject (Filter F). Do not consume — slot stays free.
-                row.result = "FAIL";
-                row.reason = FILTER_F_REASON;
-              } else if (
-                // Research candidates (forward-validation freeze, default OFF).
-                // Ordered after C and F so a candidate only sees setups that
-                // already passed both shipped filters and RR validation, and
-                // before consume() so a rejection leaves the slot free for a
-                // later refill. One at a time — never stacked before OOS.
-                (options.enableFilterD ?? false) &&
-                outcome.side &&
-                rejectFilterD(
-                  ctx,
-                  candle.index,
-                  candle.trend,
-                  outcome.side,
-                  outcome.entry ?? row.entry,
-                )
-              ) {
-                row.result = "FAIL";
-                row.reason = FILTER_D_REASON;
-              } else if (
-                (options.enableFilterH1214 ?? false) &&
-                rejectFilterH1214(ctx, candle.index)
-              ) {
-                row.result = "FAIL";
-                row.reason = FILTER_H1214_REASON;
-              } else if (
-                (options.enableFilterDojiHighVol ?? false) &&
-                rejectFilterDojiHighVol(ctx, candle.index)
-              ) {
-                row.result = "FAIL";
-                row.reason = FILTER_DOJI_HIGHVOL_REASON;
-              } else if (
-                (options.enableFilterDojiCompressed ?? false) &&
-                rejectFilterDojiCompressed(ctx, candle.index)
-              ) {
-                row.result = "FAIL";
-                row.reason = FILTER_DOJI_COMPRESSED_REASON;
-              } else if (outcome.consumeKey) {
-                // A2 fix: commit de-dupe slot only after spread/RR validation succeeds.
-                consume(ctx, strategy.id, outcome.consumeKey);
+              } else {
+                // v2.0 gate chain, in order: (2) min stop floor → (3) regime gate
+                // → (4) portfolio gate → (5) commit consume().
+                // Rejections leave the strategy's de-dupe slot free.
+                const minStopReason = checkMinStopFloor(
+                  math.entry,
+                  math.sl,
+                  atr[candle.index],
+                  ctx.spread,
+                );
+                const regimeReason =
+                  minStopReason === null && enableRegimeGate && outcome.side
+                    ? checkRegimeGate(ctx, candle.index, strategy.id, outcome.side)
+                    : null;
+                const portfolioReason =
+                  minStopReason === null &&
+                  regimeReason === null &&
+                  enablePortfolioGate &&
+                  outcome.side
+                    ? portfolioGate.canOpen(outcome.side, candle.index)
+                    : null;
+                const rejectReason = minStopReason ?? regimeReason ?? portfolioReason;
+                if (rejectReason !== null) {
+                  row.result = "FAIL";
+                  row.reason = rejectReason;
+                } else if (outcome.consumeKey) {
+                  // A2 fix: commit de-dupe slot only after validation succeeds.
+                  consume(ctx, strategy.id, outcome.consumeKey);
+                }
               }
             }
           }
@@ -364,6 +289,24 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
           row.exitPrice = status.resolutionPrice;
         }
         attachOutcome(row, status.resolutionLevel);
+        // LAYER 4: drawdown-throttled risk multiplier (0.5 / 1.0) + registration.
+        // Registration happens only after consume() succeeded, so the gate
+        // never tracks a candidate that was rejected.
+        if (enablePortfolioGate && isTradeStrategy(strategy.id) && outcome.side && row.rr !== undefined) {
+          const exitIndex = status.resolutionCandle ? status.resolutionCandle.index : Infinity;
+          const exitIndexClean =
+            status.setupStatus === "EXPIRED" ? Infinity : exitIndex;
+          portfolioGate.registerTrade({
+            strategyId: strategy.id,
+            side: outcome.side,
+            entryIndex: candle.index,
+            exitIndex: exitIndexClean,
+            rMultiple: row.rMultiple ?? 0,
+          });
+          row.riskMultiplier = portfolioGate.riskMultiplierAt(candle.index);
+        } else {
+          row.riskMultiplier = 1.0;
+        }
       }
       results.push(row);
     }
@@ -562,20 +505,11 @@ function resolvedWinRate(rows: ResultRow[]) {
  * HTF direction-alignment numbers per strategy — the Analysis page's
  * "HTF direction filter: before vs after" table.
  *
- * This used to run the whole engine TWICE on identical source data (once with
- * `enableHtfDirectionFilter: false`, once with `true`), on top of the analysis
- * the caller had just run. Measured on the locked 9738-row baseline: 2.11s for
- * the pair (~1.2s per pass) of blocked main thread — and both passes returned
- * identical rows, because the flag is inert for trade generation (see
- * `RunOptions.enableHtfDirectionFilter`: `runAnalysis` never reads it). Every
- * before/after pair was therefore equal by construction and the table's
- * "Δ win rate" column was always +0.0 pp.
- *
- * One pass returns byte-identical output at half the cost.
- * `tests/analyzer-htf-inert.test.mjs` pins both halves of that claim (the flag
- * is inert, and this function makes exactly one engine pass): if the filter is
- * ever activated that test fails first, and the two-pass comparison must be
- * restored here.
+ * The v2.0 regime gate applies htfAllowsDirection as G1 before consume(), so
+ * every PASS row is already HTF-aligned by construction. This function returns
+ * the same numbers on both sides of the table (they are equal by construction)
+ * so the UI's shape is unchanged; a before/after Δ of 0 pp is the honest
+ * output for a filter that ships default-on.
  */
 export function compareHtfDirectionFilter(csv: string): HtfFilterComparison[] {
   const run = runAnalysis(csv, ANALYZER_LIVE_OPTIONS);

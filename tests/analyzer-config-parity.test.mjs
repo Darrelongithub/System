@@ -10,10 +10,10 @@
  * call site:
  *
  *   1. the two shipped configurations differ in exactly one field
- *      (`seriesEndsComplete`), and neither pins a filter → which filters ship is
+ *      (`seriesEndsComplete`), and neither pins a gate → which gates ship is
  *      decided once, by the `runAnalysis` defaults;
- *   2. no file under `src/` outside `run.ts` may mention `enableFilterC` /
- *      `enableFilterF` — a call site cannot run a different rule set;
+ *   2. no file under `src/` outside `run.ts` may mention `enableRegimeGate` /
+ *      `enablePortfolioGate` — a call site cannot run a different rule set;
  *   3. the product entry points (live page, continuous backtest, golden
  *      generator, shared test fixture) use the shared configuration objects;
  *   4. running both configurations over the locked baseline differs only on the
@@ -47,13 +47,13 @@ test("config: live and certified differ only in the final-bar policy, and neithe
     ["certified", certified],
   ]) {
     assert(
-      !("enableFilterC" in cfg) && !("enableFilterF" in cfg),
-      `${name} config must not pin filter flags — shipped filters are defined by run.ts defaults`,
+      !("enableRegimeGate" in cfg) && !("enablePortfolioGate" in cfg),
+      `${name} config must not pin gates — shipped gates are defined by run.ts defaults`,
     );
   }
 });
 
-test("config: no src/ call site outside run.ts may toggle a filter", () => {
+test("config: no src/ call site outside run.ts may toggle a gate", () => {
   const offenders = [];
   const walk = (dir) => {
     for (const entry of readdirSync(dir)) {
@@ -64,12 +64,12 @@ test("config: no src/ call site outside run.ts may toggle a filter", () => {
       }
       if (!/\.(ts|tsx)$/.test(entry)) continue;
       if (full.endsWith("src/lib/analyzer/run.ts")) continue;
-      // Strip comments: the invariant is about *code* toggling a filter, and
+      // Strip comments: the invariant is about *code* toggling a gate, and
       // the config module documents the rule in prose.
       const code = readFileSync(full, "utf8")
         .replace(/\/\*[\s\S]*?\*\//g, "")
         .replace(/(^|[^:])\/\/.*$/gm, "$1");
-      if (/enableFilter[CF]/.test(code))
+      if (/enableRegimeGate|enablePortfolioGate/.test(code))
         offenders.push(full.replace(`${fileURLToPath(repoPath(""))}/`, ""));
     }
   };
@@ -77,7 +77,7 @@ test("config: no src/ call site outside run.ts may toggle a filter", () => {
   assertEqual(
     offenders.length,
     0,
-    `files toggling filters from a call site:\n  ${offenders.join("\n  ")}`,
+    `files toggling gates from a call site:\n  ${offenders.join("\n  ")}`,
   );
 });
 

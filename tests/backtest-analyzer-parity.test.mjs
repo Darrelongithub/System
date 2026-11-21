@@ -2,11 +2,11 @@
  * BACKTESTER ↔ ANALYZER PARITY — round-3 hostile audit, committed gates.
  *
  * Reference implementation: the certified Backtester config
- *   runAnalysis(csv, { enableHtfDirectionFilter: true, seriesEndsComplete: true })
+ *   runAnalysis(csv, { seriesEndsComplete: true })
  * which reproduces the locked golden row-for-row.
  *
  * Live Analyzer (AnalysisV2) runs the same engine with
- *   runAnalysis(csv, { enableHtfDirectionFilter: true, seriesEndsComplete: false })
+ *   runAnalysis(csv, { seriesEndsComplete: false })
  * — i.e. it treats the final bar as possibly-in-progress (live-candle safety,
  * F2). On static historical data that is an intentional, bounded policy
  * difference: these tests certify that under the Analyzer config
@@ -84,7 +84,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
   const g = aggregatesOf(golden),
     r = aggregatesOf(ref.analysis.tradePasses);
   assertEqual(ref.analysis.tradePasses.length, golden.length, "row count");
-  assertEqual(summary.totals.triggers, 2286, "locked trigger count");
+  assertEqual(summary.totals.triggers, 186, "locked trigger count");
   assert(
     Math.abs(g.r - summary.totals.rSum) / Math.max(1, Math.abs(summary.totals.rSum)) < 1e-12,
     "golden R internal precision",
@@ -97,7 +97,7 @@ test("parity: Backtester reference reproduces the locked golden exactly", () => 
     for (const f of TRADE_FIELDS) assert(nearly(t[f], norm(g0[f])), `${keyOf(t)} field ${f}`);
     exact += 1;
   }
-  assertEqual(exact, 2286, "all fields row-for-row");
+  assertEqual(exact, 186, "all fields row-for-row");
   assert(Math.abs(r.r - g.r) / Math.max(1, Math.abs(g.r)) < 1e-12, "aggregate R");
 });
 
@@ -143,10 +143,10 @@ test("parity: Backtest day-supplied accounting equals golden and per-strategy re
     totals.open += s.open;
     totals.noFill += s.noFill;
   }
-  assertEqual(totals.triggers, 2286, "bt triggers");
-  assertEqual(totals.tp, 750, "bt tp");
-  assertEqual(totals.sl, 1532, "bt sl");
-  assertEqual(totals.open, 4, "bt open");
+  assertEqual(totals.triggers, 186, "bt triggers");
+  assertEqual(totals.tp, 61, "bt tp");
+  assertEqual(totals.sl, 125, "bt sl");
+  assertEqual(totals.open, 0, "bt open");
   assertEqual(totals.noFill, 0, "bt noFill");
   assert(skippedDays > 0, "genuinely empty days still skipped");
   const perGolden = {};
@@ -306,8 +306,8 @@ test("parity: applyTriggers classifies every outcome class correctly (synthetic 
   // trades, so dataset-derived gates cannot see a NO_FILL misclassification.
   // This synthetic gate exercises every branch of the accounting funnel.
   const mk = (outcome, rMultiple) => ({
-    strategyId: "macd-cross",
-    strategy: "MACD Cross",
+    strategyId: "donchian-55-coiled",
+    strategy: "55-Bar Coiled Channel Breakout",
     datetime: "2025-01-02 03:00:00",
     side: "long",
     entry: 100,
@@ -325,7 +325,7 @@ test("parity: applyTriggers classifies every outcome class correctly (synthetic 
   });
   const state = { stats: {} };
   applyTriggers(state, [mk("TP", 3), mk("SL", -1), mk("OPEN", undefined), mk("NO_FILL", 0)]);
-  const s = state.stats["macd-cross"];
+  const s = state.stats["donchian-55-coiled"];
   assertEqual(s.triggers, 4, "all triggers counted");
   assertEqual(s.tpHits, 1, "tp classified");
   assertEqual(s.slHits, 1, "sl classified");
