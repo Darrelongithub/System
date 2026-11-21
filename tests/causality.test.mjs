@@ -10,7 +10,7 @@ import { readFileSync } from "node:fs";
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
 import { parseCsv } from "../src/lib/analyzer/parse.ts";
 
-const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
+const OPTIONS = { seriesEndsComplete: true };
 
 function splitDataLines(csv) {
   const lines = csv.split("\n");

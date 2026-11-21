@@ -431,9 +431,10 @@ export function evaluateSetupStatus(
       continue;
     }
 
-    // Deterministic same-candle ambiguity policy: when both TP and SL are
-    // touched on this post-fill candle, TP is checked first. This is not a
-    // claim about true tick order; changing it requires a golden re-baseline
+    // Deterministic same-candle tie-break (pessimistic): when a non-gap bar
+    // touches BOTH TP and SL, the trade resolves to SL — never TP. Intrabar
+    // tick order is unknowable from OHLC, and a pessimistic -1R resolution is
+    // the only honest choice. Changing this requires a golden re-baseline
     // (pinned by tests/causality.test.mjs and the golden trades).
     //
     // Gap-through is decided BEFORE any in-bar touch, and it is not ambiguous:
@@ -465,18 +466,10 @@ export function evaluateSetupStatus(
         };
       }
     }
-    if (touched(candle, row.tp)) {
-      return {
-        setupStatus: "RESOLVED",
-        candlesSinceTrigger,
-        statusNote: `TP hit at ${candle.datetime} at ${row.tp}`,
-        fillCandle,
-        resolutionCandle: candle,
-        resolutionPrice: row.tp,
-        resolutionLevel: "TP",
-      };
-    }
-    if (touched(candle, row.sl)) {
+    const tpHit = touched(candle, row.tp);
+    const slHit = touched(candle, row.sl);
+    // Pessimistic tie-break: SL wins on a same-candle touch, never TP.
+    if (slHit) {
       return {
         setupStatus: "RESOLVED",
         candlesSinceTrigger,
@@ -485,6 +478,17 @@ export function evaluateSetupStatus(
         resolutionCandle: candle,
         resolutionPrice: row.sl,
         resolutionLevel: "SL",
+      };
+    }
+    if (tpHit) {
+      return {
+        setupStatus: "RESOLVED",
+        candlesSinceTrigger,
+        statusNote: `TP hit at ${candle.datetime} at ${row.tp}`,
+        fillCandle,
+        resolutionCandle: candle,
+        resolutionPrice: row.tp,
+        resolutionLevel: "TP",
       };
     }
   }

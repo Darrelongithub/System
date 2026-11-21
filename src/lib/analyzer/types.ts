@@ -142,6 +142,12 @@ export interface ResultRow {
   exitPrice?: number | undefined;
   /** Realised R multiple: +rr on a target hit, -1 on a stop, partial for trailing exits. */
   rMultiple?: number | undefined;
+  /**
+   * Drawdown-throttle multiplier applied to this setup's risk (1.0 = unthrottled).
+   * Set by the portfolio gate when the rolling closed-trade sum over the last
+   * 20 trades is below the -4.0 floor. Consumed by the live engine for sizing.
+   */
+  riskMultiplier?: number | undefined;
   /** Full per-trigger reasoning, including requirements, ATR, SL/TP rationale and resolution. */
   detail?: string[] | undefined;
 }

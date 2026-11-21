@@ -11,27 +11,34 @@ import { evaluateSetupStatus } from "../src/lib/analyzer/status.ts";
 import { parseCsv } from "../src/lib/analyzer/parse.ts";
 
 function buildSet() {
+  // Sideways regime with bounded daily extremes for the EMA200 warm-up, then
+  // a 55-channel breakout, then a couple of quiet bars, then the untrusted final
+  // bar that spikes violently through the open trade's levels.
   let ms = Date.parse("2025-01-01T00:00:00+03:00");
   const rows = [];
   let p = 4000;
-  for (let i = 0; i < 120; i++) {
-    p += Math.sin(i / 5) * 2;
-    rows.push(csvRow(eatDateTime(ms), p, p + 3, p - 3, p + 0.5));
+  for (let i = 0; i < 240; i++) {
+    p += i % 2 === 0 ? 1.1 : -1.1;
+    rows.push(csvRow(eatDateTime(ms), p, p + 2.5, p - 2.5, p + 0.2));
     ms += 1800000;
   }
-  for (let i = 0; i < 10; i++) {
-    p += 30;
-    rows.push(csvRow(eatDateTime(ms), p - 28, p + 2, p - 30, p));
+  for (let i = 0; i < 30; i++) {
+    p += i % 2 === 0 ? 2.0 : -2.0;
+    rows.push(csvRow(eatDateTime(ms), p, p + 3.5, p - 3.5, p + 0.1));
     ms += 1800000;
   }
-  const spike = p + 80;
+  // Trigger bar: sharp breakout above the 55-bar channel.
+  const triggerPrice = p + 55;
+  rows.push(csvRow(eatDateTime(ms), p + 20, triggerPrice + 6, triggerPrice - 4, triggerPrice));
+  ms += 1800000;
+  // Quiet bars after the trigger — the trade must stay OPEN through this window.
   for (let i = 0; i < 3; i++) {
-    p -= 1;
-    rows.push(csvRow(eatDateTime(ms), p + 1, p + 2, p - 1, p));
+    p += 0.4;
+    rows.push(csvRow(eatDateTime(ms), p, p + 3.0, p - 3.0, p + 0.1));
     ms += 1800000;
   }
-  // Final (untrusted) bar spikes violently through open trades' levels.
-  rows.push(csvRow(eatDateTime(ms), p, spike, p - 2, spike - 1));
+  // Final (untrusted) bar spikes violently through the open trade's levels.
+  rows.push(csvRow(eatDateTime(ms), p, triggerPrice + 120, p - 4, triggerPrice + 100));
   return rows;
 }
 

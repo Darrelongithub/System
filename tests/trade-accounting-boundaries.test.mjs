@@ -12,8 +12,8 @@
  *     the fill bar itself;
  *   - a limit/stop entry whose protective level also trades on the fill bar is
  *     reported FILLED with an explicit ambiguity note — no outcome is invented;
- *   - when a later bar touches both TP and SL, TP is evaluated first (a
- *     deterministic policy, not a claim about intrabar tick order);
+ *   - when a later bar touches both TP and SL, SL is evaluated first (the
+ *     pessimistic tie-break; decision-grade SL, never a faked TP);
  *   - a stop broken before the entry ever fills expires the setup;
  *   - a setup that never fills expires after the declared number of waiting bars.
  *
@@ -86,15 +86,15 @@ test("accounting: a market entry fills at the trigger close and is not resolved 
   assertEqual(later.resolutionCandle?.index, 1, "resolution recorded on the touching bar");
 });
 
-test("accounting: when a later bar touches BOTH levels, TP is evaluated first", () => {
+test("accounting: when a later bar touches BOTH levels, SL is evaluated first (pessimistic)", () => {
   const candles = [
     candle(0, stamp(0), { open: 100, high: 100.5, low: 99.5, close: 100 }),
     candle(1, stamp(1), { open: 100, high: 104, low: 97, close: 99 }),
   ];
   const status = evaluateSetupStatus(longRow(0, { entry: 100, sl: 98, tp: 103 }), candles);
   assertEqual(status.setupStatus, "RESOLVED", "the bar resolves the trade");
-  assertEqual(status.resolutionLevel, "TP", "TP wins the same-candle tie (documented policy)");
-  assertEqual(status.resolutionPrice, 103, "resolution price is the TP level");
+  assertEqual(status.resolutionLevel, "SL", "SL wins the same-candle tie (pessimistic policy)");
+  assertEqual(status.resolutionPrice, 98, "resolution price is the SL level");
   assertEqual(status.resolutionCandle?.index, 1, "resolution recorded on the touching bar");
 });
 
@@ -176,8 +176,8 @@ test("accounting: short setups mirror long setups", () => {
   const row = { ...longRow(0, { entry: 100, sl: 103, tp: 97 }), side: "short" };
   const status = evaluateSetupStatus(row, candles);
   assertEqual(status.setupStatus, "RESOLVED", "short trade resolves");
-  assertEqual(status.resolutionLevel, "TP", "the short's TP is below entry and was touched");
-  assertEqual(status.resolutionPrice, 97, "resolution price is the short TP");
+  assertEqual(status.resolutionLevel, "SL", "the short's SL wins the same-candle tie");
+  assertEqual(status.resolutionPrice, 103, "resolution price is the short's SL");
 });
 
 test("accounting: a market entry on the final bar of a certified series stays open, never resolved", () => {

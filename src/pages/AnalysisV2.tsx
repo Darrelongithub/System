@@ -312,13 +312,10 @@ export default function AnalysisV2() {
                     HTF direction filter: before vs after
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Baseline and filtered runs use the same CSV, structure, RR rules, and
-                    no-lookahead HTF context. The HTF direction filter is currently{" "}
-                    <strong className="font-medium text-foreground">inert</strong> for trade
-                    generation (see <code className="num">RunOptions.enableHtfDirectionFilter</code>
-                    ), so Before and After are identical by construction and Δ win rate is always
-                    +0.0 pp — read the trend-fighting count as an alignment mix, not as a filter
-                    effect.
+                    Every PASS row is already HTF-aligned by construction — the v2.0 regime
+                    gate enforces htfAllowsDirection (G1) before consume(). Before and After
+                    are therefore identical by construction and Δ win rate is always +0.0 pp —
+                    read the trend-fighting count as an alignment mix, not as a filter effect.
                   </p>
                   <div className="overflow-x-auto rounded-md border border-border">
                     <table className="data-table w-full text-xs">

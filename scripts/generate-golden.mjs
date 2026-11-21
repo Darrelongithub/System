@@ -50,12 +50,13 @@ const TRADE_FIELDS = [
 // what makes "which code state does this lock describe?" answerable later.
 const sha256 = (text) => createHash("sha256").update(text, "utf8").digest("hex");
 const RULE_SOURCES = [
-  "src/lib/analyzer/regime-filters.ts",
   "src/lib/analyzer/run.ts",
-  "src/lib/analyzer/strategies/final-survivors.ts",
-  // Added v1.8.2: status.ts decides how (and at what price) a setup resolves,
-  // so it shapes the locked rows exactly like the entry rules do.
+  "src/lib/analyzer/regime-state.ts",
+  "src/lib/analyzer/portfolio-gate.ts",
+  "src/lib/analyzer/strategies/v2-regime-bots.ts",
+  "src/lib/analyzer/math.ts",
   "src/lib/analyzer/status.ts",
+  "src/lib/analyzer/structure.ts",
 ];
 const inputHashes = {
   baselineCsv: sha256(CSV),
@@ -94,15 +95,25 @@ const agg = (rows) => {
   return a;
 };
 
-// Preserve the historical per-strategy key order for a stable diff.
-const priorSummary = JSON.parse(
-  readFileSync(new URL("../artifacts/golden-summary.json", import.meta.url), "utf8"),
-);
-const order = Object.keys(priorSummary.perStrategy ?? {});
+// Per-strategy order follows the current production registry (v2.0 bots first),
+// filtered to strategies that actually fired — the legacy v1.8 keys carry 0
+// trades and would only pad the summary with empty bookkeeping.
+const REGISTRY_ORDER = [
+  "donchian-55-coiled",
+  "ny-pivot-s1r1-reject",
+  "killzone-orb-stretch",
+  "supertrend-ema-pullback",
+  "keltner-squeeze-release",
+  "asymmetric-vol-breakout",
+  "kijun-cloud-continuation",
+  "engulfing-zone-retest",
+];
 
 const perStrategy = {};
-for (const id of order) {
-  const a = agg(analysis.tradePasses.filter((t) => t.strategyId === id));
+for (const id of REGISTRY_ORDER) {
+  const rows = analysis.tradePasses.filter((t) => t.strategyId === id);
+  if (rows.length === 0) continue;
+  const a = agg(rows);
   perStrategy[id] = {
     triggers: a.triggers,
     tp: a.tp,
@@ -112,7 +123,7 @@ for (const id of order) {
     rSum: a.rSum,
   };
 }
-// Any strategy not present in the prior summary (shouldn't happen) is appended.
+// Any other strategy that fired is appended (defensive — shouldn't happen).
 for (const t of analysis.tradePasses) {
   if (!(t.strategyId in perStrategy)) {
     perStrategy[t.strategyId] = agg(
@@ -138,12 +149,9 @@ const summary = {
   // regression lock would be replaying a series the live product refuses.
   seriesContract: analysis.contract,
   note:
-    "v1.8.2 re-baseline: gap-fill exit correction (see logs/v1.8.2-gap-fill-resolution.md). " +
-    "A bar that opens beyond a tracked stop/target and never trades it now resolves at that " +
-    "bar's open instead of leaving the position alive to a later touch; 52 of 2286 rows were " +
-    "priced that way (one booked as a +2.41R winner was a ~-2.0R loss). Trade count, entries, " +
-    "stops and targets are unchanged. Previous lock v1.8: 2286 / R 541.3570458970024 " +
-    "(Filter C + Filter F, 751 TP / 1531 SL).",
+    "v2.0 re-baseline: regime-gated ruleset. Replaces the retired v1.8 9-strategy " +
+    "ruleset and all regime filters with 8 regime-routed bots behind the Layer 1-4 gates " +
+    "(spread→RR→min stop floor→regime gate→portfolio gate). See logs/v2.0-regime-bots.md.",
 };
 
 // ---- golden-regression-report.json (self-consistent: current == golden) ----

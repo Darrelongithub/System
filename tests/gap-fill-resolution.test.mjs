@@ -205,23 +205,23 @@ test("gap fill: the locked baseline books every gapped exit at the gap bar's ope
       `exit strictly after trigger on ${t.strategyId}@${t.index}`,
     );
   }
-  // Blast radius on the locked baseline; moves only with a documented re-baseline.
-  assertEqual(gapped, 52, "gap-resolved trades in the locked book");
+  // Blast radius on the locked baseline (v2.0); moves only with a documented re-baseline.
+  assertEqual(gapped, 9, "gap-resolved trades in the locked book");
 });
 
-test("gap fill: the baseline's recorded false winner is booked as the loss it was", async () => {
+test("gap fill: the baseline's gapped stop is booked at the gap bar's open", async () => {
   const analysis = await baselineAnalysis();
   const t = analysis.tradePasses.find(
-    (x) => x.strategyId === "three-soldiers" && x.datetime === "2025-12-20 00:00:00",
+    (x) => x.strategyId === "killzone-orb-stretch" && x.datetime === "2026-04-09 13:00:00",
   );
-  assert(t, "the three-soldiers short must be in the book");
-  assertEqual(t.side, "short", "fixture row identity");
-  // 2025-12-22 03:00 EAT opens at 4354.28, above the 4346.02 stop, and never
-  // trades it. The old gap-blind engine ignored that bar, later "hit" the
-  // 4318.265 target and recorded +2.414R for a trade that lost ~2R.
+  assert(t, "the killzone-orb-stretch long must be in the book");
+  assertEqual(t.side, "long", "fixture row identity");
+  // 2026-04-13 03:00 EAT opens at 4669.24, under the 4703.77 stop, and never
+  // trades it. The gap-blind engine would ignore that bar; the gap-aware engine
+  // resolves the trade at the open.
   assertEqual(t.outcome, "SL", "the gap-through stop is the outcome");
-  assertEqual(t.exitDatetime, "2025-12-22 03:00:00", "resolved on the gap bar, not weeks later");
-  assertEqual(t.exitPrice, 4354.28, "exited at the gap bar's open");
+  assertEqual(t.exitDatetime, "2026-04-13 03:00:00", "resolved on the gap bar");
+  assertEqual(t.exitPrice, 4669.24, "exited at the gap bar's open");
   assert(
     t.rMultiple !== undefined && t.rMultiple < -2,
     `the loss must be reported truthfully, got ${t.rMultiple}`,
@@ -235,5 +235,5 @@ test("gap fill: the certified book still satisfies the shipped configuration", (
     const level = t.outcome === "TP" ? t.tp : t.sl;
     return (t.outcome === "TP" || t.outcome === "SL") && t.exitPrice !== level;
   });
-  assertEqual(gapped.length, 52, "same blast radius under the shipped configuration");
+  assertEqual(gapped.length, 9, "same blast radius under the shipped configuration");
 });

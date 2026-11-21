@@ -142,7 +142,8 @@ test("golden: records which baseline data and rule sources it was generated from
   );
   assertEqual(summary.options.seriesEndsComplete, true, "certified run treats every row as closed");
   assert(
-    !("enableFilterC" in summary.options) && !("enableFilterF" in summary.options),
-    "the golden must be produced by the shipped defaults, not by pinned filter flags",
+    !("enableRegimeGate" in summary.options) &&
+      !("enablePortfolioGate" in summary.options),
+    "the golden must be produced by the shipped defaults, not by pinned gate flags",
   );
 });

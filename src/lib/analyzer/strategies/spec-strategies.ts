@@ -4,7 +4,7 @@ import { eatDay } from "../time";
 import { daysBeforeTail, lastDayBefore } from "../day-lookup";
 import { turtleRun } from "./turtle";
 import { isConsumed, consume } from "./util";
-import { FINAL_TRADE_STRATEGIES } from "./final-survivors";
+import { V2_TRADE_STRATEGIES } from "./v2-regime-bots";
 import { CRABEL_ORB_WINDOW_MINUTES } from "@/lib/strategies/crabel-orb";
 const c = (ctx: AnalysisContext, i: number) => ctx.candles[i]!;
 const pass = (
@@ -396,7 +396,7 @@ const CONTEXT_STRATEGIES: StrategyCheck[] = [
 
 /**
  * Legacy / reference trade systems retained for research and explicit strategyIds runs.
- * Not part of the default production set (see FINAL_TRADE_STRATEGIES / FINAL_STRATEGY_IDS).
+ * Not part of the default production set (see V2_TRADE_STRATEGIES / V2_STRATEGY_IDS).
  */
 const LEGACY_TRADE_STRATEGIES: StrategyCheck[] = [turtleSpec, orbSpec];
 
@@ -407,12 +407,12 @@ const LEGACY_TRADE_STRATEGIES: StrategyCheck[] = [turtleSpec, orbSpec];
  */
 export const ALL_STRATEGY_IMPLEMENTATIONS: StrategyCheck[] = [
   ...LEGACY_TRADE_STRATEGIES,
-  ...FINAL_TRADE_STRATEGIES,
+  ...V2_TRADE_STRATEGIES,
   ...CONTEXT_STRATEGIES,
 ];
 
 /**
- * Default production strategy set: the 9 locked final trade strategies plus context diagnostics.
+ * Default production strategy set: the 8 regime-routed trade bots plus context diagnostics.
  * Turtle and Opening-Range-Breakout are intentionally excluded from unfiltered analysis.
  */
-export const SPEC_STRATEGIES: StrategyCheck[] = [...FINAL_TRADE_STRATEGIES, ...CONTEXT_STRATEGIES];
+export const SPEC_STRATEGIES: StrategyCheck[] = [...V2_TRADE_STRATEGIES, ...CONTEXT_STRATEGIES];

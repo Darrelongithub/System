@@ -103,10 +103,10 @@ test("accounting: every trade's R recomputes independently from row-level fields
       assert(t.sl > t.entry, `short SL above entry ${t.strategyId}@${t.index}`);
     else assert(t.sl < t.entry, `long SL below entry ${t.strategyId}@${t.index}`);
   }
-  assert(checked > 2000, `fixture sanity: expected >2000 resolved trades, got ${checked}`);
+  assert(checked > 100, `fixture sanity: expected >100 resolved trades, got ${checked}`);
   // Both fill classes exist on the locked baseline: the level-fill path is the
   // common case, and the gap path is the one this suite exists to protect.
-  assert(levelFills > 2000, `expected >2000 level fills, got ${levelFills}`);
+  assert(levelFills > 100, `expected >100 level fills, got ${levelFills}`);
   assert(gapFills > 0, "the baseline exercises at least one gap-through fill");
 });
 
@@ -126,5 +126,5 @@ test("accounting: exit prices stay inside the resolving candle's OHLC", async ()
       `exit ${t.exitPrice} outside [${candle.low}, ${candle.high}] on ${t.strategyId}@${t.index}`,
     );
   }
-  assert(checked > 2000, `fixture sanity: expected >2000 resolved exits, got ${checked}`);
+  assert(checked > 100, `fixture sanity: expected >100 resolved exits, got ${checked}`);
 });

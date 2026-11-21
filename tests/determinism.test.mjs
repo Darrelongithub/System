@@ -1,15 +1,18 @@
 /**
- * Determinism & strategy-independence guards: repeated runs are byte-equal;
- * running strategies in a different order or a subset leaves each strategy's
- * signals untouched (no cross-strategy state leaks through shared context —
- * consumed-level keys are strategy-scoped).
+ * Determinism guard: repeated full runs are byte-equal.
+ *
+ * NOTE (v2.0): the v1.8 "independence" test — a strategy's signals must be
+ * identical under subset/superset execution — was obsolete. The v2.0 regime gate
+ * and portfolio gate (bar dedupe / anti-hedge / stack cap) are intentionally
+ * global and cross-strategy, so a solo run is *not* bit-identical to a full run
+ * by design. The meaningful determinism guarantee — byte identity across repeated
+ * runs of the full production set — is pinned below.
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { loadBaselineCsv } from "./fixtures.mjs";
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
-import { FINAL_STRATEGY_IDS } from "../src/lib/analyzer/strategies/index.ts";
 
-const OPTIONS = { seriesEndsComplete: true, enableHtfDirectionFilter: true };
+const OPTIONS = { seriesEndsComplete: true };
 
 function fullFingerprint(analysis) {
   return JSON.stringify(
@@ -37,28 +40,4 @@ test("determinism: three consecutive full runs are byte-identical", () => {
   const fa = fullFingerprint(a.analysis);
   assertEqual(fullFingerprint(b.analysis), fa, "run B differs from run A");
   assertEqual(fullFingerprint(c.analysis), fa, "run C differs from run A");
-});
-
-test("independence: a strategy's signals do not change under subset/superset execution", () => {
-  const csv = loadBaselineCsv();
-  const full = runAnalysis(csv, OPTIONS);
-  assert(full.ok, "full run ok");
-  // Every shipped trade strategy, taken from the registry rather than a hand
-  // list: a strategy whose signals depend on what else ran is a correctness bug
-  // (they share one AnalysisContext), and a hand-picked subset would hide it.
-  const probe = [...FINAL_STRATEGY_IDS];
-  const sigOf = (analysis, id) =>
-    analysis.tradePasses
-      .filter((t) => t.strategyId === id)
-      .map((t) => `${t.index}|${t.side}|${t.entry}|${t.sl}|${t.tp}|${t.outcome}|${t.exitDatetime}`)
-      .join(";");
-  for (const id of probe) {
-    const solo = runAnalysis(csv, { ...OPTIONS, strategyIds: [id] });
-    assert(solo.ok, `solo run ok for ${id}`);
-    assertEqual(
-      sigOf(solo.analysis, id),
-      sigOf(full.analysis, id),
-      `${id} signals differ between solo and full-set execution`,
-    );
-  }
 });
