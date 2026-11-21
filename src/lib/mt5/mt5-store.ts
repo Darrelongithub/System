@@ -4,6 +4,7 @@
 
 import { useSyncExternalStore } from "react";
 import { mt5Engine } from "./engine";
+import { V2_STRATEGY_IDS } from "@/lib/analyzer/strategies/v2-regime-bots";
 import { newsManager } from "./news-filter";
 import {
   DEFAULT_MT5_CONFIG,
@@ -91,6 +92,16 @@ if (typeof window !== "undefined") {
     const savedConfig = window.localStorage.getItem(STORAGE_KEY_CONFIG);
     if (savedConfig) {
       const parsed = JSON.parse(savedConfig);
+      // v2.0 migration: a persisted v1.8 strategy list carries zero valid v2.0
+      // IDs — reset it to the full v2.0 set rather than silently rejecting
+      // every new signal. A list that already holds at least one valid v2.0
+      // ID is preserved as-is.
+      if (
+        Array.isArray(parsed.strategies) &&
+        !parsed.strategies.some((id) => (V2_STRATEGY_IDS as readonly string[]).includes(id))
+      ) {
+        parsed.strategies = [...V2_STRATEGY_IDS];
+      }
       mt5Engine.setConfig(parsed);
       state.config = mt5Engine.getConfig();
     }

@@ -230,37 +230,99 @@ string BuildTelemetryJson()
 void ProcessBridgeResponse(string json)
 {
    if(StringFind(json, "\\"commands\\":") < 0) return;
-   
-   // Check for trade command
-   // Expected format: {"commands":[{"id":"...","action":"OPEN","symbol":"XAUUSD","type":"BUY","volume":0.1,"sl":2640.0,"tp":2670.0,"comment":"SFP-macd-cross"}]}
-   int cmdPos = StringFind(json, "\\"action\\":\\"OPEN\\"");
-   if(cmdPos > 0)
+
+   // OPEN commands — iterate every { ... } member of "commands", not just
+   // the first one. Each marker is isolated (objStart..objEnd) and dispatched.
+   int cursor = 0;
+   while(true)
    {
-      string symbol = ExtractJsonString(json, "symbol");
-      string typeStr = ExtractJsonString(json, "type");
-      double volume = ExtractJsonDouble(json, "volume");
-      double sl = ExtractJsonDouble(json, "sl");
-      double tp = ExtractJsonDouble(json, "tp");
-      string comment = ExtractJsonString(json, "comment");
-      string cmdId = ExtractJsonString(json, "id");
-      
-      if(volume > InpMaxLotSize) volume = InpMaxLotSize;
-      if(volume < 0.01) volume = 0.01;
-      
-      ExecuteTradeCommand(cmdId, symbol, typeStr, volume, sl, tp, comment);
-   }
-   
-   // Check for close command
-   int closePos = StringFind(json, "\\"action\\":\\"CLOSE\\"");
-   if(closePos > 0)
-   {
-      ulong ticket = (ulong)ExtractJsonDouble(json, "ticket");
-      if(ticket > 0)
+      int openPos = StringFind(json, "\\"action\\":\\"OPEN\\"", cursor);
+      if(openPos < 0) break;
+
+      int objStart = -1;
+      int objEnd = -1;
+      for(int p = openPos; p >= 0; p--)
       {
-         m_trade.PositionClose(ticket);
-         Print("✅ [SignalFinderBridge] Closed Position Ticket #", ticket);
+         if(StringGetCharacter(json, p) == '{') { objStart = p; break; }
+      }
+      for(int p = openPos; p < StringLen(json); p++)
+      {
+         if(StringGetCharacter(json, p) == '}') { objEnd = p; break; }
+      }
+      if(objStart >= 0 && objEnd >= 0)
+      {
+         string obj = StringSubstr(json, objStart, objEnd - objStart + 1);
+
+         string symbol = ExtractJsonString(obj, "symbol");
+         string typeStr = ExtractJsonString(obj, "type");
+         double volume = ExtractJsonDouble(obj, "volume");
+         double sl = ExtractJsonDouble(obj, "sl");
+         double tp = ExtractJsonDouble(obj, "tp");
+         string comment = ExtractJsonString(obj, "comment");
+         string cmdId = ExtractJsonString(obj, "id");
+
+         if(volume > InpMaxLotSize) volume = InpMaxLotSize;
+         if(volume < 0.01) volume = 0.01;
+
+         ExecuteTradeCommand(cmdId, symbol, typeStr, volume, sl, tp, comment);
+      }
+      cursor = openPos + 1;
+   }
+
+   // CLOSE commands — same cursor loop
+   cursor = 0;
+   while(true)
+   {
+      int closePos = StringFind(json, "\\"action\\":\\"CLOSE\\"", cursor);
+      if(closePos < 0) break;
+
+      int objStart = -1;
+      int objEnd = -1;
+      for(int p = closePos; p >= 0; p--)
+      {
+         if(StringGetCharacter(json, p) == '{') { objStart = p; break; }
+      }
+      for(int p = closePos; p < StringLen(json); p++)
+      {
+         if(StringGetCharacter(json, p) == '}') { objEnd = p; break; }
+      }
+      if(objStart >= 0 && objEnd >= 0)
+      {
+         string obj = StringSubstr(json, objStart, objEnd - objStart + 1);
+         ulong ticket = (ulong)ExtractJsonDouble(obj, "ticket");
+         if(ticket > 0)
+         {
+            m_trade.PositionClose(ticket);
+            Print("✅ [SignalFinderBridge] Closed Position Ticket #", ticket);
+         }
+      }
+      cursor = closePos + 1;
+   }
+}
+
+//+------------------------------------------------------------------+
+//| Opposite-side anti-hedge guard (terminal level)                 |
+//| Block fills that would open the signal's opposite side while an |
+//| opposite-side position exists on the same symbol.               |
+//+------------------------------------------------------------------+
+bool HasOppositePositionOpen(string sym, string typeStr)
+{
+   string tradeSymbol = NormalizeSymbol(sym);
+   for(int i = 0; i < PositionsTotal(); i++)
+   {
+      if(m_position.SelectByIndex(i))
+      {
+         if(m_position.Magic() == InpMagicNumber || InpMagicNumber == 0)
+         {
+            if(m_position.Symbol() == tradeSymbol)
+            {
+               if(typeStr == "BUY" && m_position.PositionType() == POSITION_TYPE_SELL) return true;
+               if(typeStr == "SELL" && m_position.PositionType() == POSITION_TYPE_BUY) return true;
+            }
+         }
       }
    }
+   return false;
 }
 
 //+------------------------------------------------------------------+
@@ -274,7 +336,13 @@ void ExecuteTradeCommand(string id, string sym, string typeStr, double volume, d
       Print("❌ [SignalFinderBridge] Symbol not found on broker: ", sym, " (tried ", tradeSymbol, ")");
       return;
    }
-   
+
+   if(HasOppositePositionOpen(tradeSymbol, typeStr))
+   {
+      Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): opposite-side position already open (anti-hedge).");
+      return;
+   }
+
    m_symbol.RefreshRates();
    
    if(!InpAllowAutoSl) sl = 0;

@@ -3,7 +3,6 @@ import {
   Activity,
   Cloud,
   Copy,
-  Cpu,
   Download,
   Flame,
   Lock,
@@ -33,7 +32,7 @@ import {
   toggleAutoTrading,
   useMT5State,
 } from "@/lib/mt5/mt5-store";
-import { FINAL_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
+import { V2_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
 import type { ResultRow } from "@/lib/analyzer/types";
 import { checkNewsBlackout } from "@/lib/mt5/news-filter";
 import { cn } from "@/lib/utils";
@@ -129,7 +128,7 @@ const fmtMoney = (value: number | undefined | null) =>
 export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5AutomationPanelProps) {
   const mt5 = useMT5State();
   const [activeTab, setActiveTab] = useState<
-    "dashboard" | "news" | "rules" | "bridge" | "standalone_ea" | "cloud_daemon"
+    "dashboard" | "news" | "rules" | "bridge" | "cloud_daemon"
   >("dashboard");
   const [isConnecting, setIsConnecting] = useState(false);
   const [serverSnap, setServerSnap] = useState<ServerSnapshot | null>(null);
@@ -488,11 +487,6 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             label: "MT5 Login & Real-Trade Bridge",
             icon: Lock,
             badge: "Recommended",
-          },
-          {
-            id: "standalone_ea",
-            label: "24/7 Standalone MT5 EA (Offline)",
-            icon: Cpu,
           },
           { id: "cloud_daemon", label: "24/7 Server Daemon", icon: Cloud },
         ].map((tab) => {
@@ -1040,10 +1034,10 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           {/* Strategy Whitelist Selector */}
           <div className="flex flex-col gap-2.5">
             <Label className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Active Strategies for Auto-Execution (Production 9)
+              Active Strategies for Auto-Execution (Production 8 — Regime-Routed v2.0)
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              {FINAL_TRADE_STRATEGIES.map((strat) => {
+              {V2_TRADE_STRATEGIES.map((strat) => {
                 const isChecked = configForm.strategies.includes(strat.id);
                 return (
                   <label
@@ -1272,115 +1266,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
         </div>
       )}
 
-      {/* ─── TAB 5: 24/7 STANDALONE MT5 EA (OFFLINE CAPABLE) ─── */}
-      {activeTab === "standalone_ea" && (
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-5">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded bg-emerald-500 text-black px-2 py-0.5 text-[10px] font-black uppercase">
-                  100% Offline Capable
-                </span>
-                <span className="rounded bg-red-500 text-white px-2 py-0.5 text-[10px] font-black uppercase">
-                  🔴 Built-In Red Folder News Filter
-                </span>
-                <h3 className="text-base font-bold text-foreground">
-                  SignalFinderPro_247_Autotrader.mq5
-                </h3>
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Embeds all 9 strategy algorithms and <strong>Red Folder News Protection</strong>{" "}
-                directly inside MetaTrader 5. Once attached to your MT5 chart (on PC or $5/mo VPS),
-                it executes{" "}
-                <strong>
-                  Auto Entry, Auto SL, Auto TP and pauses on High-Impact News 24/7/365
-                </strong>{" "}
-                with zero dependency on your browser or phone!
-              </p>
-            </div>
-            <Button
-              asChild
-              className="font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"
-            >
-              <a href="/api/mt5/ea?type=standalone" download="SignalFinderPro_247_Autotrader.mq5">
-                <Download className="mr-2 size-4" /> Download 24/7 Standalone EA
-              </a>
-            </Button>
-          </div>
-
-          {/* Honest port disclosure */}
-          <div className="rounded-xl border border-amber-500/40 bg-amber-950/20 px-4 py-3 text-xs text-amber-200/90">
-            <strong className="text-amber-200 uppercase tracking-wide text-[10px] mr-2">
-              Honest note
-            </strong>
-            This standalone file is a native MQL5 re-implementation of the strategies — it is NOT
-            the exact TypeScript engine that produces signals in this web app, so small drift is
-            possible. For exact parity with the signals you see here, use the{" "}
-            <button
-              type="button"
-              className="font-bold underline underline-offset-2 text-amber-100"
-              onClick={() => setActiveTab("bridge")}
-            >
-              Real-Trade Bridge
-            </button>{" "}
-            instead.
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="flex flex-col gap-2 rounded-xl border border-border/60 bg-secondary/30 p-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                <Cpu className="size-4 text-emerald-400" /> Standalone MT5 EA Features
-              </h4>
-              <ul className="flex flex-col gap-1.5 text-xs text-muted-foreground list-disc pl-4">
-                <li>
-                  <strong className="text-foreground">Runs 24/7 inside MT5:</strong> Works when your
-                  computer is sleeping, closed, or offline (on a VPS or PC).
-                </li>
-                <li>
-                  <strong className="text-foreground">🔴 Red Folder News Filter:</strong> Uses MT5
-                  Economic Calendar to pause trading before/after High Impact news.
-                </li>
-                <li>
-                  <strong className="text-foreground">Dynamic Lot Sizing:</strong> Automatically
-                  calculates lot size based on account equity and stop loss points.
-                </li>
-                <li>
-                  <strong className="text-foreground">Built-in Auto SL & TP:</strong> Sets
-                  strategy-defined stop losses and profit targets on every order.
-                </li>
-              </ul>
-            </div>
-
-            <div className="flex flex-col gap-2 rounded-xl border border-border/60 bg-secondary/30 p-4">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-foreground flex items-center gap-2">
-                <Zap className="size-4 text-primary" /> Setup in 2 Minutes
-              </h4>
-              <ol className="flex flex-col gap-2 text-xs text-muted-foreground list-decimal pl-4">
-                <li>
-                  Download{" "}
-                  <code className="text-primary font-mono">SignalFinderPro_247_Autotrader.mq5</code>
-                </li>
-                <li>
-                  In MT5, click{" "}
-                  <code className="font-mono text-foreground">
-                    File → Open Data Folder → MQL5 → Experts
-                  </code>{" "}
-                  and paste the file.
-                </li>
-                <li>
-                  Restart MT5 or right-click <strong>Expert Advisors → Refresh</strong>.
-                </li>
-                <li>
-                  Drag the EA onto your chart (e.g. <strong>XAUUSD M30</strong>), enable{" "}
-                  <strong>Algo Trading</strong>, and you're set!
-                </li>
-              </ol>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ─── TAB 6: 24/7 SERVER DAEMON (REAL FEED) ─── */}
+      {/* ─── TAB 5: 24/7 SERVER DAEMON (REAL FEED) ─── */}
       {activeTab === "cloud_daemon" && (
         <div className="flex flex-col gap-6">
           <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-primary/30 bg-primary/10 p-5">
@@ -1395,7 +1281,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
               </div>
               <p className="mt-1 text-xs text-muted-foreground max-w-2xl">
                 Runs inside this app's server process (not the browser). On every closed 30-minute
-                bar it fetches real candles from the configured provider, runs the exact 9
+                bar it fetches real candles from the configured provider, runs the exact 8
                 production strategies, and dispatches signals to the engine — respecting Red Folder
                 news blackouts. With no provider key configured it fetches nothing and says so.
               </p>

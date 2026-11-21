@@ -4,7 +4,6 @@
 import { test, assert, assertEqual } from "./tiny.mjs";
 import { calculateLotSize, mt5Engine } from "../src/lib/mt5/engine.ts";
 import { generateMql5EaSource } from "../src/lib/mt5/mql5-ea.ts";
-import { generateStandalone247EaSource } from "../src/lib/mt5/standalone-ea.ts";
 import { serverDaemon } from "../src/lib/mt5/server-daemon.ts";
 import {
   getCurrenciesForSymbol,
@@ -239,36 +238,6 @@ test("mt5: generateMql5EaSource produces complete MQL5 Expert Advisor bridge cod
   assert(eaCode.includes("PollBridgeAndExecute"), "Contains polling routine");
   assert(eaCode.includes("m_trade.Buy"), "Contains CTrade Buy execution");
   assert(eaCode.includes("m_trade.Sell"), "Contains CTrade Sell execution");
-});
-
-test("mt5: generateStandalone247EaSource produces autonomous 24/7 offline-capable MQL5 EA with Red Folder News Guard", () => {
-  const standaloneEa = generateStandalone247EaSource({
-    magicNumber: 992200,
-    riskPct: 1.5,
-    fixedLot: 0.2,
-    minRr: 2.0,
-    newsFilterEnabled: true,
-    newsMinsBefore: 30,
-    newsMinsAfter: 30,
-  });
-
-  assert(
-    standaloneEa.includes("SignalFinderPro_247_Autotrader.mq5"),
-    "Contains standalone 24/7 EA header",
-  );
-  assert(standaloneEa.includes("InpEnableNewsFilter"), "Embeds Red Folder News Filter input");
-  assert(standaloneEa.includes("IsNewsBlackout"), "Embeds native MT5 News Blackout check");
-  assert(standaloneEa.includes("CheckMacdCross"), "Embeds MACD Cross strategy natively");
-  assert(standaloneEa.includes("CheckDualThrust"), "Embeds Dual Thrust strategy natively");
-  assert(standaloneEa.includes("CheckPdhRetest"), "Embeds PDH Retest strategy natively");
-  assert(standaloneEa.includes("CheckClassicPivot"), "Embeds Classic Pivot strategy natively");
-  assert(standaloneEa.includes("CheckWilliamsFade"), "Embeds Williams %R strategy natively");
-  assert(standaloneEa.includes("CheckThreeSoldiers"), "Embeds Three Soldiers strategy natively");
-  assert(standaloneEa.includes("CheckMorningStar"), "Embeds Morning Star strategy natively");
-  assert(standaloneEa.includes("CheckIchimokuTk"), "Embeds Ichimoku TK strategy natively");
-  assert(standaloneEa.includes("CheckDonchian55"), "Embeds Donchian 55 strategy natively");
-  assert(standaloneEa.includes("CalculateLots"), "Embeds dynamic risk % lot sizing");
-  assert(standaloneEa.includes("OpenTrade"), "Embeds auto entry, SL, and TP execution");
 });
 
 test("mt5: serverDaemon provides autonomous 24/7 cloud background execution", () => {

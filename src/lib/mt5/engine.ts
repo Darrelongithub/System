@@ -249,6 +249,34 @@ class MT5TradingEngine {
       return null; // Already executed
     }
 
+    // Desired side type
+    const desiredType = signal.side === "long" ? "BUY" : "SELL";
+
+    // Zero opposite-side self-hedging: never carry an opposite-side fill on the same symbol.
+    if (this.positions.some((p) => p.symbol === symbol && p.type !== desiredType)) {
+      this.addLog(
+        "WARN",
+        symbol,
+        `Order rejected: opposite-side position already open on ${symbol} (anti-hedge).`,
+        signal.strategy,
+      );
+      return null;
+    }
+
+    // Max 3 same-side stack per symbol.
+    const sameSideCount = this.positions.filter(
+      (p) => p.symbol === symbol && p.type === desiredType,
+    ).length;
+    if (sameSideCount >= 3) {
+      this.addLog(
+        "WARN",
+        symbol,
+        `Order rejected: max 3 same-side positions already open on ${symbol}.`,
+        signal.strategy,
+      );
+      return null;
+    }
+
     // Max open positions check
     if (this.positions.length >= this.config.maxOpenPositions) {
       this.addLog(
@@ -265,7 +293,7 @@ class MT5TradingEngine {
     if (this.config.sizingMode === "risk_pct") {
       const sizing = calculateLotSize({
         equity: this.account.equity,
-        riskPct: this.config.riskPct,
+        riskPct: this.config.riskPct * (signal.riskMultiplier ?? 1.0),
         entry: signal.entry,
         sl: signal.sl,
         symbol,
@@ -275,7 +303,7 @@ class MT5TradingEngine {
     }
 
     // Determine order type
-    const orderType = signal.side === "long" ? "BUY" : "SELL";
+    const orderType = desiredType;
 
     const orderRequest: MT5OrderRequest = {
       id: "req-" + Math.random().toString(36).slice(2, 9),

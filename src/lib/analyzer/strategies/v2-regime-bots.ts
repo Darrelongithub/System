@@ -73,7 +73,17 @@ type UsableBar = {
   datetime: string;
   index: number;
 };
-function usable(b: { open?: number | undefined; high?: number | undefined; low?: number | undefined; close?: number | undefined; invalid?: string | undefined } | undefined): b is UsableBar {
+function usable(
+  b:
+    | {
+        open?: number | undefined;
+        high?: number | undefined;
+        low?: number | undefined;
+        close?: number | undefined;
+        invalid?: string | undefined;
+      }
+    | undefined,
+): b is UsableBar {
   return (
     !!b &&
     !b.invalid &&
@@ -210,7 +220,7 @@ function findKillzoneOr(
   day: string,
   orBars: [number, number],
 ): { orHigh: number; orLow: number } | undefined {
-  const found = new Map<number, typeof ctx.candles[number]>();
+  const found = new Map<number, (typeof ctx.candles)[number]>();
   for (let j = i - 1; j >= 0; j--) {
     const bj = ctx.candles[j]!;
     if (eatDay(bj.datetime) !== day) break;
@@ -551,7 +561,11 @@ const kijunCloudContinuation: StrategyCheck = {
     const day = eatDay(x.datetime);
     const key = `${day}:L`;
 
-    if (tenkanPrev <= kijunPrev && tenkanNow > kijunNow && x.close! > Math.max(spanANow, spanBNow)) {
+    if (
+      tenkanPrev <= kijunPrev &&
+      tenkanNow > kijunNow &&
+      x.close! > Math.max(spanANow, spanBNow)
+    ) {
       if (isConsumed(ctx, "kijun-cloud-continuation", key)) return fail("consumed");
       const sl = Math.min(kijunNow - 0.5 * atr, x.close! - 1.5 * atr);
       if (!(sl < x.close!)) return fail("stop not below entry");
@@ -566,7 +580,11 @@ const kijunCloudContinuation: StrategyCheck = {
       );
     }
     const keyS = `${day}:S`;
-    if (tenkanPrev >= kijunPrev && tenkanNow < kijunNow && x.close! < Math.min(spanANow, spanBNow)) {
+    if (
+      tenkanPrev >= kijunPrev &&
+      tenkanNow < kijunNow &&
+      x.close! < Math.min(spanANow, spanBNow)
+    ) {
       if (isConsumed(ctx, "kijun-cloud-continuation", keyS)) return fail("consumed");
       const sl = Math.max(kijunNow + 0.5 * atr, x.close! + 1.5 * atr);
       if (!(sl > x.close!)) return fail("stop not above entry");
@@ -655,7 +673,6 @@ const engulfingZoneRetest: StrategyCheck = {
     }
 
     // Prune expired / mitigated zones (scan completed bars strictly after creation).
-    const completed = ctx.candles.slice(0, i);
     for (let k = zones.length - 1; k >= 0; k--) {
       const z = zones[k]!;
       if (i - z.createdIdx > ZONE_MAX_AGE) {
@@ -664,7 +681,7 @@ const engulfingZoneRetest: StrategyCheck = {
       }
       let mitigated = false;
       for (let j = z.createdIdx + 1; j <= i - 1; j++) {
-        const b = completed[j];
+        const b = ctx.candles[j];
         if (!b || b.invalid || b.close === undefined) continue;
         if (z.side === "long" && b.close < z.bot) {
           mitigated = true;

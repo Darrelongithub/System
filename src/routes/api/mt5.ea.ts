@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateMql5EaSource } from "@/lib/mt5/mql5-ea";
-import { generateStandalone247EaSource } from "@/lib/mt5/standalone-ea";
 import { mt5Engine } from "@/lib/mt5/engine";
 
 export const Route = createFileRoute("/api/mt5/ea")({
@@ -8,7 +7,7 @@ export const Route = createFileRoute("/api/mt5/ea")({
     handlers: {
       GET: async ({ request }) => {
         const url = new URL(request.url);
-        const type = url.searchParams.get("type") || "standalone";
+        const type = url.searchParams.get("type") || "bridge";
         const creds = mt5Engine.getCredentials();
         const config = mt5Engine.getConfig();
 
@@ -30,22 +29,16 @@ export const Route = createFileRoute("/api/mt5/ea")({
           });
         }
 
-        // Default: Standalone 24/7 Autotrader EA
-        const source = generateStandalone247EaSource({
-          magicNumber: config.magicNumber || 992200,
-          riskPct: config.riskPct || 1.0,
-          fixedLot: config.fixedLot || 0.1,
-          minRr: config.minRr || 2.0,
-          syncServerUrl: bridgeUrl,
-          authToken: creds.apiToken || "sfp-default-token",
-        });
-
-        return new Response(source, {
-          headers: {
-            "Content-Type": "text/plain; charset=utf-8",
-            "Content-Disposition": 'attachment; filename="SignalFinderPro_247_Autotrader.mq5"',
-          },
-        });
+        // The standalone 24/7 EA was retired (v2.0): it carried hardcoded v1.8
+        // strategies and never parity-executed the bridge engine. Live trading
+        // now exclusively uses the parity-exact Bridge EA + Server Daemon.
+        return new Response(
+          JSON.stringify({
+            error:
+              "Standalone EA retired in v2.0. Live trading exclusively uses the parity-exact Bridge EA (SignalFinderBridge.mq5) + Server Daemon — switch to ?type=bridge.",
+          }),
+          { status: 410, headers: { "Content-Type": "application/json; charset=utf-8" } },
+        );
       },
     },
   },

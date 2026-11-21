@@ -2,6 +2,8 @@
  * MetaTrader 5 (MT5) Automation & Live Trading Types
  */
 
+import { V2_STRATEGY_IDS } from "@/lib/analyzer/strategies/v2-regime-bots";
+
 export type MT5BridgeMode = "mql5_ea" | "direct_rest" | "metaapi" | "simulated";
 
 export type MT5OrderType = "BUY" | "SELL" | "BUY_LIMIT" | "SELL_LIMIT" | "BUY_STOP" | "SELL_STOP";
@@ -157,25 +159,15 @@ export const DEFAULT_MT5_CREDENTIALS: MT5AccountCredentials = {
 export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   enabled: false,
   symbols: ["XAU/USD", "EUR/USD", "GBP/USD", "USD/JPY"],
-  strategies: [
-    "macd-cross",
-    "dual-thrust",
-    "pdh-retest",
-    "classic-pivot",
-    "williams-r-fade",
-    "three-soldiers",
-    "morning-star",
-    "ichimoku-tk",
-    "donchian-55",
-  ],
+  strategies: [...V2_STRATEGY_IDS],
   autoEntry: true,
   autoSl: true,
   autoTp: true,
   sizingMode: "risk_pct",
   fixedLot: 0.1,
-  riskPct: 1.0,
+  riskPct: 0.35,
   maxRiskAmount: 100,
-  maxOpenPositions: 5,
+  maxOpenPositions: 3,
   magicNumber: 992200,
   commentPrefix: "SFP",
   minRr: 2.0,
