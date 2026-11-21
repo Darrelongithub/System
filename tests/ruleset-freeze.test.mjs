@@ -53,7 +53,7 @@ const FROZEN_RULES = {
   "src/lib/analyzer/run.ts": "8b310641907fffd2",
   "src/lib/analyzer/regime-state.ts": "39006decfe9983a1",
   "src/lib/analyzer/portfolio-gate.ts": "ee0a1374ce8a1c1a",
-  "src/lib/analyzer/strategies/v2-regime-bots.ts": "19319b8953b33f35",
+  "src/lib/analyzer/strategies/v2-regime-bots.ts": "ef8f33632b140277",
   "src/lib/analyzer/math.ts": "72645bc29f6c3318",
   "src/lib/analyzer/status.ts": "aa08a97cb2818d64",
   "src/lib/analyzer/structure.ts": "83670a1bf9fa24bf",
