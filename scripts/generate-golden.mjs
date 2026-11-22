@@ -16,6 +16,7 @@
  * Run:  node --experimental-strip-types --import ./tests/register.mjs scripts/generate-golden.mjs
  */
 import { runAnalysis } from "../src/lib/analyzer/run.ts";
+import { V2_STRATEGY_IDS } from "../src/lib/analyzer/strategies/v2-regime-bots.ts";
 import { ANALYZER_CERTIFIED_OPTIONS } from "../src/lib/analyzer/config.ts";
 import { formatSeriesContract } from "../src/lib/analyzer/series-contract.ts";
 import { readFileSync, writeFileSync } from "node:fs";
@@ -54,6 +55,7 @@ const RULE_SOURCES = [
   "src/lib/analyzer/regime-state.ts",
   "src/lib/analyzer/portfolio-gate.ts",
   "src/lib/analyzer/strategies/v2-regime-bots.ts",
+  "src/lib/analyzer/strategies/v3-expansion-bots.ts",
   "src/lib/analyzer/math.ts",
   "src/lib/analyzer/status.ts",
   "src/lib/analyzer/structure.ts",
@@ -95,19 +97,11 @@ const agg = (rows) => {
   return a;
 };
 
-// Per-strategy order follows the current production registry (v2.0 bots first),
-// filtered to strategies that actually fired — the legacy v1.8 keys carry 0
-// trades and would only pad the summary with empty bookkeeping.
-const REGISTRY_ORDER = [
-  "donchian-55-coiled",
-  "ny-pivot-s1r1-reject",
-  "killzone-orb-stretch",
-  "supertrend-ema-pullback",
-  "keltner-squeeze-release",
-  "asymmetric-vol-breakout",
-  "kijun-cloud-continuation",
-  "engulfing-zone-retest",
-];
+// Per-strategy order follows the current production registry (Core v2.2 bots
+// first, then the 22 v3.0 expansion bots), filtered to strategies that actually
+// fired — the legacy v1.8 keys carry 0 trades and would only pad the summary
+// with empty bookkeeping.
+const REGISTRY_ORDER = V2_STRATEGY_IDS;
 
 const perStrategy = {};
 for (const id of REGISTRY_ORDER) {
@@ -149,9 +143,10 @@ const summary = {
   // regression lock would be replaying a series the live product refuses.
   seriesContract: analysis.contract,
   note:
-    "v2.0 re-baseline: regime-gated ruleset. Replaces the retired v1.8 9-strategy " +
-    "ruleset and all regime filters with 8 regime-routed bots behind the Layer 1-4 gates " +
-    "(spread→RR→min stop floor→regime gate→portfolio gate). See logs/v2.0-regime-bots.md.",
+    "v3.0 re-baseline: 30-bot Stage 2A Strict Per-Bot Edge-Zone ruleset (8 Core v2.2 foundation " +
+    "bots + 22 certified quantitative expansion bots) behind Layer 1-5 gates (spread→RR→min stop " +
+    "floor→HTF/macro/archetype/Stage 2A per-bot edge-zone gate→portfolio gate). See " +
+    "logs/v3.0-30bot-stage2a.md.",
 };
 
 // ---- golden-regression-report.json (self-consistent: current == golden) ----

@@ -16,6 +16,7 @@ import { eatDay, eatParts } from "../time";
 import { isConsumed } from "./util";
 import { daysBeforeTail, lastDayBefore } from "../day-lookup";
 import { getRegimeState } from "../regime-state";
+import { V3_EXPANSION_STRATEGIES } from "./v3-expansion-bots";
 
 const c = (ctx: AnalysisContext, i: number) => ctx.candles[i]!;
 
@@ -739,8 +740,8 @@ const engulfingZoneRetest: StrategyCheck = {
   },
 };
 
-/** Active v2 production trade strategies (8 regime-routed bots). */
-export const V2_TRADE_STRATEGIES: StrategyCheck[] = [
+/** Core v2.2 regime-routed foundation bots (priority tier 1 under Core-First routing). */
+export const V2_CORE_STRATEGIES: StrategyCheck[] = [
   donchian55Coiled,
   nyPivotS1R1Reject,
   killzoneOrbStretch,
@@ -749,6 +750,15 @@ export const V2_TRADE_STRATEGIES: StrategyCheck[] = [
   asymmetricVolBreakout,
   kijunCloudContinuation,
   engulfingZoneRetest,
+];
+
+/**
+ * Active v3.0 production trade strategies: 30 Stage-2A-routed institutional bots
+ * (8 Core v2.2 foundation bots + 22 certified quantitative expansion bots).
+ */
+export const V2_TRADE_STRATEGIES: StrategyCheck[] = [
+  ...V2_CORE_STRATEGIES,
+  ...V3_EXPANSION_STRATEGIES,
 ];
 
 export const V2_STRATEGY_IDS = V2_TRADE_STRATEGIES.map((s) => s.id);

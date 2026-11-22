@@ -1,94 +1,239 @@
 {
   "analyzedRows": 9738,
   "invalidRows": 0,
-  "tradePassCount": 186,
+  "tradePassCount": 150,
   "contextPassCount": 3184,
   "perStrategy": {
     "donchian-55-coiled": {
-      "triggers": 54,
-      "tp": 13,
-      "sl": 41,
-      "open": 0,
+      "triggers": 43,
+      "tp": 11,
+      "sl": 31,
+      "open": 1,
       "noFill": 0,
-      "rSum": 10.801349659924226
+      "rSum": 13.351438604418595
     },
     "ny-pivot-s1r1-reject": {
-      "triggers": 11,
+      "triggers": 9,
       "tp": 2,
-      "sl": 9,
+      "sl": 7,
       "open": 0,
       "noFill": 0,
-      "rSum": -3.0595482028992245
+      "rSum": -1.0549326006437352
     },
     "killzone-orb-stretch": {
-      "triggers": 38,
-      "tp": 11,
-      "sl": 27,
+      "triggers": 5,
+      "tp": 4,
+      "sl": 1,
       "open": 0,
       "noFill": 0,
-      "rSum": 5.254252411041339
+      "rSum": 10.926565267996729
     },
     "supertrend-ema-pullback": {
-      "triggers": 40,
-      "tp": 16,
-      "sl": 24,
+      "triggers": 3,
+      "tp": 2,
+      "sl": 1,
       "open": 0,
       "noFill": 0,
-      "rSum": 24.79733140086904
+      "rSum": 4.956838626828896
     },
     "keltner-squeeze-release": {
-      "triggers": 9,
-      "tp": 3,
+      "triggers": 7,
+      "tp": 1,
       "sl": 6,
       "open": 0,
       "noFill": 0,
-      "rSum": 3.440405292156277
+      "rSum": -2.835781775132128
     },
     "asymmetric-vol-breakout": {
-      "triggers": 19,
-      "tp": 9,
-      "sl": 10,
+      "triggers": 14,
+      "tp": 7,
+      "sl": 7,
       "open": 0,
       "noFill": 0,
-      "rSum": 16.700317682665144
+      "rSum": 14.353979455052109
     },
     "kijun-cloud-continuation": {
-      "triggers": 7,
-      "tp": 3,
-      "sl": 4,
+      "triggers": 1,
+      "tp": 0,
+      "sl": 1,
       "open": 0,
       "noFill": 0,
-      "rSum": 4.916284672496381
+      "rSum": -1
     },
     "engulfing-zone-retest": {
-      "triggers": 8,
-      "tp": 4,
+      "triggers": 5,
+      "tp": 3,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 7.450932211536182
+    },
+    "weekly-highlow-breakout": {
+      "triggers": 2,
+      "tp": 0,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -2.147855016053625
+    },
+    "fuller-fakey-reversal": {
+      "triggers": 3,
+      "tp": 1,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 0.9615482149816579
+    },
+    "crabel-nr7-ignition": {
+      "triggers": 2,
+      "tp": 0,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -2
+    },
+    "bollinger-bandwidth-pop": {
+      "triggers": 4,
+      "tp": 0,
       "sl": 4,
       "open": 0,
       "noFill": 0,
-      "rSum": 8.40157356416353
+      "rSum": -4
+    },
+    "fib-golden-pocket-impulse": {
+      "triggers": 3,
+      "tp": 0,
+      "sl": 3,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -3
+    },
+    "fast-adx7-di-cross": {
+      "triggers": 6,
+      "tp": 4,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 9.8788034914203
+    },
+    "keltner-15atr-tight-surge": {
+      "triggers": 8,
+      "tp": 2,
+      "sl": 6,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -0.051188491288681526
+    },
+    "marubozu-displacement-thrust": {
+      "triggers": 1,
+      "tp": 1,
+      "sl": 0,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 2.979637726649938
+    },
+    "kama-efficiency-breakout": {
+      "triggers": 1,
+      "tp": 1,
+      "sl": 0,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 3.1928236334504634
+    },
+    "sunrise-pullback-window": {
+      "triggers": 8,
+      "tp": 3,
+      "sl": 5,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 4.529459685878873
+    },
+    "aroon-25-dominance": {
+      "triggers": 2,
+      "tp": 0,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -2
+    },
+    "donchian-20-turbo": {
+      "triggers": 2,
+      "tp": 2,
+      "sl": 0,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 6.454136744972795
+    },
+    "brooks-h2l2-second-entry": {
+      "triggers": 3,
+      "tp": 1,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 1.950449336813186
+    },
+    "fvg-displacement-retest": {
+      "triggers": 6,
+      "tp": 5,
+      "sl": 1,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 13.904042854336117
+    },
+    "linreg-30-channel-break": {
+      "triggers": 1,
+      "tp": 1,
+      "sl": 0,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 2.9786327682430667
+    },
+    "lambert-cci20-momentum": {
+      "triggers": 2,
+      "tp": 0,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -2
+    },
+    "chandelier-22-flip": {
+      "triggers": 7,
+      "tp": 5,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": 12.834325891027467
+    },
+    "vortex-14-thrust": {
+      "triggers": 2,
+      "tp": 0,
+      "sl": 2,
+      "open": 0,
+      "noFill": 0,
+      "rSum": -2
     }
   },
   "totals": {
-    "triggers": 186,
-    "tp": 61,
-    "sl": 125,
-    "open": 0,
+    "triggers": 150,
+    "tp": 56,
+    "sl": 93,
+    "open": 1,
     "noFill": 0,
-    "rSum": 71.25196648041668
+    "rSum": 88.6138566304882
   },
-  "generatedAt": "2026-11-21T19:28:10.465Z",
-  "runAnalysisMs": 998,
+  "generatedAt": "2026-11-22T11:49:46.764Z",
+  "runAnalysisMs": 1429,
   "options": {
     "seriesEndsComplete": true
   },
   "inputs": {
     "baselineCsv": "87d2ac67585afe4b373be6107fcc66183a43d5e67f14aa56bc77b968ea3473bf",
     "rules": {
-      "src/lib/analyzer/run.ts": "1bade9acc89c173a60f19a4cb913a81e51854d5fccac54bdab1b67ccccb1e768",
-      "src/lib/analyzer/regime-state.ts": "02af58b5efa12967aedd1917d77033e316fb2ce9d0e6b2006f3f8aa145c6bf94",
+      "src/lib/analyzer/run.ts": "6eb6a3edc393218d6475948cff923bc7e14622ac927ac0677735a0dc5061a651",
+      "src/lib/analyzer/regime-state.ts": "7c6b2a51aa97de3a337599b9fefaeaf141d775f58a2498bac3284d0ea467115a",
       "src/lib/analyzer/portfolio-gate.ts": "a540368735482c37698a193d13c6e9100f65f514f0f044f4c7380c1c1841eda7",
-      "src/lib/analyzer/strategies/v2-regime-bots.ts": "32a3492ea4285cf5543f8a713521fd5c0d21828960fe43e08f996fd6d646c482",
+      "src/lib/analyzer/strategies/v2-regime-bots.ts": "4854aa36fcb10ec57150bb4c2e83026556f7fbb70fc3851929359c4c2cf4ecc9",
+      "src/lib/analyzer/strategies/v3-expansion-bots.ts": "d0fa49f5d3f52eb00ee22d0adf065223339bea2d523c5d97f11ee2dc61f154a1",
       "src/lib/analyzer/math.ts": "4cba71f6c1c01aa96e46c3b7f04044083930ef40c879d9b4d86339e1c92871b4",
       "src/lib/analyzer/status.ts": "90030a9b280da02a9be4beb5ac4799d9c9d3f5d324511135cc898207cd3a1ffe",
       "src/lib/analyzer/structure.ts": "3aec72e3be5e9e8f6f95e8bcc336c6d69ab58aa01bc50447692a5f43c65cfc18"
@@ -116,5 +261,5 @@
     "failures": [],
     "warnings": []
   },
-  "note": "v2.0 re-baseline: regime-gated ruleset. Replaces the retired v1.8 9-strategy ruleset and all regime filters with 8 regime-routed bots behind the Layer 1-4 gates (spread→RR→min stop floor→regime gate→portfolio gate). See logs/v2.0-regime-bots.md."
+  "note": "v3.0 re-baseline: 30-bot Stage 2A Strict Per-Bot Edge-Zone ruleset (8 Core v2.2 foundation bots + 22 certified quantitative expansion bots) behind Layer 1-5 gates (spread→RR→min stop floor→HTF/macro/archetype/Stage 2A per-bot edge-zone gate→portfolio gate). See logs/v3.0-30bot-stage2a.md."
 }

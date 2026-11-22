@@ -96,9 +96,8 @@ test("G1: day-supplied trigger accounting matches the continuous engine over the
 
   assertEqual(applied, continuous.tradeTriggers.length, "every engine trigger is applied");
   assert(skippedDays > 0, "true empty days are still skipped");
-  // v2.0 locked baseline: no trigger-bearing weekend days at all (the old
-  // v1.8 ruleset had 37 Saturday-tail triggers); the G1 fix keeps any
-  // future Saturday-tail triggers in the day loop rather than skipping them.
+  // v3.0 locked baseline: no trigger-bearing weekend days (0 Saturday-tail
+  // triggers); the G1 fix keeps any future Saturday-tail triggers in the day loop.
   assertEqual(
     [...weekendTriggerBearing.values()].reduce((a, b) => a + b, 0),
     0,

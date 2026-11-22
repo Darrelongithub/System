@@ -1034,7 +1034,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           {/* Strategy Whitelist Selector */}
           <div className="flex flex-col gap-2.5">
             <Label className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Active Strategies for Auto-Execution (Production 8 — Regime-Routed v2.0)
+              Active Strategies for Auto-Execution (Production 30 — Stage 2A Routed v3.0)
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {V2_TRADE_STRATEGIES.map((strat) => {

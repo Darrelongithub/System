@@ -1,13 +1,24 @@
 /**
- * MT5 v2.0 live-execution parity gate.
+ * MT5 live-execution parity gate (v3.0 30-Bot ARSENAL).
  *
  * Guards the live edges that parity-exact live execution depends on:
- *  - DEFAULT_MT5_CONFIG ships exactly the 8 v2 regime-routed strategies;
+ *  - DEFAULT_MT5_CONFIG ships exactly the 30 v3.0 regime-routed strategies
+ *    (8 v2.2 Core + 22 certified expansion bots);
  *  - the rolling-drawdown riskMultiplier throttles risk_pct sizing (0.5 → half risk);
  *  - opposite-side self-hedging is blocked at the engine level;
  *  - the max 3 same-side stack per symbol is enforced;
  *  - the Bridge EA source executes multi-command bridge payloads (cursor loop)
  *    and guards fills with HasOppositePositionOpen (terminal-level anti-hedge).
+ *
+ * Plus the v2.2 live-execution edge-case gate (see the v2.2 section below):
+ *  - bridge GET payload field extraction (OPEN/CLOSE) with exact fields;
+ *  - terminal-level EA guards (InpMaxOpenPositions + CountSameSidePositions);
+ *  - syncFromEa canonical-alias anti-hedge + 3-stack cap;
+ *  - stale carryover signal skipping (feedLiveSignalsToMT5);
+ *  - 15s optimistic-fill preservation across syncFromEa heartbeats;
+ *  - full $350 risk at $100k (no maxRiskAmount cap); $1k micro-account rejection;
+ *  - canonicalSymbol suffix rules (case-insensitive, never truncate 6-char pairs);
+ *  - 2nd same-side optimistic position preservation (count deficit).
  */
 import { test, assert, assertEqual, assertDeepEqual } from "./tiny.mjs";
 import { DEFAULT_MT5_CONFIG } from "../src/lib/mt5/types.ts";
@@ -45,7 +56,7 @@ test("mt5 v2 parity: DEFAULT_MT5_CONFIG ships the v2 ruleset exactly", () => {
     [...V2_STRATEGY_IDS],
     "strategies == V2_STRATEGY_IDS",
   );
-  assertEqual(V2_STRATEGY_IDS.length, 8, "eight v2 regime-routed bots");
+  assertEqual(V2_STRATEGY_IDS.length, 30, "thirty v3.0 Stage-2A regime-routed bots");
   assertEqual(DEFAULT_MT5_CONFIG.riskPct, 0.35, "v2 default riskPct is 0.35%");
   assertEqual(DEFAULT_MT5_CONFIG.maxOpenPositions, 3, "v2 default max open positions is 3");
   assertEqual(DEFAULT_MT5_CONFIG.sizingMode, "risk_pct", "v2 default sizing is risk_pct");
