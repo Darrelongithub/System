@@ -1,54 +1,14 @@
 import { runAll } from "./tiny.mjs";
+import { readdirSync } from "node:fs";
 
-await import("./golden.test.mjs");
-await import("./adversarial-v3-integrity.test.mjs");
-await import("./adversarial-pipeline-feed.test.mjs");
-await import("./math-finiteness.test.mjs");
-await import("./live-final-bar.test.mjs");
-await import("./ema-invalid-seed.test.mjs");
-await import("./parse-spread.test.mjs");
-await import("./csv-round-trip.test.mjs");
-await import("./analysis-store.test.mjs");
-await import("./rate-limit-retry-cap.test.mjs");
-await import("./cooldown-abort.test.mjs");
-await import("./parse-fail-closed.test.mjs");
-await import("./ohlc-chunking.test.mjs");
-await import("./ny-session-tail.test.mjs");
-await import("./session-window-agreement.test.mjs");
-await import("./eat-clock.test.mjs");
-await import("./swing-ref-causality.test.mjs");
-await import("./accounting.test.mjs");
-await import("./trade-accounting-boundaries.test.mjs");
-await import("./gap-fill-resolution.test.mjs");
-await import("./determinism.test.mjs");
-await import("./causality.test.mjs");
-await import("./weekend-tail-accounting.test.mjs");
-await import("./backtest-analyzer-parity.test.mjs");
-await import("./backtest-day-index.test.mjs");
-await import("./perf-equivalence.test.mjs");
-await import("./enrich-equivalence.test.mjs");
-await import("./server-env.test.mjs");
-await import("./repo-hygiene.test.mjs");
-await import("./backtest-week-bucketing.test.mjs");
-await import("./market-data-symbols.test.mjs");
-await import("./status-parse-time-tz.test.mjs");
-await import("./tz-matrix.test.mjs");
-await import("./analyzer-config-parity.test.mjs");
-await import("./warmup-window-sufficiency.test.mjs");
-await import("./trend-input-causality.test.mjs");
-await import("./series-contract.test.mjs");
-await import("./ruleset-freeze.test.mjs");
-await import("./generator-ref-integrity.test.mjs");
-await import("./generator-weekend-boundary.test.mjs");
-await import("./generator-window-stability.test.mjs");
-await import("./ohlc-export-gate.test.mjs");
-await import("./compositing-hygiene.test.mjs");
-await import("./mt5-automation.test.mjs");
-await import("./mt5-bridge-auth.test.mjs");
-await import("./mt5-daemon-feed.test.mjs");
-await import("./synth.test.mjs");
-await import("./v2-regime-gates.test.mjs");
-await import("./mt5-v2-live-parity.test.mjs");
+const suites = readdirSync(new URL(".", import.meta.url))
+  .filter((name) => name.endsWith(".test.mjs"))
+  .sort();
+// Load the pinned baseline first; discover all other suites so newly-added risk-,
+// adversarial-, watcher-, and future test files cannot silently be skipped.
+for (const file of ["golden.test.mjs", ...suites.filter((name) => name !== "golden.test.mjs")]) {
+  await import(`./${file}`);
+}
 
 const filter = process.argv[2];
 const ok = await runAll(filter);

@@ -38,6 +38,7 @@ import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 import { todayEat } from "@/lib/analyzer/time";
+import { V2_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
 import {
   ExecutionFriction,
   FRICTION_PRESETS,
@@ -193,7 +194,7 @@ export default function Backtest() {
         `Auto-Backtest ${symbol} | ${days[0]} → ${days[days.length - 1]} (${days.length} day(s))`,
       );
       addLog(
-        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context), local engine only.`,
+        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (${V2_TRADE_STRATEGIES.length} trade strategies + context), local engine only.`,
       );
       addLog(
         `Closed-candle policy: seriesEndsComplete=true (historical bars). Future bars only resolve already-generated trades.`,
@@ -629,7 +630,7 @@ export default function Backtest() {
           <p className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 font-mono text-[11px] text-muted-foreground">
             {days.length === 0
               ? "From date must be on or before the To date."
-              : `${days.length} day(s) queued · report range ${days[0]} → ${days[days.length - 1]} · OHLC fetch ${addUtcDays(days[0]!, -STANDARD_LOOKBACK_CALENDAR_DAYS)} → ${addUtcDays(days[days.length - 1]!, Math.max(0, forwardDays))} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up + ${forwardDays}d forward resolution) · strategies: production nine + context · seriesEndsComplete=true`}
+              : `${days.length} day(s) queued · report range ${days[0]} → ${days[days.length - 1]} · OHLC fetch ${addUtcDays(days[0]!, -STANDARD_LOOKBACK_CALENDAR_DAYS)} → ${addUtcDays(days[days.length - 1]!, Math.max(0, forwardDays))} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up + ${forwardDays}d forward resolution) · strategies: ${V2_TRADE_STRATEGIES.length} trade strategies + context · seriesEndsComplete=true`}
           </p>
 
           <div className="flex flex-wrap gap-2">

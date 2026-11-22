@@ -18,6 +18,11 @@ output/
 # Logs & scratch
 *.log
 npm-debug.log*
+logs/.mt5-runtime-state.json
+logs/live-trade-journal-*.jsonl
+*.zip
+*.scratch
+scratch/
 
 # OS / editor
 .DS_Store

@@ -116,7 +116,10 @@ test("adversarial v3: friction profiles and R conversion are explicit and arithm
   );
   assertEqual(summary.count, 2, "only resolved TP/SL trades are priced");
   assertEqual(summary.grossSum, 1, "gross resolved R total");
-  assert(Math.abs(summary.netSum - 0.9) < 1e-12, "net R subtracts cost per stop risk on each trade");
+  assert(
+    Math.abs(summary.netSum - 0.9) < 1e-12,
+    "net R subtracts cost per stop risk on each trade",
+  );
   const backtest = read("../src/pages/Backtest.tsx");
   assert(
     backtest.includes("Net avg R") && backtest.includes("Gross avg R"),

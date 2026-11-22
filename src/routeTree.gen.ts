@@ -20,6 +20,10 @@ import { Route as ApiMt5RouteImport } from './routes/api/mt5'
 import { Route as ApiMarketDataHealthRouteImport } from './routes/api/market-data.health'
 import { Route as ApiMt5BridgeRouteImport } from './routes/api/mt5.bridge'
 import { Route as ApiMt5EaRouteImport } from './routes/api/mt5.ea'
+import { Route as ApiWatcherFredRouteImport } from './routes/api/watcher.fred'
+import { Route as ApiWatcherJournalRouteImport } from './routes/api/watcher.journal'
+import { Route as ApiWatcherMonthlyReportRouteImport } from './routes/api/watcher.monthly-report'
+import { Route as ApiWatcherReviewRouteImport } from './routes/api/watcher.review'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -76,6 +80,26 @@ const ApiMt5EaRoute = ApiMt5EaRouteImport.update({
   path: '/ea',
   getParentRoute: () => ApiMt5Route,
 } as any)
+const ApiWatcherFredRoute = ApiWatcherFredRouteImport.update({
+  id: '/api/watcher/fred',
+  path: '/api/watcher/fred',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWatcherJournalRoute = ApiWatcherJournalRouteImport.update({
+  id: '/api/watcher/journal',
+  path: '/api/watcher/journal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWatcherMonthlyReportRoute = ApiWatcherMonthlyReportRouteImport.update({
+  id: '/api/watcher/monthly-report',
+  path: '/api/watcher/monthly-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWatcherReviewRoute = ApiWatcherReviewRouteImport.update({
+  id: '/api/watcher/review',
+  path: '/api/watcher/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +113,10 @@ export interface FileRoutesByFullPath {
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
   '/api/mt5/bridge': typeof ApiMt5BridgeRoute
   '/api/mt5/ea': typeof ApiMt5EaRoute
+  '/api/watcher/fred': typeof ApiWatcherFredRoute
+  '/api/watcher/journal': typeof ApiWatcherJournalRoute
+  '/api/watcher/monthly-report': typeof ApiWatcherMonthlyReportRoute
+  '/api/watcher/review': typeof ApiWatcherReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,6 +129,10 @@ export interface FileRoutesByTo {
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
   '/api/mt5/bridge': typeof ApiMt5BridgeRoute
   '/api/mt5/ea': typeof ApiMt5EaRoute
+  '/api/watcher/fred': typeof ApiWatcherFredRoute
+  '/api/watcher/journal': typeof ApiWatcherJournalRoute
+  '/api/watcher/monthly-report': typeof ApiWatcherMonthlyReportRoute
+  '/api/watcher/review': typeof ApiWatcherReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,6 +147,10 @@ export interface FileRoutesById {
   '/api/market-data/health': typeof ApiMarketDataHealthRoute
   '/api/mt5/bridge': typeof ApiMt5BridgeRoute
   '/api/mt5/ea': typeof ApiMt5EaRoute
+  '/api/watcher/fred': typeof ApiWatcherFredRoute
+  '/api/watcher/journal': typeof ApiWatcherJournalRoute
+  '/api/watcher/monthly-report': typeof ApiWatcherMonthlyReportRoute
+  '/api/watcher/review': typeof ApiWatcherReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -130,6 +166,10 @@ export interface FileRouteTypes {
     | '/api/market-data/health'
     | '/api/mt5/bridge'
     | '/api/mt5/ea'
+    | '/api/watcher/fred'
+    | '/api/watcher/journal'
+    | '/api/watcher/monthly-report'
+    | '/api/watcher/review'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -142,6 +182,10 @@ export interface FileRouteTypes {
     | '/api/market-data/health'
     | '/api/mt5/bridge'
     | '/api/mt5/ea'
+    | '/api/watcher/fred'
+    | '/api/watcher/journal'
+    | '/api/watcher/monthly-report'
+    | '/api/watcher/review'
   id:
     | '__root__'
     | '/'
@@ -155,6 +199,10 @@ export interface FileRouteTypes {
     | '/api/market-data/health'
     | '/api/mt5/bridge'
     | '/api/mt5/ea'
+    | '/api/watcher/fred'
+    | '/api/watcher/journal'
+    | '/api/watcher/monthly-report'
+    | '/api/watcher/review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,6 +213,10 @@ export interface RootRouteChildren {
   MapGeneratorRoute: typeof MapGeneratorRoute
   ApiMarketDataRoute: typeof ApiMarketDataRouteWithChildren
   ApiMt5Route: typeof ApiMt5RouteWithChildren
+  ApiWatcherFredRoute: typeof ApiWatcherFredRoute
+  ApiWatcherJournalRoute: typeof ApiWatcherJournalRoute
+  ApiWatcherMonthlyReportRoute: typeof ApiWatcherMonthlyReportRoute
+  ApiWatcherReviewRoute: typeof ApiWatcherReviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -246,6 +298,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiMt5EaRouteImport
       parentRoute: typeof ApiMt5Route
     }
+    '/api/watcher/fred': {
+      id: '/api/watcher/fred'
+      path: '/api/watcher/fred'
+      fullPath: '/api/watcher/fred'
+      preLoaderRoute: typeof ApiWatcherFredRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/watcher/journal': {
+      id: '/api/watcher/journal'
+      path: '/api/watcher/journal'
+      fullPath: '/api/watcher/journal'
+      preLoaderRoute: typeof ApiWatcherJournalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/watcher/monthly-report': {
+      id: '/api/watcher/monthly-report'
+      path: '/api/watcher/monthly-report'
+      fullPath: '/api/watcher/monthly-report'
+      preLoaderRoute: typeof ApiWatcherMonthlyReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/watcher/review': {
+      id: '/api/watcher/review'
+      path: '/api/watcher/review'
+      fullPath: '/api/watcher/review'
+      preLoaderRoute: typeof ApiWatcherReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -294,6 +374,10 @@ const rootRouteChildren: RootRouteChildren = {
   MapGeneratorRoute: MapGeneratorRoute,
   ApiMarketDataRoute: ApiMarketDataRouteWithChildren,
   ApiMt5Route: ApiMt5RouteWithChildren,
+  ApiWatcherFredRoute: ApiWatcherFredRoute,
+  ApiWatcherJournalRoute: ApiWatcherJournalRoute,
+  ApiWatcherMonthlyReportRoute: ApiWatcherMonthlyReportRoute,
+  ApiWatcherReviewRoute: ApiWatcherReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

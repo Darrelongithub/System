@@ -14,6 +14,7 @@ import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
 import { MT5AutomationPanel } from "@/components/MT5AutomationPanel";
+import { WatcherCopilotPanel } from "@/components/WatcherCopilotPanel";
 import { feedLiveSignalsToMT5 } from "@/lib/mt5/mt5-store";
 import {
   ExecutionFriction,
@@ -195,6 +196,7 @@ export default function AnalysisV2() {
 
         {/* ─── MT5 LIVE AUTOMATION & EXECUTION PANEL ─── */}
         <MT5AutomationPanel currentSymbol={currentSymbol} liveSignals={analysis?.live || []} />
+        <WatcherCopilotPanel />
 
         <section className="panel flex flex-col gap-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
