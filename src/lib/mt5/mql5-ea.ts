@@ -42,6 +42,7 @@ input bool     InpAllowAutoEntry = true;          // Allow Automated Entry
 input bool     InpAllowAutoSl    = true;          // Allow Automated Stop Loss
 input bool     InpAllowAutoTp    = true;          // Allow Automated Take Profit
 input double   InpMaxLotSize     = 10.0;          // Max Allowed Lot Size
+input int      InpMaxOpenPositions = 3;           // Max Total Magic Positions (terminal-level)
 input bool     InpVerboseLogs    = true;          // Detailed Journal Logs
 
 //--- Global Objects
@@ -326,6 +327,49 @@ bool HasOppositePositionOpen(string sym, string typeStr)
 }
 
 //+------------------------------------------------------------------+
+//| Count same-side magic positions on the normalized symbol         |
+//+------------------------------------------------------------------+
+int CountSameSidePositions(string sym, string typeStr)
+{
+   string tradeSymbol = NormalizeSymbol(sym);
+   int count = 0;
+   for(int i = 0; i < PositionsTotal(); i++)
+   {
+      if(m_position.SelectByIndex(i))
+      {
+         if(m_position.Magic() == InpMagicNumber || InpMagicNumber == 0)
+         {
+            if(m_position.Symbol() == tradeSymbol)
+            {
+               if(typeStr == "BUY" && m_position.PositionType() == POSITION_TYPE_BUY) count++;
+               if(typeStr == "SELL" && m_position.PositionType() == POSITION_TYPE_SELL) count++;
+            }
+         }
+      }
+   }
+   return count;
+}
+
+//+------------------------------------------------------------------+
+//| Count all magic-numbered positions across all symbols            |
+//+------------------------------------------------------------------+
+int CountTotalMagicPositions()
+{
+   int count = 0;
+   for(int i = 0; i < PositionsTotal(); i++)
+   {
+      if(m_position.SelectByIndex(i))
+      {
+         if(m_position.Magic() == InpMagicNumber || InpMagicNumber == 0)
+         {
+            count++;
+         }
+      }
+   }
+   return count;
+}
+
+//+------------------------------------------------------------------+
 //| Execute Trade Order on MetaTrader 5                              |
 //+------------------------------------------------------------------+
 void ExecuteTradeCommand(string id, string sym, string typeStr, double volume, double sl, double tp, string comment)
@@ -340,6 +384,18 @@ void ExecuteTradeCommand(string id, string sym, string typeStr, double volume, d
    if(HasOppositePositionOpen(tradeSymbol, typeStr))
    {
       Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): opposite-side position already open (anti-hedge).");
+      return;
+   }
+
+   if(CountSameSidePositions(tradeSymbol, typeStr) >= 3)
+   {
+      Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): max 3 same-side positions already open.");
+      return;
+   }
+
+   if(CountTotalMagicPositions() >= InpMaxOpenPositions)
+   {
+      Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): total magic positions (", CountTotalMagicPositions(), "/", InpMaxOpenPositions, ") at the terminal-level cap.");
       return;
    }
 

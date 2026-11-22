@@ -58,10 +58,25 @@ export interface MT5Position {
   magic: number;
   openTime: string;
   pips?: number;
+  /**
+   * Set when the position was opened OPTIMISTICALLY against the Bridge EA
+   * (before the broker could have confirmed it in a telemetry sync). The
+   * sync-preserve logic in the engine keys off this to keep a just-opened
+   * position from being wiped by a heartbeat that has not yet seen it.
+   */
+  createdAtMs?: number;
 }
 
 export interface MT5OrderRequest {
   id?: string;
+  /**
+   * Bridge wire protocol: the EA dispatches each command to the broker.
+   * "OPEN" carries a broker order; "CLOSE" closes the broker position by ticket.
+   * Defaults to "OPEN" (legacy callers that build requests without an action).
+   */
+  action?: "OPEN" | "CLOSE";
+  /** Broker ticket — the CLOSE marker the EA reads to close the position. */
+  ticket?: number;
   symbol: string;
   strategyId: string;
   strategyName: string;
@@ -158,7 +173,7 @@ export const DEFAULT_MT5_CREDENTIALS: MT5AccountCredentials = {
 
 export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   enabled: false,
-  symbols: ["XAU/USD", "EUR/USD", "GBP/USD", "USD/JPY"],
+  symbols: ["XAU/USD"],
   strategies: [...V2_STRATEGY_IDS],
   autoEntry: true,
   autoSl: true,
@@ -166,7 +181,7 @@ export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   sizingMode: "risk_pct",
   fixedLot: 0.1,
   riskPct: 0.35,
-  maxRiskAmount: 100,
+  maxRiskAmount: 0,
   maxOpenPositions: 3,
   magicNumber: 992200,
   commentPrefix: "SFP",
@@ -174,7 +189,7 @@ export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   maxSlippagePoints: 20,
   soundAlerts: true,
   pollIntervalSeconds: 15,
-  newsFilterEnabled: true,
+  newsFilterEnabled: false,
   newsFilterHighImpact: true,
   newsFilterMediumImpact: false,
   newsFilterMinutesBefore: 30,

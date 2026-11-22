@@ -389,6 +389,9 @@ class MT5ServerDaemon {
     }
 
     for (const signal of outcome.analysis.live) {
+      // Carryover historical FILLED rows (candles since trigger > 0) must not be
+      // auto-dispatched — only freshly triggered closed-bar setups qualify.
+      if ((signal.candlesSinceTrigger ?? 0) > 0) continue;
       this.signalsDetectedCount++;
       const result = mt5Engine.handleLiveStrategySignal(signal, symbol);
       if (result?.ok) {

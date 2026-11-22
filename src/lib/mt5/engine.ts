@@ -29,6 +29,37 @@ function getContractSize(symbol: string): number {
 }
 
 /**
+ * Broker-side symbol aliases ("XAU/USD", "XAUUSD.pro", "XAUUSD-m", ...) must
+ * all reduce to the same canonical key so the anti-hedge, the 3-stack cap,
+ * the dedupe key and telemetry sync all compare like-for-like across the
+ * telemetry boundary.
+ *
+ * Steps: trim, uppercase, strip broker suffixes (.pro, .raw, .ecn, .m, _i),
+ * strip separators, then strip a trailing m/c on a 6-letter pair
+ * (e.g. XAUUSDm → XAUUSD).
+ */
+export function canonicalSymbol(sym: string): string {
+  let s = String(sym ?? "")
+    .trim()
+    .toUpperCase();
+  // Broker suffixes (case-insensitive after the uppercase)
+  s = s.replace(/\.(PRO|RAW|ECN|M)$/, "");
+  s = s.replace(/_I$/, "");
+  // Separators: /, \, -, _, spaces
+  s = s.replace(/[\s/\\_-]/g, "");
+  // Trailing lowercase m/c on a 6-letter pair (e.g. XAUUSDm, GBPUSDc)
+  if (/^[A-Z0-9]{6}[MC]$/.test(s)) {
+    s = s.slice(0, 6);
+  }
+  return s;
+}
+
+/** Cash risk implied by the (possibly min-lot-rounded) volume over the SL distance. */
+function cashRiskFor(symbol: string, volume: number, entry: number, sl: number): number {
+  return volume * Math.abs(entry - sl) * getContractSize(symbol);
+}
+
+/**
  * Calculate dynamic lot size from Account Equity, Risk % and Stop Loss distance.
  */
 export function calculateLotSize(params: {
@@ -244,7 +275,7 @@ class MT5TradingEngine {
     }
 
     // Deduplication check: timestamp + strategyId + side + symbol
-    const signalKey = `${symbol}|${signal.strategyId}|${signal.side}|${signal.datetime}`;
+    const signalKey = `${canonicalSymbol(symbol)}|${signal.strategyId}|${signal.side}|${signal.datetime}`;
     if (this.executedSignals.has(signalKey)) {
       return null; // Already executed
     }
@@ -253,7 +284,11 @@ class MT5TradingEngine {
     const desiredType = signal.side === "long" ? "BUY" : "SELL";
 
     // Zero opposite-side self-hedging: never carry an opposite-side fill on the same symbol.
-    if (this.positions.some((p) => p.symbol === symbol && p.type !== desiredType)) {
+    if (
+      this.positions.some(
+        (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type !== desiredType,
+      )
+    ) {
       this.addLog(
         "WARN",
         symbol,
@@ -265,7 +300,7 @@ class MT5TradingEngine {
 
     // Max 3 same-side stack per symbol.
     const sameSideCount = this.positions.filter(
-      (p) => p.symbol === symbol && p.type === desiredType,
+      (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type === desiredType,
     ).length;
     if (sameSideCount >= 3) {
       this.addLog(
@@ -300,6 +335,23 @@ class MT5TradingEngine {
         maxRiskAmount: this.config.maxRiskAmount,
       });
       volume = sizing.volume;
+
+      // Micro-account over-risk guard: when the SL distance forces the rounded
+      // volume down to the 0.01 min lot, the actual cash risk can balloon past
+      // the budgeted risk (wide SL on a small account → 10-27% per trade).
+      // Reject rather than blow the risk budget.
+      if (volume === 0.01) {
+        const actualRisk = cashRiskFor(symbol, volume, signal.entry, signal.sl);
+        if (actualRisk > 2.0 * sizing.riskAmount) {
+          this.addLog(
+            "WARN",
+            symbol,
+            `Signal rejected: min-lot over-risk guard tripped — 0.01 lots implies $${actualRisk.toFixed(2)} actual cash risk (> 2× the $${sizing.riskAmount.toFixed(2)} budgeted risk).`,
+            signal.strategy,
+          );
+          return null;
+        }
+      }
     }
 
     // Determine order type
@@ -307,6 +359,7 @@ class MT5TradingEngine {
 
     const orderRequest: MT5OrderRequest = {
       id: "req-" + Math.random().toString(36).slice(2, 9),
+      action: "OPEN",
       symbol,
       strategyId: signal.strategyId,
       strategyName: signal.strategy,
@@ -340,9 +393,11 @@ class MT5TradingEngine {
       { req },
     );
 
-    // If using MQL5 EA Bridge, queue the command for the EA to fetch
+    // If using MQL5 EA Bridge, queue the command for the EA to fetch. Every
+    // command on the wire carries its action explicitly — the EA dispatches
+    // whatever it reads, so the wire payload must never silently default.
     if (this.credentials.bridgeMode === "mql5_ea") {
-      this.pendingCommands.push(req);
+      this.pendingCommands.push({ ...req, action: "OPEN" });
     }
 
     // Immediate simulated / broker execution
@@ -367,6 +422,9 @@ class MT5TradingEngine {
       comment: req.comment ?? "SFP Auto",
       magic: req.magic ?? this.config.magicNumber,
       openTime: new Date().toLocaleTimeString(),
+      // Track optimistic fills so syncFromEa can preserve a just-opened
+      // position within the pre-fill window (see syncFromEa).
+      createdAtMs: this.credentials.bridgeMode === "mql5_ea" ? Date.now() : undefined,
     };
 
     this.positions.push(newPosition);
@@ -399,6 +457,20 @@ class MT5TradingEngine {
 
     const pos = this.positions[index]!;
     this.positions.splice(index, 1);
+
+    // Close the broker position too — the EA only acts on commands it sees.
+    if (this.credentials.bridgeMode === "mql5_ea") {
+      this.pendingCommands.push({
+        id: "close-" + ticket,
+        action: "CLOSE",
+        ticket,
+        symbol: pos.symbol,
+        strategyId: pos.strategyId,
+        strategyName: pos.strategyName,
+        type: pos.type,
+        volume: pos.volume,
+      });
+    }
 
     // Book closed trade
     this.account.balance += pos.profit + pos.commission + pos.swap;
@@ -458,7 +530,39 @@ class MT5TradingEngine {
     this.account.lastUpdated = new Date().toISOString();
 
     if (Array.isArray(telemetry.positions)) {
-      this.positions = telemetry.positions.map((p) => ({
+      // A heartbeat that arrives in the 15s window between the optimistic
+      // local fill and the broker's first confirmation would otherwise wipe
+      // the local position (telemetry.positions doesn't report it yet),
+      // allowing duplicate/hedge orders in the interval. Preserve optimistic
+      // positions by count deficit per canonicalSymbol+side: if the engine
+      // holds more same-side canonical positions than the broker has
+      // confirmed (e.g. a 2nd stacked fill whose confirmation has not
+      // arrived yet), the unconfirmed slots must survive the sync.
+      const liveCounts = new Map<string, number>();
+      for (const p of telemetry.positions) {
+        const key = `${canonicalSymbol(p.symbol)}|${p.type}`;
+        liveCounts.set(key, (liveCounts.get(key) ?? 0) + 1);
+      }
+      const localCounts = new Map<string, number>();
+      for (const p of this.positions) {
+        const key = `${canonicalSymbol(p.symbol)}|${p.type}`;
+        localCounts.set(key, (localCounts.get(key) ?? 0) + 1);
+      }
+      const preserved = [];
+      const preservedByKey = new Map<string, number>();
+      for (const p of this.positions) {
+        if (typeof p.createdAtMs !== "number") continue; // not an optimistic fill
+        if (Date.now() - p.createdAtMs >= 15_000) continue; // out of the pre-fill window
+        const key = `${canonicalSymbol(p.symbol)}|${p.type}`;
+        const deficit = (localCounts.get(key) ?? 0) - (liveCounts.get(key) ?? 0);
+        if (deficit <= 0) continue;
+        const alreadyPreserved = preservedByKey.get(key) ?? 0;
+        if (alreadyPreserved >= deficit) continue;
+        preserved.push(p);
+        preservedByKey.set(key, alreadyPreserved + 1);
+      }
+
+      const brokerPositions = telemetry.positions.map((p) => ({
         id: "pos-" + p.ticket,
         ticket: p.ticket,
         symbol: p.symbol,
@@ -477,6 +581,8 @@ class MT5TradingEngine {
         magic: this.config.magicNumber,
         openTime: new Date().toLocaleTimeString(),
       }));
+
+      this.positions = [...brokerPositions, ...preserved];
     }
   }
 
@@ -487,7 +593,7 @@ class MT5TradingEngine {
     const contractSize = getContractSize(symbol);
     for (let i = this.positions.length - 1; i >= 0; i--) {
       const pos = this.positions[i]!;
-      if (pos.symbol !== symbol) continue;
+      if (canonicalSymbol(pos.symbol) !== canonicalSymbol(symbol)) continue;
 
       pos.currentPrice = currentPrice;
       const priceDiff =
