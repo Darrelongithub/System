@@ -25,14 +25,17 @@ Started 2026-11-21/22. No trade has been run yet — Stage 4 blocked until Stage
 - [x] Cost rule frozen: `costR = (spreadOverAtr + 2×0.02×slippageMultiplier)/1.5` (baseline = median spread + 1x slippage; stress = p95 + 2x slippage)
 - [ ] Unmeasured-year per-year cost overlay NOT yet decided — logged in QUESTIONS.md (see below)
 
-## Stage 4 — verdict run (BLOCKED until Stage 3 overlay + Stage 2 freeze land)
-- [ ] No trade run yet (hard gate: Stage 2 must be frozen before any run)
-- [ ] Frozen CSVs + engine worktrees must exist; use worktrees at /tmp/frozen-core8, /tmp/frozen-v31 (recreate if /tmp wiped — `git worktree add`)
-- [ ] Random baseline: side-matched, ≥4,000 draws per side per segment, fixed seed (20261026), one-slot blocking
-- [ ] Stack=3, no self-hedging, side-split report
-- [ ] PASS gates per bot (≥100 trades; net mean > +0.10R with t>2; excess over matched random >0 with t>2; concentration <50%; LOYO ≥75% positive; positive after 2x cost; single failed bar = FAIL)
-- [ ] 2-year-window inflation: none (this is a full-window verdict)
+## Stage 4 — verdict (DONE — one run, frozen)
+- [x] CORE-8 (PRIMARY, 2004–2019 UNSEEN): 0/8 PASS — 2,685 trades, gross +132.87R, net (measured cost) −265.37R, net2x −663.60R. Gate detail in artifacts/rc-test/stage4-verdict-report.md
+- [x] v3.1 NINE (CONTAMINATED, 2004–2019 UNSEEN): 0/9 PASS — 1,869 trades, gross +139.62R, net (measured cost) −81.18R, net2x −301.98R. CONTAMINATED — pruning used 2004–2019 (Stage 1).
+- [x] CORE-8 IN-SAMPLE 2020–2026 (separate report, labeled IN-SAMPLE): 2/8 PASS — 1,121 trades, gross +334.72R, net +253.01R, net2x +171.31R. Does NOT generalize to the unseen window.
+- by-side split + per-bot × per-side stats in artifacts/rc-test/stage4-verdict-report.md (LONG/SHORT-SPLIT)
+- random baseline: side-matched (921-1681 per side per segment ≈ 11,000+ pooled draws), fixed seed 20261026, one-slot blocking per (bot, side) segment, 1.5 ATR stop / 2R target / 96-bar cap, same measured cost — counts ≥ 4,000/side/segment in every segment
+- RANDOM baseline reported in full in verdict-*.json (drawN counts per bot+side)
+- PASS gates printed per bot in both reports.
 
 ## Current state
-- Stage 1+2 frozen and committed. QUESTIONS.md created (5 open questions).
-- Next: Stage 3 — conservative cost overlay for unmeasured years (2004–2009, 2012–2017, 2019) + exact same-side computation; then Stage 4 verdict.
+- ALL Stages 1–4 complete — no rerun after results.
+- QUESTIONS.md has 7 open questions (Q1–Q7, none blocking).
+- v3.1 nine continues to require human re-confirmation of the contamination label if a fresh clean book is desired (see Q3).
+

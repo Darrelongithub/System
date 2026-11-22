@@ -1,0 +1,3155 @@
+{
+  "label": "v3.1 NINE",
+  "worktree": "/tmp/frozen-v31",
+  "csv": "artifacts/rc-test/unseen-2004-2019-eat-twoepoch.csv",
+  "strategyIds": [
+    "donchian-55-coiled",
+    "ny-pivot-s1r1-reject",
+    "supertrend-ema-pullback",
+    "engulfing-zone-retest",
+    "weekly-highlow-breakout",
+    "crabel-nr7-ignition",
+    "bollinger-bandwidth-pop",
+    "lambert-cci20-momentum",
+    "chandelier-22-flip"
+  ],
+  "generatedAt": "2026-11-22T16:06:30.975Z",
+  "rowCounts": {
+    "totalTradeRows": 1869,
+    "perBot": 9
+  },
+  "perBot": [
+    {
+      "botId": "donchian-55-coiled",
+      "trades": 677,
+      "resolved": 677,
+      "longs": 407,
+      "shorts": 270,
+      "totalGrossR": 39.893639500569634,
+      "totalNetR_measured": -6.687523625096173,
+      "meanGrossR": 0.058927089365686317,
+      "meanNetRMeasured": -0.009878173744602915,
+      "t_netMeasured": -0.127,
+      "excessVsRandomR": 0.2197,
+      "t_excess": 2.827,
+      "wins": 148,
+      "wr": 0.21861152141802068,
+      "yearR": [
+        {
+          "year": 2013,
+          "trades": 40,
+          "net": -2.606
+        },
+        {
+          "year": 2011,
+          "trades": 52,
+          "net": 5.509
+        },
+        {
+          "year": 2012,
+          "trades": 33,
+          "net": -9.674
+        },
+        {
+          "year": 2008,
+          "trades": 51,
+          "net": 2.636
+        },
+        {
+          "year": 2016,
+          "trades": 41,
+          "net": -1.439
+        },
+        {
+          "year": 2019,
+          "trades": 32,
+          "net": -15.723
+        },
+        {
+          "year": 2006,
+          "trades": 46,
+          "net": 7.334
+        },
+        {
+          "year": 2010,
+          "trades": 51,
+          "net": -1.342
+        },
+        {
+          "year": 2009,
+          "trades": 42,
+          "net": -2.569
+        },
+        {
+          "year": 2015,
+          "trades": 43,
+          "net": 4.973
+        },
+        {
+          "year": 2014,
+          "trades": 47,
+          "net": 0.34
+        },
+        {
+          "year": 2018,
+          "trades": 53,
+          "net": 8.281
+        },
+        {
+          "year": 2017,
+          "trades": 46,
+          "net": -21.857
+        },
+        {
+          "year": 2007,
+          "trades": 50,
+          "net": 8.197
+        },
+        {
+          "year": 2005,
+          "trades": 35,
+          "net": 27.711
+        },
+        {
+          "year": 2004,
+          "trades": 15,
+          "net": -16.46
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 4,
+      "loyoTotal": 16,
+      "loyoFraction": 0.25,
+      "net2xMean": -0.0787,
+      "net2xSum": -53.2686867507619,
+      "randomBaseline": {
+        "drawCount": 11708,
+        "meanNetR": -0.22956486540450724,
+        "sd": 1.4482177145074064
+      },
+      "sideStats": {
+        "long": {
+          "botId": "donchian-55-coiled",
+          "trades": 407,
+          "resolved": 407,
+          "longs": 407,
+          "shorts": 0,
+          "totalGrossR": 81.74212392114201,
+          "totalNetR_measured": 51.54584179839959,
+          "meanGrossR": 0.20084059931484524,
+          "meanNetRMeasured": 0.12664825994692774,
+          "t_netMeasured": 1.21,
+          "excessVsRandomR": 0.3285,
+          "t_excess": 3.139,
+          "wins": 101,
+          "wr": 0.24815724815724816,
+          "yearR": [
+            {
+              "year": 2012,
+              "trades": 19,
+              "net": -0.041
+            },
+            {
+              "year": 2011,
+              "trades": 33,
+              "net": 10.285
+            },
+            {
+              "year": 2013,
+              "trades": 7,
+              "net": -7.202
+            },
+            {
+              "year": 2016,
+              "trades": 32,
+              "net": -1.367
+            },
+            {
+              "year": 2019,
+              "trades": 20,
+              "net": -7.348
+            },
+            {
+              "year": 2010,
+              "trades": 43,
+              "net": 7.345
+            },
+            {
+              "year": 2009,
+              "trades": 27,
+              "net": 4.415
+            },
+            {
+              "year": 2015,
+              "trades": 14,
+              "net": 5.245
+            },
+            {
+              "year": 2008,
+              "trades": 30,
+              "net": -3.755
+            },
+            {
+              "year": 2014,
+              "trades": 26,
+              "net": -2.35
+            },
+            {
+              "year": 2006,
+              "trades": 33,
+              "net": 12.206
+            },
+            {
+              "year": 2017,
+              "trades": 27,
+              "net": -5.814
+            },
+            {
+              "year": 2018,
+              "trades": 21,
+              "net": 2.521
+            },
+            {
+              "year": 2007,
+              "trades": 34,
+              "net": 20.887
+            },
+            {
+              "year": 2005,
+              "trades": 26,
+              "net": 32.978
+            },
+            {
+              "year": 2004,
+              "trades": 15,
+              "net": -16.46
+            }
+          ],
+          "concentration": 0.64,
+          "loyoPositive": 16,
+          "loyoTotal": 16,
+          "loyoFraction": 1,
+          "net2xMean": 0.0525,
+          "net2xSum": 21.349559675657176,
+          "randomBaseline": {
+            "drawCount": 5751,
+            "meanNetR": -0.20187784071169962,
+            "sdReal": 2.111163536053043,
+            "seExcess": 0.10464649132828983,
+            "baseSd": 1.4598355148381912,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "donchian-55-coiled",
+          "trades": 270,
+          "resolved": 270,
+          "longs": 0,
+          "shorts": 270,
+          "totalGrossR": -41.848484420572404,
+          "totalNetR_measured": -58.2333654234958,
+          "meanGrossR": -0.15499438674286076,
+          "meanNetRMeasured": -0.2156791311981326,
+          "t_netMeasured": -1.901,
+          "excessVsRandomR": 0.0406,
+          "t_excess": 0.358,
+          "wins": 47,
+          "wr": 0.17407407407407408,
+          "yearR": [
+            {
+              "year": 2013,
+              "trades": 33,
+              "net": 4.596
+            },
+            {
+              "year": 2011,
+              "trades": 19,
+              "net": -4.776
+            },
+            {
+              "year": 2008,
+              "trades": 21,
+              "net": 6.391
+            },
+            {
+              "year": 2012,
+              "trades": 14,
+              "net": -9.633
+            },
+            {
+              "year": 2006,
+              "trades": 13,
+              "net": -4.872
+            },
+            {
+              "year": 2019,
+              "trades": 12,
+              "net": -8.375
+            },
+            {
+              "year": 2010,
+              "trades": 8,
+              "net": -8.687
+            },
+            {
+              "year": 2009,
+              "trades": 15,
+              "net": -6.984
+            },
+            {
+              "year": 2016,
+              "trades": 9,
+              "net": -0.071
+            },
+            {
+              "year": 2015,
+              "trades": 29,
+              "net": -0.272
+            },
+            {
+              "year": 2014,
+              "trades": 21,
+              "net": 2.69
+            },
+            {
+              "year": 2018,
+              "trades": 32,
+              "net": 5.76
+            },
+            {
+              "year": 2017,
+              "trades": 19,
+              "net": -16.043
+            },
+            {
+              "year": 2007,
+              "trades": 16,
+              "net": -12.69
+            },
+            {
+              "year": 2005,
+              "trades": 9,
+              "net": -5.267
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 15,
+          "loyoFraction": 0,
+          "net2xMean": -0.2764,
+          "net2xSum": -74.61824642641915,
+          "randomBaseline": {
+            "drawCount": 5957,
+            "meanNetR": -0.25629444052763806,
+            "sdReal": 1.8641878745895293,
+            "seExcess": 0.11345086114892186,
+            "baseSd": 1.4365288911984468,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": true,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "weekly-highlow-breakout",
+      "trades": 107,
+      "resolved": 107,
+      "longs": 62,
+      "shorts": 45,
+      "totalGrossR": 1.7367611388633244,
+      "totalNetR_measured": -12.221663312271897,
+      "meanGrossR": 0.01623141251274135,
+      "meanNetRMeasured": -0.11422115245113922,
+      "t_netMeasured": -0.662,
+      "excessVsRandomR": 0.1174,
+      "t_excess": 0.68,
+      "wins": 26,
+      "wr": 0.24299065420560748,
+      "yearR": [
+        {
+          "year": 2014,
+          "trades": 9,
+          "net": -1.789
+        },
+        {
+          "year": 2011,
+          "trades": 6,
+          "net": 2.23
+        },
+        {
+          "year": 2010,
+          "trades": 10,
+          "net": -6.513
+        },
+        {
+          "year": 2012,
+          "trades": 4,
+          "net": -4.172
+        },
+        {
+          "year": 2008,
+          "trades": 9,
+          "net": 2.016
+        },
+        {
+          "year": 2016,
+          "trades": 6,
+          "net": 1.226
+        },
+        {
+          "year": 2009,
+          "trades": 9,
+          "net": -6.202
+        },
+        {
+          "year": 2017,
+          "trades": 6,
+          "net": 0.847
+        },
+        {
+          "year": 2015,
+          "trades": 9,
+          "net": -9.653
+        },
+        {
+          "year": 2013,
+          "trades": 7,
+          "net": 0.688
+        },
+        {
+          "year": 2006,
+          "trades": 5,
+          "net": -5.832
+        },
+        {
+          "year": 2018,
+          "trades": 6,
+          "net": 1.843
+        },
+        {
+          "year": 2019,
+          "trades": 6,
+          "net": 5.57
+        },
+        {
+          "year": 2007,
+          "trades": 6,
+          "net": 5.838
+        },
+        {
+          "year": 2005,
+          "trades": 5,
+          "net": -5.723
+        },
+        {
+          "year": 2004,
+          "trades": 4,
+          "net": 7.405
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 0,
+      "loyoTotal": 16,
+      "loyoFraction": 0,
+      "net2xMean": -0.2447,
+      "net2xSum": -26.180087763407116,
+      "randomBaseline": {
+        "drawCount": 11967,
+        "meanNetR": -0.23157495806701445,
+        "sd": 1.4382167802629773
+      },
+      "sideStats": {
+        "long": {
+          "botId": "weekly-highlow-breakout",
+          "trades": 62,
+          "resolved": 62,
+          "longs": 62,
+          "shorts": 0,
+          "totalGrossR": 2.404142826808014,
+          "totalNetR_measured": -6.113150421871813,
+          "meanGrossR": 0.03877649720658087,
+          "meanNetRMeasured": -0.09859920035277119,
+          "t_netMeasured": -0.424,
+          "excessVsRandomR": 0.125,
+          "t_excess": 0.538,
+          "wins": 15,
+          "wr": 0.24193548387096775,
+          "yearR": [
+            {
+              "year": 2014,
+              "trades": 4,
+              "net": -4.237
+            },
+            {
+              "year": 2011,
+              "trades": 3,
+              "net": 1.32
+            },
+            {
+              "year": 2010,
+              "trades": 7,
+              "net": -3.209
+            },
+            {
+              "year": 2012,
+              "trades": 3,
+              "net": -3.144
+            },
+            {
+              "year": 2008,
+              "trades": 6,
+              "net": -2.873
+            },
+            {
+              "year": 2016,
+              "trades": 5,
+              "net": 2.377
+            },
+            {
+              "year": 2009,
+              "trades": 6,
+              "net": -2.474
+            },
+            {
+              "year": 2017,
+              "trades": 3,
+              "net": -3.397
+            },
+            {
+              "year": 2015,
+              "trades": 2,
+              "net": -2.083
+            },
+            {
+              "year": 2013,
+              "trades": 1,
+              "net": -1.052
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": -4.628
+            },
+            {
+              "year": 2018,
+              "trades": 4,
+              "net": 0.2
+            },
+            {
+              "year": 2019,
+              "trades": 4,
+              "net": 7.984
+            },
+            {
+              "year": 2007,
+              "trades": 4,
+              "net": 3.955
+            },
+            {
+              "year": 2005,
+              "trades": 3,
+              "net": -3.412
+            },
+            {
+              "year": 2004,
+              "trades": 3,
+              "net": 8.559
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 16,
+          "loyoFraction": 0,
+          "net2xMean": -0.236,
+          "net2xSum": -14.630443670551637,
+          "randomBaseline": {
+            "drawCount": 5957,
+            "meanNetR": -0.22358487153925377,
+            "sdReal": 1.830287644902763,
+            "seExcess": 0.2324467633495305,
+            "baseSd": 1.4411986776122805,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "weekly-highlow-breakout",
+          "trades": 45,
+          "resolved": 45,
+          "longs": 0,
+          "shorts": 45,
+          "totalGrossR": -0.6673816879446899,
+          "totalNetR_measured": -6.108512890400082,
+          "meanGrossR": -0.014830704176548665,
+          "meanNetRMeasured": -0.1357447308977796,
+          "t_netMeasured": -0.523,
+          "excessVsRandomR": 0.1037,
+          "t_excess": 0.4,
+          "wins": 11,
+          "wr": 0.24444444444444444,
+          "yearR": [
+            {
+              "year": 2012,
+              "trades": 1,
+              "net": -1.029
+            },
+            {
+              "year": 2011,
+              "trades": 3,
+              "net": 0.91
+            },
+            {
+              "year": 2008,
+              "trades": 3,
+              "net": 4.889
+            },
+            {
+              "year": 2010,
+              "trades": 3,
+              "net": -3.304
+            },
+            {
+              "year": 2007,
+              "trades": 2,
+              "net": 1.882
+            },
+            {
+              "year": 2013,
+              "trades": 6,
+              "net": 1.74
+            },
+            {
+              "year": 2014,
+              "trades": 5,
+              "net": 2.449
+            },
+            {
+              "year": 2017,
+              "trades": 3,
+              "net": 4.244
+            },
+            {
+              "year": 2018,
+              "trades": 2,
+              "net": 1.643
+            },
+            {
+              "year": 2015,
+              "trades": 7,
+              "net": -7.57
+            },
+            {
+              "year": 2016,
+              "trades": 1,
+              "net": -1.152
+            },
+            {
+              "year": 2019,
+              "trades": 2,
+              "net": -2.415
+            },
+            {
+              "year": 2009,
+              "trades": 3,
+              "net": -3.728
+            },
+            {
+              "year": 2006,
+              "trades": 1,
+              "net": -1.204
+            },
+            {
+              "year": 2004,
+              "trades": 1,
+              "net": -1.154
+            },
+            {
+              "year": 2005,
+              "trades": 2,
+              "net": -2.311
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 1,
+          "loyoTotal": 16,
+          "loyoFraction": 0.063,
+          "net2xMean": -0.2567,
+          "net2xSum": -11.549644092855475,
+          "randomBaseline": {
+            "drawCount": 6010,
+            "meanNetR": -0.23949458293325113,
+            "sdReal": 1.741092229467145,
+            "seExcess": 0.25954670534567986,
+            "baseSd": 1.4353310853292904,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "bollinger-bandwidth-pop",
+      "trades": 94,
+      "resolved": 94,
+      "longs": 53,
+      "shorts": 41,
+      "totalGrossR": 11.438387078865212,
+      "totalNetR_measured": -3.6308975696835946,
+      "meanGrossR": 0.121684968924098,
+      "meanNetRMeasured": -0.038626569890251004,
+      "t_netMeasured": -0.205,
+      "excessVsRandomR": 0.1738,
+      "t_excess": 0.921,
+      "wins": 27,
+      "wr": 0.2872340425531915,
+      "yearR": [
+        {
+          "year": 2011,
+          "trades": 5,
+          "net": -5.34
+        },
+        {
+          "year": 2008,
+          "trades": 5,
+          "net": -1.973
+        },
+        {
+          "year": 2006,
+          "trades": 7,
+          "net": 6.819
+        },
+        {
+          "year": 2017,
+          "trades": 7,
+          "net": -8.668
+        },
+        {
+          "year": 2010,
+          "trades": 10,
+          "net": -2.662
+        },
+        {
+          "year": 2019,
+          "trades": 7,
+          "net": 10.586
+        },
+        {
+          "year": 2009,
+          "trades": 11,
+          "net": -9.661
+        },
+        {
+          "year": 2016,
+          "trades": 3,
+          "net": -3.683
+        },
+        {
+          "year": 2015,
+          "trades": 10,
+          "net": 1.004
+        },
+        {
+          "year": 2012,
+          "trades": 3,
+          "net": 0.824
+        },
+        {
+          "year": 2014,
+          "trades": 6,
+          "net": 1.317
+        },
+        {
+          "year": 2018,
+          "trades": 10,
+          "net": 4.02
+        },
+        {
+          "year": 2013,
+          "trades": 3,
+          "net": 0.693
+        },
+        {
+          "year": 2007,
+          "trades": 4,
+          "net": 6.534
+        },
+        {
+          "year": 2005,
+          "trades": 3,
+          "net": -3.442
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 4,
+      "loyoTotal": 15,
+      "loyoFraction": 0.267,
+      "net2xMean": -0.1989,
+      "net2xSum": -18.7001822182324,
+      "randomBaseline": {
+        "drawCount": 11838,
+        "meanNetR": -0.2123933275756051,
+        "sd": 1.444510404836907
+      },
+      "sideStats": {
+        "long": {
+          "botId": "bollinger-bandwidth-pop",
+          "trades": 53,
+          "resolved": 53,
+          "longs": 53,
+          "shorts": 0,
+          "totalGrossR": 14.651928077760072,
+          "totalNetR_measured": 6.028358011055905,
+          "meanGrossR": 0.2764514731652844,
+          "meanNetRMeasured": 0.1137426039821869,
+          "t_netMeasured": 0.423,
+          "excessVsRandomR": 0.3269,
+          "t_excess": 1.217,
+          "wins": 17,
+          "wr": 0.32075471698113206,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 3,
+              "net": -3.184
+            },
+            {
+              "year": 2008,
+              "trades": 2,
+              "net": 1.763
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": 3.107
+            },
+            {
+              "year": 2017,
+              "trades": 5,
+              "net": -6.211
+            },
+            {
+              "year": 2010,
+              "trades": 7,
+              "net": 0.549
+            },
+            {
+              "year": 2019,
+              "trades": 3,
+              "net": 8.226
+            },
+            {
+              "year": 2009,
+              "trades": 9,
+              "net": -7.189
+            },
+            {
+              "year": 2016,
+              "trades": 3,
+              "net": -3.683
+            },
+            {
+              "year": 2015,
+              "trades": 5,
+              "net": 2.567
+            },
+            {
+              "year": 2012,
+              "trades": 1,
+              "net": 2.956
+            },
+            {
+              "year": 2014,
+              "trades": 3,
+              "net": 0.746
+            },
+            {
+              "year": 2018,
+              "trades": 4,
+              "net": 3.362
+            },
+            {
+              "year": 2007,
+              "trades": 2,
+              "net": 5.333
+            },
+            {
+              "year": 2005,
+              "trades": 2,
+              "net": -2.313
+            }
+          ],
+          "concentration": 1.365,
+          "loyoPositive": 13,
+          "loyoTotal": 14,
+          "loyoFraction": 0.929,
+          "net2xMean": -0.049,
+          "net2xSum": -2.5952120556482603,
+          "randomBaseline": {
+            "drawCount": 5799,
+            "meanNetR": -0.21318945429867506,
+            "sdReal": 1.8831148109729763,
+            "seExcess": 0.26857807179365173,
+            "baseSd": 1.4472840651103875,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "bollinger-bandwidth-pop",
+          "trades": 41,
+          "resolved": 41,
+          "longs": 0,
+          "shorts": 41,
+          "totalGrossR": -3.2135409988948624,
+          "totalNetR_measured": -9.6592555807395,
+          "meanGrossR": -0.07837904875353323,
+          "meanNetRMeasured": -0.23559159953023173,
+          "t_netMeasured": -0.918,
+          "excessVsRandomR": -0.024,
+          "t_excess": -0.093,
+          "wins": 10,
+          "wr": 0.24390243902439024,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 2,
+              "net": -2.155
+            },
+            {
+              "year": 2013,
+              "trades": 3,
+              "net": 0.693
+            },
+            {
+              "year": 2009,
+              "trades": 2,
+              "net": -2.473
+            },
+            {
+              "year": 2012,
+              "trades": 2,
+              "net": -2.131
+            },
+            {
+              "year": 2008,
+              "trades": 3,
+              "net": -3.735
+            },
+            {
+              "year": 2015,
+              "trades": 5,
+              "net": -1.563
+            },
+            {
+              "year": 2014,
+              "trades": 3,
+              "net": 0.571
+            },
+            {
+              "year": 2010,
+              "trades": 3,
+              "net": -3.21
+            },
+            {
+              "year": 2019,
+              "trades": 4,
+              "net": 2.359
+            },
+            {
+              "year": 2017,
+              "trades": 2,
+              "net": -2.457
+            },
+            {
+              "year": 2007,
+              "trades": 2,
+              "net": 1.202
+            },
+            {
+              "year": 2006,
+              "trades": 3,
+              "net": 3.712
+            },
+            {
+              "year": 2018,
+              "trades": 6,
+              "net": 0.658
+            },
+            {
+              "year": 2005,
+              "trades": 1,
+              "net": -1.129
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 14,
+          "loyoFraction": 0,
+          "net2xMean": -0.3928,
+          "net2xSum": -16.104970162584138,
+          "randomBaseline": {
+            "drawCount": 6039,
+            "meanNetR": -0.21162884026530954,
+            "sdReal": 1.6439543778855803,
+            "seExcess": 0.25674253956763415,
+            "baseSd": 1.4419613919046539,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": false,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "crabel-nr7-ignition",
+      "trades": 79,
+      "resolved": 79,
+      "longs": 44,
+      "shorts": 35,
+      "totalGrossR": 17.380727693366328,
+      "totalNetR_measured": 5.27779496525585,
+      "meanGrossR": 0.22000921130843454,
+      "meanNetRMeasured": 0.06680753120577025,
+      "t_netMeasured": 0.321,
+      "excessVsRandomR": 0.2758,
+      "t_excess": 1.326,
+      "wins": 24,
+      "wr": 0.3037974683544304,
+      "yearR": [
+        {
+          "year": 2008,
+          "trades": 3,
+          "net": 4.532
+        },
+        {
+          "year": 2011,
+          "trades": 5,
+          "net": -1.308
+        },
+        {
+          "year": 2012,
+          "trades": 5,
+          "net": -1.212
+        },
+        {
+          "year": 2013,
+          "trades": 3,
+          "net": -3.208
+        },
+        {
+          "year": 2010,
+          "trades": 7,
+          "net": 0.87
+        },
+        {
+          "year": 2009,
+          "trades": 11,
+          "net": 2.869
+        },
+        {
+          "year": 2019,
+          "trades": 5,
+          "net": -2.027
+        },
+        {
+          "year": 2007,
+          "trades": 10,
+          "net": -8.079
+        },
+        {
+          "year": 2016,
+          "trades": 2,
+          "net": 1.414
+        },
+        {
+          "year": 2014,
+          "trades": 3,
+          "net": 0.886
+        },
+        {
+          "year": 2015,
+          "trades": 5,
+          "net": 6.693
+        },
+        {
+          "year": 2006,
+          "trades": 6,
+          "net": 8.506
+        },
+        {
+          "year": 2018,
+          "trades": 5,
+          "net": -5.366
+        },
+        {
+          "year": 2017,
+          "trades": 8,
+          "net": -1.916
+        },
+        {
+          "year": 2005,
+          "trades": 1,
+          "net": 2.623
+        }
+      ],
+      "concentration": 1.612,
+      "loyoPositive": 13,
+      "loyoTotal": 15,
+      "loyoFraction": 0.867,
+      "net2xMean": -0.0864,
+      "net2xSum": -6.825137762854631,
+      "randomBaseline": {
+        "drawCount": 11323,
+        "meanNetR": -0.2090102034737288,
+        "sd": 1.4429498616642746
+      },
+      "sideStats": {
+        "long": {
+          "botId": "crabel-nr7-ignition",
+          "trades": 44,
+          "resolved": 44,
+          "longs": 44,
+          "shorts": 0,
+          "totalGrossR": 16.348294620153826,
+          "totalNetR_measured": 9.638131772337463,
+          "meanGrossR": 0.3715521504580415,
+          "meanNetRMeasured": 0.21904844937130596,
+          "t_netMeasured": 0.757,
+          "excessVsRandomR": 0.4214,
+          "t_excess": 1.455,
+          "wins": 15,
+          "wr": 0.3409090909090909,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 4,
+              "net": -0.227
+            },
+            {
+              "year": 2013,
+              "trades": 1,
+              "net": -1.056
+            },
+            {
+              "year": 2010,
+              "trades": 6,
+              "net": 1.926
+            },
+            {
+              "year": 2009,
+              "trades": 9,
+              "net": 5.275
+            },
+            {
+              "year": 2019,
+              "trades": 3,
+              "net": 0.335
+            },
+            {
+              "year": 2007,
+              "trades": 5,
+              "net": -6.013
+            },
+            {
+              "year": 2015,
+              "trades": 1,
+              "net": 3.02
+            },
+            {
+              "year": 2012,
+              "trades": 3,
+              "net": -3.189
+            },
+            {
+              "year": 2014,
+              "trades": 2,
+              "net": 1.958
+            },
+            {
+              "year": 2008,
+              "trades": 1,
+              "net": 2.817
+            },
+            {
+              "year": 2006,
+              "trades": 2,
+              "net": 5.35
+            },
+            {
+              "year": 2017,
+              "trades": 4,
+              "net": -1.008
+            },
+            {
+              "year": 2018,
+              "trades": 2,
+              "net": -2.172
+            },
+            {
+              "year": 2005,
+              "trades": 1,
+              "net": 2.623
+            }
+          ],
+          "concentration": 0.624,
+          "loyoPositive": 14,
+          "loyoTotal": 14,
+          "loyoFraction": 1,
+          "net2xMean": 0.0665,
+          "net2xSum": 2.9279689245211005,
+          "randomBaseline": {
+            "drawCount": 5596,
+            "meanNetR": -0.20235254304188127,
+            "sdReal": 1.9206542078266216,
+            "seExcess": 0.289549516335372,
+            "baseSd": 1.4431573108135567,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "crabel-nr7-ignition",
+          "trades": 35,
+          "resolved": 35,
+          "longs": 0,
+          "shorts": 35,
+          "totalGrossR": 1.032433073212506,
+          "totalNetR_measured": -4.360336807081609,
+          "meanGrossR": 0.0294980878060716,
+          "meanNetRMeasured": -0.1245810516309031,
+          "t_netMeasured": -0.418,
+          "excessVsRandomR": 0.0909,
+          "t_excess": 0.305,
+          "wins": 9,
+          "wr": 0.2571428571428571,
+          "yearR": [
+            {
+              "year": 2008,
+              "trades": 2,
+              "net": 1.715
+            },
+            {
+              "year": 2012,
+              "trades": 2,
+              "net": 1.977
+            },
+            {
+              "year": 2011,
+              "trades": 1,
+              "net": -1.08
+            },
+            {
+              "year": 2013,
+              "trades": 2,
+              "net": -2.152
+            },
+            {
+              "year": 2016,
+              "trades": 2,
+              "net": 1.414
+            },
+            {
+              "year": 2019,
+              "trades": 2,
+              "net": -2.362
+            },
+            {
+              "year": 2014,
+              "trades": 1,
+              "net": -1.072
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": 3.155
+            },
+            {
+              "year": 2010,
+              "trades": 1,
+              "net": -1.056
+            },
+            {
+              "year": 2018,
+              "trades": 3,
+              "net": -3.193
+            },
+            {
+              "year": 2009,
+              "trades": 2,
+              "net": -2.406
+            },
+            {
+              "year": 2015,
+              "trades": 4,
+              "net": 3.674
+            },
+            {
+              "year": 2017,
+              "trades": 4,
+              "net": -0.908
+            },
+            {
+              "year": 2007,
+              "trades": 5,
+              "net": -2.066
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 14,
+          "loyoFraction": 0,
+          "net2xMean": -0.2787,
+          "net2xSum": -9.753106687375727,
+          "randomBaseline": {
+            "drawCount": 5727,
+            "meanNetR": -0.2155155758810549,
+            "sdReal": 1.7617688185831353,
+            "seExcess": 0.29779328257471377,
+            "baseSd": 1.442843462689942,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": false,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": true,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "chandelier-22-flip",
+      "trades": 317,
+      "resolved": 317,
+      "longs": 189,
+      "shorts": 128,
+      "totalGrossR": 13.276440255961964,
+      "totalNetR_measured": -30.748578191972406,
+      "meanGrossR": 0.04188151500303459,
+      "meanNetRMeasured": -0.09699866937530728,
+      "t_netMeasured": -0.947,
+      "excessVsRandomR": 0.1377,
+      "t_excess": 1.344,
+      "wins": 87,
+      "wr": 0.2744479495268139,
+      "yearR": [
+        {
+          "year": 2011,
+          "trades": 23,
+          "net": 22.775
+        },
+        {
+          "year": 2008,
+          "trades": 24,
+          "net": -4.857
+        },
+        {
+          "year": 2010,
+          "trades": 17,
+          "net": -7.53
+        },
+        {
+          "year": 2012,
+          "trades": 14,
+          "net": -3.179
+        },
+        {
+          "year": 2016,
+          "trades": 18,
+          "net": -11.711
+        },
+        {
+          "year": 2009,
+          "trades": 28,
+          "net": 0.33
+        },
+        {
+          "year": 2013,
+          "trades": 17,
+          "net": 1.15
+        },
+        {
+          "year": 2015,
+          "trades": 19,
+          "net": -14.014
+        },
+        {
+          "year": 2007,
+          "trades": 25,
+          "net": 12.52
+        },
+        {
+          "year": 2014,
+          "trades": 28,
+          "net": -7.328
+        },
+        {
+          "year": 2006,
+          "trades": 19,
+          "net": -7.6
+        },
+        {
+          "year": 2019,
+          "trades": 20,
+          "net": -5.516
+        },
+        {
+          "year": 2018,
+          "trades": 26,
+          "net": 1.613
+        },
+        {
+          "year": 2017,
+          "trades": 18,
+          "net": -9.795
+        },
+        {
+          "year": 2004,
+          "trades": 6,
+          "net": -2.947
+        },
+        {
+          "year": 2005,
+          "trades": 15,
+          "net": 5.339
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 0,
+      "loyoTotal": 16,
+      "loyoFraction": 0,
+      "net2xMean": -0.2359,
+      "net2xSum": -74.77359663990669,
+      "randomBaseline": {
+        "drawCount": 11514,
+        "meanNetR": -0.23466823289803024,
+        "sd": 1.4480293340264299
+      },
+      "sideStats": {
+        "long": {
+          "botId": "chandelier-22-flip",
+          "trades": 189,
+          "resolved": 189,
+          "longs": 189,
+          "shorts": 0,
+          "totalGrossR": 31.732200652973376,
+          "totalNetR_measured": 3.8099787330358055,
+          "meanGrossR": 0.16789524155012367,
+          "meanNetRMeasured": 0.020158617635110083,
+          "t_netMeasured": 0.145,
+          "excessVsRandomR": 0.2174,
+          "t_excess": 1.56,
+          "wins": 58,
+          "wr": 0.30687830687830686,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 11,
+              "net": 11.978
+            },
+            {
+              "year": 2010,
+              "trades": 12,
+              "net": -1.223
+            },
+            {
+              "year": 2016,
+              "trades": 16,
+              "net": -9.358
+            },
+            {
+              "year": 2009,
+              "trades": 20,
+              "net": 2.534
+            },
+            {
+              "year": 2008,
+              "trades": 14,
+              "net": 3.015
+            },
+            {
+              "year": 2015,
+              "trades": 11,
+              "net": -11.77
+            },
+            {
+              "year": 2012,
+              "trades": 6,
+              "net": -6.372
+            },
+            {
+              "year": 2013,
+              "trades": 6,
+              "net": 5.284
+            },
+            {
+              "year": 2007,
+              "trades": 19,
+              "net": 15.745
+            },
+            {
+              "year": 2014,
+              "trades": 15,
+              "net": -0.938
+            },
+            {
+              "year": 2006,
+              "trades": 15,
+              "net": -2.875
+            },
+            {
+              "year": 2019,
+              "trades": 12,
+              "net": -3.615
+            },
+            {
+              "year": 2018,
+              "trades": 9,
+              "net": 1.714
+            },
+            {
+              "year": 2017,
+              "trades": 10,
+              "net": -8.024
+            },
+            {
+              "year": 2004,
+              "trades": 4,
+              "net": -0.682
+            },
+            {
+              "year": 2005,
+              "trades": 9,
+              "net": 8.399
+            }
+          ],
+          "concentration": 4.132,
+          "loyoPositive": 12,
+          "loyoTotal": 16,
+          "loyoFraction": 0.75,
+          "net2xMean": -0.1276,
+          "net2xSum": -24.112243186901782,
+          "randomBaseline": {
+            "drawCount": 5707,
+            "meanNetR": -0.19721936320657113,
+            "sdReal": 1.7874916046387435,
+            "seExcess": 0.13934406153638512,
+            "baseSd": 1.4618375514636142,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "chandelier-22-flip",
+          "trades": 128,
+          "resolved": 128,
+          "longs": 0,
+          "shorts": 128,
+          "totalGrossR": -18.455760397011414,
+          "totalNetR_measured": -34.558556925008176,
+          "meanGrossR": -0.14418562810165167,
+          "meanNetRMeasured": -0.2699887259766264,
+          "t_netMeasured": -1.825,
+          "excessVsRandomR": 0.0015,
+          "t_excess": 0.01,
+          "wins": 29,
+          "wr": 0.2265625,
+          "yearR": [
+            {
+              "year": 2008,
+              "trades": 10,
+              "net": -7.872
+            },
+            {
+              "year": 2012,
+              "trades": 8,
+              "net": 3.193
+            },
+            {
+              "year": 2011,
+              "trades": 12,
+              "net": 10.797
+            },
+            {
+              "year": 2013,
+              "trades": 11,
+              "net": -4.134
+            },
+            {
+              "year": 2007,
+              "trades": 6,
+              "net": -3.224
+            },
+            {
+              "year": 2010,
+              "trades": 5,
+              "net": -6.307
+            },
+            {
+              "year": 2019,
+              "trades": 8,
+              "net": -1.901
+            },
+            {
+              "year": 2009,
+              "trades": 8,
+              "net": -2.203
+            },
+            {
+              "year": 2014,
+              "trades": 13,
+              "net": -6.389
+            },
+            {
+              "year": 2015,
+              "trades": 8,
+              "net": -2.244
+            },
+            {
+              "year": 2016,
+              "trades": 2,
+              "net": -2.354
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": -4.725
+            },
+            {
+              "year": 2018,
+              "trades": 17,
+              "net": -0.101
+            },
+            {
+              "year": 2017,
+              "trades": 8,
+              "net": -1.77
+            },
+            {
+              "year": 2004,
+              "trades": 2,
+              "net": -2.265
+            },
+            {
+              "year": 2005,
+              "trades": 6,
+              "net": -3.06
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 16,
+          "loyoFraction": 0,
+          "net2xMean": -0.3958,
+          "net2xSum": -50.66135345300492,
+          "randomBaseline": {
+            "drawCount": 5807,
+            "meanNetR": -0.27147221074017297,
+            "sdReal": 1.6329783452192883,
+            "seExcess": 0.14794709820627708,
+            "baseSd": 1.4335022819773044,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "engulfing-zone-retest",
+      "trades": 113,
+      "resolved": 113,
+      "longs": 61,
+      "shorts": 52,
+      "totalGrossR": -23.56635710424107,
+      "totalNetR_measured": -42.58162591987453,
+      "meanGrossR": -0.20855183278089443,
+      "meanNetRMeasured": -0.37682854796349147,
+      "t_netMeasured": -2.55,
+      "excessVsRandomR": -0.1331,
+      "t_excess": -0.901,
+      "wins": 24,
+      "wr": 0.21238938053097345,
+      "yearR": [
+        {
+          "year": 2012,
+          "trades": 4,
+          "net": -4.335
+        },
+        {
+          "year": 2013,
+          "trades": 13,
+          "net": 5.608
+        },
+        {
+          "year": 2011,
+          "trades": 4,
+          "net": -0.508
+        },
+        {
+          "year": 2015,
+          "trades": 3,
+          "net": -3.231
+        },
+        {
+          "year": 2019,
+          "trades": 11,
+          "net": -6.375
+        },
+        {
+          "year": 2008,
+          "trades": 8,
+          "net": -2.509
+        },
+        {
+          "year": 2009,
+          "trades": 9,
+          "net": -7.588
+        },
+        {
+          "year": 2016,
+          "trades": 6,
+          "net": -0.076
+        },
+        {
+          "year": 2018,
+          "trades": 10,
+          "net": -3.287
+        },
+        {
+          "year": 2010,
+          "trades": 8,
+          "net": -1.277
+        },
+        {
+          "year": 2014,
+          "trades": 8,
+          "net": -5.037
+        },
+        {
+          "year": 2007,
+          "trades": 13,
+          "net": -4.732
+        },
+        {
+          "year": 2006,
+          "trades": 6,
+          "net": -4.726
+        },
+        {
+          "year": 2017,
+          "trades": 3,
+          "net": -3.71
+        },
+        {
+          "year": 2004,
+          "trades": 3,
+          "net": -3.394
+        },
+        {
+          "year": 2005,
+          "trades": 4,
+          "net": 2.595
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 0,
+      "loyoTotal": 16,
+      "loyoFraction": 0,
+      "net2xMean": -0.5451,
+      "net2xSum": -61.59689473550799,
+      "randomBaseline": {
+        "drawCount": 11762,
+        "meanNetR": -0.24372015436518388,
+        "sd": 1.4342221039125715
+      },
+      "sideStats": {
+        "long": {
+          "botId": "engulfing-zone-retest",
+          "trades": 61,
+          "resolved": 61,
+          "longs": 61,
+          "shorts": 0,
+          "totalGrossR": -28.54765064569813,
+          "totalNetR_measured": -39.217630164450114,
+          "meanGrossR": -0.4679942728802972,
+          "meanNetRMeasured": -0.6429119699090182,
+          "t_netMeasured": -3.677,
+          "excessVsRandomR": -0.4183,
+          "t_excess": -2.392,
+          "wins": 9,
+          "wr": 0.14754098360655737,
+          "yearR": [
+            {
+              "year": 2012,
+              "trades": 2,
+              "net": -2.117
+            },
+            {
+              "year": 2011,
+              "trades": 4,
+              "net": -0.508
+            },
+            {
+              "year": 2015,
+              "trades": 1,
+              "net": -1.044
+            },
+            {
+              "year": 2009,
+              "trades": 5,
+              "net": -6.233
+            },
+            {
+              "year": 2013,
+              "trades": 1,
+              "net": -1.067
+            },
+            {
+              "year": 2019,
+              "trades": 6,
+              "net": -4.084
+            },
+            {
+              "year": 2016,
+              "trades": 4,
+              "net": -1.147
+            },
+            {
+              "year": 2008,
+              "trades": 4,
+              "net": -1.434
+            },
+            {
+              "year": 2010,
+              "trades": 4,
+              "net": 3.364
+            },
+            {
+              "year": 2014,
+              "trades": 6,
+              "net": -6.529
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": -6.143
+            },
+            {
+              "year": 2018,
+              "trades": 5,
+              "net": -1.628
+            },
+            {
+              "year": 2007,
+              "trades": 8,
+              "net": -6.184
+            },
+            {
+              "year": 2004,
+              "trades": 3,
+              "net": -3.394
+            },
+            {
+              "year": 2017,
+              "trades": 1,
+              "net": -1.193
+            },
+            {
+              "year": 2005,
+              "trades": 3,
+              "net": 0.124
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 16,
+          "loyoFraction": 0,
+          "net2xMean": -0.8178,
+          "net2xSum": -49.8876096832021,
+          "randomBaseline": {
+            "drawCount": 5858,
+            "meanNetR": -0.2246540365539239,
+            "sdReal": 1.365777907775375,
+            "seExcess": 0.1748699419928376,
+            "baseSd": 1.4379218477694355,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "engulfing-zone-retest",
+          "trades": 52,
+          "resolved": 52,
+          "longs": 0,
+          "shorts": 52,
+          "totalGrossR": 4.98129354145707,
+          "totalNetR_measured": -3.363995755424403,
+          "meanGrossR": 0.09579410656648212,
+          "meanNetRMeasured": -0.06469222606585391,
+          "t_netMeasured": -0.268,
+          "excessVsRandomR": 0.1979,
+          "t_excess": 0.819,
+          "wins": 15,
+          "wr": 0.28846153846153844,
+          "yearR": [
+            {
+              "year": 2013,
+              "trades": 12,
+              "net": 6.675
+            },
+            {
+              "year": 2019,
+              "trades": 5,
+              "net": -2.291
+            },
+            {
+              "year": 2012,
+              "trades": 2,
+              "net": -2.219
+            },
+            {
+              "year": 2008,
+              "trades": 4,
+              "net": -1.075
+            },
+            {
+              "year": 2018,
+              "trades": 5,
+              "net": -1.659
+            },
+            {
+              "year": 2007,
+              "trades": 5,
+              "net": 1.452
+            },
+            {
+              "year": 2009,
+              "trades": 4,
+              "net": -1.354
+            },
+            {
+              "year": 2010,
+              "trades": 4,
+              "net": -4.641
+            },
+            {
+              "year": 2016,
+              "trades": 2,
+              "net": 1.071
+            },
+            {
+              "year": 2017,
+              "trades": 2,
+              "net": -2.517
+            },
+            {
+              "year": 2014,
+              "trades": 2,
+              "net": 1.493
+            },
+            {
+              "year": 2015,
+              "trades": 2,
+              "net": -2.188
+            },
+            {
+              "year": 2006,
+              "trades": 2,
+              "net": 1.417
+            },
+            {
+              "year": 2005,
+              "trades": 1,
+              "net": 2.471
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 1,
+          "loyoTotal": 14,
+          "loyoFraction": 0.071,
+          "net2xMean": -0.2252,
+          "net2xSum": -11.709285052305875,
+          "randomBaseline": {
+            "drawCount": 5904,
+            "meanNetR": -0.2626377218005757,
+            "sdReal": 1.7432480869552598,
+            "seExcess": 0.24174501397583445,
+            "baseSd": 1.430412331346499,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": false,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "lambert-cci20-momentum",
+      "trades": 172,
+      "resolved": 172,
+      "longs": 93,
+      "shorts": 79,
+      "totalGrossR": 7.102626617273909,
+      "totalNetR_measured": -14.798237684661224,
+      "meanGrossR": 0.04129434079810412,
+      "meanNetRMeasured": -0.08603626560849549,
+      "t_netMeasured": -0.63,
+      "excessVsRandomR": 0.1596,
+      "t_excess": 1.169,
+      "wins": 47,
+      "wr": 0.27325581395348836,
+      "yearR": [
+        {
+          "year": 2011,
+          "trades": 18,
+          "net": 4.541
+        },
+        {
+          "year": 2008,
+          "trades": 10,
+          "net": -8.048
+        },
+        {
+          "year": 2016,
+          "trades": 13,
+          "net": -0.112
+        },
+        {
+          "year": 2012,
+          "trades": 9,
+          "net": 2.168
+        },
+        {
+          "year": 2009,
+          "trades": 8,
+          "net": 2.476
+        },
+        {
+          "year": 2013,
+          "trades": 6,
+          "net": 1.441
+        },
+        {
+          "year": 2010,
+          "trades": 10,
+          "net": -6.699
+        },
+        {
+          "year": 2019,
+          "trades": 11,
+          "net": -5.699
+        },
+        {
+          "year": 2015,
+          "trades": 12,
+          "net": -8.898
+        },
+        {
+          "year": 2014,
+          "trades": 11,
+          "net": 3.774
+        },
+        {
+          "year": 2005,
+          "trades": 13,
+          "net": -4.058
+        },
+        {
+          "year": 2018,
+          "trades": 13,
+          "net": 1.013
+        },
+        {
+          "year": 2017,
+          "trades": 11,
+          "net": -2.125
+        },
+        {
+          "year": 2007,
+          "trades": 16,
+          "net": 4.156
+        },
+        {
+          "year": 2006,
+          "trades": 9,
+          "net": 0.002
+        },
+        {
+          "year": 2004,
+          "trades": 2,
+          "net": 1.269
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 0,
+      "loyoTotal": 16,
+      "loyoFraction": 0,
+      "net2xMean": -0.2134,
+      "net2xSum": -36.69910198659637,
+      "randomBaseline": {
+        "drawCount": 11948,
+        "meanNetR": -0.24565968375095978,
+        "sd": 1.4355655902721884
+      },
+      "sideStats": {
+        "long": {
+          "botId": "lambert-cci20-momentum",
+          "trades": 93,
+          "resolved": 93,
+          "longs": 93,
+          "shorts": 0,
+          "totalGrossR": 1.1490615571166036,
+          "totalNetR_measured": -11.436392416975458,
+          "meanGrossR": 0.012355500614157027,
+          "meanNetRMeasured": -0.12297196147285439,
+          "t_netMeasured": -0.679,
+          "excessVsRandomR": 0.1092,
+          "t_excess": 0.603,
+          "wins": 25,
+          "wr": 0.26881720430107525,
+          "yearR": [
+            {
+              "year": 2008,
+              "trades": 5,
+              "net": -2.054
+            },
+            {
+              "year": 2016,
+              "trades": 10,
+              "net": 3.524
+            },
+            {
+              "year": 2009,
+              "trades": 8,
+              "net": 2.476
+            },
+            {
+              "year": 2011,
+              "trades": 9,
+              "net": -1.638
+            },
+            {
+              "year": 2010,
+              "trades": 7,
+              "net": -7.464
+            },
+            {
+              "year": 2013,
+              "trades": 2,
+              "net": -2.138
+            },
+            {
+              "year": 2019,
+              "trades": 5,
+              "net": -2.171
+            },
+            {
+              "year": 2015,
+              "trades": 5,
+              "net": -5.27
+            },
+            {
+              "year": 2012,
+              "trades": 3,
+              "net": -3.219
+            },
+            {
+              "year": 2014,
+              "trades": 1,
+              "net": -1.046
+            },
+            {
+              "year": 2005,
+              "trades": 7,
+              "net": 3.011
+            },
+            {
+              "year": 2017,
+              "trades": 8,
+              "net": -6.029
+            },
+            {
+              "year": 2007,
+              "trades": 12,
+              "net": 8.938
+            },
+            {
+              "year": 2018,
+              "trades": 4,
+              "net": -0.548
+            },
+            {
+              "year": 2006,
+              "trades": 5,
+              "net": 0.922
+            },
+            {
+              "year": 2004,
+              "trades": 2,
+              "net": 1.269
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 16,
+          "loyoFraction": 0,
+          "net2xMean": -0.2583,
+          "net2xSum": -24.02184639106752,
+          "randomBaseline": {
+            "drawCount": 6029,
+            "meanNetR": -0.23213287816822514,
+            "sdReal": 1.70327975726731,
+            "seExcess": 0.1810558663216375,
+            "baseSd": 1.4422800942826057,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "lambert-cci20-momentum",
+          "trades": 79,
+          "resolved": 79,
+          "longs": 0,
+          "shorts": 79,
+          "totalGrossR": 5.95356506015731,
+          "totalNetR_measured": -3.3618452676857657,
+          "meanGrossR": 0.07536158303996594,
+          "meanNetRMeasured": -0.042555003388427416,
+          "t_netMeasured": -0.204,
+          "excessVsRandomR": 0.2169,
+          "t_excess": 1.04,
+          "wins": 22,
+          "wr": 0.27848101265822783,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 9,
+              "net": 6.179
+            },
+            {
+              "year": 2008,
+              "trades": 5,
+              "net": -5.994
+            },
+            {
+              "year": 2012,
+              "trades": 6,
+              "net": 5.387
+            },
+            {
+              "year": 2013,
+              "trades": 4,
+              "net": 3.58
+            },
+            {
+              "year": 2010,
+              "trades": 3,
+              "net": 0.765
+            },
+            {
+              "year": 2014,
+              "trades": 10,
+              "net": 4.819
+            },
+            {
+              "year": 2016,
+              "trades": 3,
+              "net": -3.635
+            },
+            {
+              "year": 2019,
+              "trades": 6,
+              "net": -3.528
+            },
+            {
+              "year": 2018,
+              "trades": 9,
+              "net": 1.561
+            },
+            {
+              "year": 2015,
+              "trades": 7,
+              "net": -3.628
+            },
+            {
+              "year": 2006,
+              "trades": 4,
+              "net": -0.92
+            },
+            {
+              "year": 2007,
+              "trades": 4,
+              "net": -4.782
+            },
+            {
+              "year": 2005,
+              "trades": 6,
+              "net": -7.069
+            },
+            {
+              "year": 2017,
+              "trades": 3,
+              "net": 3.904
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 6,
+          "loyoTotal": 14,
+          "loyoFraction": 0.429,
+          "net2xMean": -0.1605,
+          "net2xSum": -12.677255595528834,
+          "randomBaseline": {
+            "drawCount": 5919,
+            "meanNetR": -0.2594378744687349,
+            "sdReal": 1.7706896601117759,
+            "seExcess": 0.20846311290636133,
+            "baseSd": 1.428684025689292,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "ny-pivot-s1r1-reject",
+      "trades": 177,
+      "resolved": 177,
+      "longs": 98,
+      "shorts": 79,
+      "totalGrossR": 53.00316847873901,
+      "totalNetR_measured": 25.7843228338492,
+      "meanGrossR": 0.2994529292584125,
+      "meanNetRMeasured": 0.14567414030423276,
+      "t_netMeasured": 1.06,
+      "excessVsRandomR": 0.364,
+      "t_excess": 2.648,
+      "wins": 60,
+      "wr": 0.3389830508474576,
+      "yearR": [
+        {
+          "year": 2011,
+          "trades": 8,
+          "net": 11.015
+        },
+        {
+          "year": 2013,
+          "trades": 16,
+          "net": -9.436
+        },
+        {
+          "year": 2008,
+          "trades": 11,
+          "net": 2.477
+        },
+        {
+          "year": 2015,
+          "trades": 17,
+          "net": 4.756
+        },
+        {
+          "year": 2009,
+          "trades": 10,
+          "net": 7.607
+        },
+        {
+          "year": 2012,
+          "trades": 7,
+          "net": -3.682
+        },
+        {
+          "year": 2017,
+          "trades": 13,
+          "net": 2.85
+        },
+        {
+          "year": 2019,
+          "trades": 19,
+          "net": -12.314
+        },
+        {
+          "year": 2010,
+          "trades": 10,
+          "net": 4.567
+        },
+        {
+          "year": 2016,
+          "trades": 15,
+          "net": 4.375
+        },
+        {
+          "year": 2014,
+          "trades": 10,
+          "net": -3.329
+        },
+        {
+          "year": 2006,
+          "trades": 9,
+          "net": 2.037
+        },
+        {
+          "year": 2007,
+          "trades": 9,
+          "net": 0.288
+        },
+        {
+          "year": 2018,
+          "trades": 10,
+          "net": 11.417
+        },
+        {
+          "year": 2005,
+          "trades": 9,
+          "net": 4.155
+        },
+        {
+          "year": 2004,
+          "trades": 4,
+          "net": -0.998
+        }
+      ],
+      "concentration": 0.478,
+      "loyoPositive": 16,
+      "loyoTotal": 16,
+      "loyoFraction": 1,
+      "net2xMean": -0.0081,
+      "net2xSum": -1.4345228110406112,
+      "randomBaseline": {
+        "drawCount": 11814,
+        "meanNetR": -0.21836772979272462,
+        "sd": 1.4491793677572176
+      },
+      "sideStats": {
+        "long": {
+          "botId": "ny-pivot-s1r1-reject",
+          "trades": 98,
+          "resolved": 98,
+          "longs": 98,
+          "shorts": 0,
+          "totalGrossR": 44.98001918620626,
+          "totalNetR_measured": 28.984715384867457,
+          "meanGrossR": 0.4589797876143496,
+          "meanNetRMeasured": 0.2957624018864026,
+          "t_netMeasured": 1.541,
+          "excessVsRandomR": 0.5064,
+          "t_excess": 2.638,
+          "wins": 37,
+          "wr": 0.37755102040816324,
+          "yearR": [
+            {
+              "year": 2011,
+              "trades": 5,
+              "net": 10.412
+            },
+            {
+              "year": 2013,
+              "trades": 6,
+              "net": -2.58
+            },
+            {
+              "year": 2008,
+              "trades": 6,
+              "net": 4.506
+            },
+            {
+              "year": 2009,
+              "trades": 7,
+              "net": -0.314
+            },
+            {
+              "year": 2015,
+              "trades": 6,
+              "net": 5.055
+            },
+            {
+              "year": 2012,
+              "trades": 3,
+              "net": 0.587
+            },
+            {
+              "year": 2019,
+              "trades": 10,
+              "net": -8.634
+            },
+            {
+              "year": 2016,
+              "trades": 10,
+              "net": 6.588
+            },
+            {
+              "year": 2010,
+              "trades": 7,
+              "net": 7.782
+            },
+            {
+              "year": 2014,
+              "trades": 7,
+              "net": -3.78
+            },
+            {
+              "year": 2006,
+              "trades": 9,
+              "net": 2.037
+            },
+            {
+              "year": 2018,
+              "trades": 4,
+              "net": -0.522
+            },
+            {
+              "year": 2007,
+              "trades": 5,
+              "net": -2.351
+            },
+            {
+              "year": 2017,
+              "trades": 5,
+              "net": 4.817
+            },
+            {
+              "year": 2005,
+              "trades": 4,
+              "net": 6.38
+            },
+            {
+              "year": 2004,
+              "trades": 4,
+              "net": -0.998
+            }
+          ],
+          "concentration": 0.359,
+          "loyoPositive": 16,
+          "loyoTotal": 16,
+          "loyoFraction": 1,
+          "net2xMean": 0.1325,
+          "net2xSum": 12.989411583528664,
+          "randomBaseline": {
+            "drawCount": 5775,
+            "meanNetR": -0.21061358728138507,
+            "sdReal": 1.9006106896208843,
+            "seExcess": 0.19199067243236687,
+            "baseSd": 1.4583450260380624,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "ny-pivot-s1r1-reject",
+          "trades": 79,
+          "resolved": 79,
+          "longs": 0,
+          "shorts": 79,
+          "totalGrossR": 8.023149292532738,
+          "totalNetR_measured": -3.2003925510182603,
+          "meanGrossR": 0.10155885180421187,
+          "meanNetRMeasured": -0.04051129811415519,
+          "t_netMeasured": -0.208,
+          "excessVsRandomR": 0.1853,
+          "t_excess": 0.952,
+          "wins": 23,
+          "wr": 0.2911392405063291,
+          "yearR": [
+            {
+              "year": 2013,
+              "trades": 10,
+              "net": -6.857
+            },
+            {
+              "year": 2008,
+              "trades": 5,
+              "net": -2.029
+            },
+            {
+              "year": 2015,
+              "trades": 11,
+              "net": -0.299
+            },
+            {
+              "year": 2012,
+              "trades": 4,
+              "net": -4.27
+            },
+            {
+              "year": 2017,
+              "trades": 8,
+              "net": -1.967
+            },
+            {
+              "year": 2009,
+              "trades": 3,
+              "net": 7.921
+            },
+            {
+              "year": 2010,
+              "trades": 3,
+              "net": -3.215
+            },
+            {
+              "year": 2016,
+              "trades": 5,
+              "net": -2.213
+            },
+            {
+              "year": 2019,
+              "trades": 9,
+              "net": -3.679
+            },
+            {
+              "year": 2011,
+              "trades": 3,
+              "net": 0.603
+            },
+            {
+              "year": 2014,
+              "trades": 3,
+              "net": 0.451
+            },
+            {
+              "year": 2007,
+              "trades": 4,
+              "net": 2.639
+            },
+            {
+              "year": 2018,
+              "trades": 6,
+              "net": 11.938
+            },
+            {
+              "year": 2005,
+              "trades": 5,
+              "net": -2.225
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 4,
+          "loyoTotal": 14,
+          "loyoFraction": 0.286,
+          "net2xMean": -0.1826,
+          "net2xSum": -14.423934394569265,
+          "randomBaseline": {
+            "drawCount": 6039,
+            "meanNetR": -0.22578289339649102,
+            "sdReal": 1.7294323888131606,
+            "seExcess": 0.1945763456123278,
+            "baseSd": 1.4404415897994198,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": true,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": true,
+        "concentration": true,
+        "loyo": true,
+        "net2x": false
+      },
+      "pass": false
+    },
+    {
+      "botId": "supertrend-ema-pullback",
+      "trades": 133,
+      "resolved": 133,
+      "longs": 71,
+      "shorts": 62,
+      "totalGrossR": 19.35858620982644,
+      "totalNetR_measured": -1.5707648116189235,
+      "meanGrossR": 0.14555327977313115,
+      "meanNetRMeasured": -0.011810261741495664,
+      "t_netMeasured": -0.077,
+      "excessVsRandomR": 0.2424,
+      "t_excess": 1.591,
+      "wins": 40,
+      "wr": 0.3007518796992481,
+      "yearR": [
+        {
+          "year": 2008,
+          "trades": 4,
+          "net": 2.855
+        },
+        {
+          "year": 2016,
+          "trades": 11,
+          "net": 1.638
+        },
+        {
+          "year": 2011,
+          "trades": 6,
+          "net": 1.164
+        },
+        {
+          "year": 2013,
+          "trades": 11,
+          "net": 3.333
+        },
+        {
+          "year": 2010,
+          "trades": 10,
+          "net": -3.529
+        },
+        {
+          "year": 2012,
+          "trades": 9,
+          "net": -5.94
+        },
+        {
+          "year": 2019,
+          "trades": 11,
+          "net": 1.793
+        },
+        {
+          "year": 2009,
+          "trades": 7,
+          "net": -1.019
+        },
+        {
+          "year": 2014,
+          "trades": 12,
+          "net": -5.335
+        },
+        {
+          "year": 2006,
+          "trades": 4,
+          "net": 2.723
+        },
+        {
+          "year": 2017,
+          "trades": 11,
+          "net": -2.203
+        },
+        {
+          "year": 2015,
+          "trades": 11,
+          "net": -4.488
+        },
+        {
+          "year": 2018,
+          "trades": 8,
+          "net": -1.294
+        },
+        {
+          "year": 2005,
+          "trades": 6,
+          "net": 5.121
+        },
+        {
+          "year": 2004,
+          "trades": 4,
+          "net": -1.05
+        },
+        {
+          "year": 2007,
+          "trades": 8,
+          "net": 4.659
+        }
+      ],
+      "concentration": 1,
+      "loyoPositive": 5,
+      "loyoTotal": 16,
+      "loyoFraction": 0.313,
+      "net2xMean": -0.1692,
+      "net2xSum": -22.5001158330643,
+      "randomBaseline": {
+        "drawCount": 12082,
+        "meanNetR": -0.2542570440364804,
+        "sd": 1.4342572282208552
+      },
+      "sideStats": {
+        "long": {
+          "botId": "supertrend-ema-pullback",
+          "trades": 71,
+          "resolved": 71,
+          "longs": 71,
+          "shorts": 0,
+          "totalGrossR": 17.161295533263722,
+          "totalNetR_measured": 5.37921643315328,
+          "meanGrossR": 0.2417083877924468,
+          "meanNetRMeasured": 0.07576361173455323,
+          "t_netMeasured": 0.352,
+          "excessVsRandomR": 0.3294,
+          "t_excess": 1.531,
+          "wins": 23,
+          "wr": 0.323943661971831,
+          "yearR": [
+            {
+              "year": 2016,
+              "trades": 8,
+              "net": 5.373
+            },
+            {
+              "year": 2011,
+              "trades": 5,
+              "net": -1.493
+            },
+            {
+              "year": 2013,
+              "trades": 1,
+              "net": -1.06
+            },
+            {
+              "year": 2010,
+              "trades": 7,
+              "net": -0.112
+            },
+            {
+              "year": 2012,
+              "trades": 2,
+              "net": -2.148
+            },
+            {
+              "year": 2019,
+              "trades": 7,
+              "net": 2.894
+            },
+            {
+              "year": 2008,
+              "trades": 3,
+              "net": 0.107
+            },
+            {
+              "year": 2014,
+              "trades": 7,
+              "net": -3.736
+            },
+            {
+              "year": 2006,
+              "trades": 3,
+              "net": 0.218
+            },
+            {
+              "year": 2009,
+              "trades": 3,
+              "net": 3.88
+            },
+            {
+              "year": 2015,
+              "trades": 3,
+              "net": 0.586
+            },
+            {
+              "year": 2018,
+              "trades": 5,
+              "net": 1.995
+            },
+            {
+              "year": 2017,
+              "trades": 4,
+              "net": -4.959
+            },
+            {
+              "year": 2005,
+              "trades": 4,
+              "net": 3.922
+            },
+            {
+              "year": 2004,
+              "trades": 4,
+              "net": -1.05
+            },
+            {
+              "year": 2007,
+              "trades": 5,
+              "net": 0.965
+            }
+          ],
+          "concentration": 0.999,
+          "loyoPositive": 16,
+          "loyoTotal": 16,
+          "loyoFraction": 1,
+          "net2xMean": -0.0902,
+          "net2xSum": -6.402862666957152,
+          "randomBaseline": {
+            "drawCount": 6007,
+            "meanNetR": -0.2535944506772614,
+            "sdReal": 1.8129386977991127,
+            "seExcess": 0.21515623939778358,
+            "baseSd": 1.4270780484396361,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        },
+        "short": {
+          "botId": "supertrend-ema-pullback",
+          "trades": 62,
+          "resolved": 62,
+          "longs": 0,
+          "shorts": 62,
+          "totalGrossR": 2.1972906765627234,
+          "totalNetR_measured": -6.949981244772202,
+          "meanGrossR": 0.03544017220262457,
+          "meanNetRMeasured": -0.11209647168987422,
+          "t_netMeasured": -0.519,
+          "excessVsRandomR": 0.1428,
+          "t_excess": 0.661,
+          "wins": 17,
+          "wr": 0.27419354838709675,
+          "yearR": [
+            {
+              "year": 2008,
+              "trades": 1,
+              "net": 2.748
+            },
+            {
+              "year": 2013,
+              "trades": 10,
+              "net": 4.393
+            },
+            {
+              "year": 2010,
+              "trades": 3,
+              "net": -3.417
+            },
+            {
+              "year": 2009,
+              "trades": 4,
+              "net": -4.898
+            },
+            {
+              "year": 2016,
+              "trades": 3,
+              "net": -3.734
+            },
+            {
+              "year": 2012,
+              "trades": 7,
+              "net": -3.792
+            },
+            {
+              "year": 2017,
+              "trades": 7,
+              "net": 2.756
+            },
+            {
+              "year": 2019,
+              "trades": 4,
+              "net": -1.1
+            },
+            {
+              "year": 2014,
+              "trades": 5,
+              "net": -1.599
+            },
+            {
+              "year": 2015,
+              "trades": 8,
+              "net": -5.073
+            },
+            {
+              "year": 2011,
+              "trades": 1,
+              "net": 2.657
+            },
+            {
+              "year": 2006,
+              "trades": 1,
+              "net": 2.505
+            },
+            {
+              "year": 2018,
+              "trades": 3,
+              "net": -3.288
+            },
+            {
+              "year": 2007,
+              "trades": 3,
+              "net": 3.694
+            },
+            {
+              "year": 2005,
+              "trades": 2,
+              "net": 1.2
+            }
+          ],
+          "concentration": 1,
+          "loyoPositive": 0,
+          "loyoTotal": 15,
+          "loyoFraction": 0,
+          "net2xMean": -0.2596,
+          "net2xSum": -16.097253166107144,
+          "randomBaseline": {
+            "drawCount": 6075,
+            "meanNetR": -0.25491222071287706,
+            "sdReal": 1.70098637713415,
+            "seExcess": 0.21602548592163096,
+            "baseSd": 1.4414380569816074,
+            "meta": {
+              "seed": 20261026,
+              "topupSeed": 20268945,
+              "maxHold": 96,
+              "stopMult": 1.5,
+              "targetR": 2
+            }
+          }
+        }
+      },
+      "gates": {
+        "minTrades": true,
+        "netMean": false,
+        "tNet": false,
+        "excessExcess": true,
+        "tExcess": false,
+        "concentration": false,
+        "loyo": false,
+        "net2x": false
+      },
+      "pass": false
+    }
+  ]
+}
