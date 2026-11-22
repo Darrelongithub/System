@@ -71,6 +71,8 @@ datetime       m_lastPollTime = 0;
 ulong          m_timerId = 0;
 string         m_ackIds = "";
 string         m_commandResults = "";
+int            m_closedTradeCount = -1;
+bool           m_closedSamplesDirty = true;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -137,6 +139,11 @@ void OnTimer()
    if(CheckDailyDrawdown() && InpFlattenOnDailyLimit) FlattenMagic(false);
    ManageTerminalProtection();
    PollBridgeAndExecute();
+}
+
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &request, const MqlTradeResult &result)
+{
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD) m_closedSamplesDirty = true;
 }
 
 // Broker-day equity baseline persists in terminal global variables across EA restarts.
@@ -417,6 +424,78 @@ bool GetRealizedRiskStats(double &dailyR, int &streak, long &lastLossMs)
    return known;
 }
 
+// Closed EA position returns in R. Untracked risk, partial/open positions and
+// entries outside the selected history window are excluded, never fabricated.
+string ClosedRiskSamplesJson()
+{
+   static datetime last = 0;
+   static string cached = "[]";
+   datetime now = TimeTradeServer();
+   if(!m_closedSamplesDirty && last > 0 && now - last < 60) return cached;
+   last = now;
+   m_closedSamplesDirty = false;
+   // Count up to the Kelly threshold over available full broker history,
+   // including positions for which initial-risk records are unavailable.
+   m_closedTradeCount = -1;
+   if(HistorySelect(0, now))
+   {
+      long seen[];
+      for(int i = HistoryDealsTotal() - 1; i >= 0 && ArraySize(seen) < 30; i--)
+      {
+         ulong deal = HistoryDealGetTicket(i);
+         if(HistoryDealGetInteger(deal, DEAL_MAGIC) != (long)InpMagicNumber || HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_IN) continue;
+         long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+         bool found = false, open = false;
+         for(int j = 0; j < ArraySize(seen); j++) if(seen[j] == id) { found = true; break; }
+         for(int j = PositionsTotal() - 1; j >= 0; j--) if(m_position.SelectByIndex(j) && PositionGetInteger(POSITION_IDENTIFIER) == id) { open = true; break; }
+         if(!found && !open && id > 0) { int n = ArraySize(seen); ArrayResize(seen,n+1); seen[n] = id; }
+      }
+      m_closedTradeCount = ArraySize(seen);
+   }
+   datetime from = now - 180 * 86400;
+   if(!HistorySelect(from, now)) { cached = "[]"; return cached; }
+   long ids[]; double pnl[]; datetime closed[]; bool hasExit[];
+   for(int i = HistoryDealsTotal() - 1; i >= 0; i--)
+   {
+      ulong deal = HistoryDealGetTicket(i);
+      if(HistoryDealGetInteger(deal, DEAL_MAGIC) != (long)InpMagicNumber || HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_IN) continue;
+      long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+      string key = PositionRiskKey(id);
+      if(!GlobalVariableCheck(key) || GlobalVariableGet(key) <= 0 || !GlobalVariableCheck(key + ".open") || GlobalVariableGet(key + ".open") < from) continue;
+      bool found = false; for(int j = 0; j < ArraySize(ids); j++) if(ids[j] == id) { found = true; break; }
+      if(found || ArraySize(ids) >= 500) continue;
+      int n = ArraySize(ids); ArrayResize(ids,n+1); ArrayResize(pnl,n+1); ArrayResize(closed,n+1); ArrayResize(hasExit,n+1);
+      ids[n]=id; pnl[n]=0; closed[n]=0; hasExit[n]=false;
+   }
+   for(int i = 0; i < HistoryDealsTotal(); i++)
+   {
+      ulong deal = HistoryDealGetTicket(i);
+      long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+      for(int j = 0; j < ArraySize(ids); j++) if(ids[j] == id)
+      {
+         pnl[j] += HistoryDealGetDouble(deal, DEAL_PROFIT) + HistoryDealGetDouble(deal, DEAL_SWAP) + HistoryDealGetDouble(deal, DEAL_COMMISSION) + HistoryDealGetDouble(deal, DEAL_FEE);
+         long entry = HistoryDealGetInteger(deal, DEAL_ENTRY);
+         if(entry == DEAL_ENTRY_OUT || entry == DEAL_ENTRY_OUT_BY) { hasExit[j] = true; closed[j] = (datetime)HistoryDealGetInteger(deal, DEAL_TIME); }
+         break;
+      }
+   }
+   cached = "["; int count = 0;
+   for(int j = 0; j < ArraySize(ids); j++)
+   {
+      if(!hasExit[j]) continue;
+      bool open = false;
+      for(int k = PositionsTotal() - 1; k >= 0; k--) if(m_position.SelectByIndex(k) && PositionGetInteger(POSITION_IDENTIFIER) == ids[j]) { open = true; break; }
+      if(open) continue;
+      double initial = GlobalVariableGet(PositionRiskKey(ids[j]));
+      if(initial <= 0) continue;
+      if(count++ > 0) cached += ",";
+      long closedMs = ((long)closed[j] - (long)now + (long)TimeGMT()) * 1000;
+      cached += "{\\"id\\":\\"" + IntegerToString(ids[j]) + "\\",\\"r\\":" + DoubleToString(pnl[j]/initial, 8) + ",\\"pnl\\":" + DoubleToString(pnl[j], 2) + ",\\"closedAt\\":" + IntegerToString(closedMs) + "}";
+   }
+   cached += "]";
+   return cached;
+}
+
 //+------------------------------------------------------------------+
 //| Build Account & Open Positions Telemetry JSON                     |
 //+------------------------------------------------------------------+
@@ -460,6 +539,9 @@ string BuildTelemetryJson()
    json += "\\"totalLocked\\":" + (CheckTotalDrawdown() ? "true" : "false") + ",";
    json += "\\"consecutiveLosses\\":" + IntegerToString(lossStreak) + ",";
    json += "\\"lastLossTimeMs\\":" + IntegerToString(lastLossMs) + ",";
+   string closedSamples = ClosedRiskSamplesJson();
+   json += "\\"closedTradeCount\\":" + IntegerToString(m_closedTradeCount) + ",";
+   json += "\\"closedRiskSamples\\":" + closedSamples + ",";
    json += "\\"positions\\":[";
 
    int posCount = 0;

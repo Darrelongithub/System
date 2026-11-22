@@ -52,6 +52,7 @@ const tick = {
   bid: 2650,
   ask: 2650.2,
   dailyRealizedR: 0,
+  closedTradeCount: 0,
   consecutiveLosses: 0,
   positions: [brokerPosition],
 };

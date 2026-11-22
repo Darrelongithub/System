@@ -5,6 +5,7 @@
 import type { ResultRow } from "@/lib/analyzer/types";
 import { checkNewsBlackout, newsManager, doesNewsAffectSymbol } from "./news-filter";
 import { eatParts, entryTimeBlock, observeEquity, type RiskSnapshot } from "./risk";
+import { drawdownBrake, stackMultiplier, tradeRiskMetrics } from "./crash-guard";
 import {
   DEFAULT_MT5_CONFIG,
   DEFAULT_MT5_CREDENTIALS,
@@ -116,6 +117,11 @@ export interface MT5RuntimeSnapshot {
   risk: RiskSnapshot | null;
   executedSignals: string[];
   pendingCommands: MT5OrderRequest[];
+  peakEquity?: number;
+  closedRiskSamples?: Array<{ id: string; r: number; pnl: number; closedAt: number }>;
+  telegramOffset?: number;
+  emergencyFlatten?: boolean;
+  brokerClosedTradeCount?: number;
 }
 
 /**
@@ -152,6 +158,13 @@ export class MT5TradingEngine {
   private quote: { symbol: string; bid: number; ask: number; at: number } | null = null;
   private brokerRiskRKnown = false;
   private closedRiskIds = new Set<number>();
+  private peakEquity = 0;
+  private closedRiskSamples: Array<{ id: string; r: number; pnl: number; closedAt: number }> = [];
+  private telegramOffset = 0;
+  private emergencyFlatten = false;
+  private brokerClosedTradeCount = 0;
+  private brokerHistoryAvailable = false;
+  private notificationSink: ((entry: MT5TradeLogEntry) => void) | null = null;
 
   constructor() {
     this.addLog("INFO", "SYSTEM", "MT5 Trading Automation Engine initialized.");
@@ -169,6 +182,11 @@ export class MT5TradingEngine {
       risk: this.risk ? { ...this.risk } : null,
       executedSignals: [...this.executedSignals].slice(-10000),
       pendingCommands: this.pendingCommands.map((c) => ({ ...c })),
+      peakEquity: this.peakEquity,
+      closedRiskSamples: this.closedRiskSamples.map((x) => ({ ...x })),
+      telegramOffset: this.telegramOffset,
+      emergencyFlatten: this.emergencyFlatten,
+      brokerClosedTradeCount: this.brokerClosedTradeCount,
     };
   }
   public restoreRuntimeState(snapshot: MT5RuntimeSnapshot) {
@@ -209,12 +227,43 @@ export class MT5TradingEngine {
         !Number.isFinite(snapshot.risk.lossStreak))
     )
       throw new Error("Invalid MT5 runtime risk state");
+    if (
+      snapshot.peakEquity !== undefined &&
+      (!Number.isFinite(snapshot.peakEquity) || snapshot.peakEquity < 0)
+    )
+      throw new Error("Invalid peak equity");
+    if (
+      snapshot.closedRiskSamples !== undefined &&
+      (!Array.isArray(snapshot.closedRiskSamples) ||
+        snapshot.closedRiskSamples.some(
+          (x) =>
+            !x ||
+            typeof x.id !== "string" ||
+            !Number.isFinite(x.r) ||
+            !Number.isFinite(x.pnl) ||
+            !Number.isFinite(x.closedAt),
+        ))
+    )
+      throw new Error("Invalid closed risk samples");
     this.setConfig(snapshot.config);
     this.credentials = { ...this.credentials, ...snapshot.identity };
     this.account.login = snapshot.identity.login;
     this.account.server = snapshot.identity.server;
     this.account.connected = false;
     this.risk = snapshot.risk;
+    this.peakEquity = snapshot.peakEquity ?? snapshot.risk?.totalBaseline ?? 0;
+    this.closedRiskSamples = (snapshot.closedRiskSamples ?? []).slice(-500);
+    this.telegramOffset =
+      Number.isSafeInteger(snapshot.telegramOffset) && snapshot.telegramOffset! >= 0
+        ? snapshot.telegramOffset!
+        : 0;
+    this.brokerClosedTradeCount =
+      Number.isSafeInteger(snapshot.brokerClosedTradeCount) && snapshot.brokerClosedTradeCount! >= 0
+        ? snapshot.brokerClosedTradeCount!
+        : 0;
+    this.brokerHistoryAvailable = false;
+    this.emergencyFlatten = snapshot.emergencyFlatten === true;
+    if (this.emergencyFlatten) this.config.enabled = false;
     if (this.risk?.totalLocked) this.config.enabled = false;
     this.executedSignals = new Set(snapshot.executedSignals.slice(-10000));
     this.pendingCommands = snapshot.pendingCommands;
@@ -275,7 +324,7 @@ export class MT5TradingEngine {
           command.symbol,
           `Broker confirmed OPEN ${outcome.id} ticket ${outcome.ticket}`,
           command.strategyName,
-          { outcome },
+          { outcome, req: command, spread: this.quote ? this.quote.ask - this.quote.bid : null },
         );
       } else {
         this.addLog(
@@ -288,6 +337,15 @@ export class MT5TradingEngine {
       }
     }
     this.persist();
+  }
+
+  public matchesBrokerIdentity(login: unknown, server: unknown): boolean {
+    return (
+      typeof login === "string" &&
+      typeof server === "string" &&
+      login === this.credentials.login &&
+      server === this.credentials.server
+    );
   }
 
   public getCredentials(): MT5AccountCredentials {
@@ -305,6 +363,10 @@ export class MT5TradingEngine {
       (rest.bridgeMode !== undefined && rest.bridgeMode !== this.credentials.bridgeMode);
     if (changed) {
       this.risk = null;
+      this.peakEquity = 0;
+      this.closedRiskSamples = [];
+      this.brokerClosedTradeCount = 0;
+      this.brokerHistoryAvailable = false;
       this.quote = null;
       this.brokerRiskRKnown = false;
       this.pendingCommands = [];
@@ -355,8 +417,18 @@ export class MT5TradingEngine {
       candidate.fridayCloseMinuteEat > 59
     )
       throw new Error("Invalid time protection configuration");
+    drawdownBrake(
+      100,
+      100,
+      candidate.maxTotalDrawdownPct,
+      candidate.drawdownThresholdsPct,
+      candidate.drawdownMultipliers,
+    );
+    stackMultiplier(0, candidate.stackDecayMultipliers);
     if (!Number.isSafeInteger(candidate.magicNumber) || candidate.magicNumber <= 0)
       throw new Error("A non-zero magic number is required");
+    if (this.emergencyFlatten && candidate.enabled)
+      throw new Error("Emergency flatten remains active; reconcile positions before resume");
     if (this.risk?.totalLocked && candidate.enabled)
       throw new Error("Total drawdown lock is active");
     this.config = candidate;
@@ -417,10 +489,107 @@ export class MT5TradingEngine {
     return this.risk ? { ...this.risk, brokerRiskRKnown: this.brokerRiskRKnown } : null;
   }
 
+  /** Reserve exposure for in-flight commands even if optimistic slots aged out. */
+  private exposurePositions(): Array<{ symbol: string; type: "BUY" | "SELL" }> {
+    const exposure = this.positions.map((p) => ({ symbol: p.symbol, type: p.type }));
+    if (this.credentials.bridgeMode === "mql5_ea")
+      for (const c of this.pendingCommands) {
+        if (c.action !== "OPEN" || this.positions.some((p) => p.commandId === c.id)) continue;
+        exposure.push({ symbol: c.symbol, type: c.type.startsWith("BUY") ? "BUY" : "SELL" });
+      }
+    return exposure;
+  }
+
+  public getCrashGuardStatus() {
+    const peak = this.peakEquity;
+    const brake =
+      peak > 0 && Number.isFinite(this.account.equity) && this.account.equity >= 0
+        ? drawdownBrake(
+            peak,
+            this.account.equity,
+            this.config.maxTotalDrawdownPct,
+            this.config.drawdownThresholdsPct,
+            this.config.drawdownMultipliers,
+          )
+        : null;
+    const sameSide = this.exposurePositions().filter(
+      (p) => canonicalSymbol(p.symbol) === "XAUUSD" && p.type === "BUY",
+    ).length;
+    const sellSide = this.exposurePositions().filter(
+      (p) => canonicalSymbol(p.symbol) === "XAUUSD" && p.type === "SELL",
+    ).length;
+    const metrics = tradeRiskMetrics(this.closedRiskSamples.map((x) => x.r));
+    if (this.brokerClosedTradeCount >= 30 && metrics.count < 30) metrics.halfKellyPct = 0; // incomplete risk history: fail closed
+    return {
+      peakEquity: peak || null,
+      ...brake,
+      recoveryFraction:
+        brake && Number.isFinite(brake.recoveryFraction) ? brake.recoveryFraction : null,
+      stackSlotWeight: stackMultiplier(sameSide, this.config.stackDecayMultipliers),
+      sellStackSlotWeight: stackMultiplier(sellSide, this.config.stackDecayMultipliers),
+      brokerClosedTradeCount: this.brokerHistoryAvailable ? this.brokerClosedTradeCount : null,
+      ...metrics,
+    };
+  }
+  public setNotificationSink(sink: ((entry: MT5TradeLogEntry) => void) | null) {
+    this.notificationSink = sink;
+  }
+  public getTelegramOffset() {
+    return this.telegramOffset;
+  }
+  public setTelegramOffset(offset: number) {
+    if (Number.isSafeInteger(offset) && offset > this.telegramOffset) {
+      this.telegramOffset = offset;
+      this.persist();
+    }
+  }
+  public emergencyStop() {
+    this.config.enabled = false;
+    this.emergencyFlatten = true;
+    this.pendingCommands = this.pendingCommands.filter((c) => c.action !== "OPEN");
+    this.positions = this.positions.filter((p) => !p.createdAtMs);
+    this.flattenPositions();
+    this.persist();
+    this.addLog(
+      "WARN",
+      "SYSTEM",
+      "[TELEGRAM KILL] Entries disabled; close requests queued for known positions.",
+    );
+  }
+  public resumeTrading(): boolean {
+    this.evaluateRisk();
+    if (
+      this.credentials.bridgeMode === "mql5_ea" &&
+      (!this.account.connected ||
+        Date.now() - Date.parse(this.account.lastUpdated) > 15000 ||
+        !this.brokerHistoryAvailable)
+    )
+      return false;
+    if (
+      this.persistenceError ||
+      this.risk?.totalLocked ||
+      this.risk?.dailyLocked ||
+      (this.peakEquity > 0 && this.getCrashGuardStatus().multiplier === 0)
+    )
+      return false;
+    if (
+      this.emergencyFlatten &&
+      (this.positions.length > 0 || this.pendingCommands.some((c) => c.action === "CLOSE"))
+    )
+      return false;
+    this.emergencyFlatten = false;
+    this.setConfig({ enabled: true });
+    return this.config.enabled;
+  }
+
   /** Called on each telemetry heartbeat and on a frequent server timer. */
   public evaluateRisk(now = Date.now()) {
     this.expireOpenCommands(now);
     if (this.credentials.bridgeMode === "mql5_ea" && !this.account.connected) return;
+    if (Number.isFinite(this.account.equity) && this.account.equity > 0)
+      this.peakEquity = Math.max(this.peakEquity, this.account.equity);
+    const wasDailyLocked = this.risk?.dailyLocked ?? false;
+    const wasTotalLocked = this.risk?.totalLocked ?? false;
     try {
       this.risk = observeEquity(
         this.risk,
@@ -446,9 +615,31 @@ export class MT5TradingEngine {
       if (this.risk.realizedR + floatingR <= this.config.maxDailyLossR)
         this.risk.dailyLocked = true;
     }
-    if (this.risk.totalLocked) {
+    const brake =
+      this.peakEquity > 0
+        ? drawdownBrake(
+            this.peakEquity,
+            this.account.equity,
+            this.config.maxTotalDrawdownPct,
+            this.config.drawdownThresholdsPct,
+            this.config.drawdownMultipliers,
+          )
+        : null;
+    if (brake?.multiplier === 0 && !this.risk.totalLocked) {
+      this.risk.totalLocked = true;
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Crash-guard hard lock tripped.");
+    }
+    if (this.risk.dailyLocked && !wasDailyLocked)
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Daily loss lock tripped.");
+    if (this.risk.totalLocked && !wasTotalLocked)
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Total loss lock tripped.");
+    if (this.emergencyFlatten) {
       this.config.enabled = false;
       this.flattenPositions();
+    }
+    if (this.risk.totalLocked) {
+      this.config.enabled = false;
+      if (this.config.flattenOnCrashGuard) this.flattenPositions();
     } else if (this.risk.dailyLocked && this.config.flattenOnDailyLimit) this.flattenPositions();
     const clock = eatParts(now);
     if (
@@ -475,12 +666,25 @@ export class MT5TradingEngine {
         );
       for (const p of [...this.positions]) {
         if (!events.some((e) => doesNewsAffectSymbol(e, p.symbol))) continue;
-        if (action === "close_all") this.closePosition(p.ticket);
-        else if (
+        if (action === "close_all") {
+          if (
+            !this.pendingCommands.some((c) => c.action === "CLOSE" && c.ticket === p.ticket) &&
+            this.closePosition(p.ticket)
+          )
+            this.addLog("WARN", p.symbol, `[PRE-NEWS ACTION] Close requested for #${p.ticket}.`);
+        } else if (
           p.profit > 0 &&
           (p.type === "BUY" ? p.sl < p.openPrice : p.sl === 0 || p.sl > p.openPrice)
-        )
-          this.modifyPositionToBreakeven(p);
+        ) {
+          if (!this.pendingCommands.some((c) => c.action === "MODIFY" && c.ticket === p.ticket)) {
+            this.modifyPositionToBreakeven(p);
+            this.addLog(
+              "WARN",
+              p.symbol,
+              `[PRE-NEWS ACTION] Breakeven requested for #${p.ticket}.`,
+            );
+          }
+        }
       }
     }
     this.persist();
@@ -545,6 +749,7 @@ export class MT5TradingEngine {
         return "live quote unavailable or stale";
       if (this.quote.ask - this.quote.bid > c.maxSpreadUsd) return "spread exceeds configured cap";
       if (c.maxDailyLossR < 0 && !this.brokerRiskRKnown) return "broker daily R unavailable";
+      if (!this.brokerHistoryAvailable) return "broker closed-trade history unavailable";
     }
     if (c.newsFilterEnabled) {
       if (newsManager.getStatus() !== "live") return "news calendar stale or unavailable";
@@ -582,6 +787,11 @@ export class MT5TradingEngine {
       details,
     };
     this.logs.unshift(entry);
+    try {
+      this.notificationSink?.(entry);
+    } catch {
+      /* notifications never block trading */
+    }
     if (this.logs.length > 500) this.logs.pop();
   }
 
@@ -678,7 +888,7 @@ export class MT5TradingEngine {
 
     // Zero opposite-side self-hedging: never carry an opposite-side fill on the same symbol.
     if (
-      this.positions.some(
+      this.exposurePositions().some(
         (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type !== desiredType,
       )
     ) {
@@ -692,7 +902,7 @@ export class MT5TradingEngine {
     }
 
     // Max 3 same-side stack per symbol.
-    const sameSideCount = this.positions.filter(
+    const sameSideCount = this.exposurePositions().filter(
       (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type === desiredType,
     ).length;
     if (sameSideCount >= 3) {
@@ -706,7 +916,7 @@ export class MT5TradingEngine {
     }
 
     // Max open positions check
-    if (this.positions.length >= this.config.maxOpenPositions) {
+    if (this.exposurePositions().length >= this.config.maxOpenPositions) {
       this.addLog(
         "WARN",
         symbol,
@@ -716,26 +926,57 @@ export class MT5TradingEngine {
       return null;
     }
 
+    // Use the current executable broker quote, not a stale signal entry, for cash risk.
+    const sizingEntry =
+      this.credentials.bridgeMode === "mql5_ea" && this.quote
+        ? desiredType === "BUY"
+          ? this.quote.ask
+          : this.quote.bid
+        : signal.entry;
     // Calculate volume / lot size
-    let volume = this.config.fixedLot;
+    const drawdownWeight = this.getCrashGuardStatus().multiplier ?? 1;
+    const signalWeight = signal.riskMultiplier ?? 1;
+    if (!Number.isFinite(signalWeight) || signalWeight <= 0) return null;
+    const weight =
+      Math.min(1, signalWeight) *
+      drawdownWeight *
+      stackMultiplier(sameSideCount, this.config.stackDecayMultipliers);
+    const kellyPct =
+      this.credentials.bridgeMode === "mql5_ea" ? this.getCrashGuardStatus().halfKellyPct : null;
+    if (weight <= 0) return null;
+    let volume = Math.floor(this.config.fixedLot * weight * 100 + 1e-9) / 100;
+    if (kellyPct !== null && this.account.equity > 0)
+      volume = Math.min(
+        volume,
+        Math.floor(
+          ((this.account.equity * kellyPct) /
+            100 /
+            (Math.abs(sizingEntry - signal.sl) * getContractSize(symbol))) *
+            100 +
+            1e-9,
+        ) / 100,
+      );
     if (this.config.sizingMode === "risk_pct" || this.config.sizingMode === "risk_amount") {
       const amountMode = this.config.sizingMode === "risk_amount";
-      const budget = this.config.maxRiskAmount * (signal.riskMultiplier ?? 1);
+      const budget = Math.min(
+        this.config.maxRiskAmount * weight,
+        kellyPct === null ? Infinity : (this.account.equity * kellyPct) / 100,
+      );
       if (amountMode && (!Number.isFinite(budget) || budget <= 0 || this.account.equity <= 0))
         return null;
       const sizing = calculateLotSize({
         equity: this.account.equity,
         riskPct: amountMode
           ? (budget / this.account.equity) * 100
-          : this.config.riskPct * (signal.riskMultiplier ?? 1.0),
-        entry: signal.entry,
+          : Math.min(this.config.riskPct * weight, kellyPct ?? Infinity),
+        entry: sizingEntry,
         sl: signal.sl,
         symbol,
         maxRiskAmount: amountMode ? undefined : this.config.maxRiskAmount,
       });
       volume = amountMode
         ? Math.floor(
-            (budget / (Math.abs(signal.entry - signal.sl) * getContractSize(symbol))) * 100 + 1e-9,
+            (budget / (Math.abs(sizingEntry - signal.sl) * getContractSize(symbol))) * 100 + 1e-9,
           ) / 100
         : sizing.volume;
       if (!Number.isFinite(volume) || volume < 0.01) return null;
@@ -746,7 +987,7 @@ export class MT5TradingEngine {
       // the budgeted risk (wide SL on a small account → 10-27% per trade).
       // Reject rather than blow the risk budget.
       {
-        const actualRisk = cashRiskFor(symbol, volume, signal.entry, signal.sl);
+        const actualRisk = cashRiskFor(symbol, volume, sizingEntry, signal.sl);
         if (actualRisk > sizing.riskAmount + 1e-9) {
           this.addLog(
             "WARN",
@@ -758,6 +999,8 @@ export class MT5TradingEngine {
         }
       }
     }
+
+    if (!Number.isFinite(volume) || volume < 0.01) return null;
 
     // Determine order type
     const orderType = desiredType;
@@ -787,7 +1030,7 @@ export class MT5TradingEngine {
         error: "Runtime persistence failed",
         timestamp: new Date().toISOString(),
       };
-    const result = this.placeOrder(orderRequest);
+    const result = this.placeOrder(orderRequest, true);
     if (!result.ok && !this.persistenceError) {
       this.executedSignals.delete(signalKey);
       this.persist();
@@ -798,12 +1041,48 @@ export class MT5TradingEngine {
   /**
    * Places an order directly into the engine / queue.
    */
-  public placeOrder(req: MT5OrderRequest): MT5OrderResult {
+  public placeOrder(req: MT5OrderRequest, alreadyRiskSized = false): MT5OrderResult {
     const timestamp = new Date().toISOString();
-    if (!req || typeof req.symbol !== "string" || !Number.isFinite(req.volume) || req.volume <= 0)
+    if (
+      !req ||
+      typeof req.symbol !== "string" ||
+      typeof req.type !== "string" ||
+      !Number.isFinite(req.volume) ||
+      req.volume <= 0
+    )
       return { ok: false, error: "Invalid order", timestamp };
     const block = this.entryBlock(req.symbol);
-    if (block) return { ok: false, error: block, timestamp };
+    if (block) {
+      this.addLog("WARN", req.symbol, `Order rejected: ${block}`, req.strategyName);
+      return { ok: false, error: block, timestamp };
+    }
+    if (!alreadyRiskSized && this.credentials.bridgeMode === "mql5_ea") {
+      const side = req.type.startsWith("BUY") ? "BUY" : "SELL";
+      const sameSideCount = this.exposurePositions().filter(
+        (p) => canonicalSymbol(p.symbol) === canonicalSymbol(req.symbol) && p.type === side,
+      ).length;
+      const weight =
+        (this.getCrashGuardStatus().multiplier ?? 0) *
+        stackMultiplier(sameSideCount, this.config.stackDecayMultipliers);
+      req = { ...req, volume: Math.floor(req.volume * weight * 100 + 1e-9) / 100 };
+      if (req.volume < 0.01) return { ok: false, error: "Stack or drawdown risk cap", timestamp };
+    }
+    const cap =
+      this.credentials.bridgeMode === "mql5_ea" ? this.getCrashGuardStatus().halfKellyPct : null;
+    if (
+      cap !== null &&
+      (!req.sl ||
+        !this.quote ||
+        this.account.equity <= 0 ||
+        cashRiskFor(
+          req.symbol,
+          req.volume,
+          req.type.startsWith("BUY") ? this.quote.ask : this.quote.bid,
+          req.sl,
+        ) >
+          (this.account.equity * cap) / 100 + 1e-9)
+    )
+      return { ok: false, error: "Half-Kelly risk cap", timestamp };
     this.addLog(
       "ORDER_SENT",
       req.symbol,
@@ -958,6 +1237,8 @@ export class MT5TradingEngine {
     dailyLocked?: boolean;
     totalBaseline?: number;
     totalLocked?: boolean;
+    closedRiskSamples?: Array<{ id: string; r: number; pnl: number; closedAt: number }>;
+    closedTradeCount?: number;
     positions?: Array<{
       ticket: number;
       symbol: string;
@@ -972,6 +1253,20 @@ export class MT5TradingEngine {
       magic?: number;
     }>;
   }) {
+    if (
+      (telemetry.login && telemetry.login !== this.credentials.login) ||
+      (telemetry.server && telemetry.server !== this.credentials.server)
+    ) {
+      this.account.connected = false;
+      this.quote = null;
+      this.brokerHistoryAvailable = false;
+      this.addLog(
+        "ERROR",
+        "MT5",
+        "Broker identity mismatch; telemetry rejected and entries blocked.",
+      );
+      return;
+    }
     if (telemetry.login) this.account.login = telemetry.login;
     if (telemetry.server) this.account.server = telemetry.server;
     if (telemetry.currency) this.account.currency = telemetry.currency;
@@ -1004,6 +1299,41 @@ export class MT5TradingEngine {
         (typeof telemetry.lastLossTimeMs === "number" &&
           Number.isFinite(telemetry.lastLossTimeMs) &&
           telemetry.lastLossTimeMs > 0));
+    this.brokerHistoryAvailable =
+      Number.isSafeInteger(telemetry.closedTradeCount) && telemetry.closedTradeCount! >= 0;
+    if (this.brokerHistoryAvailable)
+      this.brokerClosedTradeCount = Math.max(
+        this.brokerClosedTradeCount,
+        telemetry.closedTradeCount!,
+      );
+    if (Array.isArray(telemetry.closedRiskSamples)) {
+      const known = new Set(this.closedRiskSamples.map((x) => x.id));
+      for (const sample of telemetry.closedRiskSamples.slice(0, 500)) {
+        if (
+          !sample ||
+          typeof sample.id !== "string" ||
+          !/^\d{1,20}$/.test(sample.id) ||
+          !Number.isFinite(sample.r) ||
+          !Number.isFinite(sample.pnl) ||
+          !Number.isFinite(sample.closedAt) ||
+          sample.closedAt <= 0 ||
+          known.has(sample.id)
+        )
+          continue;
+        known.add(sample.id);
+        this.closedRiskSamples.push({ ...sample });
+        if (sample.closedAt >= Date.now() - 120000 && sample.closedAt <= Date.now() + 30000)
+          this.addLog(
+            "POSITION_CLOSED",
+            "MT5",
+            `Broker closed position ${sample.id}: PnL ${sample.pnl.toFixed(2)}, ${sample.r.toFixed(2)}R`,
+            undefined,
+            { sample },
+          );
+      }
+      this.closedRiskSamples.sort((a, b) => a.closedAt - b.closedAt);
+      this.closedRiskSamples = this.closedRiskSamples.slice(-500);
+    }
     this.account.connected = true;
     this.account.lastUpdated = new Date().toISOString();
 
@@ -1070,8 +1400,14 @@ export class MT5TradingEngine {
         this.risk.dayBaseline = Math.max(this.risk.dayBaseline, telemetry.dailyBaseline);
       if (typeof telemetry.totalBaseline === "number" && telemetry.totalBaseline > 0)
         this.risk.totalBaseline = Math.max(this.risk.totalBaseline, telemetry.totalBaseline);
-      if (telemetry.dailyLocked) this.risk.dailyLocked = true;
-      if (telemetry.totalLocked) this.risk.totalLocked = true;
+      if (telemetry.dailyLocked && !this.risk.dailyLocked) {
+        this.risk.dailyLocked = true;
+        this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Terminal daily lock tripped.");
+      }
+      if (telemetry.totalLocked && !this.risk.totalLocked) {
+        this.risk.totalLocked = true;
+        this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Terminal total lock tripped.");
+      }
     }
     if (this.risk && this.brokerRiskRKnown) {
       this.risk.realizedR = telemetry.dailyRealizedR!;

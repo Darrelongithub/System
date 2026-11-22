@@ -30,6 +30,7 @@ export const Route = createFileRoute("/api/mt5")({
             calendarStatus: newsManager.getStatus(),
             calendarLastFetched: newsManager.getLastFetched(),
             risk: mt5Engine.getRiskStatus(),
+            crashGuard: mt5Engine.getCrashGuardStatus(),
           }),
           {
             headers: { "Content-Type": "application/json" },

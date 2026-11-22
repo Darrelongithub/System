@@ -172,6 +172,10 @@ export interface MT5AutoTradeConfig {
   fridayCloseHourEat: number;
   fridayCloseMinuteEat: number;
   fridayFlatten: boolean;
+  drawdownThresholdsPct: number[];
+  drawdownMultipliers: number[];
+  stackDecayMultipliers: number[];
+  flattenOnCrashGuard: boolean;
 }
 
 import type { EconomicNewsEvent } from "./news-filter";
@@ -237,6 +241,10 @@ export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   fridayCloseHourEat: 23,
   fridayCloseMinuteEat: 30,
   fridayFlatten: false,
+  drawdownThresholdsPct: [3, 5, 8, 10],
+  drawdownMultipliers: [1, 0.75, 0.5, 0.25, 0],
+  stackDecayMultipliers: [1, 0.75, 0.5],
+  flattenOnCrashGuard: true,
 };
 
 export const COMMON_MT5_SERVERS = [

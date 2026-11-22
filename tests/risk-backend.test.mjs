@@ -24,6 +24,7 @@ function ready() {
     bid: 2650,
     ask: 2650.2,
     dailyRealizedR: 0,
+    closedTradeCount: 0,
     consecutiveLosses: 0,
     positions: [],
   });
@@ -148,7 +149,7 @@ test("runtime state survives a fresh server process with restricted file permiss
     );
   try {
     run(
-      `import {initializeRuntimeState} from './src/lib/mt5/runtime-state.ts'; import {mt5Engine as e} from './src/lib/mt5/engine.ts'; initializeRuntimeState(); e.setCredentials({bridgeMode:'mql5_ea', apiToken:'bridge-test'}); e.setConfig({enabled:true,newsFilterEnabled:false,rolloverEnabled:false,fridayCloseEnabled:false}); e.syncFromEa({balance:10000,equity:10000,quoteSymbol:'XAUUSD',bid:2650,ask:2650.2,dailyRealizedR:0,consecutiveLosses:0,positions:[]}); e.placeOrder({id:'persist1',symbol:'XAUUSD',type:'BUY',volume:0.1,strategyId:'s',strategyName:'s'}); e.syncFromEa({balance:10000,equity:9799,quoteSymbol:'XAUUSD',bid:2650,ask:2650.2,dailyRealizedR:0,consecutiveLosses:0,positions:[]});`,
+      `import {initializeRuntimeState} from './src/lib/mt5/runtime-state.ts'; import {mt5Engine as e} from './src/lib/mt5/engine.ts'; initializeRuntimeState(); e.setCredentials({bridgeMode:'mql5_ea', apiToken:'bridge-test'}); e.setConfig({enabled:true,newsFilterEnabled:false,rolloverEnabled:false,fridayCloseEnabled:false}); e.syncFromEa({balance:10000,equity:10000,quoteSymbol:'XAUUSD',bid:2650,ask:2650.2,dailyRealizedR:0,closedTradeCount:0,consecutiveLosses:0,positions:[]}); e.placeOrder({id:'persist1',symbol:'XAUUSD',type:'BUY',volume:0.1,strategyId:'s',strategyName:'s'}); e.syncFromEa({balance:10000,equity:9799,quoteSymbol:'XAUUSD',bid:2650,ask:2650.2,dailyRealizedR:0,closedTradeCount:0,consecutiveLosses:0,positions:[]});`,
     );
     assert.equal(statSync(file).mode & 0o777, 0o600);
     const state = JSON.parse(readFileSync(file, "utf8"));
@@ -222,6 +223,7 @@ test("persisted signal key prevents a duplicate after a fresh engine restore", (
     bid: 2650,
     ask: 2650.2,
     dailyRealizedR: 0,
+    closedTradeCount: 0,
     consecutiveLosses: 0,
     positions: [],
   });

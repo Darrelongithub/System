@@ -34,6 +34,7 @@ import {
   useMT5State,
 } from "@/lib/mt5/mt5-store";
 import { V2_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
+import { V2_STRATEGY_IDS } from "@/lib/analyzer/strategies/v2-regime-bots";
 import type { ResultRow } from "@/lib/analyzer/types";
 import { checkNewsBlackout } from "@/lib/mt5/news-filter";
 import { cn } from "@/lib/utils";
@@ -74,6 +75,7 @@ interface ServerSnapshot {
   positions: MT5Position[];
   daemon: ServerDaemonStatus | null;
   calendarStatus: "live" | "stale" | "unavailable";
+  crashGuard: ReturnType<import("@/lib/mt5/engine").MT5TradingEngine["getCrashGuardStatus"]> | null;
   risk: import("@/lib/mt5/risk").RiskSnapshot | null;
   upcomingNews: import("@/lib/mt5/news-filter").EconomicNewsEvent[];
   fetchedAt: number;
@@ -158,6 +160,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           account: normalizeServerAccount(json["account"]),
           positions: normalizeServerPositions(json["positions"]),
           daemon: (json["daemon"] as ServerDaemonStatus | null) ?? null,
+          crashGuard: (json["crashGuard"] as ServerSnapshot["crashGuard"]) ?? null,
           risk: (json["risk"] as import("@/lib/mt5/risk").RiskSnapshot | null) ?? null,
           calendarStatus:
             json["calendarStatus"] === "live" || json["calendarStatus"] === "stale"
@@ -547,6 +550,45 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
       </div>
 
       {/* ─── TAB 1: LIVE DASHBOARD & POSITIONS ─── */}
+      {activeTab === "dashboard" && serverSnap?.crashGuard && (
+        <section className="rounded-xl border border-border/60 bg-secondary/20 p-4 grid gap-3 grid-cols-2 md:grid-cols-4 text-xs">
+          <h3 className="font-bold col-span-full">
+            Crash-Guard Risk Strip (server, confirmed live trades)
+          </h3>
+          <span>
+            Peak equity:{" "}
+            {serverSnap.crashGuard.peakEquity === null
+              ? "Unavailable"
+              : fmtMoney(serverSnap.crashGuard.peakEquity)}
+          </span>
+          <span>Current drawdown: {serverSnap.crashGuard.drawdownPct?.toFixed(2) ?? "—"}%</span>
+          <span>Drawdown brake: {serverSnap.crashGuard.multiplier ?? "—"}x</span>
+          <span>
+            Next stack BUY / SELL: {serverSnap.crashGuard.stackSlotWeight}x /{" "}
+            {serverSnap.crashGuard.sellStackSlotWeight}x
+          </span>
+          <span>
+            Recovery required:{" "}
+            {serverSnap.crashGuard.recoveryFraction == null
+              ? "—"
+              : (serverSnap.crashGuard.recoveryFraction * 100).toFixed(2)}
+            %
+          </span>
+          <span>
+            Half-Kelly cap:{" "}
+            {serverSnap.crashGuard.halfKellyPct == null
+              ? "Insufficient live trades"
+              : serverSnap.crashGuard.halfKellyPct.toFixed(2) + "%"}
+          </span>
+          <span>
+            CVaR 97.5% empirical: {serverSnap.crashGuard.empiricalCvarR?.toFixed(2) ?? "—"} R
+          </span>
+          <span>
+            CVaR 97.5% Gaussian: {serverSnap.crashGuard.parametricCvarR?.toFixed(2) ?? "—"} R (
+            {serverSnap.crashGuard.count} closed)
+          </span>
+        </section>
+      )}
       {activeTab === "dashboard" && (
         <div className="flex flex-col gap-5">
           {/* Active Positions Table */}
@@ -973,6 +1015,77 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
               fail closed. Closing or modifying is not guaranteed until the broker confirms it.
             </p>
           </div>
+          <div className="rounded-xl border p-4 grid gap-3 sm:grid-cols-3">
+            <h4 className="font-bold sm:col-span-3">Drawdown brake and stack multipliers</h4>
+            {configForm.drawdownThresholdsPct.map((value, i) => (
+              <label key={`threshold-${i}`} className="text-xs">
+                Drawdown step {i + 1} (%)
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      drawdownThresholdsPct: configForm.drawdownThresholdsPct.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            {configForm.drawdownMultipliers.map((value, i) => (
+              <label key={`brake-${i}`} className="text-xs">
+                Brake step {i + 1}
+                <Input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      drawdownMultipliers: configForm.drawdownMultipliers.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            {configForm.stackDecayMultipliers.map((value, i) => (
+              <label key={`stack-${i}`} className="text-xs">
+                Stack slot {i + 1}
+                <Input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      stackDecayMultipliers: configForm.stackDecayMultipliers.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            <label className="text-xs">
+              <input
+                type="checkbox"
+                checked={configForm.flattenOnCrashGuard}
+                onChange={(e) =>
+                  setConfigForm({ ...configForm, flattenOnCrashGuard: e.target.checked })
+                }
+              />{" "}
+              Flatten on crash lock
+            </label>
+          </div>
           {/* Risk Model & Sizing */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-secondary/20 p-4">
@@ -1174,7 +1287,8 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           {/* Strategy Whitelist Selector */}
           <div className="flex flex-col gap-2.5">
             <Label className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Active Strategies for Auto-Execution (Production 30 — Stage 2A Routed v3.0)
+              Active Strategies for Auto-Execution (Production {V2_STRATEGY_IDS.length} — v3.1
+              All-Weather)
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {V2_TRADE_STRATEGIES.map((strat) => {

@@ -34,6 +34,11 @@ export const Route = createFileRoute("/api/mt5/bridge")({
           const body = await request.json();
 
           if (body.action === "sync") {
+            if (!mt5Engine.matchesBrokerIdentity(body.login, body.server))
+              return new Response(
+                JSON.stringify({ status: "error", message: "Broker identity mismatch" }),
+                { status: 403, headers: { "Content-Type": "application/json" } },
+              );
             if (Array.isArray(body.commandResults))
               mt5Engine.reconcileOutcomes(body.commandResults);
             if (typeof body.ackIds === "string")

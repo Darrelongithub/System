@@ -1,9 +1,8 @@
 /**
- * MT5 live-execution parity gate (v3.0 30-Bot ARSENAL).
+ * MT5 live-execution parity gate.
  *
  * Guards the live edges that parity-exact live execution depends on:
- *  - DEFAULT_MT5_CONFIG ships exactly the 30 v3.0 regime-routed strategies
- *    (8 v2.2 Core + 22 certified expansion bots);
+ *  - DEFAULT_MT5_CONFIG ships exactly the current production strategy IDs;
  *  - the rolling-drawdown riskMultiplier throttles risk_pct sizing (0.5 → half risk);
  *  - opposite-side self-hedging is blocked at the engine level;
  *  - the max 3 same-side stack per symbol is enforced;
@@ -56,7 +55,11 @@ test("mt5 v2 parity: DEFAULT_MT5_CONFIG ships the v2 ruleset exactly", () => {
     [...V2_STRATEGY_IDS],
     "strategies == V2_STRATEGY_IDS",
   );
-  assertEqual(V2_STRATEGY_IDS.length, 30, "thirty v3.0 Stage-2A regime-routed bots");
+  assertEqual(
+    DEFAULT_MT5_CONFIG.strategies.length,
+    V2_STRATEGY_IDS.length,
+    "dynamic production strategy count",
+  );
   assertEqual(DEFAULT_MT5_CONFIG.riskPct, 0.35, "v2 default riskPct is 0.35%");
   assertEqual(DEFAULT_MT5_CONFIG.maxOpenPositions, 3, "v2 default max open positions is 3");
   assertEqual(DEFAULT_MT5_CONFIG.sizingMode, "risk_pct", "v2 default sizing is risk_pct");
@@ -103,8 +106,11 @@ test("mt5 v2 parity: riskMultiplier throttles risk_pct sizing, stack cap + anti-
 
     assert(fullResult.volume > 0 && throttledResult.volume > 0, "volumes are positive");
     assert(
-      Math.abs(fullResult.volume - 2 * throttledResult.volume) <= 0.020000001,
-      `0.5 multiplier halves risk within volume-step rounding (full ${fullResult.volume} vs throttled ${throttledResult.volume})`,
+      Math.abs(
+        throttledResult.volume -
+          fullResult.volume * 0.5 * DEFAULT_MT5_CONFIG.stackDecayMultipliers[1],
+      ) <= 0.02,
+      `signal and second-stack multipliers combine within volume-step rounding (full ${fullResult.volume} vs throttled ${throttledResult.volume})`,
     );
 
     // 3. Anti-hedge: opposite-side (short) signal on the same symbol while longs are open.
@@ -288,7 +294,12 @@ function closeOpenedPositions(tickets) {
 test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exact fields", () => {
   newsManager.setEvents([]);
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
     mt5Engine.syncFromEa({
       balance: 10000,
       equity: 10000,
@@ -296,6 +307,7 @@ test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exac
       bid: 2650,
       ask: 2650.2,
       dailyRealizedR: 0,
+      closedTradeCount: 0,
       consecutiveLosses: 0,
       positions: [],
     });
@@ -321,6 +333,7 @@ test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exac
       bid: 2650,
       ask: 2650.2,
       dailyRealizedR: 0,
+      closedTradeCount: 0,
       consecutiveLosses: 0,
       positions: [
         {
@@ -547,7 +560,12 @@ test("mt5 v2.2 parity: feedLiveSignalsToMT5 skips stale carryover signals only",
 test("mt5 v2.2 parity: syncFromEa preserves pre-fill optimistic fills within 15s", () => {
   newsManager.setEvents([]);
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
     mt5Engine.syncFromEa({
       balance: 10000,
       equity: 10000,
@@ -555,6 +573,7 @@ test("mt5 v2.2 parity: syncFromEa preserves pre-fill optimistic fills within 15s
       bid: 2650,
       ask: 2650.2,
       dailyRealizedR: 0,
+      closedTradeCount: 0,
       consecutiveLosses: 0,
       positions: [],
     });
@@ -725,7 +744,12 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
   newsManager.setEvents([]);
   const ticketsToClose = [];
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
     mt5Engine.syncFromEa({
       balance: 10000,
       equity: 10000,
@@ -733,6 +757,7 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
       bid: 2650,
       ask: 2650.2,
       dailyRealizedR: 0,
+      closedTradeCount: 0,
       consecutiveLosses: 0,
       positions: [],
     });
@@ -767,6 +792,7 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
       bid: 2650,
       ask: 2650.2,
       dailyRealizedR: 0,
+      closedTradeCount: 0,
       consecutiveLosses: 0,
       positions: [
         {
