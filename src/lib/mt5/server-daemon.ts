@@ -30,6 +30,8 @@
 
 import { createHash } from "node:crypto";
 import { mt5Engine } from "./engine";
+import { initializeRuntimeState } from "./runtime-state";
+import { newsManager } from "./news-filter";
 import { runAnalysis } from "@/lib/analyzer/run";
 import { ANALYZER_LIVE_OPTIONS } from "@/lib/analyzer/config";
 import { buildOhlcCsv } from "@/lib/ohlc-generator";
@@ -163,6 +165,7 @@ export interface ServerDaemonStatus {
 
 class MT5ServerDaemon {
   private timer: NodeJS.Timeout | null = null;
+  private riskTimer: NodeJS.Timeout | null = null;
   private isRunning = false;
   private isProcessing = false;
   private startedAt: string | null = null;
@@ -187,6 +190,11 @@ class MT5ServerDaemon {
   public start() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.riskTimer = setInterval(() => {
+      void newsManager.refresh();
+      mt5Engine.evaluateRisk();
+    }, 10_000);
+    this.riskTimer.unref?.();
     this.startedAt = new Date().toISOString();
     mt5Engine.addLog(
       "INFO",
@@ -214,6 +222,8 @@ class MT5ServerDaemon {
       clearTimeout(this.timer);
       this.timer = null;
     }
+    if (this.riskTimer) clearInterval(this.riskTimer);
+    this.riskTimer = null;
     this.isRunning = false;
     mt5Engine.addLog("WARN", "SERVER_DAEMON", "🛑 24/7 Server Strategy Engine PAUSED.");
   }
@@ -285,6 +295,7 @@ class MT5ServerDaemon {
     this.lastProcessedBarStart = barBoundaryFor(Date.now());
 
     try {
+      await newsManager.refresh();
       // .env defaults must be loaded BEFORE the key check: keys may live in
       // .env on a freshly started server.
       await ensureServerEnv();
@@ -407,4 +418,5 @@ class MT5ServerDaemon {
 }
 
 // Global server daemon singleton
+initializeRuntimeState();
 export const serverDaemon = new MT5ServerDaemon();

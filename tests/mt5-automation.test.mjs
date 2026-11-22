@@ -2,6 +2,7 @@
  * MT5 Live Automation & Trading Engine Unit and Integration Tests
  */
 import { test, assert, assertEqual } from "./tiny.mjs";
+import "./mt5-risk-integrated.test.mjs";
 import { calculateLotSize, mt5Engine } from "../src/lib/mt5/engine.ts";
 import { generateMql5EaSource } from "../src/lib/mt5/mql5-ea.ts";
 import { serverDaemon } from "../src/lib/mt5/server-daemon.ts";
@@ -80,6 +81,7 @@ test("mt5: MT5TradingEngine manages credentials, config, and state transitions",
 });
 
 test("mt5: handleLiveStrategySignal executes valid signals with auto entry, auto SL, and auto TP", () => {
+  mt5Engine.setCredentials({ bridgeMode: "simulated" });
   mt5Engine.setConfig({
     enabled: true,
     autoEntry: true,

@@ -133,168 +133,137 @@ export function checkNewsBlackout(params: {
 /**
  * In-memory Economic News Cache & Calendar Provider
  */
-class EconomicNewsManager {
-  private events: EconomicNewsEvent[] = [];
-  private lastFetched: number = 0;
+export type CalendarStatus = "live" | "stale" | "unavailable";
+const CACHE_MS = 15 * 60_000;
+const MAX_AGE_MS = 60 * 60_000;
 
-  constructor() {
-    this.seedRecurringCalendar();
-  }
+/** Server-side cache. A failed request never creates or updates events. */
+export class EconomicNewsManager {
+  private events: EconomicNewsEvent[] = [];
+  private manualEvents: EconomicNewsEvent[] = [];
+  private lastFetched = 0;
+  private nextAttempt = 0;
+  private failures = 0;
+  private inFlight: Promise<void> | null = null;
 
   public getLastFetched(): number {
     return this.lastFetched;
   }
-
-  public getEvents(): EconomicNewsEvent[] {
-    return [...this.events];
+  public getStatus(now = Date.now()): CalendarStatus {
+    if (!this.lastFetched) return "unavailable";
+    return now - this.lastFetched <= MAX_AGE_MS ? "live" : "stale";
   }
-
+  public getEvents(): EconomicNewsEvent[] {
+    return [...this.events, ...this.manualEvents].map((e) => ({ ...e }));
+  }
+  public setManualEvents(events: EconomicNewsEvent[]) {
+    if (
+      !Array.isArray(events) ||
+      events.length > 1000 ||
+      events.some(
+        (e) =>
+          !e ||
+          typeof e.id !== "string" ||
+          typeof e.title !== "string" ||
+          typeof e.currency !== "string" ||
+          !["HIGH", "MEDIUM", "LOW"].includes(e.impact) ||
+          typeof e.datetime !== "string" ||
+          !Number.isFinite(Date.parse(e.datetime)),
+      )
+    )
+      throw new Error("Invalid manual calendar events");
+    this.manualEvents = events.map((e) => ({ ...e, currency: e.currency.toUpperCase() }));
+  }
   public getUpcomingHighImpactEvents(withinHours = 24): EconomicNewsEvent[] {
     const now = Date.now();
-    const limit = now + withinHours * 3600 * 1000;
-    return this.events.filter((e) => {
-      const t = Date.parse(e.datetime);
-      return e.impact === "HIGH" && t >= now - 3600 * 1000 && t <= limit;
-    });
-  }
-
-  public setEvents(events: EconomicNewsEvent[]) {
-    this.events = events;
-    this.lastFetched = Date.now();
-  }
-
-  /**
-   * Generates recurring real-world High Impact calendar schedule
-   * (NFP, CPI, Fed Interest Rate Decisions, ECB, BOE, Retail Sales, GDP)
-   * aligned with realistic market release times.
-   */
-  public seedRecurringCalendar() {
-    const now = new Date();
-    const generated: EconomicNewsEvent[] = [];
-
-    // Key major news releases
-    const templates = [
-      {
-        title: "USD Non-Farm Payrolls (NFP)",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "185K",
-        previous: "142K",
-      },
-      {
-        title: "USD Consumer Price Index (CPI YoY)",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "2.6%",
-        previous: "2.9%",
-      },
-      {
-        title: "USD FOMC Interest Rate Decision & Statement",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 18,
-        minute: 0,
-        forecast: "4.75%",
-        previous: "5.00%",
-      },
-      {
-        title: "USD Fed Chair Powell Press Conference",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 18,
-        minute: 30,
-        forecast: "—",
-        previous: "—",
-      },
-      {
-        title: "EUR ECB Monetary Policy Statement & Rate Decision",
-        currency: "EUR",
-        impact: "HIGH" as const,
-        hourUTC: 12,
-        minute: 15,
-        forecast: "3.50%",
-        previous: "3.75%",
-      },
-      {
-        title: "GBP BOE Official Bank Rate Votes",
-        currency: "GBP",
-        impact: "HIGH" as const,
-        hourUTC: 11,
-        minute: 0,
-        forecast: "5.00%",
-        previous: "5.00%",
-      },
-      {
-        title: "USD Core PPI (MoM)",
-        currency: "USD",
-        impact: "MEDIUM" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "0.2%",
-        previous: "0.3%",
-      },
-      {
-        title: "USD Retail Sales (MoM)",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "0.3%",
-        previous: "0.1%",
-      },
-      {
-        title: "USD Prelim GDP (QoQ)",
-        currency: "USD",
-        impact: "HIGH" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "2.8%",
-        previous: "3.0%",
-      },
-      {
-        title: "USD Unemployment Claims",
-        currency: "USD",
-        impact: "MEDIUM" as const,
-        hourUTC: 12,
-        minute: 30,
-        forecast: "218K",
-        previous: "222K",
-      },
-    ];
-
-    // Seed events spanning yesterday, today, and the next 7 days
-    for (let dayOffset = -1; dayOffset <= 7; dayOffset++) {
-      const eventDate = new Date(now);
-      eventDate.setUTCDate(now.getUTCDate() + dayOffset);
-
-      // Distribute templates across weekdays (skip weekends)
-      const dayOfWeek = eventDate.getUTCDay();
-      if (dayOfWeek === 0 || dayOfWeek === 6) continue;
-
-      const templateIndex = Math.abs((dayOffset + dayOfWeek * 2) % templates.length);
-      const t = templates[templateIndex]!;
-
-      eventDate.setUTCHours(t.hourUTC, t.minute, 0, 0);
-
-      generated.push({
-        id: `news-${eventDate.toISOString().slice(0, 10)}-${t.currency}-${t.hourUTC}`,
-        title: t.title,
-        currency: t.currency,
-        impact: t.impact,
-        datetime: eventDate.toISOString(),
-        forecast: t.forecast,
-        previous: t.previous,
-      });
-    }
-
-    this.events = generated.sort(
-      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime(),
+    return this.getEvents().filter(
+      (e) =>
+        e.impact === "HIGH" &&
+        Date.parse(e.datetime) >= now - 3600_000 &&
+        Date.parse(e.datetime) <= now + withinHours * 3600_000,
     );
+  }
+  public setEvents(events: EconomicNewsEvent[]) {
+    if (
+      !Array.isArray(events) ||
+      events.some(
+        (e) =>
+          !e ||
+          typeof e.id !== "string" ||
+          typeof e.title !== "string" ||
+          typeof e.currency !== "string" ||
+          !["HIGH", "MEDIUM", "LOW"].includes(e.impact) ||
+          !Number.isFinite(Date.parse(e.datetime)),
+      )
+    )
+      throw new Error("Invalid calendar events");
+    this.events = events.map((e) => ({ ...e }));
     this.lastFetched = Date.now();
+  }
+  public async refresh(fetcher: typeof fetch = fetch): Promise<void> {
+    if (this.inFlight) return this.inFlight;
+    if (Date.now() < this.nextAttempt) return;
+    this.inFlight = (async () => {
+      let retryAfterMs = 0;
+      try {
+        const response = await fetcher("https://nfs.faireconomy.media/ff_calendar_thisweek.json", {
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!response.ok) {
+          const retry = response.headers.get("Retry-After");
+          if (retry) {
+            const seconds = Number(retry);
+            retryAfterMs = Number.isFinite(seconds)
+              ? seconds * 1000
+              : Math.max(0, Date.parse(retry) - Date.now());
+            if (!Number.isFinite(retryAfterMs)) retryAfterMs = 0;
+          }
+          throw new Error(`Calendar HTTP ${response.status}`);
+        }
+        const rows: unknown = await response.json();
+        if (!Array.isArray(rows)) throw new Error("Invalid calendar response");
+        const events: EconomicNewsEvent[] = rows.map((row: Record<string, unknown>, i: number) => {
+          if (
+            typeof row["title"] !== "string" ||
+            typeof row["country"] !== "string" ||
+            typeof row["date"] !== "string" ||
+            !Number.isFinite(Date.parse(row["date"])) ||
+            typeof row["impact"] !== "string"
+          )
+            throw new Error("Invalid calendar row");
+          const impact = row["impact"].toUpperCase();
+          if (!["HIGH", "MEDIUM", "LOW", "HOLIDAY", "NON-ECONOMIC"].includes(impact))
+            throw new Error("Invalid impact");
+          return {
+            id: `${row["date"]}-${row["country"]}-${i}`,
+            title: row["title"],
+            currency: row["country"].toUpperCase(),
+            datetime: new Date(row["date"]).toISOString(),
+            impact:
+              impact === "HOLIDAY" || impact === "NON-ECONOMIC" ? "LOW" : (impact as NewsImpact),
+            forecast: typeof row["forecast"] === "string" ? row["forecast"] : undefined,
+            previous: typeof row["previous"] === "string" ? row["previous"] : undefined,
+          };
+        });
+        this.setEvents(events);
+        this.failures = 0;
+        this.nextAttempt = Date.now() + CACHE_MS;
+      } catch {
+        this.failures++;
+        this.nextAttempt =
+          Date.now() +
+          Math.min(
+            24 * 60 * 60_000,
+            Math.max(
+              retryAfterMs,
+              Math.min(60 * 60_000, 60_000 * 2 ** Math.min(this.failures - 1, 6)),
+            ),
+          );
+      }
+    })().finally(() => {
+      this.inFlight = null;
+    });
+    return this.inFlight;
   }
 }
 

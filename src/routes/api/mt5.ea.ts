@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateMql5EaSource } from "@/lib/mt5/mql5-ea";
+import { verifyAdminRequest, adminUnauthorized } from "@/lib/mt5/admin-auth";
 import { mt5Engine } from "@/lib/mt5/engine";
 
 export const Route = createFileRoute("/api/mt5/ea")({
   server: {
     handlers: {
       GET: async ({ request }) => {
+        if (!verifyAdminRequest(request)) return adminUnauthorized();
         const url = new URL(request.url);
         const type = url.searchParams.get("type") || "bridge";
         const creds = mt5Engine.getCredentials();

@@ -55,7 +55,7 @@ export function unauthorizedBridgeResponse(): Response {
       status: "error",
       code: "unauthorized",
       message:
-        "Invalid or missing bridge token. The token rotates when the server restarts — re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.",
+        "Invalid or missing bridge token. The token may have changed — re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.",
     }),
     {
       status: 401,
