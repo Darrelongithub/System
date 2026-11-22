@@ -14,7 +14,14 @@ import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import type { Analysis, ResultRow } from "@/lib/analyzer/types";
 import { useAnalysisSnapshot } from "@/lib/analysis-store";
 import { MT5AutomationPanel } from "@/components/MT5AutomationPanel";
+import { WatcherCopilotPanel } from "@/components/WatcherCopilotPanel";
 import { feedLiveSignalsToMT5 } from "@/lib/mt5/mt5-store";
+import {
+  ExecutionFriction,
+  FRICTION_PRESETS,
+  summarizeFrictionAdjustedR,
+  type FrictionPreset,
+} from "@/components/ExecutionFriction";
 
 type Status = "idle" | "working" | "ready" | "error";
 
@@ -55,6 +62,7 @@ export default function AnalysisV2() {
   const [strategyFilter, setStrategyFilter] = useState("all");
   const [resultFilter, setResultFilter] = useState<"all" | "PASS" | "FAIL">("all");
   const [bundle, setBundle] = useState<BundleOutcome | null>(null);
+  const [frictionPreset, setFrictionPreset] = useState<FrictionPreset>("realistic");
   const csv = snapshot?.ohlcCsv ?? null;
   const currentSymbol = snapshot?.symbol || "XAU/USD";
   const csvName = snapshot?.csvName ?? (snapshot ? `${snapshot.symbol}.csv` : null);
@@ -152,6 +160,11 @@ export default function AnalysisV2() {
   }, [analysis, strategyFilter, resultFilter]);
 
   const visible = rows.slice(0, 500);
+  const frictionStats = useMemo(
+    () =>
+      summarizeFrictionAdjustedR(analysis?.results ?? [], FRICTION_PRESETS[frictionPreset].cost),
+    [analysis, frictionPreset],
+  );
 
   return (
     <main className="app-shell min-h-screen bg-background px-4 py-6 sm:px-8 sm:py-10">
@@ -173,8 +186,17 @@ export default function AnalysisV2() {
           </h1>
         </header>
 
+        <section className="panel flex flex-wrap items-center justify-between gap-3 p-4">
+          <ExecutionFriction value={frictionPreset} onChange={setFrictionPreset} />
+          <p className="max-w-xl text-xs text-muted-foreground">
+            This analyzer reports signal levels, not historical net R. The selected cost is an
+            execution assumption only and does not alter signals or automate trade fills.
+          </p>
+        </section>
+
         {/* ─── MT5 LIVE AUTOMATION & EXECUTION PANEL ─── */}
         <MT5AutomationPanel currentSymbol={currentSymbol} liveSignals={analysis?.live || []} />
+        <WatcherCopilotPanel />
 
         <section className="panel flex flex-col gap-4 p-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -270,6 +292,45 @@ export default function AnalysisV2() {
                 ))}
               </div>
 
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="rounded-md border border-border/60 bg-secondary/30 p-4">
+                  <p className="text-xs text-muted-foreground">Resolved gross R total</p>
+                  <p className="num mt-1 text-xl font-semibold">
+                    {frictionStats.grossSum.toFixed(2)}R
+                  </p>
+                </div>
+                <div className="rounded-md border border-border/60 bg-secondary/30 p-4">
+                  <p className="text-xs text-muted-foreground">
+                    Net R total · {FRICTION_PRESETS[frictionPreset].label}
+                  </p>
+                  <p className="num mt-1 text-xl font-semibold">
+                    {frictionStats.netSum.toFixed(2)}R
+                  </p>
+                </div>
+                <div className="rounded-md border border-border/60 bg-secondary/30 p-4">
+                  <p className="text-xs text-muted-foreground">Gross avg R</p>
+                  <p className="num mt-1 text-xl font-semibold">
+                    {frictionStats.count
+                      ? (frictionStats.grossSum / frictionStats.count).toFixed(3)
+                      : "n/a"}
+                    R
+                  </p>
+                </div>
+                <div className="rounded-md border border-border/60 bg-secondary/30 p-4">
+                  <p className="text-xs text-muted-foreground">Net avg R</p>
+                  <p className="num mt-1 text-xl font-semibold">
+                    {frictionStats.count
+                      ? (frictionStats.netSum / frictionStats.count).toFixed(3)
+                      : "n/a"}
+                    R
+                  </p>
+                </div>
+                <p className="col-span-full text-[11px] text-muted-foreground">
+                  {frictionStats.count} resolved rows priced; OPEN and NO_FILL are excluded. Rows
+                  lacking valid entry-to-stop risk are excluded from both totals.
+                </p>
+              </div>
+
               <div className="flex flex-col gap-3">
                 <h3 className="text-sm font-medium text-foreground">Per strategy</h3>
                 <div className="flex flex-col gap-2">
@@ -312,10 +373,10 @@ export default function AnalysisV2() {
                     HTF direction filter: before vs after
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Every PASS row is already HTF-aligned by construction — the v2.0 regime
-                    gate enforces htfAllowsDirection (G1) before consume(). Before and After
-                    are therefore identical by construction and Δ win rate is always +0.0 pp —
-                    read the trend-fighting count as an alignment mix, not as a filter effect.
+                    Every PASS row is already HTF-aligned by construction — the v2.0 regime gate
+                    enforces htfAllowsDirection (G1) before consume(). Before and After are
+                    therefore identical by construction and Δ win rate is always +0.0 pp — read the
+                    trend-fighting count as an alignment mix, not as a filter effect.
                   </p>
                   <div className="overflow-x-auto rounded-md border border-border">
                     <table className="data-table w-full text-xs">

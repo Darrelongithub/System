@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DEFAULT_PROFILE_SUMMARY } from "@/lib/synth/profile-summary";
+import { ExecutionFriction, type FrictionPreset } from "@/components/ExecutionFriction";
 import { SCENARIOS, SEQUENCE_SCENARIOS, SINGLE_CONDITION_SCENARIOS } from "@/lib/synth/scenarios";
 import { toCsv } from "@/lib/synth/csv";
 import type {
@@ -424,9 +425,10 @@ function PriceMap({ result }: { result: SyntheticResult }) {
 
 export default function MapGenerator() {
   const [scenario, setScenario] = useState<ScenarioName>("normal_chop");
+  const [frictionPreset, setFrictionPreset] = useState<FrictionPreset>("realistic");
   const [seed, setSeed] = useState(DEFAULT_SEED);
   const [tradingDays, setTradingDays] = useState("120");
-  const [startDate, setStartDate] = useState(
+  const [startDate, setStartDate] = useState<string>(
     DEFAULT_PROFILE_SUMMARY.sample.calendar.representativeStartDate,
   );
   const [priceLevel, setPriceLevel] = useState(String(DEFAULT_PROFILE_SUMMARY.sample.price.median));
@@ -945,6 +947,13 @@ export default function MapGenerator() {
                 {error}
               </div>
             )}
+            <div className="rounded-lg border border-border/50 p-3">
+              <ExecutionFriction value={frictionPreset} onChange={setFrictionPreset} />
+              <p className="mt-2 text-[10px] text-muted-foreground">
+                Execution-cost scenario for downstream comparisons only; this generator does not run
+                trades, calculate R, or apply costs to generated OHLC.
+              </p>
+            </div>
             <Button onClick={handleGenerate} disabled={isGenerating} className="h-10 w-full">
               {isGenerating ? (
                 <>

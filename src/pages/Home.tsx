@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Activity, Database, History, Map as MapIcon } from "lucide-react";
+import { WatcherCopilotPanel } from "@/components/WatcherCopilotPanel";
 
 const sections = [
   { title: "Data Generator", to: "/generator", icon: Database, hint: "Fetch real market data" },
@@ -55,6 +56,7 @@ export default function Home() {
             </Link>
           ))}
         </nav>
+        <WatcherCopilotPanel />
       </div>
     </main>
   );

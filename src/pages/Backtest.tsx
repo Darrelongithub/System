@@ -38,6 +38,13 @@ import { formatSeriesContract } from "@/lib/analyzer/series-contract";
 import { MIN_PRODUCTION_BARS } from "@/lib/analyzer/config";
 import { STANDARD_LOOKBACK_CALENDAR_DAYS } from "@/lib/pipeline/policy";
 import { todayEat } from "@/lib/analyzer/time";
+import { V2_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
+import {
+  ExecutionFriction,
+  FRICTION_PRESETS,
+  frictionInR,
+  type FrictionPreset,
+} from "@/components/ExecutionFriction";
 
 function inIframe(): boolean {
   try {
@@ -59,6 +66,12 @@ function inIframe(): boolean {
  * than a microtask because a microtask drains before the browser can paint or
  * process input.
  */
+function countCsvLines(text: string): number {
+  let lines = 0;
+  for (let i = 0; i < text.length; i++) if (text.charCodeAt(i) === 10) lines++;
+  return lines + (text.endsWith("\n") ? 0 : 1);
+}
+
 function yieldToBrowser(): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, 0);
@@ -94,6 +107,10 @@ export default function Backtest() {
   const [logs, setLogs] = useState<string[]>([]);
   const [state, setState] = useState<BacktestState>(() => emptyState("XAU/USD"));
   const [zip, setZip] = useState<{ name: string; url: string } | null>(null);
+  const [frictionPreset, setFrictionPreset] = useState<FrictionPreset>("realistic");
+  const [frictionTotals, setFrictionTotals] = useState<
+    Record<string, { inverseRiskSum: number; priced: number }>
+  >({});
 
   const stopRef = useRef(false);
   /** Aborts the continuous OHLC pull and its cooldown waits on Stop. */
@@ -168,6 +185,8 @@ export default function Backtest() {
     // Every run is self-contained: the selected range is always processed in full.
     // Clear prior results immediately so a failed re-run cannot leave stale success stats.
     const working: BacktestState = emptyState(symbol);
+    const frictionByStrategy: Record<string, { inverseRiskSum: number; priced: number }> = {};
+    setFrictionTotals({});
     setState(working);
 
     try {
@@ -175,7 +194,7 @@ export default function Backtest() {
         `Auto-Backtest ${symbol} | ${days[0]} → ${days[days.length - 1]} (${days.length} day(s))`,
       );
       addLog(
-        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (9 final strategies + context), local engine only.`,
+        `Mode: CONTINUOUS portfolio replay (analyseContinuous) — default production set (${V2_TRADE_STRATEGIES.length} trade strategies + context), local engine only.`,
       );
       addLog(
         `Closed-candle policy: seriesEndsComplete=true (historical bars). Future bars only resolve already-generated trades.`,
@@ -255,7 +274,16 @@ export default function Backtest() {
       // block starts.
       await yieldToBrowser();
       if (!isCurrent()) return;
-      const continuous = analyseContinuous(continuousCsv, { seriesEndsComplete: true });
+      const largeReplay = countCsvLines(continuousCsv) >= 50_000;
+      if (largeReplay) {
+        addLog(
+          "Large-series memory mode: retaining PASS rows and exact run-level fail aggregates; per-day fail-reason lists are suppressed.",
+        );
+      }
+      const continuous = analyseContinuous(continuousCsv, {
+        seriesEndsComplete: true,
+        omitFailResults: largeReplay,
+      });
       if (!isCurrent()) return;
       if (!continuous.ok) {
         addLog(`Continuous analysis failed: ${continuous.error}`);
@@ -390,12 +418,24 @@ export default function Backtest() {
         // them, so they stay off the skip path. `rowsForDay` is the slice from
         // the one-pass index — never a fresh filter of the full result table.
         const contextLog = continuous.contextLogOnDay(day);
-        const strategyBreakdown = buildStrategyBreakdown(
-          continuous.analysis.results,
-          day,
-          rowsByDay.get(day) ?? [],
-        );
+        const strategyBreakdown = largeReplay
+          ? []
+          : buildStrategyBreakdown(continuous.analysis.results, day, rowsByDay.get(day) ?? []);
 
+        // Keep a parallel exposure denominator so the selected per-ounce round-turn
+        // cost can be converted to R per resolved trade without mislabeling gross R.
+        for (const trigger of triggers) {
+          if (trigger.outcome !== "TP" && trigger.outcome !== "SL") continue;
+          const inverseRisk = frictionInR(1, trigger.entry, trigger.sl);
+          if (inverseRisk === null) continue;
+          const bucket = (frictionByStrategy[trigger.strategyId] ??= {
+            inverseRiskSum: 0,
+            priced: 0,
+          });
+          bucket.inverseRiskSum += inverseRisk;
+          bucket.priced += 1;
+        }
+        setFrictionTotals({ ...frictionByStrategy });
         // Cumulative stats grow strictly with completed trading days (chronological).
         applyTriggers(working, triggers);
         working.firstDay = working.firstDay ?? day;
@@ -590,7 +630,7 @@ export default function Backtest() {
           <p className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 font-mono text-[11px] text-muted-foreground">
             {days.length === 0
               ? "From date must be on or before the To date."
-              : `${days.length} day(s) queued · report range ${days[0]} → ${days[days.length - 1]} · OHLC fetch ${addUtcDays(days[0]!, -STANDARD_LOOKBACK_CALENDAR_DAYS)} → ${addUtcDays(days[days.length - 1]!, Math.max(0, forwardDays))} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up + ${forwardDays}d forward resolution) · strategies: production nine + context · seriesEndsComplete=true`}
+              : `${days.length} day(s) queued · report range ${days[0]} → ${days[days.length - 1]} · OHLC fetch ${addUtcDays(days[0]!, -STANDARD_LOOKBACK_CALENDAR_DAYS)} → ${addUtcDays(days[days.length - 1]!, Math.max(0, forwardDays))} (${STANDARD_LOOKBACK_CALENDAR_DAYS}d warm-up + ${forwardDays}d forward resolution) · strategies: ${V2_TRADE_STRATEGIES.length} trade strategies + context · seriesEndsComplete=true`}
           </p>
 
           <div className="flex flex-wrap gap-2">
@@ -632,6 +672,19 @@ export default function Backtest() {
         </section>
 
         <section className="glass-card flex flex-col gap-3 rounded-xl p-5">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">Execution assumptions</h2>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Net R subtracts selected XAUUSD round-turn cost divided by each resolved trade’s
+                entry-to-stop risk. OPEN and NO_FILL are excluded.
+              </p>
+            </div>
+            <ExecutionFriction value={frictionPreset} onChange={setFrictionPreset} />
+          </div>
+        </section>
+
+        <section className="glass-card flex flex-col gap-3 rounded-xl p-5">
           <h2 className="text-sm font-semibold text-foreground">
             Rolling stats {state.firstDay ? `since ${state.firstDay}` : ""}
           </h2>
@@ -649,7 +702,8 @@ export default function Backtest() {
                     <th className="py-1.5 pr-3">No fill</th>
                     <th className="py-1.5 pr-3">Open</th>
                     <th className="py-1.5 pr-3">Planned RR avg</th>
-                    <th className="py-1.5 pr-3">Avg realized R</th>
+                    <th className="py-1.5 pr-3">Gross avg R</th>
+                    <th className="py-1.5 pr-3">Net avg R</th>
                     <th className="py-1.5">Win rate</th>
                   </tr>
                 </thead>
@@ -658,6 +712,14 @@ export default function Backtest() {
                     const rate = winRate(row);
                     const avgRr = averageRr(row);
                     const realized = realizedR(row);
+                    const friction = frictionTotals[row.strategyId];
+                    const allResolvedHaveRisk =
+                      (friction?.priced ?? 0) === row.resolvedCount && row.resolvedCount > 0;
+                    const netR = allResolvedHaveRisk
+                      ? (row.resolvedRrSum -
+                          FRICTION_PRESETS[frictionPreset].cost * (friction?.inverseRiskSum ?? 0)) /
+                        row.resolvedCount
+                      : null;
                     return (
                       <tr key={row.strategyId} className="border-t border-border/40">
                         <td className="py-1.5 pr-3 font-sans text-foreground">{row.strategy}</td>
@@ -673,6 +735,9 @@ export default function Backtest() {
                           {realized === null
                             ? "n/a"
                             : `${realized >= 0 ? "+" : ""}${realized.toFixed(2)}R`}
+                        </td>
+                        <td className="py-1.5 pr-3">
+                          {netR === null ? "n/a" : `${netR >= 0 ? "+" : ""}${netR.toFixed(2)}R`}
                         </td>
                         <td className="py-1.5">{rate === null ? "n/a" : `${rate.toFixed(1)}%`}</td>
                       </tr>
