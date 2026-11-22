@@ -77,3 +77,4 @@ Gates: ≥100 trades; net mean > +0.10R with t > 2 (CR1 day-cluster); excess ove
 - **2004–2009 epoch A is EXTRAPOLATED** (no independent UTC reference pre-2010-01). All 2004–2009-2019 epoch B 2012+ cells are measured; epoch A 2009 (mostly) is not.
 - **The full-archive conversion reproduced the unseen CSV byte-identically** (sha256 75608e…) — Stage 2 freeze verified.
 - **No in-sample look-ahead**: the in-sample 2020–2026 report is labelled IN-SAMPLE for this reason; the PRIMARY verdict (0/8) is the honest one.
+- **In-sample random baseline shortfall.** The IN-SAMPLE (2020–2026) window is short (~6 years); the random baseline's accepted per-side-per-segment count runs 3,000–3,400 (below the 4,000 target) because one-slot blocking rejects more draws relative to the available bar pool. Documented honestly, no re-run after results. The unseen (2004–2019) primary verdict meets the ≥4,000/side/segment requirement (min 5,455).
