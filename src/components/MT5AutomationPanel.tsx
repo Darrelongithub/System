@@ -1,3 +1,4 @@
+import { adminHeaders, MT5_ADMIN_SESSION_KEY } from "@/lib/mt5/admin-client";
 import { useEffect, useState } from "react";
 import {
   Activity,
@@ -33,6 +34,7 @@ import {
   useMT5State,
 } from "@/lib/mt5/mt5-store";
 import { V2_TRADE_STRATEGIES } from "@/lib/analyzer/strategies";
+import { V2_STRATEGY_IDS } from "@/lib/analyzer/strategies/v2-regime-bots";
 import type { ResultRow } from "@/lib/analyzer/types";
 import { checkNewsBlackout } from "@/lib/mt5/news-filter";
 import { cn } from "@/lib/utils";
@@ -72,6 +74,10 @@ interface ServerSnapshot {
   account: MT5AccountInfo | null;
   positions: MT5Position[];
   daemon: ServerDaemonStatus | null;
+  calendarStatus: "live" | "stale" | "unavailable";
+  crashGuard: ReturnType<import("@/lib/mt5/engine").MT5TradingEngine["getCrashGuardStatus"]> | null;
+  risk: import("@/lib/mt5/risk").RiskSnapshot | null;
+  upcomingNews: import("@/lib/mt5/news-filter").EconomicNewsEvent[];
   fetchedAt: number;
 }
 
@@ -131,6 +137,12 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
     "dashboard" | "news" | "rules" | "bridge" | "cloud_daemon"
   >("dashboard");
   const [isConnecting, setIsConnecting] = useState(false);
+  const [adminToken, setAdminToken] = useState("");
+  useEffect(() => {
+    try {
+      setAdminToken(sessionStorage.getItem(MT5_ADMIN_SESSION_KEY) || "");
+    } catch {}
+  }, []);
   const [serverSnap, setServerSnap] = useState<ServerSnapshot | null>(null);
 
   // Poll the SERVER engine state every 5s: account/positions as reported by
@@ -148,6 +160,15 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           account: normalizeServerAccount(json["account"]),
           positions: normalizeServerPositions(json["positions"]),
           daemon: (json["daemon"] as ServerDaemonStatus | null) ?? null,
+          crashGuard: (json["crashGuard"] as ServerSnapshot["crashGuard"]) ?? null,
+          risk: (json["risk"] as import("@/lib/mt5/risk").RiskSnapshot | null) ?? null,
+          calendarStatus:
+            json["calendarStatus"] === "live" || json["calendarStatus"] === "stale"
+              ? json["calendarStatus"]
+              : "unavailable",
+          upcomingNews: Array.isArray(json["upcomingNews"])
+            ? (json["upcomingNews"] as import("@/lib/mt5/news-filter").EconomicNewsEvent[])
+            : [],
           fetchedAt: Date.now(),
         });
       } catch {
@@ -529,6 +550,45 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
       </div>
 
       {/* ─── TAB 1: LIVE DASHBOARD & POSITIONS ─── */}
+      {activeTab === "dashboard" && serverSnap?.crashGuard && (
+        <section className="rounded-xl border border-border/60 bg-secondary/20 p-4 grid gap-3 grid-cols-2 md:grid-cols-4 text-xs">
+          <h3 className="font-bold col-span-full">
+            Crash-Guard Risk Strip (server, confirmed live trades)
+          </h3>
+          <span>
+            Peak equity:{" "}
+            {serverSnap.crashGuard.peakEquity === null
+              ? "Unavailable"
+              : fmtMoney(serverSnap.crashGuard.peakEquity)}
+          </span>
+          <span>Current drawdown: {serverSnap.crashGuard.drawdownPct?.toFixed(2) ?? "—"}%</span>
+          <span>Drawdown brake: {serverSnap.crashGuard.multiplier ?? "—"}x</span>
+          <span>
+            Next stack BUY / SELL: {serverSnap.crashGuard.stackSlotWeight}x /{" "}
+            {serverSnap.crashGuard.sellStackSlotWeight}x
+          </span>
+          <span>
+            Recovery required:{" "}
+            {serverSnap.crashGuard.recoveryFraction == null
+              ? "—"
+              : (serverSnap.crashGuard.recoveryFraction * 100).toFixed(2)}
+            %
+          </span>
+          <span>
+            Half-Kelly cap:{" "}
+            {serverSnap.crashGuard.halfKellyPct == null
+              ? "Insufficient live trades"
+              : serverSnap.crashGuard.halfKellyPct.toFixed(2) + "%"}
+          </span>
+          <span>
+            CVaR 97.5% empirical: {serverSnap.crashGuard.empiricalCvarR?.toFixed(2) ?? "—"} R
+          </span>
+          <span>
+            CVaR 97.5% Gaussian: {serverSnap.crashGuard.parametricCvarR?.toFixed(2) ?? "—"} R (
+            {serverSnap.crashGuard.count} closed)
+          </span>
+        </section>
+      )}
       {activeTab === "dashboard" && (
         <div className="flex flex-col gap-5">
           {/* Active Positions Table */}
@@ -766,15 +826,47 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             </div>
           </div>
 
+          <label className="block text-xs">
+            Upload manual events JSON (array: id, title, currency, impact, datetime)
+            <input
+              type="file"
+              accept="application/json,.json"
+              onChange={async (e) => {
+                try {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  const events = JSON.parse(await file.text());
+                  const response = await fetch("/api/mt5", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", ...adminHeaders() },
+                    body: JSON.stringify({ action: "manual_news", events }),
+                  });
+                  if (!response.ok) throw new Error("Invalid events or server error");
+                  toast.success("Manual events loaded into server memory");
+                } catch {
+                  toast.error("Could not load manual events");
+                }
+                e.target.value = "";
+              }}
+            />
+            <span className="block text-amber-500">
+              Manual events do not certify complete calendar coverage or make an offline feed live.
+            </span>
+          </label>
           {/* Upcoming High Impact Events Feed */}
           <div className="flex flex-col gap-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center justify-between">
-              <span>Upcoming High-Impact Economic Events (Next 48 Hours)</span>
+              <span>
+                Upcoming High-Impact Economic Events (Next 48 Hours) — Calendar:{" "}
+                {serverSnap && Date.now() - serverSnap.fetchedAt < 15000
+                  ? serverSnap.calendarStatus
+                  : "unavailable"}
+              </span>
               <span className="font-mono text-[10px] text-primary">All Times UTC</span>
             </h4>
 
             <div className="grid gap-2.5 sm:grid-cols-2">
-              {(mt5.upcomingNews || []).map((event) => {
+              {(serverSnap?.upcomingNews || []).map((event) => {
                 const eventDate = new Date(event.datetime);
                 const isPast = eventDate.getTime() < Date.now();
                 const diffMins = Math.round((eventDate.getTime() - Date.now()) / (60 * 1000));
@@ -848,6 +940,152 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
       {/* ─── TAB 3: AUTOMATION RULES & RISK SETTINGS ─── */}
       {activeTab === "rules" && (
         <form onSubmit={handleSaveConfig} className="flex flex-col gap-6">
+          <div className="rounded-xl border p-4 grid gap-3 sm:grid-cols-2">
+            <h4 className="font-bold sm:col-span-2">Capital protection &amp; liquidity</h4>
+            <p className="text-xs sm:col-span-2">
+              Server risk:{" "}
+              {serverSnap?.risk
+                ? serverSnap.risk.totalLocked
+                  ? "TOTAL LOCKED"
+                  : serverSnap.risk.dailyLocked
+                    ? "DAILY LOCKED"
+                    : "monitoring"
+                : "unavailable — awaiting telemetry"}
+            </p>
+            {(
+              [
+                ["maxDailyLossPct", "Daily equity loss %"],
+                ["maxDailyLossR", "Daily loss R (negative)"],
+                ["maxTotalDrawdownPct", "Total equity drawdown %"],
+                ["consecutiveLossLimit", "Consecutive losses"],
+                ["consecutiveLossCooldownHours", "Cooldown hours"],
+                ["maxSpreadUsd", "Maximum gold spread USD"],
+                ["rolloverStartMinuteEat", "Rollover start minute EAT"],
+                ["rolloverEndMinuteEat", "Rollover end minute EAT"],
+                ["fridayCloseHourEat", "Friday close hour EAT"],
+                ["fridayCloseMinuteEat", "Friday close minute EAT"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="text-xs">
+                {label}
+                <Input
+                  type="number"
+                  step="any"
+                  value={configForm[key]}
+                  onChange={(e) => setConfigForm({ ...configForm, [key]: Number(e.target.value) })}
+                />
+              </label>
+            ))}
+            {(
+              [
+                ["flattenOnDailyLimit", "Flatten on daily limit"],
+                ["rolloverEnabled", "Rollover blackout"],
+                ["fridayCloseEnabled", "Friday gap protection"],
+                ["fridayFlatten", "Flatten gold at Friday close"],
+              ] as const
+            ).map(([key, label]) => (
+              <label key={key} className="text-xs">
+                <input
+                  type="checkbox"
+                  checked={configForm[key]}
+                  onChange={(e) => setConfigForm({ ...configForm, [key]: e.target.checked })}
+                />{" "}
+                {label}
+              </label>
+            ))}
+            <label className="text-xs">
+              Pre-news position action
+              <select
+                className="block bg-card border p-2"
+                value={configForm.preNewsAction}
+                onChange={(e) =>
+                  setConfigForm({
+                    ...configForm,
+                    preNewsAction: e.target.value as typeof configForm.preNewsAction,
+                  })
+                }
+              >
+                <option value="none">None</option>
+                <option value="breakeven_if_profit">Move profitable positions to breakeven</option>
+                <option value="close_all">Close all affected positions</option>
+              </select>
+            </label>
+            <p className="text-xs text-amber-500 sm:col-span-2">
+              Live daily R requires broker-confirmed risk history. Until available, live entries
+              fail closed. Closing or modifying is not guaranteed until the broker confirms it.
+            </p>
+          </div>
+          <div className="rounded-xl border p-4 grid gap-3 sm:grid-cols-3">
+            <h4 className="font-bold sm:col-span-3">Drawdown brake and stack multipliers</h4>
+            {configForm.drawdownThresholdsPct.map((value, i) => (
+              <label key={`threshold-${i}`} className="text-xs">
+                Drawdown step {i + 1} (%)
+                <Input
+                  type="number"
+                  step="0.1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      drawdownThresholdsPct: configForm.drawdownThresholdsPct.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            {configForm.drawdownMultipliers.map((value, i) => (
+              <label key={`brake-${i}`} className="text-xs">
+                Brake step {i + 1}
+                <Input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      drawdownMultipliers: configForm.drawdownMultipliers.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            {configForm.stackDecayMultipliers.map((value, i) => (
+              <label key={`stack-${i}`} className="text-xs">
+                Stack slot {i + 1}
+                <Input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  max="1"
+                  value={value}
+                  onChange={(e) =>
+                    setConfigForm({
+                      ...configForm,
+                      stackDecayMultipliers: configForm.stackDecayMultipliers.map((n, j) =>
+                        i === j ? Number(e.target.value) : n,
+                      ),
+                    })
+                  }
+                />
+              </label>
+            ))}
+            <label className="text-xs">
+              <input
+                type="checkbox"
+                checked={configForm.flattenOnCrashGuard}
+                onChange={(e) =>
+                  setConfigForm({ ...configForm, flattenOnCrashGuard: e.target.checked })
+                }
+              />{" "}
+              Flatten on crash lock
+            </label>
+          </div>
           {/* Risk Model & Sizing */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-3 rounded-xl border border-border/60 bg-secondary/20 p-4">
@@ -870,6 +1108,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                   className="rounded-md border border-input bg-card px-3 py-2 text-xs text-foreground font-semibold"
                 >
                   <option value="risk_pct">Dynamic Risk % of Equity (Recommended)</option>
+                  <option value="risk_amount">Fixed cash risk</option>
                   <option value="fixed">Fixed Lot Size</option>
                 </select>
               </div>
@@ -893,6 +1132,20 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
                       })
                     }
                     className="font-mono text-sm"
+                  />
+                </div>
+              ) : configForm.sizingMode === "risk_amount" ? (
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="risk-amount">Maximum cash risk per trade</Label>
+                  <Input
+                    id="risk-amount"
+                    type="number"
+                    min="0"
+                    step="1"
+                    value={configForm.maxRiskAmount}
+                    onChange={(e) =>
+                      setConfigForm({ ...configForm, maxRiskAmount: Number(e.target.value) })
+                    }
                   />
                 </div>
               ) : (
@@ -1034,7 +1287,8 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
           {/* Strategy Whitelist Selector */}
           <div className="flex flex-col gap-2.5">
             <Label className="text-xs font-bold uppercase tracking-wide text-foreground">
-              Active Strategies for Auto-Execution (Production 30 — Stage 2A Routed v3.0)
+              Active Strategies for Auto-Execution (Production {V2_STRATEGY_IDS.length} — v3.1
+              All-Weather)
             </Label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {V2_TRADE_STRATEGIES.map((strat) => {
@@ -1178,12 +1432,46 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
               asChild
               className="font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg"
             >
-              <a href="/api/mt5/ea?type=bridge" download="SignalFinderBridge.mq5">
+              <a
+                href="/api/mt5/ea?type=bridge"
+                download="SignalFinderBridge.mq5"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  try {
+                    const res = await fetch("/api/mt5/ea?type=bridge", { headers: adminHeaders() });
+                    if (!res.ok) throw new Error("Admin token required");
+                    const url = URL.createObjectURL(await res.blob());
+                    const link = document.createElement("a");
+                    link.href = url;
+                    link.download = "SignalFinderBridge.mq5";
+                    link.click();
+                    URL.revokeObjectURL(url);
+                  } catch {
+                    toast.error("EA download rejected; check admin token");
+                  }
+                }}
+              >
                 <Download className="mr-2 size-4" /> Download Bridge EA
               </a>
             </Button>
           </div>
 
+          <label className="block text-xs">
+            MT5 admin token (this browser session only)
+            <Input
+              type="password"
+              autoComplete="off"
+              value={adminToken}
+              onChange={(e) => {
+                const value = e.target.value;
+                setAdminToken(value);
+                try {
+                  if (value) sessionStorage.setItem(MT5_ADMIN_SESSION_KEY, value);
+                  else sessionStorage.removeItem(MT5_ADMIN_SESSION_KEY);
+                } catch {}
+              }}
+            />
+          </label>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-1.5 rounded-xl border border-border/60 bg-secondary/30 p-4">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
@@ -1226,7 +1514,7 @@ export function MT5AutomationPanel({ currentSymbol, liveSignals }: MT5Automation
             <strong className="text-amber-200 uppercase tracking-wide text-[10px] mr-2">
               Token rotation
             </strong>
-            The bridge token changes when the server restarts. If the EA journal shows{" "}
+            If the bridge token has changed or runtime state was lost and the EA journal shows{" "}
             <code className="font-mono">HTTP 401</code>, re-download the EA above and attach it
             again — the fresh file always embeds the current token.
           </div>

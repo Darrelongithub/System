@@ -3,7 +3,9 @@
  */
 
 import type { ResultRow } from "@/lib/analyzer/types";
-import { checkNewsBlackout, newsManager } from "./news-filter";
+import { checkNewsBlackout, newsManager, doesNewsAffectSymbol } from "./news-filter";
+import { eatParts, entryTimeBlock, observeEquity, type RiskSnapshot } from "./risk";
+import { drawdownBrake, stackMultiplier, tradeRiskMetrics } from "./crash-guard";
 import {
   DEFAULT_MT5_CONFIG,
   DEFAULT_MT5_CREDENTIALS,
@@ -12,16 +14,28 @@ import {
   type MT5AutoTradeConfig,
   type MT5OrderRequest,
   type MT5OrderResult,
+  type MT5CommandOutcome,
   type MT5Position,
   type MT5TradeLogEntry,
 } from "./types";
+
+/** Stable signal identity lets the terminal deduplicate re-analysis after server restart. */
+function stableSignalId(value: string): string {
+  let a = 2166136261,
+    b = 2246822519;
+  for (let i = 0; i < value.length; i++) {
+    a = Math.imul(a ^ value.charCodeAt(i), 16777619);
+    b = Math.imul(b ^ value.charCodeAt(i), 3266489917);
+  }
+  return `sig-${(a >>> 0).toString(16)}${(b >>> 0).toString(16)}`;
+}
 
 /**
  * Standard contract sizes for financial instruments.
  */
 function getContractSize(symbol: string): number {
   const s = symbol.toUpperCase().replace(/[^A-Z]/g, "");
-  if (s.includes("XAU")) return 100; // 1 lot Gold = 100 oz
+  if (s.includes("XAU") || s.includes("GOLD")) return 100; // 1 lot Gold = 100 oz
   if (s.includes("XAG")) return 5000; // 1 lot Silver = 5000 oz
   if (s.includes("BTC") || s.includes("ETH") || s.includes("SOL")) return 1; // 1 lot Crypto = 1 coin
   if (s.includes("USO") || s.includes("BCO")) return 1000; // 1 lot Oil = 1000 barrels
@@ -51,7 +65,7 @@ export function canonicalSymbol(sym: string): string {
   if (/^[A-Z0-9]{6}[MC]$/.test(s)) {
     s = s.slice(0, 6);
   }
-  return s;
+  return s === "GOLD" ? "XAUUSD" : s;
 }
 
 /** Cash risk implied by the (possibly min-lot-rounded) volume over the SL distance. */
@@ -90,15 +104,30 @@ export function calculateLotSize(params: {
 
   // Clamp & step to 0.01
   rawLots = Math.max(0.01, Math.min(100.0, rawLots));
-  const volume = Number(rawLots.toFixed(2));
+  const volume = Math.floor(rawLots * 100 + 1e-9) / 100;
 
   return { volume, riskAmount, slDistance };
+}
+
+export const OPEN_COMMAND_TTL_MS = 90_000;
+export interface MT5RuntimeSnapshot {
+  version: 1;
+  config: MT5AutoTradeConfig;
+  identity: Pick<MT5AccountCredentials, "login" | "server" | "bridgeMode" | "isDemo" | "apiToken">;
+  risk: RiskSnapshot | null;
+  executedSignals: string[];
+  pendingCommands: MT5OrderRequest[];
+  peakEquity?: number;
+  closedRiskSamples?: Array<{ id: string; r: number; pnl: number; closedAt: number }>;
+  telegramOffset?: number;
+  emergencyFlatten?: boolean;
+  brokerClosedTradeCount?: number;
 }
 
 /**
  * Global In-Memory MT5 Engine for Live Session
  */
-class MT5TradingEngine {
+export class MT5TradingEngine {
   private credentials: MT5AccountCredentials = { ...DEFAULT_MT5_CREDENTIALS };
   private config: MT5AutoTradeConfig = { ...DEFAULT_MT5_CONFIG };
   private account: MT5AccountInfo = {
@@ -123,9 +152,200 @@ class MT5TradingEngine {
   private pendingCommands: MT5OrderRequest[] = [];
   private executedSignals = new Set<string>();
   private ticketCounter = 1048200;
+  private persistHook: ((snapshot: MT5RuntimeSnapshot) => void) | null = null;
+  private persistenceError: string | null = null;
+  private risk: RiskSnapshot | null = null;
+  private quote: { symbol: string; bid: number; ask: number; at: number } | null = null;
+  private brokerRiskRKnown = false;
+  private closedRiskIds = new Set<number>();
+  private peakEquity = 0;
+  private closedRiskSamples: Array<{ id: string; r: number; pnl: number; closedAt: number }> = [];
+  private telegramOffset = 0;
+  private emergencyFlatten = false;
+  private brokerClosedTradeCount = 0;
+  private brokerHistoryAvailable = false;
+  private notificationSink: ((entry: MT5TradeLogEntry) => void) | null = null;
 
   constructor() {
     this.addLog("INFO", "SYSTEM", "MT5 Trading Automation Engine initialized.");
+  }
+
+  public setPersistence(hook: (snapshot: MT5RuntimeSnapshot) => void) {
+    this.persistHook = hook;
+  }
+  public exportRuntimeState(): MT5RuntimeSnapshot {
+    const { login, server, bridgeMode, isDemo, apiToken } = this.credentials;
+    return {
+      version: 1,
+      config: { ...this.config },
+      identity: { login, server, bridgeMode, isDemo, apiToken },
+      risk: this.risk ? { ...this.risk } : null,
+      executedSignals: [...this.executedSignals].slice(-10000),
+      pendingCommands: this.pendingCommands.map((c) => ({ ...c })),
+      peakEquity: this.peakEquity,
+      closedRiskSamples: this.closedRiskSamples.map((x) => ({ ...x })),
+      telegramOffset: this.telegramOffset,
+      emergencyFlatten: this.emergencyFlatten,
+      brokerClosedTradeCount: this.brokerClosedTradeCount,
+    };
+  }
+  public restoreRuntimeState(snapshot: MT5RuntimeSnapshot) {
+    if (
+      !snapshot ||
+      snapshot.version !== 1 ||
+      !snapshot.config ||
+      !snapshot.identity ||
+      !Array.isArray(snapshot.pendingCommands) ||
+      !Array.isArray(snapshot.executedSignals)
+    )
+      throw new Error("Invalid MT5 runtime state");
+    if (
+      typeof snapshot.identity.login !== "string" ||
+      typeof snapshot.identity.server !== "string" ||
+      !["mql5_ea", "simulated", "direct_rest", "metaapi"].includes(snapshot.identity.bridgeMode) ||
+      snapshot.executedSignals.some((s) => typeof s !== "string") ||
+      snapshot.pendingCommands.some(
+        (c) =>
+          !c ||
+          typeof c.symbol !== "string" ||
+          typeof c.id !== "string" ||
+          !["OPEN", "CLOSE", "MODIFY"].includes(c.action ?? ""),
+      )
+    )
+      throw new Error("Invalid MT5 runtime identity or command");
+    if (
+      snapshot.risk &&
+      (typeof snapshot.risk.day !== "string" ||
+        !Number.isFinite(snapshot.risk.dayBaseline) ||
+        snapshot.risk.dayBaseline <= 0 ||
+        !Number.isFinite(snapshot.risk.totalBaseline) ||
+        snapshot.risk.totalBaseline <= 0 ||
+        typeof snapshot.risk.dailyLocked !== "boolean" ||
+        typeof snapshot.risk.totalLocked !== "boolean" ||
+        !Number.isFinite(snapshot.risk.realizedR) ||
+        !Number.isFinite(snapshot.risk.cooldownUntil) ||
+        !Number.isFinite(snapshot.risk.lossStreak))
+    )
+      throw new Error("Invalid MT5 runtime risk state");
+    if (
+      snapshot.peakEquity !== undefined &&
+      (!Number.isFinite(snapshot.peakEquity) || snapshot.peakEquity < 0)
+    )
+      throw new Error("Invalid peak equity");
+    if (
+      snapshot.closedRiskSamples !== undefined &&
+      (!Array.isArray(snapshot.closedRiskSamples) ||
+        snapshot.closedRiskSamples.some(
+          (x) =>
+            !x ||
+            typeof x.id !== "string" ||
+            !Number.isFinite(x.r) ||
+            !Number.isFinite(x.pnl) ||
+            !Number.isFinite(x.closedAt),
+        ))
+    )
+      throw new Error("Invalid closed risk samples");
+    this.setConfig(snapshot.config);
+    this.credentials = { ...this.credentials, ...snapshot.identity };
+    this.account.login = snapshot.identity.login;
+    this.account.server = snapshot.identity.server;
+    this.account.connected = false;
+    this.risk = snapshot.risk;
+    this.peakEquity = snapshot.peakEquity ?? snapshot.risk?.totalBaseline ?? 0;
+    this.closedRiskSamples = (snapshot.closedRiskSamples ?? []).slice(-500);
+    this.telegramOffset =
+      Number.isSafeInteger(snapshot.telegramOffset) && snapshot.telegramOffset! >= 0
+        ? snapshot.telegramOffset!
+        : 0;
+    this.brokerClosedTradeCount =
+      Number.isSafeInteger(snapshot.brokerClosedTradeCount) && snapshot.brokerClosedTradeCount! >= 0
+        ? snapshot.brokerClosedTradeCount!
+        : 0;
+    this.brokerHistoryAvailable = false;
+    this.emergencyFlatten = snapshot.emergencyFlatten === true;
+    if (this.emergencyFlatten) this.config.enabled = false;
+    if (this.risk?.totalLocked) this.config.enabled = false;
+    this.executedSignals = new Set(snapshot.executedSignals.slice(-10000));
+    this.pendingCommands = snapshot.pendingCommands;
+    this.expireOpenCommands();
+  }
+  private persist() {
+    if (!this.persistHook) return;
+    try {
+      this.persistHook(this.exportRuntimeState());
+      this.persistenceError = null;
+    } catch (err) {
+      this.persistenceError = String(err);
+      this.config.enabled = false;
+      console.error("[MT5] Runtime persistence failed; entries disabled", err);
+    }
+  }
+  public failPersistence(error: unknown) {
+    this.persistenceError = String(error);
+    this.config.enabled = false;
+  }
+  public expireOpenCommands(now = Date.now()) {
+    const expired = this.pendingCommands.filter(
+      (c) => c.action === "OPEN" && (!c.createdAtMs || now - c.createdAtMs >= OPEN_COMMAND_TTL_MS),
+    );
+    if (!expired.length) return;
+    const ids = new Set(expired.map((c) => c.id));
+    this.pendingCommands = this.pendingCommands.filter((c) => !expired.includes(c));
+    this.positions = this.positions.filter((p) => !p.commandId || !ids.has(p.commandId));
+    for (const c of expired)
+      this.addLog(
+        "ORDER_REJECTED",
+        c.symbol,
+        `OPEN ${c.id} expired before confirmation; reconcile broker state.`,
+        c.strategyName,
+      );
+    this.persist();
+  }
+  public reconcileOutcomes(outcomes: MT5CommandOutcome[]) {
+    for (const outcome of outcomes) {
+      if (
+        !outcome ||
+        typeof outcome.id !== "string" ||
+        !["FILLED", "REJECTED", "UNKNOWN"].includes(outcome.status)
+      )
+        continue;
+      const command = this.pendingCommands.find((c) => c.id === outcome.id && c.action === "OPEN");
+      if (!command) continue; // replay, or already expired; broker telemetry remains authoritative
+      this.pendingCommands = this.pendingCommands.filter((c) => c.id !== outcome.id);
+      this.positions = this.positions.filter((p) => p.commandId !== outcome.id);
+      if (
+        outcome.status === "FILLED" &&
+        typeof outcome.ticket === "number" &&
+        Number.isSafeInteger(outcome.ticket) &&
+        outcome.ticket > 0
+      ) {
+        this.addLog(
+          "ORDER_FILLED",
+          command.symbol,
+          `Broker confirmed OPEN ${outcome.id} ticket ${outcome.ticket}`,
+          command.strategyName,
+          { outcome, req: command, spread: this.quote ? this.quote.ask - this.quote.bid : null },
+        );
+      } else {
+        this.addLog(
+          outcome.status === "UNKNOWN" ? "WARN" : "ORDER_REJECTED",
+          command.symbol,
+          `OPEN ${outcome.id}: ${outcome.status} — ${outcome.error || "terminal did not confirm fill"}`,
+          command.strategyName,
+          { outcome },
+        );
+      }
+    }
+    this.persist();
+  }
+
+  public matchesBrokerIdentity(login: unknown, server: unknown): boolean {
+    return (
+      typeof login === "string" &&
+      typeof server === "string" &&
+      login === this.credentials.login &&
+      server === this.credentials.server
+    );
   }
 
   public getCredentials(): MT5AccountCredentials {
@@ -137,6 +357,23 @@ class MT5TradingEngine {
     // terminal; a payload that still carries `password` (old localStorage, a
     // direct POST) must not land in memory, logs, or a later sync.
     const { password: _neverStored, ...rest } = creds;
+    const changed =
+      (rest.login !== undefined && rest.login !== this.credentials.login) ||
+      (rest.server !== undefined && rest.server !== this.credentials.server) ||
+      (rest.bridgeMode !== undefined && rest.bridgeMode !== this.credentials.bridgeMode);
+    if (changed) {
+      this.risk = null;
+      this.peakEquity = 0;
+      this.closedRiskSamples = [];
+      this.brokerClosedTradeCount = 0;
+      this.brokerHistoryAvailable = false;
+      this.quote = null;
+      this.brokerRiskRKnown = false;
+      this.pendingCommands = [];
+      this.positions = [];
+      this.account.connected = false;
+      this.config.enabled = false;
+    }
     this.credentials = { ...this.credentials, ...rest };
     delete this.credentials.password;
     this.account.login = this.credentials.login || "50198421";
@@ -147,6 +384,7 @@ class MT5TradingEngine {
       "SYSTEM",
       `MT5 Account credentials updated: ${this.credentials.login} on ${this.credentials.server} (${this.credentials.bridgeMode})`,
     );
+    this.persist();
   }
 
   public getConfig(): MT5AutoTradeConfig {
@@ -154,7 +392,47 @@ class MT5TradingEngine {
   }
 
   public setConfig(config: Partial<MT5AutoTradeConfig>) {
-    this.config = { ...this.config, ...config };
+    const candidate = { ...this.config, ...config };
+    if (
+      ![candidate.maxDailyLossPct, candidate.maxTotalDrawdownPct, candidate.maxSpreadUsd].every(
+        (n) => Number.isFinite(n) && n > 0,
+      ) ||
+      !Number.isFinite(candidate.maxDailyLossR) ||
+      candidate.maxDailyLossR >= 0 ||
+      !Number.isFinite(candidate.consecutiveLossLimit) ||
+      candidate.consecutiveLossLimit < 1 ||
+      !Number.isFinite(candidate.consecutiveLossCooldownHours) ||
+      candidate.consecutiveLossCooldownHours <= 0
+    )
+      throw new Error("Invalid capital protection configuration");
+    if (
+      ![candidate.rolloverStartMinuteEat, candidate.rolloverEndMinuteEat].every(
+        (n) => Number.isInteger(n) && n >= 0 && n < 1440,
+      ) ||
+      !Number.isInteger(candidate.fridayCloseHourEat) ||
+      candidate.fridayCloseHourEat < 0 ||
+      candidate.fridayCloseHourEat > 23 ||
+      !Number.isInteger(candidate.fridayCloseMinuteEat) ||
+      candidate.fridayCloseMinuteEat < 0 ||
+      candidate.fridayCloseMinuteEat > 59
+    )
+      throw new Error("Invalid time protection configuration");
+    drawdownBrake(
+      100,
+      100,
+      candidate.maxTotalDrawdownPct,
+      candidate.drawdownThresholdsPct,
+      candidate.drawdownMultipliers,
+    );
+    stackMultiplier(0, candidate.stackDecayMultipliers);
+    if (!Number.isSafeInteger(candidate.magicNumber) || candidate.magicNumber <= 0)
+      throw new Error("A non-zero magic number is required");
+    if (this.emergencyFlatten && candidate.enabled)
+      throw new Error("Emergency flatten remains active; reconcile positions before resume");
+    if (this.risk?.totalLocked && candidate.enabled)
+      throw new Error("Total drawdown lock is active");
+    this.config = candidate;
+    this.persist();
     this.addLog(
       "INFO",
       "SYSTEM",
@@ -163,7 +441,7 @@ class MT5TradingEngine {
   }
 
   public getAccountInfo(): MT5AccountInfo {
-    this.updateEquity();
+    if (this.credentials.bridgeMode !== "mql5_ea") this.updateEquity();
     return { ...this.account };
   }
 
@@ -183,8 +461,313 @@ class MT5TradingEngine {
     return [...this.pendingCommands];
   }
 
+  public getDispatchableCommands(): MT5OrderRequest[] {
+    this.expireOpenCommands();
+    this.evaluateRisk();
+    // An unavailable heartbeat or a temporary guard must not destroy durable
+    // OPENs. Hold them until eligible or the hard TTL expires; never deliver
+    // them to the terminal while any gate is closed.
+    return this.pendingCommands.filter(
+      (c) => c.action !== "OPEN" || (this.config.enabled && !this.entryBlock(c.symbol)),
+    );
+  }
+
+  public acknowledgeCommands(ids: string[]) {
+    const acknowledged = new Set(ids.filter((id) => typeof id === "string"));
+    this.pendingCommands = this.pendingCommands.filter(
+      (command) => command.action === "OPEN" || !command.id || !acknowledged.has(command.id),
+    );
+    this.persist();
+  }
+
   public clearPendingCommands() {
     this.pendingCommands = [];
+    this.persist();
+  }
+
+  public getRiskStatus() {
+    return this.risk ? { ...this.risk, brokerRiskRKnown: this.brokerRiskRKnown } : null;
+  }
+
+  /** Reserve exposure for in-flight commands even if optimistic slots aged out. */
+  private exposurePositions(): Array<{ symbol: string; type: "BUY" | "SELL" }> {
+    const exposure = this.positions.map((p) => ({ symbol: p.symbol, type: p.type }));
+    if (this.credentials.bridgeMode === "mql5_ea")
+      for (const c of this.pendingCommands) {
+        if (c.action !== "OPEN" || this.positions.some((p) => p.commandId === c.id)) continue;
+        exposure.push({ symbol: c.symbol, type: c.type.startsWith("BUY") ? "BUY" : "SELL" });
+      }
+    return exposure;
+  }
+
+  public getCrashGuardStatus() {
+    const peak = this.peakEquity;
+    const brake =
+      peak > 0 && Number.isFinite(this.account.equity) && this.account.equity >= 0
+        ? drawdownBrake(
+            peak,
+            this.account.equity,
+            this.config.maxTotalDrawdownPct,
+            this.config.drawdownThresholdsPct,
+            this.config.drawdownMultipliers,
+          )
+        : null;
+    const sameSide = this.exposurePositions().filter(
+      (p) => canonicalSymbol(p.symbol) === "XAUUSD" && p.type === "BUY",
+    ).length;
+    const sellSide = this.exposurePositions().filter(
+      (p) => canonicalSymbol(p.symbol) === "XAUUSD" && p.type === "SELL",
+    ).length;
+    const metrics = tradeRiskMetrics(this.closedRiskSamples.map((x) => x.r));
+    if (this.brokerClosedTradeCount >= 30 && metrics.count < 30) metrics.halfKellyPct = 0; // incomplete risk history: fail closed
+    return {
+      peakEquity: peak || null,
+      ...brake,
+      recoveryFraction:
+        brake && Number.isFinite(brake.recoveryFraction) ? brake.recoveryFraction : null,
+      stackSlotWeight: stackMultiplier(sameSide, this.config.stackDecayMultipliers),
+      sellStackSlotWeight: stackMultiplier(sellSide, this.config.stackDecayMultipliers),
+      brokerClosedTradeCount: this.brokerHistoryAvailable ? this.brokerClosedTradeCount : null,
+      ...metrics,
+    };
+  }
+  public setNotificationSink(sink: ((entry: MT5TradeLogEntry) => void) | null) {
+    this.notificationSink = sink;
+  }
+  public getTelegramOffset() {
+    return this.telegramOffset;
+  }
+  public setTelegramOffset(offset: number) {
+    if (Number.isSafeInteger(offset) && offset > this.telegramOffset) {
+      this.telegramOffset = offset;
+      this.persist();
+    }
+  }
+  public emergencyStop() {
+    this.config.enabled = false;
+    this.emergencyFlatten = true;
+    this.pendingCommands = this.pendingCommands.filter((c) => c.action !== "OPEN");
+    this.positions = this.positions.filter((p) => !p.createdAtMs);
+    this.flattenPositions();
+    this.persist();
+    this.addLog(
+      "WARN",
+      "SYSTEM",
+      "[TELEGRAM KILL] Entries disabled; close requests queued for known positions.",
+    );
+  }
+  public resumeTrading(): boolean {
+    this.evaluateRisk();
+    if (
+      this.credentials.bridgeMode === "mql5_ea" &&
+      (!this.account.connected ||
+        Date.now() - Date.parse(this.account.lastUpdated) > 15000 ||
+        !this.brokerHistoryAvailable)
+    )
+      return false;
+    if (
+      this.persistenceError ||
+      this.risk?.totalLocked ||
+      this.risk?.dailyLocked ||
+      (this.peakEquity > 0 && this.getCrashGuardStatus().multiplier === 0)
+    )
+      return false;
+    if (
+      this.emergencyFlatten &&
+      (this.positions.length > 0 || this.pendingCommands.some((c) => c.action === "CLOSE"))
+    )
+      return false;
+    this.emergencyFlatten = false;
+    this.setConfig({ enabled: true });
+    return this.config.enabled;
+  }
+
+  /** Called on each telemetry heartbeat and on a frequent server timer. */
+  public evaluateRisk(now = Date.now()) {
+    this.expireOpenCommands(now);
+    if (this.credentials.bridgeMode === "mql5_ea" && !this.account.connected) return;
+    if (Number.isFinite(this.account.equity) && this.account.equity > 0)
+      this.peakEquity = Math.max(this.peakEquity, this.account.equity);
+    const wasDailyLocked = this.risk?.dailyLocked ?? false;
+    const wasTotalLocked = this.risk?.totalLocked ?? false;
+    try {
+      this.risk = observeEquity(
+        this.risk,
+        now,
+        this.account.equity,
+        this.account.balance,
+        this.config.maxDailyLossPct,
+        this.config.maxTotalDrawdownPct,
+        this.config.maxDailyLossR,
+      );
+    } catch {
+      return;
+    }
+    if (this.credentials.bridgeMode !== "mql5_ea") {
+      const floatingR = this.positions.reduce(
+        (sum, p) =>
+          sum +
+          (p.initialRiskCash && p.initialRiskCash > 0
+            ? (p.profit + p.swap + p.commission) / p.initialRiskCash
+            : 0),
+        0,
+      );
+      if (this.risk.realizedR + floatingR <= this.config.maxDailyLossR)
+        this.risk.dailyLocked = true;
+    }
+    const brake =
+      this.peakEquity > 0
+        ? drawdownBrake(
+            this.peakEquity,
+            this.account.equity,
+            this.config.maxTotalDrawdownPct,
+            this.config.drawdownThresholdsPct,
+            this.config.drawdownMultipliers,
+          )
+        : null;
+    if (brake?.multiplier === 0 && !this.risk.totalLocked) {
+      this.risk.totalLocked = true;
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Crash-guard hard lock tripped.");
+    }
+    if (this.risk.dailyLocked && !wasDailyLocked)
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Daily loss lock tripped.");
+    if (this.risk.totalLocked && !wasTotalLocked)
+      this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Total loss lock tripped.");
+    if (this.emergencyFlatten) {
+      this.config.enabled = false;
+      this.flattenPositions();
+    }
+    if (this.risk.totalLocked) {
+      this.config.enabled = false;
+      if (this.config.flattenOnCrashGuard) this.flattenPositions();
+    } else if (this.risk.dailyLocked && this.config.flattenOnDailyLimit) this.flattenPositions();
+    const clock = eatParts(now);
+    if (
+      this.config.fridayCloseEnabled &&
+      this.config.fridayFlatten &&
+      clock.weekday === 5 &&
+      clock.minute >= this.config.fridayCloseHourEat * 60 + this.config.fridayCloseMinuteEat
+    ) {
+      for (const p of [...this.positions])
+        if (canonicalSymbol(p.symbol) === "XAUUSD") this.closePosition(p.ticket);
+    }
+    const action =
+      this.config.preNewsAction === "none" && this.config.newsFilterCloseOnNews
+        ? "close_all"
+        : this.config.preNewsAction;
+    if (this.config.newsFilterEnabled && action !== "none") {
+      const events = newsManager
+        .getEvents()
+        .filter(
+          (e) =>
+            e.impact === "HIGH" &&
+            Date.parse(e.datetime) >= now &&
+            Date.parse(e.datetime) - now <= this.config.newsFilterMinutesBefore * 60000,
+        );
+      for (const p of [...this.positions]) {
+        if (!events.some((e) => doesNewsAffectSymbol(e, p.symbol))) continue;
+        if (action === "close_all") {
+          if (
+            !this.pendingCommands.some((c) => c.action === "CLOSE" && c.ticket === p.ticket) &&
+            this.closePosition(p.ticket)
+          )
+            this.addLog("WARN", p.symbol, `[PRE-NEWS ACTION] Close requested for #${p.ticket}.`);
+        } else if (
+          p.profit > 0 &&
+          (p.type === "BUY" ? p.sl < p.openPrice : p.sl === 0 || p.sl > p.openPrice)
+        ) {
+          if (!this.pendingCommands.some((c) => c.action === "MODIFY" && c.ticket === p.ticket)) {
+            this.modifyPositionToBreakeven(p);
+            this.addLog(
+              "WARN",
+              p.symbol,
+              `[PRE-NEWS ACTION] Breakeven requested for #${p.ticket}.`,
+            );
+          }
+        }
+      }
+    }
+    this.persist();
+  }
+
+  private flattenPositions() {
+    for (const p of [...this.positions]) this.closePosition(p.ticket);
+  }
+  private modifyPositionToBreakeven(p: MT5Position) {
+    if (this.credentials.bridgeMode !== "mql5_ea") {
+      p.sl = p.openPrice;
+      return;
+    }
+    if (this.pendingCommands.some((c) => c.action === "MODIFY" && c.ticket === p.ticket)) return;
+    this.pendingCommands.push({
+      id: `modify-${p.ticket}-${Date.now()}`,
+      action: "MODIFY",
+      ticket: p.ticket,
+      symbol: p.symbol,
+      strategyId: p.strategyId,
+      strategyName: p.strategyName,
+      type: p.type,
+      volume: p.volume,
+      sl: p.openPrice,
+      tp: p.tp,
+    });
+    this.persist();
+  }
+
+  private entryBlock(symbol: string): string | null {
+    if (this.persistenceError) return "runtime persistence unavailable";
+    this.evaluateRisk();
+    if (this.persistenceError) return "runtime persistence unavailable";
+    if (this.risk?.totalLocked) return "total drawdown lock";
+    if (this.risk?.dailyLocked) return "daily loss lock";
+    if (this.risk && Date.now() < this.risk.cooldownUntil) return "consecutive-loss cooldown";
+    const c = this.config;
+    const time = entryTimeBlock(
+      Date.now(),
+      c.rolloverEnabled,
+      c.rolloverStartMinuteEat,
+      c.rolloverEndMinuteEat,
+      c.fridayCloseEnabled,
+      c.fridayCloseHourEat * 60 + c.fridayCloseMinuteEat,
+    );
+    if (time) return time;
+    if (this.credentials.bridgeMode === "mql5_ea") {
+      if (
+        !this.account.connected ||
+        !Number.isFinite(this.account.equity) ||
+        this.account.equity <= 0 ||
+        !Number.isFinite(this.account.balance) ||
+        this.account.balance <= 0 ||
+        Date.now() - Date.parse(this.account.lastUpdated) > 15000
+      )
+        return "broker account telemetry unavailable or stale";
+      if (
+        !this.quote ||
+        Date.now() - this.quote.at > 15000 ||
+        canonicalSymbol(this.quote.symbol) !== canonicalSymbol(symbol)
+      )
+        return "live quote unavailable or stale";
+      if (this.quote.ask - this.quote.bid > c.maxSpreadUsd) return "spread exceeds configured cap";
+      if (c.maxDailyLossR < 0 && !this.brokerRiskRKnown) return "broker daily R unavailable";
+      if (!this.brokerHistoryAvailable) return "broker closed-trade history unavailable";
+    }
+    if (c.newsFilterEnabled) {
+      if (newsManager.getStatus() !== "live") return "news calendar stale or unavailable";
+      const blackout = checkNewsBlackout({
+        symbol,
+        config: {
+          enabled: true,
+          filterHighImpact: c.newsFilterHighImpact,
+          filterMediumImpact: c.newsFilterMediumImpact,
+          minutesBefore: c.newsFilterMinutesBefore,
+          minutesAfter: c.newsFilterMinutesAfter,
+          affectedCurrenciesOnly: true,
+        },
+        events: newsManager.getEvents(),
+      });
+      if (blackout.isBlocked) return blackout.reason ?? "news blackout";
+    }
+    return null;
   }
 
   public addLog(
@@ -204,6 +787,11 @@ class MT5TradingEngine {
       details,
     };
     this.logs.unshift(entry);
+    try {
+      this.notificationSink?.(entry);
+    } catch {
+      /* notifications never block trading */
+    }
     if (this.logs.length > 500) this.logs.pop();
   }
 
@@ -225,6 +813,12 @@ class MT5TradingEngine {
       return null;
     }
 
+    const riskBlock = this.entryBlock(symbol);
+    if (riskBlock) {
+      this.addLog("WARN", symbol, `Entry rejected: ${riskBlock}`, signal.strategy);
+      return null;
+    }
+
     // Check strategy whitelist
     if (this.config.strategies.length > 0 && !this.config.strategies.includes(signal.strategyId)) {
       this.addLog(
@@ -238,6 +832,15 @@ class MT5TradingEngine {
 
     // Check Economic News & Red Folder Blackout Filter
     if (this.config.newsFilterEnabled) {
+      if (newsManager.getStatus() !== "live") {
+        this.addLog(
+          "WARN",
+          symbol,
+          "News calendar stale or unavailable; entry blocked.",
+          signal.strategy,
+        );
+        return null;
+      }
       const blackout = checkNewsBlackout({
         symbol,
         config: {
@@ -285,7 +888,7 @@ class MT5TradingEngine {
 
     // Zero opposite-side self-hedging: never carry an opposite-side fill on the same symbol.
     if (
-      this.positions.some(
+      this.exposurePositions().some(
         (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type !== desiredType,
       )
     ) {
@@ -299,7 +902,7 @@ class MT5TradingEngine {
     }
 
     // Max 3 same-side stack per symbol.
-    const sameSideCount = this.positions.filter(
+    const sameSideCount = this.exposurePositions().filter(
       (p) => canonicalSymbol(p.symbol) === canonicalSymbol(symbol) && p.type === desiredType,
     ).length;
     if (sameSideCount >= 3) {
@@ -313,7 +916,7 @@ class MT5TradingEngine {
     }
 
     // Max open positions check
-    if (this.positions.length >= this.config.maxOpenPositions) {
+    if (this.exposurePositions().length >= this.config.maxOpenPositions) {
       this.addLog(
         "WARN",
         symbol,
@@ -323,30 +926,73 @@ class MT5TradingEngine {
       return null;
     }
 
+    // Use the current executable broker quote, not a stale signal entry, for cash risk.
+    const sizingEntry =
+      this.credentials.bridgeMode === "mql5_ea" && this.quote
+        ? desiredType === "BUY"
+          ? this.quote.ask
+          : this.quote.bid
+        : signal.entry;
     // Calculate volume / lot size
-    let volume = this.config.fixedLot;
-    if (this.config.sizingMode === "risk_pct") {
+    const drawdownWeight = this.getCrashGuardStatus().multiplier ?? 1;
+    const signalWeight = signal.riskMultiplier ?? 1;
+    if (!Number.isFinite(signalWeight) || signalWeight <= 0) return null;
+    const weight =
+      Math.min(1, signalWeight) *
+      drawdownWeight *
+      stackMultiplier(sameSideCount, this.config.stackDecayMultipliers);
+    const kellyPct =
+      this.credentials.bridgeMode === "mql5_ea" ? this.getCrashGuardStatus().halfKellyPct : null;
+    if (weight <= 0) return null;
+    let volume = Math.floor(this.config.fixedLot * weight * 100 + 1e-9) / 100;
+    if (kellyPct !== null && this.account.equity > 0)
+      volume = Math.min(
+        volume,
+        Math.floor(
+          ((this.account.equity * kellyPct) /
+            100 /
+            (Math.abs(sizingEntry - signal.sl) * getContractSize(symbol))) *
+            100 +
+            1e-9,
+        ) / 100,
+      );
+    if (this.config.sizingMode === "risk_pct" || this.config.sizingMode === "risk_amount") {
+      const amountMode = this.config.sizingMode === "risk_amount";
+      const budget = Math.min(
+        this.config.maxRiskAmount * weight,
+        kellyPct === null ? Infinity : (this.account.equity * kellyPct) / 100,
+      );
+      if (amountMode && (!Number.isFinite(budget) || budget <= 0 || this.account.equity <= 0))
+        return null;
       const sizing = calculateLotSize({
         equity: this.account.equity,
-        riskPct: this.config.riskPct * (signal.riskMultiplier ?? 1.0),
-        entry: signal.entry,
+        riskPct: amountMode
+          ? (budget / this.account.equity) * 100
+          : Math.min(this.config.riskPct * weight, kellyPct ?? Infinity),
+        entry: sizingEntry,
         sl: signal.sl,
         symbol,
-        maxRiskAmount: this.config.maxRiskAmount,
+        maxRiskAmount: amountMode ? undefined : this.config.maxRiskAmount,
       });
-      volume = sizing.volume;
+      volume = amountMode
+        ? Math.floor(
+            (budget / (Math.abs(sizingEntry - signal.sl) * getContractSize(symbol))) * 100 + 1e-9,
+          ) / 100
+        : sizing.volume;
+      if (!Number.isFinite(volume) || volume < 0.01) return null;
+      volume = Math.min(volume, 100);
 
       // Micro-account over-risk guard: when the SL distance forces the rounded
       // volume down to the 0.01 min lot, the actual cash risk can balloon past
       // the budgeted risk (wide SL on a small account → 10-27% per trade).
       // Reject rather than blow the risk budget.
-      if (volume === 0.01) {
-        const actualRisk = cashRiskFor(symbol, volume, signal.entry, signal.sl);
-        if (actualRisk > 2.0 * sizing.riskAmount) {
+      {
+        const actualRisk = cashRiskFor(symbol, volume, sizingEntry, signal.sl);
+        if (actualRisk > sizing.riskAmount + 1e-9) {
           this.addLog(
             "WARN",
             symbol,
-            `Signal rejected: min-lot over-risk guard tripped — 0.01 lots implies $${actualRisk.toFixed(2)} actual cash risk (> 2× the $${sizing.riskAmount.toFixed(2)} budgeted risk).`,
+            `Signal rejected: volume implies $${actualRisk.toFixed(2)} cash risk, above the $${sizing.riskAmount.toFixed(2)} budget.`,
             signal.strategy,
           );
           return null;
@@ -354,11 +1000,13 @@ class MT5TradingEngine {
       }
     }
 
+    if (!Number.isFinite(volume) || volume < 0.01) return null;
+
     // Determine order type
     const orderType = desiredType;
 
     const orderRequest: MT5OrderRequest = {
-      id: "req-" + Math.random().toString(36).slice(2, 9),
+      id: stableSignalId(`${this.config.magicNumber}|${signalKey}`),
       action: "OPEN",
       symbol,
       strategyId: signal.strategyId,
@@ -373,18 +1021,68 @@ class MT5TradingEngine {
       deviation: this.config.maxSlippagePoints,
     };
 
-    // Mark as executed
+    // Persist the signal identity before a command can be delivered.
     this.executedSignals.add(signalKey);
-
-    // Place the order
-    return this.placeOrder(orderRequest);
+    this.persist();
+    if (this.persistenceError)
+      return {
+        ok: false,
+        error: "Runtime persistence failed",
+        timestamp: new Date().toISOString(),
+      };
+    const result = this.placeOrder(orderRequest, true);
+    if (!result.ok && !this.persistenceError) {
+      this.executedSignals.delete(signalKey);
+      this.persist();
+    }
+    return result;
   }
 
   /**
    * Places an order directly into the engine / queue.
    */
-  public placeOrder(req: MT5OrderRequest): MT5OrderResult {
+  public placeOrder(req: MT5OrderRequest, alreadyRiskSized = false): MT5OrderResult {
     const timestamp = new Date().toISOString();
+    if (
+      !req ||
+      typeof req.symbol !== "string" ||
+      typeof req.type !== "string" ||
+      !Number.isFinite(req.volume) ||
+      req.volume <= 0
+    )
+      return { ok: false, error: "Invalid order", timestamp };
+    const block = this.entryBlock(req.symbol);
+    if (block) {
+      this.addLog("WARN", req.symbol, `Order rejected: ${block}`, req.strategyName);
+      return { ok: false, error: block, timestamp };
+    }
+    if (!alreadyRiskSized && this.credentials.bridgeMode === "mql5_ea") {
+      const side = req.type.startsWith("BUY") ? "BUY" : "SELL";
+      const sameSideCount = this.exposurePositions().filter(
+        (p) => canonicalSymbol(p.symbol) === canonicalSymbol(req.symbol) && p.type === side,
+      ).length;
+      const weight =
+        (this.getCrashGuardStatus().multiplier ?? 0) *
+        stackMultiplier(sameSideCount, this.config.stackDecayMultipliers);
+      req = { ...req, volume: Math.floor(req.volume * weight * 100 + 1e-9) / 100 };
+      if (req.volume < 0.01) return { ok: false, error: "Stack or drawdown risk cap", timestamp };
+    }
+    const cap =
+      this.credentials.bridgeMode === "mql5_ea" ? this.getCrashGuardStatus().halfKellyPct : null;
+    if (
+      cap !== null &&
+      (!req.sl ||
+        !this.quote ||
+        this.account.equity <= 0 ||
+        cashRiskFor(
+          req.symbol,
+          req.volume,
+          req.type.startsWith("BUY") ? this.quote.ask : this.quote.bid,
+          req.sl,
+        ) >
+          (this.account.equity * cap) / 100 + 1e-9)
+    )
+      return { ok: false, error: "Half-Kelly risk cap", timestamp };
     this.addLog(
       "ORDER_SENT",
       req.symbol,
@@ -397,7 +1095,13 @@ class MT5TradingEngine {
     // command on the wire carries its action explicitly — the EA dispatches
     // whatever it reads, so the wire payload must never silently default.
     if (this.credentials.bridgeMode === "mql5_ea") {
-      this.pendingCommands.push({ ...req, action: "OPEN" });
+      if (req.id && !/^[A-Za-z0-9_-]{1,35}$/.test(req.id))
+        return { ok: false, error: "Invalid command id", timestamp };
+      if (!req.id) req.id = `manual-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      this.pendingCommands.push({ ...req, action: "OPEN", createdAtMs: Date.now() });
+      this.persist();
+      if (this.persistenceError)
+        return { ok: false, error: "Runtime persistence failed", timestamp };
     }
 
     // Immediate simulated / broker execution
@@ -425,15 +1129,17 @@ class MT5TradingEngine {
       // Track optimistic fills so syncFromEa can preserve a just-opened
       // position within the pre-fill window (see syncFromEa).
       createdAtMs: this.credentials.bridgeMode === "mql5_ea" ? Date.now() : undefined,
+      commandId: this.credentials.bridgeMode === "mql5_ea" ? req.id : undefined,
+      initialRiskCash: req.sl ? cashRiskFor(req.symbol, req.volume, entryPrice, req.sl) : undefined,
     };
 
     this.positions.push(newPosition);
-    this.updateEquity();
+    if (this.credentials.bridgeMode !== "mql5_ea") this.updateEquity();
 
     this.addLog(
-      "ORDER_FILLED",
+      this.credentials.bridgeMode === "mql5_ea" ? "ORDER_SENT" : "ORDER_FILLED",
       req.symbol,
-      `✅ ORDER EXECUTED! Ticket #${ticket} | ${newPosition.type} ${newPosition.volume} ${req.symbol} @ ${entryPrice.toFixed(2)} | SL: ${req.sl?.toFixed(2) ?? "—"} | TP: ${req.tp?.toFixed(2) ?? "—"}`,
+      `✅ ${this.credentials.bridgeMode === "mql5_ea" ? "ORDER QUEUED (not broker-confirmed)" : "ORDER EXECUTED"}! Ticket #${ticket} | ${newPosition.type} ${newPosition.volume} ${req.symbol} @ ${entryPrice.toFixed(2)} | SL: ${req.sl?.toFixed(2) ?? "—"} | TP: ${req.tp?.toFixed(2) ?? "—"}`,
       req.strategyName,
       { ticket, position: newPosition },
     );
@@ -451,17 +1157,17 @@ class MT5TradingEngine {
   /**
    * Closes an active position by ticket.
    */
-  public closePosition(ticket: number): boolean {
+  public closePosition(ticket: number, reason?: "SL" | "TP"): boolean {
     const index = this.positions.findIndex((p) => p.ticket === ticket);
     if (index === -1) return false;
 
     const pos = this.positions[index]!;
-    this.positions.splice(index, 1);
-
-    // Close the broker position too — the EA only acts on commands it sees.
     if (this.credentials.bridgeMode === "mql5_ea") {
+      if (pos.createdAtMs) return false; // never close an invented optimistic ticket
+      if (this.pendingCommands.some((c) => c.action === "CLOSE" && c.ticket === ticket))
+        return true;
       this.pendingCommands.push({
-        id: "close-" + ticket,
+        id: `close-${ticket}-${Date.now()}`,
         action: "CLOSE",
         ticket,
         symbol: pos.symbol,
@@ -470,8 +1176,25 @@ class MT5TradingEngine {
         type: pos.type,
         volume: pos.volume,
       });
+      this.persist();
+      return true; // queued, not broker-confirmed
     }
+    this.positions.splice(index, 1);
 
+    // Record simulated realised R and cooldown. Broker exits must come from telemetry.
+    if (this.risk && !this.closedRiskIds.has(ticket)) {
+      this.closedRiskIds.add(ticket);
+      const initialRisk =
+        pos.initialRiskCash ?? cashRiskFor(pos.symbol, pos.volume, pos.openPrice, pos.sl);
+      if (initialRisk > 0)
+        this.risk.realizedR += (pos.profit + pos.commission + pos.swap) / initialRisk;
+      this.risk.lossStreak = reason === "SL" && pos.profit < 0 ? this.risk.lossStreak + 1 : 0;
+      if (
+        this.config.consecutiveLossLimit > 0 &&
+        this.risk.lossStreak >= this.config.consecutiveLossLimit
+      )
+        this.risk.cooldownUntil = Date.now() + this.config.consecutiveLossCooldownHours * 3600000;
+    }
     // Book closed trade
     this.account.balance += pos.profit + pos.commission + pos.swap;
     this.closedPositions.unshift({
@@ -504,6 +1227,18 @@ class MT5TradingEngine {
     freeMargin?: number;
     leverage?: number;
     currency?: string;
+    quoteSymbol?: string;
+    bid?: number;
+    ask?: number;
+    dailyRealizedR?: number;
+    consecutiveLosses?: number;
+    lastLossTimeMs?: number;
+    dailyBaseline?: number;
+    dailyLocked?: boolean;
+    totalBaseline?: number;
+    totalLocked?: boolean;
+    closedRiskSamples?: Array<{ id: string; r: number; pnl: number; closedAt: number }>;
+    closedTradeCount?: number;
     positions?: Array<{
       ticket: number;
       symbol: string;
@@ -515,8 +1250,23 @@ class MT5TradingEngine {
       tp: number;
       profit: number;
       comment: string;
+      magic?: number;
     }>;
   }) {
+    if (
+      (telemetry.login && telemetry.login !== this.credentials.login) ||
+      (telemetry.server && telemetry.server !== this.credentials.server)
+    ) {
+      this.account.connected = false;
+      this.quote = null;
+      this.brokerHistoryAvailable = false;
+      this.addLog(
+        "ERROR",
+        "MT5",
+        "Broker identity mismatch; telemetry rejected and entries blocked.",
+      );
+      return;
+    }
     if (telemetry.login) this.account.login = telemetry.login;
     if (telemetry.server) this.account.server = telemetry.server;
     if (telemetry.currency) this.account.currency = telemetry.currency;
@@ -526,6 +1276,64 @@ class MT5TradingEngine {
     if (typeof telemetry.freeMargin === "number") this.account.freeMargin = telemetry.freeMargin;
     if (typeof telemetry.leverage === "number") this.account.leverage = telemetry.leverage;
 
+    if (
+      typeof telemetry.bid === "number" &&
+      typeof telemetry.ask === "number" &&
+      telemetry.bid > 0 &&
+      telemetry.ask >= telemetry.bid &&
+      telemetry.quoteSymbol
+    )
+      this.quote = {
+        symbol: telemetry.quoteSymbol,
+        bid: telemetry.bid,
+        ask: telemetry.ask,
+        at: Date.now(),
+      };
+    else this.quote = null;
+    this.brokerRiskRKnown =
+      typeof telemetry.dailyRealizedR === "number" &&
+      Number.isFinite(telemetry.dailyRealizedR) &&
+      Number.isInteger(telemetry.consecutiveLosses) &&
+      telemetry.consecutiveLosses! >= 0 &&
+      (telemetry.consecutiveLosses === 0 ||
+        (typeof telemetry.lastLossTimeMs === "number" &&
+          Number.isFinite(telemetry.lastLossTimeMs) &&
+          telemetry.lastLossTimeMs > 0));
+    this.brokerHistoryAvailable =
+      Number.isSafeInteger(telemetry.closedTradeCount) && telemetry.closedTradeCount! >= 0;
+    if (this.brokerHistoryAvailable)
+      this.brokerClosedTradeCount = Math.max(
+        this.brokerClosedTradeCount,
+        telemetry.closedTradeCount!,
+      );
+    if (Array.isArray(telemetry.closedRiskSamples)) {
+      const known = new Set(this.closedRiskSamples.map((x) => x.id));
+      for (const sample of telemetry.closedRiskSamples.slice(0, 500)) {
+        if (
+          !sample ||
+          typeof sample.id !== "string" ||
+          !/^\d{1,20}$/.test(sample.id) ||
+          !Number.isFinite(sample.r) ||
+          !Number.isFinite(sample.pnl) ||
+          !Number.isFinite(sample.closedAt) ||
+          sample.closedAt <= 0 ||
+          known.has(sample.id)
+        )
+          continue;
+        known.add(sample.id);
+        this.closedRiskSamples.push({ ...sample });
+        if (sample.closedAt >= Date.now() - 120000 && sample.closedAt <= Date.now() + 30000)
+          this.addLog(
+            "POSITION_CLOSED",
+            "MT5",
+            `Broker closed position ${sample.id}: PnL ${sample.pnl.toFixed(2)}, ${sample.r.toFixed(2)}R`,
+            undefined,
+            { sample },
+          );
+      }
+      this.closedRiskSamples.sort((a, b) => a.closedAt - b.closedAt);
+      this.closedRiskSamples = this.closedRiskSamples.slice(-500);
+    }
     this.account.connected = true;
     this.account.lastUpdated = new Date().toISOString();
 
@@ -562,34 +1370,61 @@ class MT5TradingEngine {
         preservedByKey.set(key, alreadyPreserved + 1);
       }
 
-      const brokerPositions = telemetry.positions.map((p) => ({
-        id: "pos-" + p.ticket,
-        ticket: p.ticket,
-        symbol: p.symbol,
-        strategyId: "ea-synced",
-        strategyName: p.comment || "MT5 Position",
-        type: p.type,
-        volume: p.volume,
-        openPrice: p.openPrice,
-        currentPrice: p.currentPrice,
-        sl: p.sl,
-        tp: p.tp,
-        profit: p.profit,
-        swap: 0,
-        commission: 0,
-        comment: p.comment,
-        magic: this.config.magicNumber,
-        openTime: new Date().toLocaleTimeString(),
-      }));
+      const brokerPositions = telemetry.positions
+        .filter((p) => p.magic === undefined || p.magic === this.config.magicNumber)
+        .map((p) => ({
+          id: "pos-" + p.ticket,
+          ticket: p.ticket,
+          symbol: p.symbol,
+          strategyId: "ea-synced",
+          strategyName: p.comment || "MT5 Position",
+          type: p.type,
+          volume: p.volume,
+          openPrice: p.openPrice,
+          currentPrice: p.currentPrice,
+          sl: p.sl,
+          tp: p.tp,
+          profit: p.profit,
+          swap: 0,
+          commission: 0,
+          comment: p.comment,
+          magic: p.magic ?? this.config.magicNumber,
+          openTime: new Date().toLocaleTimeString(),
+        }));
 
       this.positions = [...brokerPositions, ...preserved];
     }
+    this.evaluateRisk();
+    if (this.risk) {
+      if (typeof telemetry.dailyBaseline === "number" && telemetry.dailyBaseline > 0)
+        this.risk.dayBaseline = Math.max(this.risk.dayBaseline, telemetry.dailyBaseline);
+      if (typeof telemetry.totalBaseline === "number" && telemetry.totalBaseline > 0)
+        this.risk.totalBaseline = Math.max(this.risk.totalBaseline, telemetry.totalBaseline);
+      if (telemetry.dailyLocked && !this.risk.dailyLocked) {
+        this.risk.dailyLocked = true;
+        this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Terminal daily lock tripped.");
+      }
+      if (telemetry.totalLocked && !this.risk.totalLocked) {
+        this.risk.totalLocked = true;
+        this.addLog("WARN", "SYSTEM", "[CIRCUIT BREAKER] Terminal total lock tripped.");
+      }
+    }
+    if (this.risk && this.brokerRiskRKnown) {
+      this.risk.realizedR = telemetry.dailyRealizedR!;
+      if (typeof telemetry.consecutiveLosses === "number")
+        this.risk.lossStreak = telemetry.consecutiveLosses;
+      if (this.risk.lossStreak >= this.config.consecutiveLossLimit && telemetry.lastLossTimeMs)
+        this.risk.cooldownUntil =
+          telemetry.lastLossTimeMs + this.config.consecutiveLossCooldownHours * 3600000;
+    }
+    this.evaluateRisk();
   }
 
   /**
    * Simulates price updates on open positions and checks SL / TP hits.
    */
   public updateMarketPrice(symbol: string, currentPrice: number) {
+    if (this.credentials.bridgeMode === "mql5_ea") return;
     const contractSize = getContractSize(symbol);
     for (let i = this.positions.length - 1; i >= 0; i--) {
       const pos = this.positions[i]!;
@@ -610,7 +1445,7 @@ class MT5TradingEngine {
             `🎯 TAKE PROFIT HIT! Position #${pos.ticket} closed @ ${currentPrice} (TP: ${pos.tp}) | Gain: +$${pos.profit.toFixed(2)}`,
             pos.strategyName,
           );
-          this.closePosition(pos.ticket);
+          this.closePosition(pos.ticket, "TP");
           continue;
         }
       }
@@ -625,7 +1460,7 @@ class MT5TradingEngine {
             `🛑 STOP LOSS HIT! Position #${pos.ticket} closed @ ${currentPrice} (SL: ${pos.sl}) | Loss: -$${Math.abs(pos.profit).toFixed(2)}`,
             pos.strategyName,
           );
-          this.closePosition(pos.ticket);
+          this.closePosition(pos.ticket, "SL");
           continue;
         }
       }

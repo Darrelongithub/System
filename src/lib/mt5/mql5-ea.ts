@@ -43,6 +43,22 @@ input bool     InpAllowAutoSl    = true;          // Allow Automated Stop Loss
 input bool     InpAllowAutoTp    = true;          // Allow Automated Take Profit
 input double   InpMaxLotSize     = 10.0;          // Max Allowed Lot Size
 input int      InpMaxOpenPositions = 3;           // Max Total Magic Positions (terminal-level)
+input bool     InpUseTerminalNewsFilter = true;
+input int      InpNewsMinsBefore = 30;
+input int      InpNewsMinsAfter = 15;
+input int      InpMaxSpreadPoints = 50;
+input double   InpMaxSpreadUsd = 0.50; // XAUUSD/GOLD quote price per ounce
+input double   InpMaxDailyDrawdownPct = 2.0;
+input bool     InpFlattenOnDailyLimit = true;
+input double   InpMaxTotalDrawdownPct = 6.0;
+input bool     InpRolloverEnabled = true;
+input int      InpRolloverStartMinuteEat = 0;
+input int      InpRolloverEndMinuteEat = 65;
+input bool     InpFridayCloseEnabled = true;
+input int      InpFridayCloseHourEat = 23;
+input int      InpFridayCloseMinuteEat = 30;
+input bool     InpFridayFlatten = false;
+input int      InpPreNewsAction = 0; // 0 none, 1 profitable to breakeven, 2 close
 input bool     InpVerboseLogs    = true;          // Detailed Journal Logs
 
 //--- Global Objects
@@ -53,12 +69,21 @@ CSymbolInfo    m_symbol;
 
 datetime       m_lastPollTime = 0;
 ulong          m_timerId = 0;
+string         m_ackIds = "";
+string         m_commandResults = "";
+int            m_closedTradeCount = -1;
+bool           m_closedSamplesDirty = true;
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
 //+------------------------------------------------------------------+
 int OnInit()
 {
+   if(InpMagicNumber == 0 || InpMaxDailyDrawdownPct <= 0 || InpMaxTotalDrawdownPct <= 0 || InpMaxSpreadPoints <= 0 || InpMaxSpreadUsd <= 0)
+   {
+      Print("[RISK GUARD] Invalid safety inputs or zero magic number");
+      return INIT_PARAMETERS_INCORRECT;
+   }
    Print("🚀 [SignalFinderBridge] Initializing Live Bridge EA...");
    Print("🔗 Bridge Endpoint: ", InpServerUrl);
    Print("🔮 Magic Number: ", InpMagicNumber);
@@ -85,7 +110,7 @@ int OnInit()
    else if(res == 401)
    {
       Print("⛔ [SignalFinderBridge] Server rejected the auth token (HTTP 401).");
-      Print("👉 The bridge token rotates when the server restarts. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
+      Print("👉 The bridge token may have changed. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
    }
    else
    {
@@ -110,7 +135,155 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTimer()
 {
+   if(CheckTotalDrawdown()) FlattenMagic(false);
+   if(CheckDailyDrawdown() && InpFlattenOnDailyLimit) FlattenMagic(false);
+   ManageTerminalProtection();
    PollBridgeAndExecute();
+}
+
+void OnTradeTransaction(const MqlTradeTransaction &trans, const MqlTradeRequest &request, const MqlTradeResult &result)
+{
+   if(trans.type == TRADE_TRANSACTION_DEAL_ADD) m_closedSamplesDirty = true;
+}
+
+// Broker-day equity baseline persists in terminal global variables across EA restarts.
+// A late first installation cannot reconstruct the true start-of-day equity.
+bool CheckDailyDrawdown()
+{
+   MqlDateTime day;
+   TimeToStruct(TimeTradeServer(), day);
+   string key = "SFP.day." + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+   double dayId = day.year * 10000 + day.mon * 100 + day.day;
+   if(!GlobalVariableCheck(key) || GlobalVariableGet(key) != dayId)
+   {
+      GlobalVariableSet(key, dayId);
+      GlobalVariableSet(key + ".base", AccountInfoDouble(ACCOUNT_EQUITY));
+      GlobalVariableSet(key + ".locked", 0);
+   }
+   double base = GlobalVariableGet(key + ".base");
+   double high = MathMax(AccountInfoDouble(ACCOUNT_EQUITY), AccountInfoDouble(ACCOUNT_BALANCE));
+   if(high > base) { base = high; GlobalVariableSet(key + ".base", base); }
+   if(InpMaxDailyDrawdownPct > 0 && base > 0 && AccountInfoDouble(ACCOUNT_EQUITY) <= base * (1.0 - InpMaxDailyDrawdownPct / 100.0))
+      GlobalVariableSet(key + ".locked", 1);
+   return GlobalVariableGet(key + ".locked") > 0;
+}
+
+bool CheckTotalDrawdown()
+{
+   string key = "SFP.total." + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN));
+   double high = MathMax(AccountInfoDouble(ACCOUNT_EQUITY), AccountInfoDouble(ACCOUNT_BALANCE));
+   if(!GlobalVariableCheck(key) || GlobalVariableGet(key) < high) GlobalVariableSet(key, high);
+   if(!GlobalVariableCheck(key + ".locked")) GlobalVariableSet(key + ".locked", 0);
+   if(InpMaxTotalDrawdownPct > 0 && high > 0 && AccountInfoDouble(ACCOUNT_EQUITY) <= GlobalVariableGet(key) * (1 - InpMaxTotalDrawdownPct / 100.0)) GlobalVariableSet(key + ".locked", 1);
+   return GlobalVariableGet(key + ".locked") > 0;
+}
+
+void FlattenMagic(bool goldOnly)
+{
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+      if(m_position.SelectByIndex(i) && m_position.Magic() == InpMagicNumber && (!goldOnly || StringFind(m_position.Symbol(), "XAU") >= 0 || StringFind(m_position.Symbol(), "GOLD") >= 0))
+         if(!m_trade.PositionClose(m_position.Ticket())) Print("[RISK GUARD] Close request failed: ", m_trade.ResultRetcode());
+}
+
+bool EatEntryBlackout()
+{
+   MqlDateTime t;
+   TimeToStruct(TimeGMT() + 3 * 3600, t);
+   int minute = t.hour * 60 + t.min;
+   bool roll = InpRolloverStartMinuteEat <= InpRolloverEndMinuteEat ? (minute >= InpRolloverStartMinuteEat && minute < InpRolloverEndMinuteEat) : (minute >= InpRolloverStartMinuteEat || minute < InpRolloverEndMinuteEat);
+   if(InpRolloverEnabled && roll) return true;
+   int closeMinute = InpFridayCloseHourEat * 60 + InpFridayCloseMinuteEat;
+   return InpFridayCloseEnabled && ((t.day_of_week == 5 && minute >= closeMinute - 120) || t.day_of_week == 6);
+}
+
+void ManageTerminalProtection()
+{
+   MqlDateTime t;
+   TimeToStruct(TimeGMT() + 3 * 3600, t);
+   if(InpFridayCloseEnabled && InpFridayFlatten && t.day_of_week == 5 && t.hour * 60 + t.min >= InpFridayCloseHourEat * 60 + InpFridayCloseMinuteEat) FlattenMagic(true);
+   if(!InpUseTerminalNewsFilter || InpPreNewsAction == 0) return;
+   MqlCalendarValue values[];
+   datetime now = TimeTradeServer();
+   int count = CalendarValueHistory(values, now, now + InpNewsMinsBefore * 60, NULL, "USD");
+   if(count <= 0) return;
+   bool imminent = false;
+   for(int j = 0; j < count; j++) { MqlCalendarEvent event; if(CalendarEventById(values[j].event_id, event) && event.importance == CALENDAR_IMPORTANCE_HIGH) { imminent = true; break; } }
+   if(!imminent) return;
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      if(!m_position.SelectByIndex(i) || m_position.Magic() != InpMagicNumber) continue;
+      ulong ticket = m_position.Ticket();
+      if(InpPreNewsAction == 2) m_trade.PositionClose(ticket);
+      else if(InpPreNewsAction == 1 && m_position.Profit() > 0 && ((m_position.PositionType() == POSITION_TYPE_BUY && m_position.StopLoss() < m_position.PriceOpen()) || (m_position.PositionType() == POSITION_TYPE_SELL && (m_position.StopLoss() == 0 || m_position.StopLoss() > m_position.PriceOpen()))))
+         m_trade.PositionModify(ticket, m_position.PriceOpen(), m_position.TakeProfit());
+   }
+}
+
+// Mark before executing: at-most-once OPENs across terminal crashes. A crash
+// after marking but before order submission may lose the order; reconcile manually.
+bool ClaimCommand(string id)
+{
+   if(id == "") return false;
+   if(StringLen(m_ackIds) > 0) m_ackIds += ",";
+   m_ackIds += id;
+   string key = "SFP.cmd." + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + "." + id;
+   if(GlobalVariableCheck(key)) return false;
+   GlobalVariableSet(key, TimeCurrent());
+   GlobalVariablesFlush();
+   return true;
+}
+
+string OpenResultKey(string id) { return "SFP.open." + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + "." + id; }
+
+void AppendOpenResult(string id)
+{
+   string key = OpenResultKey(id);
+   int state = (int)GlobalVariableGet(key);
+   string status = state == 2 ? "FILLED" : (state == 3 ? "REJECTED" : "UNKNOWN");
+   int reason = (int)GlobalVariableGet(key + ".reason");
+   string error = state == 2 ? "" : (state != 3 ? "execution outcome unknown; reconcile broker" : (reason == 1 ? "risk or news guard" : reason == 2 ? "invalid account or SL" : reason == 3 ? "symbol unavailable" : reason == 4 ? "invalid volume" : reason == 5 ? "position guard" : reason == 6 ? "spread guard" : reason == 7 ? "invalid SL" : reason == 8 ? "SL disabled" : reason == 9 ? "command expired or clock skew" : "broker rejected order"));
+   if(StringLen(m_commandResults) > 0) m_commandResults += ",";
+   m_commandResults += "{\\"id\\":\\"" + id + "\\",\\"status\\":\\"" + status + "\\",\\"ticket\\":" + IntegerToString((long)GlobalVariableGet(key + ".ticket")) + ",\\"price\\":" + DoubleToString(GlobalVariableGet(key + ".price"), 8) + ",\\"retcode\\":" + IntegerToString((long)GlobalVariableGet(key + ".ret")) + ",\\"error\\":\\"" + error + "\\"}";
+}
+
+bool ClaimOpen(string id)
+{
+   if(id == "" || StringLen(id) > 35) return false;
+   for(int i = 0; i < StringLen(id); i++) { ushort c = StringGetCharacter(id, i); if(!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '-' || c == '_')) return false; }
+   string key = OpenResultKey(id);
+   if(GlobalVariableCheck(key)) { AppendOpenResult(id); return false; }
+   GlobalVariableSet(key, 1); // claimed; a crash in this state is UNKNOWN, not a rejection
+   GlobalVariablesFlush();
+   return true;
+}
+
+void CompleteOpen(string id, int state, ulong ticket, double price, uint retcode, int reason = 0)
+{
+   string key = OpenResultKey(id);
+   GlobalVariableSet(key + ".ticket", (double)ticket);
+   GlobalVariableSet(key + ".price", price);
+   GlobalVariableSet(key + ".ret", (double)retcode);
+   GlobalVariableSet(key + ".reason", reason);
+   GlobalVariableSet(key, state);
+   GlobalVariablesFlush();
+   AppendOpenResult(id);
+}
+
+bool TerminalNewsBlocked()
+{
+   if(!InpUseTerminalNewsFilter) return false;
+   MqlCalendarValue values[];
+   datetime now = TimeTradeServer();
+   // MT5 economic-calendar timestamps use trade-server time.
+   int count = CalendarValueHistory(values, now - InpNewsMinsAfter * 60, now + InpNewsMinsBefore * 60, NULL, "USD");
+   if(count < 0) { Print("[NEWS GUARD] Calendar unavailable; entry blocked"); return true; }
+   for(int i = 0; i < count; i++)
+   {
+      MqlCalendarEvent event;
+      if(!CalendarEventById(values[i].event_id, event)) return true;
+      if(event.importance == CALENDAR_IMPORTANCE_HIGH) return true;
+   }
+   return false;
 }
 
 //+------------------------------------------------------------------+
@@ -127,6 +300,7 @@ string NormalizeSymbol(string sym)
    // Check if direct symbol exists
    if(SymbolSelect(cleaned, true)) return cleaned;
    
+   if(cleaned == "XAUUSD" && SymbolSelect("GOLD", true)) return "GOLD";
    // Check with common suffixes (.m, .pro, .raw, etc.)
    string suffixes[] = {"", "m", ".m", ".pro", "_i", ".raw", ".a", "c"};
    for(int i = 0; i < ArraySize(suffixes); i++)
@@ -157,18 +331,169 @@ void PollBridgeAndExecute()
    if(res == 200)
    {
       string jsonResp = CharArrayToString(resultData, 0, WHOLE_ARRAY, CP_UTF8);
+      m_ackIds = ""; // server has received the acknowledgements
+      m_commandResults = "";
       ProcessBridgeResponse(jsonResp);
    }
    else if(res == 401)
    {
       Print("⛔ [SignalFinderBridge] Server rejected the auth token (HTTP 401).");
-      Print("👉 The bridge token rotates when the server restarts. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
+      Print("👉 The bridge token may have changed. Re-download the EA (SignalFinderBridge.mq5) from the MT5 panel and attach it again to pick up the current token.");
    }
    else if(InpVerboseLogs && res == -1)
    {
       // Log WebRequest error
       // Print("WebRequest error: ", GetLastError());
    }
+}
+
+string PositionRiskKey(long positionId)
+{
+   return "SFP.risk." + IntegerToString(AccountInfoInteger(ACCOUNT_LOGIN)) + "." + IntegerToString(positionId);
+}
+
+void RecordInitialRisk(string symbol, string typeStr, double volume, double entry, double sl)
+{
+   ulong deal = m_trade.ResultDeal();
+   if(deal == 0 || sl <= 0 || !HistoryDealSelect(deal)) return;
+   long positionId = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+   double pnl = 0;
+   ENUM_ORDER_TYPE side = typeStr == "BUY" ? ORDER_TYPE_BUY : ORDER_TYPE_SELL;
+   if(positionId > 0 && OrderCalcProfit(side, symbol, volume, entry, sl, pnl) && pnl < 0)
+   {
+      GlobalVariableSet(PositionRiskKey(positionId), -pnl);
+      GlobalVariableSet(PositionRiskKey(positionId) + ".open", TimeTradeServer());
+      GlobalVariablesFlush();
+   }
+}
+
+// Daily realised R is valid only when every closed deal has a recorded initial
+// risk. Older/untracked deals deliberately omit dailyRealizedR from telemetry.
+bool GetRealizedRiskStats(double &dailyR, int &streak, long &lastLossMs)
+{
+   dailyR = 0; streak = 0; lastLossMs = 0;
+   datetime now = TimeTradeServer();
+   datetime gmt = TimeGMT();
+   datetime dayStart = now - (long)((gmt + 10800) % 86400);
+   if(!HistorySelect(dayStart - 30 * 86400, now)) return false;
+   bool known = true, counting = true;
+   long countedIds[];
+   for(int i = HistoryDealsTotal() - 1; i >= 0; i--)
+   {
+      ulong deal = HistoryDealGetTicket(i);
+      if(HistoryDealGetInteger(deal, DEAL_MAGIC) != (long)InpMagicNumber) continue;
+      long entry = HistoryDealGetInteger(deal, DEAL_ENTRY);
+      datetime when = (datetime)HistoryDealGetInteger(deal, DEAL_TIME);
+      if(entry == DEAL_ENTRY_IN && when >= dayStart)
+      {
+         string entryKey = PositionRiskKey(HistoryDealGetInteger(deal, DEAL_POSITION_ID));
+         if(!GlobalVariableCheck(entryKey) || GlobalVariableGet(entryKey) <= 0) known = false;
+         else dailyR += (HistoryDealGetDouble(deal, DEAL_COMMISSION) + HistoryDealGetDouble(deal, DEAL_FEE)) / GlobalVariableGet(entryKey);
+      }
+      if(entry != DEAL_ENTRY_OUT && entry != DEAL_ENTRY_OUT_BY) continue;
+      double pnl = HistoryDealGetDouble(deal, DEAL_PROFIT) + HistoryDealGetDouble(deal, DEAL_SWAP) + HistoryDealGetDouble(deal, DEAL_COMMISSION) + HistoryDealGetDouble(deal, DEAL_FEE);
+      if(counting)
+      {
+         long positionId = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+         bool seen = false, stillOpen = false;
+         for(int j = 0; j < ArraySize(countedIds); j++) if(countedIds[j] == positionId) seen = true;
+         for(int j = PositionsTotal() - 1; j >= 0; j--) if(m_position.SelectByIndex(j) && PositionGetInteger(POSITION_IDENTIFIER) == positionId) stillOpen = true;
+         if(!seen && !stillOpen)
+         {
+            int n = ArraySize(countedIds); ArrayResize(countedIds, n + 1); countedIds[n] = positionId;
+            if(HistoryDealGetInteger(deal, DEAL_REASON) == DEAL_REASON_SL && pnl < 0)
+            {
+               streak++;
+               if(lastLossMs == 0) lastLossMs = ((long)when - (long)now + (long)gmt) * 1000;
+            }
+            else counting = false;
+         }
+      }
+      if(when < dayStart) continue;
+      string key = PositionRiskKey(HistoryDealGetInteger(deal, DEAL_POSITION_ID));
+      if(!GlobalVariableCheck(key) || GlobalVariableGet(key) <= 0 || !GlobalVariableCheck(key + ".open") || GlobalVariableGet(key + ".open") < dayStart) known = false;
+      else dailyR += pnl / GlobalVariableGet(key);
+   }
+   for(int i = PositionsTotal() - 1; i >= 0; i--)
+   {
+      if(!m_position.SelectByIndex(i) || m_position.Magic() != InpMagicNumber) continue;
+      string key = PositionRiskKey(PositionGetInteger(POSITION_IDENTIFIER));
+      if(!GlobalVariableCheck(key) || GlobalVariableGet(key) <= 0 || m_position.Time() < dayStart) known = false;
+      else dailyR += (m_position.Profit() + m_position.Swap()) / GlobalVariableGet(key);
+   }
+   return known;
+}
+
+// Closed EA position returns in R. Untracked risk, partial/open positions and
+// entries outside the selected history window are excluded, never fabricated.
+string ClosedRiskSamplesJson()
+{
+   static datetime last = 0;
+   static string cached = "[]";
+   datetime now = TimeTradeServer();
+   if(!m_closedSamplesDirty && last > 0 && now - last < 60) return cached;
+   last = now;
+   m_closedSamplesDirty = false;
+   // Count up to the Kelly threshold over available full broker history,
+   // including positions for which initial-risk records are unavailable.
+   m_closedTradeCount = -1;
+   if(HistorySelect(0, now))
+   {
+      long seen[];
+      for(int i = HistoryDealsTotal() - 1; i >= 0 && ArraySize(seen) < 30; i--)
+      {
+         ulong deal = HistoryDealGetTicket(i);
+         if(HistoryDealGetInteger(deal, DEAL_MAGIC) != (long)InpMagicNumber || HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_IN) continue;
+         long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+         bool found = false, open = false;
+         for(int j = 0; j < ArraySize(seen); j++) if(seen[j] == id) { found = true; break; }
+         for(int j = PositionsTotal() - 1; j >= 0; j--) if(m_position.SelectByIndex(j) && PositionGetInteger(POSITION_IDENTIFIER) == id) { open = true; break; }
+         if(!found && !open && id > 0) { int n = ArraySize(seen); ArrayResize(seen,n+1); seen[n] = id; }
+      }
+      m_closedTradeCount = ArraySize(seen);
+   }
+   datetime from = now - 180 * 86400;
+   if(!HistorySelect(from, now)) { cached = "[]"; return cached; }
+   long ids[]; double pnl[]; datetime closed[]; bool hasExit[];
+   for(int i = HistoryDealsTotal() - 1; i >= 0; i--)
+   {
+      ulong deal = HistoryDealGetTicket(i);
+      if(HistoryDealGetInteger(deal, DEAL_MAGIC) != (long)InpMagicNumber || HistoryDealGetInteger(deal, DEAL_ENTRY) != DEAL_ENTRY_IN) continue;
+      long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+      string key = PositionRiskKey(id);
+      if(!GlobalVariableCheck(key) || GlobalVariableGet(key) <= 0 || !GlobalVariableCheck(key + ".open") || GlobalVariableGet(key + ".open") < from) continue;
+      bool found = false; for(int j = 0; j < ArraySize(ids); j++) if(ids[j] == id) { found = true; break; }
+      if(found || ArraySize(ids) >= 500) continue;
+      int n = ArraySize(ids); ArrayResize(ids,n+1); ArrayResize(pnl,n+1); ArrayResize(closed,n+1); ArrayResize(hasExit,n+1);
+      ids[n]=id; pnl[n]=0; closed[n]=0; hasExit[n]=false;
+   }
+   for(int i = 0; i < HistoryDealsTotal(); i++)
+   {
+      ulong deal = HistoryDealGetTicket(i);
+      long id = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+      for(int j = 0; j < ArraySize(ids); j++) if(ids[j] == id)
+      {
+         pnl[j] += HistoryDealGetDouble(deal, DEAL_PROFIT) + HistoryDealGetDouble(deal, DEAL_SWAP) + HistoryDealGetDouble(deal, DEAL_COMMISSION) + HistoryDealGetDouble(deal, DEAL_FEE);
+         long entry = HistoryDealGetInteger(deal, DEAL_ENTRY);
+         if(entry == DEAL_ENTRY_OUT || entry == DEAL_ENTRY_OUT_BY) { hasExit[j] = true; closed[j] = (datetime)HistoryDealGetInteger(deal, DEAL_TIME); }
+         break;
+      }
+   }
+   cached = "["; int count = 0;
+   for(int j = 0; j < ArraySize(ids); j++)
+   {
+      if(!hasExit[j]) continue;
+      bool open = false;
+      for(int k = PositionsTotal() - 1; k >= 0; k--) if(m_position.SelectByIndex(k) && PositionGetInteger(POSITION_IDENTIFIER) == ids[j]) { open = true; break; }
+      if(open) continue;
+      double initial = GlobalVariableGet(PositionRiskKey(ids[j]));
+      if(initial <= 0) continue;
+      if(count++ > 0) cached += ",";
+      long closedMs = ((long)closed[j] - (long)now + (long)TimeGMT()) * 1000;
+      cached += "{\\"id\\":\\"" + IntegerToString(ids[j]) + "\\",\\"r\\":" + DoubleToString(pnl[j]/initial, 8) + ",\\"pnl\\":" + DoubleToString(pnl[j], 2) + ",\\"closedAt\\":" + IntegerToString(closedMs) + "}";
+   }
+   cached += "]";
+   return cached;
 }
 
 //+------------------------------------------------------------------+
@@ -185,6 +510,9 @@ string BuildTelemetryJson()
    double freeMargin = AccountInfoDouble(ACCOUNT_MARGIN_FREE);
    long leverage = AccountInfoInteger(ACCOUNT_LEVERAGE);
 
+   string quoteSymbol = NormalizeSymbol("XAUUSD");
+   MqlTick quote;
+   bool haveQuote = SymbolInfoTick(quoteSymbol, quote);
    string json = "{";
    json += "\\"action\\":\\"sync\\",";
    json += "\\"login\\":\\"" + IntegerToString(login) + "\\",";
@@ -195,6 +523,25 @@ string BuildTelemetryJson()
    json += "\\"margin\\":" + DoubleToString(margin, 2) + ",";
    json += "\\"freeMargin\\":" + DoubleToString(freeMargin, 2) + ",";
    json += "\\"leverage\\":" + IntegerToString(leverage) + ",";
+   json += "\\"quoteSymbol\\":\\"" + quoteSymbol + "\\",";
+   json += "\\"bid\\":" + DoubleToString(haveQuote ? quote.bid : 0, 5) + ",";
+   json += "\\"ask\\":" + DoubleToString(haveQuote ? quote.ask : 0, 5) + ",";
+   json += "\\"spread\\":" + DoubleToString(haveQuote ? quote.ask - quote.bid : 0, 5) + ",";
+   json += "\\"ackIds\\":\\"" + m_ackIds + "\\",";
+   json += "\\"commandResults\\":[" + m_commandResults + "],";
+   double realizedR; int lossStreak; long lastLossMs;
+   if(GetRealizedRiskStats(realizedR, lossStreak, lastLossMs)) json += "\\"dailyRealizedR\\":" + DoubleToString(realizedR, 6) + ",";
+   string dayKey = "SFP.day." + IntegerToString(login);
+   string totalKey = "SFP.total." + IntegerToString(login);
+   json += "\\"dailyBaseline\\":" + DoubleToString(GlobalVariableGet(dayKey + ".base"), 2) + ",";
+   json += "\\"dailyLocked\\":" + (CheckDailyDrawdown() ? "true" : "false") + ",";
+   json += "\\"totalBaseline\\":" + DoubleToString(GlobalVariableGet(totalKey), 2) + ",";
+   json += "\\"totalLocked\\":" + (CheckTotalDrawdown() ? "true" : "false") + ",";
+   json += "\\"consecutiveLosses\\":" + IntegerToString(lossStreak) + ",";
+   json += "\\"lastLossTimeMs\\":" + IntegerToString(lastLossMs) + ",";
+   string closedSamples = ClosedRiskSamplesJson();
+   json += "\\"closedTradeCount\\":" + IntegerToString(m_closedTradeCount) + ",";
+   json += "\\"closedRiskSamples\\":" + closedSamples + ",";
    json += "\\"positions\\":[";
 
    int posCount = 0;
@@ -207,6 +554,7 @@ string BuildTelemetryJson()
             if(posCount > 0) json += ",";
             json += "{";
             json += "\\"ticket\\":" + IntegerToString(m_position.Ticket()) + ",";
+            json += "\\"magic\\":" + IntegerToString(m_position.Magic()) + ",";
             json += "\\"symbol\\":\\"" + m_position.Symbol() + "\\",";
             json += "\\"type\\":\\"" + (m_position.PositionType() == POSITION_TYPE_BUY ? "BUY" : "SELL") + "\\",";
             json += "\\"volume\\":" + DoubleToString(m_position.Volume(), 2) + ",";
@@ -262,10 +610,13 @@ void ProcessBridgeResponse(string json)
          string comment = ExtractJsonString(obj, "comment");
          string cmdId = ExtractJsonString(obj, "id");
 
-         if(volume > InpMaxLotSize) volume = InpMaxLotSize;
-         if(volume < 0.01) volume = 0.01;
-
-         ExecuteTradeCommand(cmdId, symbol, typeStr, volume, sl, tp, comment);
+         if(ClaimOpen(cmdId))
+         {
+            double createdAtMs = ExtractJsonDouble(obj, "createdAtMs");
+            if(createdAtMs <= 0 || ((double)TimeGMT() * 1000.0 - createdAtMs >= 90000.0 || (double)TimeGMT() * 1000.0 < createdAtMs - 30000.0))
+               CompleteOpen(cmdId, 3, 0, 0, 0, 9);
+            else ExecuteTradeCommand(cmdId, symbol, typeStr, volume, sl, tp, comment);
+         }
       }
       cursor = openPos + 1;
    }
@@ -291,13 +642,40 @@ void ProcessBridgeResponse(string json)
       {
          string obj = StringSubstr(json, objStart, objEnd - objStart + 1);
          ulong ticket = (ulong)ExtractJsonDouble(obj, "ticket");
-         if(ticket > 0)
+         string cmdId = ExtractJsonString(obj, "id");
+         if(ticket > 0 && ClaimCommand(cmdId))
          {
-            m_trade.PositionClose(ticket);
-            Print("✅ [SignalFinderBridge] Closed Position Ticket #", ticket);
+            if(!PositionSelectByTicket(ticket) || PositionGetInteger(POSITION_MAGIC) != (long)InpMagicNumber)
+            {
+               Print("[RISK GUARD] CLOSE rejected: ticket not owned by EA");
+               cursor = closePos + 1;
+               continue;
+            }
+            bool closed = m_trade.PositionClose(ticket);
+            Print("Close requested result=", closed, " retcode=", m_trade.ResultRetcode());
+            if(!closed) Print("[RISK GUARD] Close request failed for ticket #", ticket);
          }
       }
       cursor = closePos + 1;
+   }
+   // MODIFY commands are restricted to this EA's magic number.
+   cursor = 0;
+   while(true)
+   {
+      int pos = StringFind(json, "\\"action\\":\\"MODIFY\\"", cursor);
+      if(pos < 0) break;
+      int start = -1, end = -1;
+      for(int p = pos; p >= 0; p--) if(StringGetCharacter(json, p) == '{') { start = p; break; }
+      for(int p = pos; p < StringLen(json); p++) if(StringGetCharacter(json, p) == '}') { end = p; break; }
+      if(start >= 0 && end >= 0)
+      {
+         string obj = StringSubstr(json, start, end - start + 1);
+         ulong ticket = (ulong)ExtractJsonDouble(obj, "ticket");
+         string id = ExtractJsonString(obj, "id");
+         if(ticket > 0 && ClaimCommand(id) && PositionSelectByTicket(ticket) && PositionGetInteger(POSITION_MAGIC) == (long)InpMagicNumber)
+            if(!m_trade.PositionModify(ticket, ExtractJsonDouble(obj, "sl"), ExtractJsonDouble(obj, "tp"))) Print("[RISK GUARD] MODIFY failed ", m_trade.ResultRetcode());
+      }
+      cursor = pos + 1;
    }
 }
 
@@ -374,34 +752,70 @@ int CountTotalMagicPositions()
 //+------------------------------------------------------------------+
 void ExecuteTradeCommand(string id, string sym, string typeStr, double volume, double sl, double tp, string comment)
 {
+   if(!InpAllowAutoEntry || CheckDailyDrawdown() || CheckTotalDrawdown() || EatEntryBlackout() || TerminalNewsBlocked())
+   {
+      Print("[RISK GUARD] Entry blocked by terminal safety controls");
+      CompleteOpen(id, 3, 0, 0, 0, 1);
+      return;
+   }
+   if(AccountInfoInteger(ACCOUNT_MARGIN_MODE) != ACCOUNT_MARGIN_MODE_RETAIL_HEDGING || sl <= 0)
+   {
+      Print("[RISK GUARD] Hedging account and protective SL are required for risk accounting");
+      CompleteOpen(id, 3, 0, 0, 0, 2);
+      return;
+   }
    string tradeSymbol = NormalizeSymbol(sym);
    if(!m_symbol.Name(tradeSymbol))
    {
       Print("❌ [SignalFinderBridge] Symbol not found on broker: ", sym, " (tried ", tradeSymbol, ")");
+      CompleteOpen(id, 3, 0, 0, 0, 3);
       return;
    }
 
+   double minLot = SymbolInfoDouble(tradeSymbol, SYMBOL_VOLUME_MIN);
+   double maxLot = SymbolInfoDouble(tradeSymbol, SYMBOL_VOLUME_MAX);
+   double stepLot = SymbolInfoDouble(tradeSymbol, SYMBOL_VOLUME_STEP);
+   if(volume <= 0 || volume > InpMaxLotSize || volume < minLot || volume > maxLot || stepLot <= 0 || MathAbs(volume / stepLot - MathRound(volume / stepLot)) > 0.000001)
+   {
+      Print("[RISK GUARD] Invalid broker volume; rejected without rounding up");
+      CompleteOpen(id, 3, 0, 0, 0, 4);
+      return;
+   }
    if(HasOppositePositionOpen(tradeSymbol, typeStr))
    {
       Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): opposite-side position already open (anti-hedge).");
+      CompleteOpen(id, 3, 0, 0, 0, 5);
       return;
    }
 
    if(CountSameSidePositions(tradeSymbol, typeStr) >= 3)
    {
       Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): max 3 same-side positions already open.");
+      CompleteOpen(id, 3, 0, 0, 0, 5);
       return;
    }
 
    if(CountTotalMagicPositions() >= InpMaxOpenPositions)
    {
       Print("⛔ [SignalFinderBridge] Blocked fill on ", tradeSymbol, " (", typeStr, "): total magic positions (", CountTotalMagicPositions(), "/", InpMaxOpenPositions, ") at the terminal-level cap.");
+      CompleteOpen(id, 3, 0, 0, 0, 5);
       return;
    }
 
-   m_symbol.RefreshRates();
+   if(!m_symbol.RefreshRates() || m_symbol.Bid() <= 0 || m_symbol.Ask() <= 0 || m_symbol.Ask() < m_symbol.Bid() || InpMaxSpreadPoints <= 0 || (m_symbol.Ask() - m_symbol.Bid()) > InpMaxSpreadPoints * SymbolInfoDouble(tradeSymbol, SYMBOL_POINT) || ((StringFind(tradeSymbol, "XAU") >= 0 || StringFind(tradeSymbol, "GOLD") >= 0) && (m_symbol.Ask() - m_symbol.Bid()) > InpMaxSpreadUsd))
+   {
+      Print("[SPREAD GUARD] Invalid quote or spread too wide on ", tradeSymbol);
+      CompleteOpen(id, 3, 0, 0, 0, 6);
+      return;
+   }
    
-   if(!InpAllowAutoSl) sl = 0;
+   if((typeStr == "BUY" && sl >= m_symbol.Ask()) || (typeStr == "SELL" && sl <= m_symbol.Bid()))
+   {
+      Print("[RISK GUARD] SL is on the wrong side of the current market");
+      CompleteOpen(id, 3, 0, 0, 0, 7);
+      return;
+   }
+   if(!InpAllowAutoSl) { Print("[RISK GUARD] SL disabled; entry rejected"); CompleteOpen(id, 3, 0, 0, 0, 8); return; }
    if(!InpAllowAutoTp) tp = 0;
    
    bool success = false;
@@ -418,14 +832,29 @@ void ExecuteTradeCommand(string id, string sym, string typeStr, double volume, d
       success = m_trade.Sell(volume, tradeSymbol, bid, sl, tp, comment);
    }
    
-   if(success)
+   uint retcode = m_trade.ResultRetcode();
+   if(success && (retcode == TRADE_RETCODE_DONE || retcode == TRADE_RETCODE_DONE_PARTIAL))
    {
-      ulong ticket = m_trade.ResultOrder();
-      Print("🎉 [SignalFinderBridge] Order Placed! Ticket: #", ticket, " Price: ", m_trade.ResultPrice());
+      ulong deal = m_trade.ResultDeal();
+      ulong ticket = 0;
+      if(deal > 0 && HistoryDealSelect(deal))
+      {
+         long positionId = HistoryDealGetInteger(deal, DEAL_POSITION_ID);
+         for(int i = PositionsTotal() - 1; i >= 0; i--)
+            if(m_position.SelectByIndex(i) && PositionGetInteger(POSITION_IDENTIFIER) == positionId) { ticket = m_position.Ticket(); break; }
+      }
+      RecordInitialRisk(tradeSymbol, typeStr, volume, m_trade.ResultPrice(), sl);
+      CompleteOpen(id, ticket > 0 ? 2 : 4, ticket, m_trade.ResultPrice(), retcode);
+      Print("[SignalFinderBridge] Trade result ", retcode, " position ", ticket);
+   }
+   else if(success && retcode == TRADE_RETCODE_PLACED)
+   {
+      CompleteOpen(id, 4, 0, 0, retcode); // accepted but not yet confirmed
    }
    else
    {
-      Print("❌ [SignalFinderBridge] Order Failed! Error: ", m_trade.ResultRetcode(), " (", m_trade.ResultRetcodeDescription(), ")");
+      CompleteOpen(id, 3, 0, 0, retcode);
+      Print("[SignalFinderBridge] Order rejected, retcode ", retcode);
    }
 }
 

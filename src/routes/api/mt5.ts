@@ -1,12 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { mt5Engine } from "@/lib/mt5/engine";
 import { serverDaemon } from "@/lib/mt5/server-daemon";
+import { verifyAdminRequest, adminUnauthorized } from "@/lib/mt5/admin-auth";
 import { newsManager } from "@/lib/mt5/news-filter";
 
 export const Route = createFileRoute("/api/mt5")({
   server: {
     handlers: {
       GET: async () => {
+        void newsManager.refresh();
         const account = mt5Engine.getAccountInfo();
         const positions = mt5Engine.getPositions();
         const closed = mt5Engine.getClosedPositions();
@@ -25,6 +27,10 @@ export const Route = createFileRoute("/api/mt5")({
             logs,
             daemon,
             upcomingNews,
+            calendarStatus: newsManager.getStatus(),
+            calendarLastFetched: newsManager.getLastFetched(),
+            risk: mt5Engine.getRiskStatus(),
+            crashGuard: mt5Engine.getCrashGuardStatus(),
           }),
           {
             headers: { "Content-Type": "application/json" },
@@ -32,12 +38,22 @@ export const Route = createFileRoute("/api/mt5")({
         );
       },
       POST: async ({ request }) => {
+        if (!verifyAdminRequest(request)) return adminUnauthorized();
         try {
           const body = await request.json();
           const action = body.action;
 
+          if (action === "manual_news") {
+            newsManager.setManualEvents(body.events);
+            return new Response(JSON.stringify({ status: "ok" }), {
+              headers: { "Content-Type": "application/json" },
+            });
+          }
+
           if (action === "update_config") {
             mt5Engine.setConfig(body.config || {});
+            if (mt5Engine.getConfig().enabled && !process.env["MT5_ADMIN_TOKEN"])
+              console.warn("[MT5] WARNING: auto-trading enabled without MT5_ADMIN_TOKEN");
             return new Response(
               JSON.stringify({
                 status: "ok",

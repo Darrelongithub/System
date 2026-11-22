@@ -4,6 +4,7 @@
 
 import { useSyncExternalStore } from "react";
 import { mt5Engine } from "./engine";
+import { adminHeaders } from "./admin-client";
 import { V2_STRATEGY_IDS } from "@/lib/analyzer/strategies/v2-regime-bots";
 import { newsManager } from "./news-filter";
 import {
@@ -33,11 +34,18 @@ function syncToServer(payload: Record<string, unknown>) {
   try {
     fetch("/api/mt5", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...adminHeaders() },
       body: JSON.stringify(payload),
-    }).catch(() => {
-      /* fire-and-forget: local state already applied */
-    });
+    })
+      .then((response) => {
+        if (!response.ok)
+          toast.error(
+            `Server rejected MT5 update (${response.status}); local settings are not server settings.`,
+          );
+      })
+      .catch(() => {
+        /* fire-and-forget: local state already applied */
+      });
   } catch {
     /* network unavailable — the localStorage copy still holds */
   }
@@ -98,7 +106,7 @@ if (typeof window !== "undefined") {
       // ID is preserved as-is.
       if (
         Array.isArray(parsed.strategies) &&
-        !parsed.strategies.some((id) => (V2_STRATEGY_IDS as readonly string[]).includes(id))
+        !parsed.strategies.some((id: string) => (V2_STRATEGY_IDS as readonly string[]).includes(id))
       ) {
         parsed.strategies = [...V2_STRATEGY_IDS];
       }

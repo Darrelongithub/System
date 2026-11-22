@@ -65,6 +65,8 @@ export interface MT5Position {
    * position from being wiped by a heartbeat that has not yet seen it.
    */
   createdAtMs?: number;
+  initialRiskCash?: number;
+  commandId?: string;
 }
 
 export interface MT5OrderRequest {
@@ -74,7 +76,8 @@ export interface MT5OrderRequest {
    * "OPEN" carries a broker order; "CLOSE" closes the broker position by ticket.
    * Defaults to "OPEN" (legacy callers that build requests without an action).
    */
-  action?: "OPEN" | "CLOSE";
+  action?: "OPEN" | "CLOSE" | "MODIFY";
+  createdAtMs?: number;
   /** Broker ticket — the CLOSE marker the EA reads to close the position. */
   ticket?: number;
   symbol: string;
@@ -88,6 +91,15 @@ export interface MT5OrderRequest {
   comment?: string;
   magic?: number;
   deviation?: number;
+}
+
+export interface MT5CommandOutcome {
+  id: string;
+  status: "FILLED" | "REJECTED" | "UNKNOWN";
+  ticket?: number;
+  price?: number;
+  retcode?: number;
+  error?: string;
 }
 
 export interface MT5OrderResult {
@@ -145,6 +157,25 @@ export interface MT5AutoTradeConfig {
   newsFilterMinutesBefore: number;
   newsFilterMinutesAfter: number;
   newsFilterCloseOnNews: boolean;
+  preNewsAction: "none" | "breakeven_if_profit" | "close_all";
+  maxDailyLossPct: number;
+  maxDailyLossR: number;
+  flattenOnDailyLimit: boolean;
+  maxTotalDrawdownPct: number;
+  consecutiveLossLimit: number;
+  consecutiveLossCooldownHours: number;
+  maxSpreadUsd: number;
+  rolloverEnabled: boolean;
+  rolloverStartMinuteEat: number;
+  rolloverEndMinuteEat: number;
+  fridayCloseEnabled: boolean;
+  fridayCloseHourEat: number;
+  fridayCloseMinuteEat: number;
+  fridayFlatten: boolean;
+  drawdownThresholdsPct: number[];
+  drawdownMultipliers: number[];
+  stackDecayMultipliers: number[];
+  flattenOnCrashGuard: boolean;
 }
 
 import type { EconomicNewsEvent } from "./news-filter";
@@ -189,12 +220,31 @@ export const DEFAULT_MT5_CONFIG: MT5AutoTradeConfig = {
   maxSlippagePoints: 20,
   soundAlerts: true,
   pollIntervalSeconds: 15,
-  newsFilterEnabled: false,
+  newsFilterEnabled: true,
   newsFilterHighImpact: true,
   newsFilterMediumImpact: false,
   newsFilterMinutesBefore: 30,
   newsFilterMinutesAfter: 30,
   newsFilterCloseOnNews: false,
+  preNewsAction: "none",
+  maxDailyLossPct: 2,
+  maxDailyLossR: -3,
+  flattenOnDailyLimit: true,
+  maxTotalDrawdownPct: 6,
+  consecutiveLossLimit: 4,
+  consecutiveLossCooldownHours: 4,
+  maxSpreadUsd: 0.5,
+  rolloverEnabled: true,
+  rolloverStartMinuteEat: 0,
+  rolloverEndMinuteEat: 65,
+  fridayCloseEnabled: true,
+  fridayCloseHourEat: 23,
+  fridayCloseMinuteEat: 30,
+  fridayFlatten: false,
+  drawdownThresholdsPct: [3, 5, 8, 10],
+  drawdownMultipliers: [1, 0.75, 0.5, 0.25, 0],
+  stackDecayMultipliers: [1, 0.75, 0.5],
+  flattenOnCrashGuard: true,
 };
 
 export const COMMON_MT5_SERVERS = [

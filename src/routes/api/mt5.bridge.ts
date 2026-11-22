@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { mt5Engine } from "@/lib/mt5/engine";
+import { initializeRuntimeState } from "@/lib/mt5/runtime-state";
+initializeRuntimeState();
 import { unauthorizedBridgeResponse, verifyBridgeToken } from "@/lib/mt5/bridge-auth";
 
 /**
@@ -19,7 +21,7 @@ export const Route = createFileRoute("/api/mt5/bridge")({
         if (!verifyBridgeToken(request.headers.get("authorization"))) {
           return unauthorizedBridgeResponse();
         }
-        const commands = mt5Engine.getPendingCommands();
+        const commands = mt5Engine.getDispatchableCommands();
         return new Response(JSON.stringify({ status: "ok", commands }), {
           headers: { "Content-Type": "application/json" },
         });
@@ -32,12 +34,21 @@ export const Route = createFileRoute("/api/mt5/bridge")({
           const body = await request.json();
 
           if (body.action === "sync") {
+            if (!mt5Engine.matchesBrokerIdentity(body.login, body.server))
+              return new Response(
+                JSON.stringify({ status: "error", message: "Broker identity mismatch" }),
+                { status: 403, headers: { "Content-Type": "application/json" } },
+              );
+            if (Array.isArray(body.commandResults))
+              mt5Engine.reconcileOutcomes(body.commandResults);
+            if (typeof body.ackIds === "string")
+              mt5Engine.acknowledgeCommands(body.ackIds.split(",").filter(Boolean));
             mt5Engine.syncFromEa(body);
           }
 
           // Return pending commands to the EA and flush them
-          const commands = [...mt5Engine.getPendingCommands()];
-          mt5Engine.clearPendingCommands();
+          const commands = [...mt5Engine.getDispatchableCommands()];
+          // Retain until the EA explicitly acknowledges; HTTP timeout must not lose a command.
 
           return new Response(
             JSON.stringify({

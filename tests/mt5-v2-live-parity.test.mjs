@@ -1,9 +1,8 @@
 /**
- * MT5 live-execution parity gate (v3.0 30-Bot ARSENAL).
+ * MT5 live-execution parity gate.
  *
  * Guards the live edges that parity-exact live execution depends on:
- *  - DEFAULT_MT5_CONFIG ships exactly the 30 v3.0 regime-routed strategies
- *    (8 v2.2 Core + 22 certified expansion bots);
+ *  - DEFAULT_MT5_CONFIG ships exactly the current production strategy IDs;
  *  - the rolling-drawdown riskMultiplier throttles risk_pct sizing (0.5 → half risk);
  *  - opposite-side self-hedging is blocked at the engine level;
  *  - the max 3 same-side stack per symbol is enforced;
@@ -56,7 +55,11 @@ test("mt5 v2 parity: DEFAULT_MT5_CONFIG ships the v2 ruleset exactly", () => {
     [...V2_STRATEGY_IDS],
     "strategies == V2_STRATEGY_IDS",
   );
-  assertEqual(V2_STRATEGY_IDS.length, 30, "thirty v3.0 Stage-2A regime-routed bots");
+  assertEqual(
+    DEFAULT_MT5_CONFIG.strategies.length,
+    V2_STRATEGY_IDS.length,
+    "dynamic production strategy count",
+  );
   assertEqual(DEFAULT_MT5_CONFIG.riskPct, 0.35, "v2 default riskPct is 0.35%");
   assertEqual(DEFAULT_MT5_CONFIG.maxOpenPositions, 3, "v2 default max open positions is 3");
   assertEqual(DEFAULT_MT5_CONFIG.sizingMode, "risk_pct", "v2 default sizing is risk_pct");
@@ -103,8 +106,11 @@ test("mt5 v2 parity: riskMultiplier throttles risk_pct sizing, stack cap + anti-
 
     assert(fullResult.volume > 0 && throttledResult.volume > 0, "volumes are positive");
     assert(
-      Math.abs(fullResult.volume - 2 * throttledResult.volume) < 1e-9,
-      `0.5 multiplier halves the risk (full ${fullResult.volume} vs throttled ${throttledResult.volume})`,
+      Math.abs(
+        throttledResult.volume -
+          fullResult.volume * 0.5 * DEFAULT_MT5_CONFIG.stackDecayMultipliers[1],
+      ) <= 0.02,
+      `signal and second-stack multipliers combine within volume-step rounding (full ${fullResult.volume} vs throttled ${throttledResult.volume})`,
     );
 
     // 3. Anti-hedge: opposite-side (short) signal on the same symbol while longs are open.
@@ -156,7 +162,7 @@ test("mt5 v2 parity: riskMultiplier throttles risk_pct sizing, stack cap + anti-
     const opened = mt5Engine.getPositions().filter((p) => touchedTickets.includes(p.ticket));
     for (const pos of opened) mt5Engine.closePosition(pos.ticket);
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
@@ -288,7 +294,23 @@ function closeOpenedPositions(tickets) {
 test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exact fields", () => {
   newsManager.setEvents([]);
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
+    mt5Engine.syncFromEa({
+      balance: 10000,
+      equity: 10000,
+      quoteSymbol: "XAUUSD",
+      bid: 2650,
+      ask: 2650.2,
+      dailyRealizedR: 0,
+      closedTradeCount: 0,
+      consecutiveLosses: 0,
+      positions: [],
+    });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: true });
     mt5Engine.clearPendingCommands();
 
@@ -303,8 +325,32 @@ test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exac
     const result = mt5Engine.handleLiveStrategySignal(signal, symbol);
     assert(result !== null && result.ok, "signal executes against the bridge");
 
-    const ticket = result.ticket;
-    assert(mt5Engine.closePosition(ticket), "position closes");
+    const ticket = 701234;
+    mt5Engine.syncFromEa({
+      balance: 10000,
+      equity: 10000,
+      quoteSymbol: "XAUUSD",
+      bid: 2650,
+      ask: 2650.2,
+      dailyRealizedR: 0,
+      closedTradeCount: 0,
+      consecutiveLosses: 0,
+      positions: [
+        {
+          ticket,
+          symbol: "XAUUSD",
+          type: "BUY",
+          volume: result.volume,
+          openPrice: 2650,
+          currentPrice: 2650,
+          sl: 2649.5,
+          tp: 2651.6,
+          profit: 0,
+          comment: "test",
+        },
+      ],
+    });
+    assert(mt5Engine.closePosition(ticket), "broker position close is queued");
 
     const commands = mt5Engine.getPendingCommands();
     assertEqual(commands.length, 2, "OPEN and CLOSE commands are queued");
@@ -336,7 +382,7 @@ test("mt5 v2.2 wire: bridge GET payload extracts action OPEN and CLOSE with exac
     mt5Engine.clearPendingCommands();
     mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "simulated" });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
@@ -464,7 +510,7 @@ test("mt5 v2.2 parity: syncFromEa canonical-alias blocks anti-hedge + 3-stack ca
   } finally {
     closeOpenedPositions([700001]);
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
@@ -507,14 +553,30 @@ test("mt5 v2.2 parity: feedLiveSignalsToMT5 skips stale carryover signals only",
   } finally {
     closeOpenedPositions(ticketsToClose);
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
 test("mt5 v2.2 parity: syncFromEa preserves pre-fill optimistic fills within 15s", () => {
   newsManager.setEvents([]);
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
+    mt5Engine.syncFromEa({
+      balance: 10000,
+      equity: 10000,
+      quoteSymbol: "XAUUSD",
+      bid: 2650,
+      ask: 2650.2,
+      dailyRealizedR: 0,
+      closedTradeCount: 0,
+      consecutiveLosses: 0,
+      positions: [],
+    });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: true });
 
     const signal = v2Signal({
@@ -578,7 +640,7 @@ test("mt5 v2.2 parity: syncFromEa preserves pre-fill optimistic fills within 15s
     closeOpenedPositions(tickets);
     mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "simulated" });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
@@ -646,7 +708,7 @@ test("mt5 v2.2 risk: full $350 risk at $100k (no maxRiskAmount cap); $1k micro-a
     const tickets = mt5Engine.getPositions().map((p) => p.ticket);
     closeOpenedPositions(tickets);
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
 
@@ -682,7 +744,23 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
   newsManager.setEvents([]);
   const ticketsToClose = [];
   try {
-    mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "mql5_ea" });
+    mt5Engine.setCredentials({
+      ...mt5Engine.getCredentials(),
+      bridgeMode: "mql5_ea",
+      login: "50198421",
+      server: "MetaQuotes-Demo",
+    });
+    mt5Engine.syncFromEa({
+      balance: 10000,
+      equity: 10000,
+      quoteSymbol: "XAUUSD",
+      bid: 2650,
+      ask: 2650.2,
+      dailyRealizedR: 0,
+      closedTradeCount: 0,
+      consecutiveLosses: 0,
+      positions: [],
+    });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: true });
     mt5Engine.clearPendingCommands();
 
@@ -710,6 +788,12 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
       balance: 10000,
       equity: 10000,
       leverage: 100,
+      quoteSymbol: "XAUUSD",
+      bid: 2650,
+      ask: 2650.2,
+      dailyRealizedR: 0,
+      closedTradeCount: 0,
+      consecutiveLosses: 0,
       positions: [
         {
           ticket: 800001,
@@ -786,6 +870,6 @@ test("mt5 v2.2 edge: syncFromEa preserves a 2nd same-side optimistic position (c
     mt5Engine.clearPendingCommands();
     mt5Engine.setCredentials({ ...mt5Engine.getCredentials(), bridgeMode: "simulated" });
     mt5Engine.setConfig({ ...DEFAULT_MT5_CONFIG, enabled: false });
-    newsManager.seedRecurringCalendar();
+    newsManager.setEvents([]); // Reset the test calendar without fabricating events.
   }
 });
