@@ -11,7 +11,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs",
-    "test:golden": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs golden"
+    "test:golden": "node --experimental-strip-types --import ./tests/register.mjs tests/run.mjs golden",
+    "generate:golden": "node --experimental-strip-types --import ./tests/register.mjs scripts/generate-golden.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

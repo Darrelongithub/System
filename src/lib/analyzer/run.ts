@@ -15,7 +15,7 @@ import {
 } from "./structure";
 import { ANALYZER_LIVE_OPTIONS } from "./config";
 import { inspectSeriesContract } from "./series-contract";
-import { createPortfolioGate, type PortfolioGate } from "./portfolio-gate";
+import { createPortfolioGate } from "./portfolio-gate";
 import { checkRegimeGate } from "./regime-state";
 import {
   formatContextChannel,
@@ -42,10 +42,17 @@ export interface RunOptions {
    * Restrict evaluation to this subset of strategy ids (e.g. ["turtle"] when
    * running Turtle on its own wider-lookback window). Resolved against the full
    * implementation registry (including legacy Turtle/ORB). When omitted, the
-   * default production set is used: the 8 V2_STRATEGY_IDS plus context tools —
+   * default production set is used: the 30 V2_STRATEGY_IDS plus context tools —
    * Turtle and Opening-Range-Breakout are not included.
    */
   strategyIds?: string[];
+  /**
+   * When true, omits FAIL rows from `analysis.results` (retaining all PASS rows
+   * and still computing exact `perStrategy` failCounts/failReasons in-flight).
+   * Optional memory saver for multi-year (80k+ bar) research backtests; default
+   * false preserves full bar×strategy `results` tables for the UI & test suite.
+   */
+  omitFailResults?: boolean;
   /**
    * When false (default live safety), last candle may be incomplete and is
    * excluded from signal generation. Historical complete series: true.
@@ -167,7 +174,25 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
 
   const enableRegimeGate = options.enableRegimeGate ?? true;
   const enablePortfolioGate = options.enablePortfolioGate ?? true;
+  const omitFailResults = options.omitFailResults ?? false;
   const portfolioGate = createPortfolioGate();
+
+  const passCounts = new Map<string, number>();
+  const failCounts = new Map<string, number>();
+  const failReasonsMap = new Map<string, Map<string, number>>();
+  for (const s of activeStrategies) {
+    passCounts.set(s.id, 0);
+    failCounts.set(s.id, 0);
+    failReasonsMap.set(s.id, new Map());
+  }
+  const recordFail = (strategyId: string, reason: string) => {
+    failCounts.set(strategyId, (failCounts.get(strategyId) ?? 0) + 1);
+    const m = failReasonsMap.get(strategyId)!;
+    m.set(reason, (m.get(reason) ?? 0) + 1);
+  };
+  const recordPass = (strategyId: string) => {
+    passCounts.set(strategyId, (passCounts.get(strategyId) ?? 0) + 1);
+  };
 
   const seriesEndsComplete = options.seriesEndsComplete ?? false;
   const signalLimit = seriesEndsComplete ? candles.length : Math.max(0, candles.length - 1);
@@ -185,6 +210,29 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
     if (candle.index >= signalLimit) continue;
     for (const strategy of activeStrategies) {
       const outcome = strategy.run(ctx, candle.index);
+      // Fast path for FAIL rows: omit undefined optional properties so V8 uses a
+      // compact 8-field hidden class (cuts 37-strategy × 80k-bar heap by >55%).
+      if (outcome.result !== "PASS") {
+        recordFail(strategy.id, outcome.reason);
+        if (!omitFailResults) {
+          const failRow: ResultRow = {
+            strategyId: strategy.id,
+            strategy: strategy.name,
+            index: candle.index,
+            datetime: candle.datetime,
+            result: "FAIL",
+            reason: outcome.reason,
+            trend: candle.trend,
+            htfTrend: candle.htfTrend,
+          };
+          if (outcome.side !== undefined) failRow.side = outcome.side;
+          if (outcome.turtleSystem !== undefined) failRow.turtleSystem = outcome.turtleSystem;
+          if (outcome.orderType !== undefined) failRow.orderType = outcome.orderType;
+          results.push(failRow);
+        }
+        continue;
+      }
+
       const row: ResultRow = {
         strategyId: strategy.id,
         strategy: strategy.name,
@@ -194,10 +242,10 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
         reason: outcome.reason,
         trend: candle.trend,
         htfTrend: candle.htfTrend,
-        side: outcome.side,
-        turtleSystem: outcome.turtleSystem,
-        orderType: outcome.orderType,
       };
+      if (outcome.side !== undefined) row.side = outcome.side;
+      if (outcome.turtleSystem !== undefined) row.turtleSystem = outcome.turtleSystem;
+      if (outcome.orderType !== undefined) row.orderType = outcome.orderType;
 
       if (outcome.result === "PASS") {
         // Step 4: spread + RR are applied only to PASS results.
@@ -307,8 +355,12 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
         } else {
           row.riskMultiplier = 1.0;
         }
+        recordPass(strategy.id);
+        results.push(row);
+      } else {
+        recordFail(strategy.id, row.reason);
+        if (!omitFailResults) results.push(row);
       }
-      results.push(row);
     }
   }
 
@@ -341,16 +393,12 @@ export function runAnalysis(text: string, options: RunOptions = {}): RunOutcome 
   }
 
   const perStrategy = activeStrategies.map((strategy) => {
-    const rows = results.filter((r) => r.strategyId === strategy.id);
-    const reasons = new Map<string, number>();
-    for (const row of rows) {
-      if (row.result === "FAIL") reasons.set(row.reason, (reasons.get(row.reason) ?? 0) + 1);
-    }
+    const reasons = failReasonsMap.get(strategy.id) ?? new Map<string, number>();
     return {
       strategyId: strategy.id,
       strategy: strategy.name,
-      passCount: rows.filter((r) => r.result === "PASS").length,
-      failCount: rows.filter((r) => r.result === "FAIL").length,
+      passCount: passCounts.get(strategy.id) ?? 0,
+      failCount: failCounts.get(strategy.id) ?? 0,
       failReasons: [...reasons.entries()]
         .map(([reason, count]) => ({ reason, count }))
         .sort((a, b) => b.count - a.count || a.reason.localeCompare(b.reason)),

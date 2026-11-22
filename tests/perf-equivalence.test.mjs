@@ -235,7 +235,7 @@ test("equivalence: candlesSinceTrigger equals a naive count to the end of the se
     return n;
   };
   const rows = analysis.analysis.tradePasses;
-  assert(rows.length === 186, "golden trade rows");
+  assert(rows.length === 150, "golden trade rows");
   for (const row of rows) {
     assertEqual(row.candlesSinceTrigger, naive(row.index), `candlesSinceTrigger @ ${row.datetime}`);
   }

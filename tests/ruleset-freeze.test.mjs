@@ -37,23 +37,26 @@ const RULE_FILES = [
   "src/lib/analyzer/regime-state.ts",
   "src/lib/analyzer/portfolio-gate.ts",
   "src/lib/analyzer/strategies/v2-regime-bots.ts",
+  "src/lib/analyzer/strategies/v3-expansion-bots.ts",
   "src/lib/analyzer/math.ts",
   "src/lib/analyzer/status.ts",
   "src/lib/analyzer/structure.ts",
 ];
 
 /**
- * Frozen 2026-11-21 (v2.0: regime-gated ruleset — 8 regime-routed bots behind the
- * Layer 1-4 gates). See logs/v2.0-regime-bots.md.
+ * Frozen 2026-11-21 (v3.0: 30-bot Stage 2A Strict Per-Bot Edge-Zone ruleset —
+ * 8 Core v2.2 bots + 22 certified quantitative expansion bots behind Layer 1-5 gates).
+ * See logs/v3.0-30bot-stage2a.md.
  *
  * These are 16 hex chars of sha256(normalised source). If this test fails, the
  * rules moved: decide, document (`logs/`), then update the value.
  */
 const FROZEN_RULES = {
-  "src/lib/analyzer/run.ts": "8b310641907fffd2",
-  "src/lib/analyzer/regime-state.ts": "39006decfe9983a1",
+  "src/lib/analyzer/run.ts": "b5bfb2a02dde6491",
+  "src/lib/analyzer/regime-state.ts": "757c748620fc43a1",
   "src/lib/analyzer/portfolio-gate.ts": "ee0a1374ce8a1c1a",
-  "src/lib/analyzer/strategies/v2-regime-bots.ts": "ef8f33632b140277",
+  "src/lib/analyzer/strategies/v2-regime-bots.ts": "22903e33c5371454",
+  "src/lib/analyzer/strategies/v3-expansion-bots.ts": "3023276a3eee4262",
   "src/lib/analyzer/math.ts": "72645bc29f6c3318",
   "src/lib/analyzer/status.ts": "aa08a97cb2818d64",
   "src/lib/analyzer/structure.ts": "83670a1bf9fa24bf",
@@ -106,11 +109,11 @@ test("freeze: the shipped configuration and golden lock are pinned", () => {
   assertEqual(MIN_PRODUCTION_BARS, 1000, "production history floor");
 
   const summary = loadGoldenSummary();
-  assertEqual(summary.totals.triggers, 186, "golden triggers");
-  assertEqual(summary.totals.tp, 61, "golden TP");
-  assertEqual(summary.totals.sl, 125, "golden SL");
-  assertEqual(summary.totals.open, 0, "golden OPEN");
-  assert(Math.abs(summary.totals.rSum - 71.25196648041668) < 1e-9, "golden R");
+  assertEqual(summary.totals.triggers, 150, "golden triggers");
+  assertEqual(summary.totals.tp, 56, "golden TP");
+  assertEqual(summary.totals.sl, 93, "golden SL");
+  assertEqual(summary.totals.open, 1, "golden OPEN");
+  assert(Math.abs(summary.totals.rSum - 88.6138566304882) < 1e-9, "golden R");
 
   // The shipped book must be the one the lock describes.
   const shipped = runAnalysis(loadBaselineCsv(), ANALYZER_CERTIFIED_OPTIONS);

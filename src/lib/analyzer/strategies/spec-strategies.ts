@@ -412,7 +412,7 @@ export const ALL_STRATEGY_IMPLEMENTATIONS: StrategyCheck[] = [
 ];
 
 /**
- * Default production strategy set: the 8 regime-routed trade bots plus context diagnostics.
+ * Default production strategy set: the 30 regime-routed trade bots plus context diagnostics.
  * Turtle and Opening-Range-Breakout are intentionally excluded from unfiltered analysis.
  */
 export const SPEC_STRATEGIES: StrategyCheck[] = [...V2_TRADE_STRATEGIES, ...CONTEXT_STRATEGIES];
