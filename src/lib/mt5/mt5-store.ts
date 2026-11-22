@@ -242,7 +242,9 @@ export function feedLiveSignalsToMT5(signals: ResultRow[], symbol: string) {
   let executedCount = 0;
 
   for (const signal of signals) {
-    if (signal.result === "PASS") {
+    // Only auto-dispatch freshly triggered closed-bar setups; stale carryover
+    // rows (candles since trigger > 0) may still be clicked manually.
+    if (signal.result === "PASS" && (signal.candlesSinceTrigger ?? 0) === 0) {
       const res = mt5Engine.handleLiveStrategySignal(signal, symbol);
       if (res?.ok) {
         executedCount++;
