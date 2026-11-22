@@ -1,6 +1,8 @@
 import { runAll } from "./tiny.mjs";
 
 await import("./golden.test.mjs");
+await import("./adversarial-v3-integrity.test.mjs");
+await import("./adversarial-pipeline-feed.test.mjs");
 await import("./math-finiteness.test.mjs");
 await import("./live-final-bar.test.mjs");
 await import("./ema-invalid-seed.test.mjs");

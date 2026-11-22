@@ -77,12 +77,12 @@ export interface ContinuousFailure {
 
 export function analyseContinuous(
   csv: string,
-  options: { seriesEndsComplete?: boolean } = {},
+  options: { seriesEndsComplete?: boolean; omitFailResults?: boolean } = {},
 ): ContinuousAnalysis | ContinuousFailure {
-  const outcome = runAnalysis(
-    csv,
-    (options.seriesEndsComplete ?? true) ? ANALYZER_CERTIFIED_OPTIONS : ANALYZER_LIVE_OPTIONS,
-  );
+  const outcome = runAnalysis(csv, {
+    ...((options.seriesEndsComplete ?? true) ? ANALYZER_CERTIFIED_OPTIONS : ANALYZER_LIVE_OPTIONS),
+    ...(options.omitFailResults ? { omitFailResults: true } : {}),
+  });
   if (!outcome.ok) return { ok: false, error: outcome.error };
 
   const tradeTriggers = outcome.analysis.tradePasses.map(toTrigger);
